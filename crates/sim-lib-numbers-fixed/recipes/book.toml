@@ -1,0 +1,5 @@
+book = "numbers/fixed"
+title = "Numbers Fixed"
+summary = "Fixed-point numeric domain descriptors."
+order = 40
+chapters = ["01-basics"]

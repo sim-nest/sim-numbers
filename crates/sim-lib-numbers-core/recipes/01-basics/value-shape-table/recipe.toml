@@ -1,0 +1,8 @@
+id = "value-shape-table"
+title = "Value shape table"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "core"]
+requires = ["numbers/core", "codec/lisp"]

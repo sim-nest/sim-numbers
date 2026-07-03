@@ -1,0 +1,5 @@
+book = "numbers/complex"
+title = "Numbers Complex"
+summary = "Complex scalar values and arithmetic."
+order = 40
+chapters = ["01-basics"]

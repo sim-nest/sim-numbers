@@ -1,0 +1,45 @@
+
+[workspace]
+resolver = "3"
+members = [
+  "crates/sim-lib-numbers-ad",
+  "crates/sim-lib-numbers-arith",
+  "crates/sim-lib-numbers-bigint",
+  "crates/sim-lib-numbers-bool",
+  "crates/sim-lib-numbers-cas",
+  "crates/sim-lib-numbers-cas-diff",
+  "crates/sim-lib-numbers-cas-eval",
+  "crates/sim-lib-numbers-codec",
+  "crates/sim-lib-numbers-complex",
+  "crates/sim-lib-numbers-core",
+  "crates/sim-lib-numbers-exotic",
+  "crates/sim-lib-numbers-f64",
+  "crates/sim-lib-numbers-fixed",
+  "crates/sim-lib-numbers-float",
+  "crates/sim-lib-numbers-func",
+  "crates/sim-lib-numbers-i64",
+  "crates/sim-lib-numbers-numeric",
+  "crates/sim-lib-numbers-prelude",
+  "crates/sim-lib-numbers-quad",
+  "crates/sim-lib-numbers-rational",
+  "crates/sim-lib-numbers-rk",
+  "crates/sim-lib-numbers-stats",
+  "crates/sim-lib-numbers-tensor",
+  "crates/sim-lib-numbers-tensor-bcast",
+  "crates/sim-lib-numbers-tensor-bit",
+  "crates/sim-lib-numbers-tensor-cmplxf",
+  "crates/sim-lib-numbers-tensor-f64",
+  "crates/sim-lib-numbers-tensor-i64",
+  "crates/sim-lib-numbers-tensor-linalg",
+  "crates/sim-lib-numbers-tensor-rat64",
+  "xtask",
+]
+
+[workspace.package]
+edition = "2024"
+license = "MPL-2.0"
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[workspace.lints.rust]
+unsafe_code = "forbid"

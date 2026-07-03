@@ -1,0 +1,1 @@
+(quote (#(numbers/Cas v1 (+ x 1)) cas/simplify))

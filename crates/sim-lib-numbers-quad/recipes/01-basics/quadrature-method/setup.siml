@@ -1,0 +1,1 @@
+(quote (numbers/quad simpson adaptive integral))

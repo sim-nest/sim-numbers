@@ -1,0 +1,5 @@
+book = "numbers/numeric"
+title = "Numbers Numeric"
+summary = "Numeric methods such as differentiation, integration, and ODE solving."
+order = 40
+chapters = ["01-basics"]

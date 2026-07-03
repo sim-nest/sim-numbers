@@ -1,0 +1,8 @@
+id = "i64-domain"
+title = "I64 domain descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "i64"]
+requires = ["numbers/i64", "codec/lisp"]

@@ -1,0 +1,8 @@
+id = "bool-domain"
+title = "Bool domain descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "bool"]
+requires = ["numbers/bool", "codec/lisp"]

@@ -1,0 +1,5 @@
+book = "numbers/tensor-bit"
+title = "Numbers Tensor Bit"
+summary = "Packed boolean tensor helpers."
+order = 40
+chapters = ["01-basics"]

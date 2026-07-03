@@ -1,0 +1,8 @@
+id = "rational-constructor"
+title = "Rational constructor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "rational", "citizen"]
+requires = ["numbers/rational", "codec/lisp"]

@@ -1,0 +1,5 @@
+book = "numbers/float"
+title = "Numbers Float"
+summary = "Generic floating scalar domain descriptors."
+order = 40
+chapters = ["01-basics"]

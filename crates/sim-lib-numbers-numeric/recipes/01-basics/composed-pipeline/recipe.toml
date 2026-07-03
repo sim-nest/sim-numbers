@@ -1,0 +1,8 @@
+id = "composed-pipeline"
+title = "Composed pipeline"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "numeric", "pipeline", "ode", "quadrature"]
+requires = ["numbers/numeric", "numbers/func", "numbers/rk", "numbers/quad", "codec/lisp"]

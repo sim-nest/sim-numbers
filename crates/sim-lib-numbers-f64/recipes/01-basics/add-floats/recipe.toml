@@ -1,0 +1,11 @@
+id = "add-floats"
+title = "Add floats"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "f64", "arithmetic"]
+requires = ["numbers/f64", "numbers/arith", "codec/lisp"]
+[[expect]]
+form = 0
+result = "3.5"

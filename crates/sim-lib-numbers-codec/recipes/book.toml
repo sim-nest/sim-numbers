@@ -1,0 +1,5 @@
+book = "numbers/codec"
+title = "Numbers Codec"
+summary = "Codec-neutral numeric plugin descriptors."
+order = 40
+chapters = ["01-basics"]

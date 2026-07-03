@@ -1,0 +1,5 @@
+book = "numbers/arith"
+title = "Numbers Arith"
+summary = "Generic arithmetic operators for number domains."
+order = 40
+chapters = ["01-basics"]

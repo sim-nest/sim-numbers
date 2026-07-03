@@ -1,0 +1,8 @@
+id = "symbolic-diff"
+title = "Symbolic differentiation"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "cas", "diff"]
+requires = ["numbers/cas-diff", "codec/lisp"]

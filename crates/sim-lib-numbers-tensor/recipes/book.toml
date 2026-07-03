@@ -1,0 +1,5 @@
+book = "numbers/tensor"
+title = "Numbers Tensor"
+summary = "Generic tensor values and indexing."
+order = 40
+chapters = ["01-basics"]

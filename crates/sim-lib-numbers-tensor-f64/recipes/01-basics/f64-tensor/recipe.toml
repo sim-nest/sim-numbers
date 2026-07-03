@@ -1,0 +1,8 @@
+id = "f64-tensor"
+title = "F64 tensor descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "tensor", "f64"]
+requires = ["numbers/tensor-f64", "codec/lisp"]

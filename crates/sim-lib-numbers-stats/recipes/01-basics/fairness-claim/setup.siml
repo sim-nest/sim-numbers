@@ -1,0 +1,13 @@
+(quote
+  (numbers/stats
+   stats/disparate-impact-claim
+   stats/mean-claim
+   stats/claims
+   reference-selected 80
+   reference-total 100
+   comparison-selected 48
+   comparison-total 80
+   passes-four-fifths false
+   subject stats/disparate-impact
+   predicate fairness-result
+   predicate stats-result))

@@ -1,0 +1,8 @@
+id = "fairness-claim"
+title = "Fairness Claim"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "stats", "fairness", "claim"]
+requires = ["numbers/stats", "numbers/f64", "codec/lisp"]

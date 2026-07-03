@@ -1,0 +1,5 @@
+book = "numbers/i64"
+title = "Numbers I64"
+summary = "I64 scalar values and checked arithmetic."
+order = 40
+chapters = ["01-basics"]

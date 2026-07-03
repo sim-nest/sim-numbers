@@ -1,0 +1,24 @@
+[package]
+name = "sim-lib-numbers-rk"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "SIM workspace package for sim lib numbers rk."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-kernel = { version = "0.1.0" }
+sim-lib-numbers-codec = { version = "0.1.0", path = "../sim-lib-numbers-codec" }
+sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
+sim-lib-numbers-func = { version = "0.1.0", path = "../sim-lib-numbers-func" }
+sim-lib-numbers-numeric = { version = "0.1.0", path = "../sim-lib-numbers-numeric" }
+
+[dev-dependencies]
+sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
+
+[lints]
+workspace = true

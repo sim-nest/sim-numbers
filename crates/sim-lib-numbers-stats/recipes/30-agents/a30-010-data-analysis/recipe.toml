@@ -1,0 +1,24 @@
+id = "a30-010-data-analysis"
+title = "Data analysis agent"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["30-agents", "chapter-08", "data-analysis", "offline", "deterministic", "numbers-stats"]
+requires = ["numbers/stats", "numbers/f64", "codec/lisp"]
+recipe_number = 10
+source_chapter = 8
+architecture_family = "data-analysis"
+runner_mode = "fake"
+safety_posture = "offline"
+capabilities = ["read-eval", "numbers/stats", "ols-fit", "anomaly-detection"]
+descriptor_shape = "data-analysis-report"
+assert_tags = ["30-agents", "chapter-08", "data-analysis", "offline"]
+assert_capabilities = ["read-eval"]
+assert_setup_codec = "lisp"
+assert_descriptor_shape = "data-analysis-report"
+expected = "expected.txt"
+
+[[expect]]
+form = 0
+result = "(data-analysis-report (id a30-010-data-analysis) (table synthetic-demand (row s1 x 1 y 5) (row s2 x 2 y 8) (row s3 x 3 y 11) (row s4 x 4 y 24)) (ols (method f64-normal-equation) (training-rows s1 s2 s3) (intercept 2) (slope 3) (r2 100)) (anomaly-detection (method residual-threshold) (threshold 5) (anomaly (row s4) (expected 14) (actual 24) (residual 10))) (confidence-scored-insights (insight linear-trend confidence 94) (insight investigate-s4 confidence 99)) (answer coefficients-intercept-2-slope-3-anomaly-s4))"

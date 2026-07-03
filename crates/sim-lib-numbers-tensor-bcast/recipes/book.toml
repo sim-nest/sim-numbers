@@ -1,0 +1,5 @@
+book = "numbers/tensor-bcast"
+title = "Numbers Tensor Bcast"
+summary = "Broadcasting helpers for tensor values."
+order = 40
+chapters = ["01-basics"]

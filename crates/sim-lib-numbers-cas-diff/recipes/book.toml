@@ -1,0 +1,5 @@
+book = "numbers/cas-diff"
+title = "Numbers CAS Diff"
+summary = "Symbolic differentiation and integration helpers."
+order = 40
+chapters = ["01-basics"]

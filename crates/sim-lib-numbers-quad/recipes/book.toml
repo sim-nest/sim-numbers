@@ -1,0 +1,5 @@
+book = "numbers/quad"
+title = "Numbers Quad"
+summary = "Quadrature algorithms for numeric integration."
+order = 40
+chapters = ["01-basics"]

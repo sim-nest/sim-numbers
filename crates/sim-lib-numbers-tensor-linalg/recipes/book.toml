@@ -1,0 +1,5 @@
+book = "numbers/tensor-linalg"
+title = "Numbers Tensor Linalg"
+summary = "Linear algebra helpers for tensors."
+order = 40
+chapters = ["01-basics"]

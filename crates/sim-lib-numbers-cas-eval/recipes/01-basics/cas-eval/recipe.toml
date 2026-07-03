@@ -1,0 +1,8 @@
+id = "cas-eval"
+title = "CAS evaluation"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "cas", "eval"]
+requires = ["numbers/cas-eval", "codec/lisp"]

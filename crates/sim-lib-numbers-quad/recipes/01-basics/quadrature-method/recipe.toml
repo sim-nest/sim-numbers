@@ -1,0 +1,8 @@
+id = "quadrature-method"
+title = "Quadrature method"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "quad"]
+requires = ["numbers/quad", "codec/lisp"]

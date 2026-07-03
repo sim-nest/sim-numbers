@@ -1,0 +1,5 @@
+book = "numbers/rk"
+title = "Numbers RK"
+summary = "Runge-Kutta ODE solver methods."
+order = 40
+chapters = ["01-basics"]

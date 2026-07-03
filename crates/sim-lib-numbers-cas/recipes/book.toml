@@ -1,0 +1,5 @@
+book = "numbers/cas"
+title = "Numbers CAS"
+summary = "Symbolic CAS values and simplification."
+order = 40
+chapters = ["01-basics"]

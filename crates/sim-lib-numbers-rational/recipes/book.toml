@@ -1,0 +1,5 @@
+book = "numbers/rational"
+title = "Numbers Rational"
+summary = "Exact rational values and constructor forms."
+order = 40
+chapters = ["01-basics"]

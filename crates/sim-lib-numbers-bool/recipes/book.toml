@@ -1,0 +1,5 @@
+book = "numbers/bool"
+title = "Numbers Bool"
+summary = "Boolean numeric domain and promotion behavior."
+order = 40
+chapters = ["01-basics"]

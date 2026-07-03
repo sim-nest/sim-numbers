@@ -1,0 +1,44 @@
+[package]
+name = "sim-lib-numbers-prelude"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "SIM workspace package for sim lib numbers prelude."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-kernel = { version = "0.1.0" }
+sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
+sim-lib-numbers-bigint = { version = "0.1.0", path = "../sim-lib-numbers-bigint" }
+sim-lib-numbers-bool = { version = "0.1.0", path = "../sim-lib-numbers-bool" }
+sim-lib-numbers-cas = { version = "0.1.0", path = "../sim-lib-numbers-cas" }
+sim-lib-numbers-cas-diff = { version = "0.1.0", path = "../sim-lib-numbers-cas-diff" }
+sim-lib-numbers-cas-eval = { version = "0.1.0", path = "../sim-lib-numbers-cas-eval" }
+sim-lib-numbers-codec = { version = "0.1.0", path = "../sim-lib-numbers-codec" }
+sim-lib-numbers-complex = { version = "0.1.0", path = "../sim-lib-numbers-complex" }
+sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-lib-numbers-exotic = { version = "0.1.0", path = "../sim-lib-numbers-exotic" }
+sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
+sim-lib-numbers-fixed = { version = "0.1.0", path = "../sim-lib-numbers-fixed" }
+sim-lib-numbers-float = { version = "0.1.0", path = "../sim-lib-numbers-float" }
+sim-lib-numbers-func = { version = "0.1.0", path = "../sim-lib-numbers-func" }
+sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
+sim-lib-numbers-numeric = { version = "0.1.0", path = "../sim-lib-numbers-numeric" }
+sim-lib-numbers-quad = { version = "0.1.0", path = "../sim-lib-numbers-quad" }
+sim-lib-numbers-rational = { version = "0.1.0", path = "../sim-lib-numbers-rational" }
+sim-lib-numbers-rk = { version = "0.1.0", path = "../sim-lib-numbers-rk" }
+sim-lib-numbers-stats = { version = "0.1.0", path = "../sim-lib-numbers-stats" }
+sim-lib-numbers-tensor = { version = "0.1.0", path = "../sim-lib-numbers-tensor" }
+sim-lib-numbers-tensor-bcast = { version = "0.1.0", path = "../sim-lib-numbers-tensor-bcast" }
+sim-lib-numbers-tensor-bit = { version = "0.1.0", path = "../sim-lib-numbers-tensor-bit" }
+sim-lib-numbers-tensor-cmplxf = { version = "0.1.0", path = "../sim-lib-numbers-tensor-cmplxf" }
+sim-lib-numbers-tensor-f64 = { version = "0.1.0", path = "../sim-lib-numbers-tensor-f64" }
+sim-lib-numbers-tensor-i64 = { version = "0.1.0", path = "../sim-lib-numbers-tensor-i64" }
+sim-lib-numbers-tensor-linalg = { version = "0.1.0", path = "../sim-lib-numbers-tensor-linalg" }
+sim-lib-numbers-tensor-rat64 = { version = "0.1.0", path = "../sim-lib-numbers-tensor-rat64" }
+
+[lints]
+workspace = true

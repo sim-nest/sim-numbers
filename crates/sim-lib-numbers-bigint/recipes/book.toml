@@ -1,0 +1,5 @@
+book = "numbers/bigint"
+title = "Numbers Bigint"
+summary = "Big integer scalar values and promotion."
+order = 40
+chapters = ["01-basics"]

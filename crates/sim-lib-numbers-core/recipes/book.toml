@@ -1,0 +1,5 @@
+book = "numbers/core"
+title = "Numbers Core"
+summary = "Shared number-domain shapes and helper descriptors."
+order = 40
+chapters = ["01-basics"]

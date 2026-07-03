@@ -1,0 +1,5 @@
+book = "numbers/tensor-cmplxf"
+title = "Numbers Tensor Cmplxf"
+summary = "Complex-cell tensor helpers."
+order = 40
+chapters = ["01-basics"]

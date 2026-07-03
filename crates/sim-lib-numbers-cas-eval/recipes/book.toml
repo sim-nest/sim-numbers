@@ -1,0 +1,5 @@
+book = "numbers/cas-eval"
+title = "Numbers CAS Eval"
+summary = "CAS expression evaluation in numeric environments."
+order = 40
+chapters = ["01-basics"]

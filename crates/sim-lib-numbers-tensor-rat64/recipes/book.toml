@@ -1,0 +1,5 @@
+book = "numbers/tensor-rat64"
+title = "Numbers Tensor Rat64"
+summary = "Rational-cell tensor helpers."
+order = 40
+chapters = ["01-basics"]

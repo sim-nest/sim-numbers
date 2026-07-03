@@ -1,0 +1,5 @@
+book = "numbers/cf"
+title = "Numbers Exotic"
+summary = "Continued-fraction and exotic number-domain descriptors."
+order = 40
+chapters = ["01-basics"]

@@ -1,0 +1,1 @@
+(quote (numbers/float f32 f64 finite-literal))

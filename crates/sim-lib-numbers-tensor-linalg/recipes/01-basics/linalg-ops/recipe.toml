@@ -1,0 +1,8 @@
+id = "linalg-ops"
+title = "Linear algebra ops"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "tensor", "linalg"]
+requires = ["numbers/tensor-linalg", "codec/lisp"]

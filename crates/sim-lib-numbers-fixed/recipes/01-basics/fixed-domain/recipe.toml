@@ -1,0 +1,8 @@
+id = "fixed-domain"
+title = "Fixed domain descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "fixed"]
+requires = ["numbers/fixed", "codec/lisp"]

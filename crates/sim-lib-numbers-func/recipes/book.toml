@@ -1,0 +1,5 @@
+book = "numbers/func"
+title = "Numbers Func"
+summary = "Symbolic and native numeric functions."
+order = 40
+chapters = ["01-basics"]

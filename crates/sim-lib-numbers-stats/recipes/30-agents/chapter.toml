@@ -1,0 +1,4 @@
+title = "30 Agents"
+order = 20
+summary = "Deterministic agent recipes over probability and statistics helpers."
+tags = ["30-agents", "numbers", "stats", "offline"]

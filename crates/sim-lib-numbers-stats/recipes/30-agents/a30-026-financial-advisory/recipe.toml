@@ -1,0 +1,24 @@
+id = "a30-026-financial-advisory"
+title = "Financial advisory agent"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 26
+tags = ["30-agents", "chapter-14", "financial-advisory", "offline", "offline-review-required", "deterministic", "numbers-stats", "compliance"]
+requires = ["numbers/stats", "numbers/fixed", "numbers/rational", "numbers/tensor", "codec/lisp"]
+recipe_number = 26
+source_chapter = 14
+architecture_family = "financial-advisory"
+runner_mode = "fake"
+safety_posture = "offline-review-required"
+capabilities = ["read-eval", "value-at-risk", "volatility", "max-drawdown", "suitability-gate", "effect-ledger"]
+descriptor_shape = "financial-advisory-trace"
+assert_tags = ["30-agents", "chapter-14", "financial-advisory", "offline"]
+assert_capabilities = ["read-eval"]
+assert_setup_codec = "lisp"
+assert_descriptor_shape = "financial-advisory-trace"
+expected = "expected.txt"
+
+[[expect]]
+form = 0
+result = "(financial-advisory-trace (id a30-026-financial-advisory) (metadata (fixture synthetic-price-series) (synthetic-data yes) (not-financial-advice yes) (review-required yes)) (client-profile (risk-tolerance moderate) (horizon-years 12) (liquidity-buffer-months 9)) (money-domain (cash-flow fixed-cents) (return-domain rational-basis-points) (tensor shape-days-8)) (price-series (symbol sim-basket) (currency usd) (close-cents 10000 10120 10050 10240 9900 9820 9950 10080)) (risk-metrics (volatility-bps 1420) (var-95-bps minus-210) (max-drawdown-bps minus-410)) (composite-risk (volatility-score 42) (drawdown-score 36) (var-score 31) (weighted-score 37)) (suitability-gate (capability suitability-review) (max-score 45) (observed-score 37) (result pass)) (concentration-gate (max-position-percent 25) (largest-position-percent 18) (result pass)) (decision eligible-for-advisor-review) (compliance (disclosure not-financial-advice) (advice-status educational-synthetic) (human-approval required-before-trade)) (effect-ledger (effect load-synthetic-prices local) (effect compute-volatility bps-1420) (effect compute-var95 minus-210-bps) (effect compute-max-drawdown minus-410-bps) (effect enforce-suitability pass)))"

@@ -1,0 +1,5 @@
+book = "numbers/prelude"
+title = "Numbers Prelude"
+summary = "Stable installer for the full number stack."
+order = 40
+chapters = ["01-basics"]

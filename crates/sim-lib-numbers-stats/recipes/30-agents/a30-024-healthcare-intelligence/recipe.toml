@@ -1,0 +1,24 @@
+id = "a30-024-healthcare-intelligence"
+title = "Healthcare intelligence agent"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 24
+tags = ["30-agents", "chapter-13", "healthcare-intelligence", "offline", "deterministic", "numbers-stats", "safety"]
+requires = ["numbers/stats", "codec/lisp"]
+recipe_number = 24
+source_chapter = 13
+architecture_family = "healthcare-intelligence"
+runner_mode = "fake"
+safety_posture = "offline-review-required"
+capabilities = ["read-eval", "bayesian-update", "safety-threshold", "review-escalation", "effect-ledger"]
+descriptor_shape = "healthcare-intelligence-trace"
+assert_tags = ["30-agents", "chapter-13", "healthcare-intelligence", "offline"]
+assert_capabilities = ["read-eval"]
+assert_setup_codec = "lisp"
+assert_descriptor_shape = "healthcare-intelligence-trace"
+expected = "expected.txt"
+
+[[expect]]
+form = 0
+result = "(healthcare-intelligence-trace (id a30-024-healthcare-intelligence) (metadata (fixture synthetic-symptom-panel) (synthetic-data yes) (non-medical-advice yes) (review-required yes)) (prior (condition dehydration) (probability 20)) (bayesian-update (evidence dry-mouth likelihood-positive 70 likelihood-negative 20 posterior 47) (evidence dizziness likelihood-positive 60 likelihood-negative 30 posterior 64)) (safety-threshold (minimum-confidence-for-self-serve 85) (posterior 64) (result below-threshold)) (decision escalate-for-clinician-review) (fail-closed (missing-reviewer-capability block) (reason medical-review-required)) (ledger (trace prior-evidence-posterior-threshold-escalate) (audit immutable-synthetic-run)) (effect-ledger (effect load-synthetic-symptoms local) (effect bayesian-update posterior-64) (effect compare-safety-threshold below) (effect require-review escalation)))"

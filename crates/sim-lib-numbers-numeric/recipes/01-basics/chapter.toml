@@ -1,0 +1,3 @@
+title = "Basics"
+order = 10
+summary = "Deterministic numeric-method and composed-pipeline descriptors."

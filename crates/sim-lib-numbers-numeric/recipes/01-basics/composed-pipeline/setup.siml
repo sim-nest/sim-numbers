@@ -1,0 +1,12 @@
+(quote
+  (numbers/numeric
+   numbers/func
+   numeric/compose
+   numeric/run-composed
+   domain ode-solve
+   domain quadrature
+   method rk4
+   method simpson
+   state f64
+   result table
+   result value))

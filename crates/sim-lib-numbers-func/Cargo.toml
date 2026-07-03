@@ -1,0 +1,24 @@
+[package]
+name = "sim-lib-numbers-func"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "SIM workspace package for sim lib numbers func."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-citizen = { version = "0.1.0" }
+sim-citizen-derive = { version = "0.1.0" }
+sim-kernel = { version = "0.1.0" }
+sim-lib-numbers-cas = { version = "0.1.0", path = "../sim-lib-numbers-cas" }
+sim-lib-numbers-cas-eval = { version = "0.1.0", path = "../sim-lib-numbers-cas-eval" }
+sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-shape = { version = "0.1.0" }
+
+[dev-dependencies]
+sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
+sim-lib-numbers-cas-diff = { version = "0.1.0", path = "../sim-lib-numbers-cas-diff" }
+sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }

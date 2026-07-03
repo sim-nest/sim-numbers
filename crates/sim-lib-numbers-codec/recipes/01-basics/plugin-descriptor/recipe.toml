@@ -1,0 +1,8 @@
+id = "plugin-descriptor"
+title = "Numeric plugin descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "codec"]
+requires = ["numbers/codec", "codec/lisp"]

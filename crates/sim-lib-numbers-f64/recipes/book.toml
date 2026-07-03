@@ -1,0 +1,5 @@
+book = "numbers/f64"
+title = "Numbers f64"
+summary = "Floating-point scalar values and arithmetic."
+order = 40
+chapters = ["01-basics"]

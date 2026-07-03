@@ -1,0 +1,5 @@
+book = "numbers/tensor-f64"
+title = "Numbers Tensor F64"
+summary = "F64-specialized tensor helpers."
+order = 40
+chapters = ["01-basics"]

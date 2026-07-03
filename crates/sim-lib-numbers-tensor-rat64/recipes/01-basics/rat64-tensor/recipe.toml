@@ -1,0 +1,8 @@
+id = "rat64-tensor"
+title = "Rat64 tensor descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "tensor", "rational"]
+requires = ["numbers/tensor-rat64", "codec/lisp"]
