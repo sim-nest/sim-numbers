@@ -113,6 +113,65 @@ fn dot_and_eye_surface_work() {
 }
 
 #[test]
+fn zeros_with_oversized_shape_errors_instead_of_oom() {
+    let mut cx = cx();
+    let err = cx
+        .call_function(
+            &Symbol::new("zeros"),
+            Args::new(vec![shape_value(&["1000000000000"])]),
+        )
+        .unwrap_err();
+    let message = err.to_string();
+    assert!(
+        message.contains("cells") && message.contains("exceeding"),
+        "expected a cell-ceiling diagnostic, got: {message}"
+    );
+}
+
+#[test]
+fn det_of_large_matrix_uses_elimination_and_returns_promptly() {
+    let mut cx = cx();
+    // A 20x20 upper-triangular matrix with 2 on the diagonal: determinant is
+    // 2^20 = 1048576. Cofactor expansion would need ~20! operations and hang;
+    // the Bareiss elimination path returns immediately.
+    let n = 20usize;
+    let mut rows = Vec::with_capacity(n);
+    for i in 0..n {
+        let mut row = Vec::with_capacity(n);
+        for j in 0..n {
+            let entry = if i == j {
+                "2"
+            } else if j > i {
+                "1"
+            } else {
+                "0"
+            };
+            row.push(i64_num(entry));
+        }
+        rows.push(cx.factory().list(row).unwrap());
+    }
+    let grid = cx.factory().list(rows).unwrap();
+    let matrix = cx
+        .call_function(&Symbol::new("mat"), Args::new(vec![grid]))
+        .unwrap();
+    let start = std::time::Instant::now();
+    let out = cx
+        .call_function(&Symbol::new("det"), Args::new(vec![matrix]))
+        .unwrap();
+    assert!(
+        start.elapsed() < std::time::Duration::from_secs(5),
+        "det of a 20x20 matrix must return promptly"
+    );
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "1048576".to_owned(),
+        })
+    );
+}
+
+#[test]
 fn symbolic_matmul_yields_symbolic_cells() {
     let mut cx = cx();
     let a = cas_var(&mut cx, "a");

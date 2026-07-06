@@ -4,7 +4,7 @@ use sim_kernel::{
     Args, Cx, DefaultFactory, EagerPolicy, Expr, Factory, NumberLiteral, Symbol,
     read_construct_capability,
 };
-use sim_lib_numbers_tensor::tensor_value_class_symbol;
+use sim_lib_numbers_tensor::{build_tensor_value, tensor_value_class_symbol};
 
 use crate::TensorBroadcastLib;
 
@@ -166,5 +166,37 @@ fn broadcast_ops_accept_tensor_citizen_values() {
                 canonical: "4".to_owned(),
             }),
         ])
+    );
+}
+
+#[test]
+fn broadcast_result_over_cell_ceiling_errors_instead_of_oom() {
+    let mut cx = test_cx();
+    let i64_domain = Symbol::qualified("numbers", "i64");
+    // Two individually-legal operands (~1M cells each) whose broadcast is a
+    // 1e12-cell shape: it fits in usize but must be rejected before the result
+    // is materialized rather than driven into an out-of-memory abort.
+    let cell = number("1");
+    let column = build_tensor_value(
+        &mut cx,
+        vec![1_000_000, 1],
+        Some(i64_domain.clone()),
+        vec![cell.clone(); 1_000_000],
+    )
+    .unwrap();
+    let row = build_tensor_value(
+        &mut cx,
+        vec![1, 1_000_000],
+        Some(i64_domain),
+        vec![cell; 1_000_000],
+    )
+    .unwrap();
+    let err = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![column, row]))
+        .unwrap_err();
+    let message = err.to_string();
+    assert!(
+        message.contains("cells") && message.contains("exceeding"),
+        "expected a cell-ceiling diagnostic, got: {message}"
     );
 }

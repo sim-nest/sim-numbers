@@ -16,10 +16,10 @@ pub use implementation::{
 };
 pub use sim_lib_numbers_core::domains;
 pub use spec::{
-    SpecTensor, SpecTensorDescriptor, checked_element_count, element_count,
-    number_literal_for_tensor_cell, parse_complex_literal_cell, parse_f64_literal_cell,
-    parse_i64_literal_cell, parse_rational_literal_cell, spec_tensor_descriptor_value,
-    spec_tensor_symbol,
+    MAX_TENSOR_CELLS, SpecTensor, SpecTensorDescriptor, bounded_element_count,
+    checked_element_count, element_count, number_literal_for_tensor_cell,
+    parse_complex_literal_cell, parse_f64_literal_cell, parse_i64_literal_cell,
+    parse_rational_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 #[cfg(test)]

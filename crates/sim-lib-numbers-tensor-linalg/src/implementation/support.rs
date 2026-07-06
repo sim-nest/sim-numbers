@@ -109,4 +109,4 @@ pub fn extract_usize(value: &Value, context: &str) -> Result<usize> {
     }
 }
 
-pub use sim_lib_numbers_tensor::element_count;
+pub use sim_lib_numbers_tensor::bounded_element_count;

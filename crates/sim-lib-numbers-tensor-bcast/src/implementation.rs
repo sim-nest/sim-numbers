@@ -7,7 +7,7 @@ use sim_kernel::{
 };
 use sim_lib_numbers_core::domains;
 use sim_lib_numbers_tensor::{
-    Tensor, build_scalar_tensor_value, build_tensor_value, element_count,
+    Tensor, bounded_element_count, build_scalar_tensor_value, build_tensor_value,
     flatten_tensor_scalar_cells, number_domain, tensor_dtype, tensor_value_ref,
 };
 
@@ -143,7 +143,12 @@ fn apply_tensor_binary(cx: &mut Cx, operator: Symbol, left: Value, right: Value)
     let right = tensor_value_ref(&right)
         .ok_or_else(|| Error::Eval("right operand was not a tensor value".to_owned()))?;
     let shape = broadcast_shape(&left.shape, &right.shape)?;
-    let mut cells = Vec::with_capacity(element_count(&shape));
+    // Size and materialize the result from the checked, ceiling-bounded cell
+    // count: a legal pair like [1_000_000, 1] x [1, 1_000_000] broadcasts to a
+    // 1e12-cell shape that fits in usize but would OOM if allocated. Fail closed
+    // before building the coordinate list or the result vector.
+    let cells_len = bounded_element_count(&shape)?;
+    let mut cells = Vec::with_capacity(cells_len);
     for coord in Tensor::coordinates(&shape) {
         let left_cell = select_cell(left, &coord, &shape)?;
         let right_cell = select_cell(right, &coord, &shape)?;

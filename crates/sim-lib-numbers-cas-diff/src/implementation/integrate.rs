@@ -92,7 +92,12 @@ fn integrate_power_of_var(cx: &mut Cx, exponent: i64, var: &Symbol) -> Result<Ca
     if exponent == -1 {
         return Ok(op(Symbol::new("ln"), vec![CasExpr::Var(var.clone())]));
     }
-    let next = exponent + 1;
+    let next = exponent.checked_add(1).ok_or_else(|| {
+        Error::Eval(format!(
+            "{} exponent {exponent} overflows when raised for integration",
+            integrate_sym_symbol()
+        ))
+    })?;
     Ok(op(
         math("mul"),
         vec![

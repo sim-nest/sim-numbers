@@ -6,8 +6,8 @@ use sim_lib_numbers_core::domains;
 use sim_lib_numbers_tensor::{Tensor, build_tensor_value, tensor_dtype};
 
 use super::support::{
-    add, div, element_count, expect_matrix, expect_tensor, expect_vector, extract_optional_symbol,
-    extract_shape, extract_usize, i64_number, mul, neg, pow, sub,
+    add, bounded_element_count, div, expect_matrix, expect_tensor, expect_vector,
+    extract_optional_symbol, extract_shape, extract_usize, i64_number, mul, neg, pow, sub,
 };
 
 pub fn dispatch(cx: &mut sim_kernel::Cx, symbol: &Symbol, values: Vec<Value>) -> Result<Value> {
@@ -292,7 +292,10 @@ fn eye(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         ));
     };
     let n = extract_usize(value, "eye size")?;
-    let mut cells = Vec::with_capacity(n * n);
+    // Bound n*n before allocating: a hostile size overflows the capacity
+    // argument or OOMs long before the identity is built.
+    let count = bounded_element_count(&[n, n])?;
+    let mut cells = Vec::with_capacity(count);
     for row in 0..n {
         for col in 0..n {
             cells.push(if row == col {
@@ -325,9 +328,18 @@ fn fill_tensor(cx: &mut sim_kernel::Cx, values: &[Value], ones: bool) -> Result<
     };
     let shape = extract_shape(cx, shape_value)?;
     let cell = if ones { i64_number(1)? } else { i64_number(0)? };
-    let size = element_count(&shape);
+    // Bound the cell count before allocating: zeros(["1000000000000"]) parses to
+    // a shape whose product fits in usize but would OOM if filled.
+    let size = bounded_element_count(&shape)?;
     build_tensor_value(cx, shape, dtype, vec![cell; size])
 }
+
+/// Above this order the determinant switches from Laplace cofactor expansion
+/// (O(n!)) to fraction-free Gaussian elimination (O(n^3)). Cofactor stays cheap
+/// and allocation-light for tiny matrices; a 7x7 cofactor expansion already
+/// costs 5040 recursive minors and grows factorially, so anything larger must
+/// take the elimination path or it hangs.
+const DET_COFACTOR_MAX: usize = 6;
 
 fn determinant(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
     let n = tensor.shape[0];
@@ -339,26 +351,102 @@ fn determinant(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
             let bc = mul(cx, tensor.data[1].clone(), tensor.data[2].clone())?;
             sub(cx, ad, bc)
         }
-        _ => {
-            let mut acc = None;
-            for col in 0..n {
-                let sign = if col % 2 == 0 {
-                    i64_number(1)?
-                } else {
-                    i64_number(-1)?
-                };
-                let factor = mul(cx, sign, tensor.data[col].clone())?;
-                let minor = minor_tensor(cx, tensor, 0, col)?;
-                let subdet = determinant(cx, &minor)?;
-                let term = mul(cx, factor, subdet)?;
-                acc = Some(match acc {
-                    Some(current) => add(cx, current, term)?,
-                    None => term,
-                });
-            }
-            Ok(acc.unwrap_or(i64_number(0)?))
-        }
+        _ if n <= DET_COFACTOR_MAX => determinant_cofactor(cx, tensor),
+        _ => determinant_bareiss(cx, tensor),
     }
+}
+
+fn determinant_cofactor(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
+    let n = tensor.shape[0];
+    let mut acc = None;
+    for col in 0..n {
+        let sign = if col % 2 == 0 {
+            i64_number(1)?
+        } else {
+            i64_number(-1)?
+        };
+        let factor = mul(cx, sign, tensor.data[col].clone())?;
+        let minor = minor_tensor(cx, tensor, 0, col)?;
+        let subdet = determinant(cx, &minor)?;
+        let term = mul(cx, factor, subdet)?;
+        acc = Some(match acc {
+            Some(current) => add(cx, current, term)?,
+            None => term,
+        });
+    }
+    Ok(acc.unwrap_or(i64_number(0)?))
+}
+
+/// Bareiss fraction-free Gaussian elimination: an O(n^3) determinant that keeps
+/// large matrices tractable where cofactor expansion would hang.
+///
+/// Every division in the recurrence
+/// `M[i][j] <- (M[i][j]*pivot - M[i][k]*M[k][j]) / prev_pivot` is exact -- Bareiss
+/// guarantees a zero remainder -- so on an exact element domain (integers,
+/// rationals) the result stays exact and integer-valued, and even a truncating
+/// integer division would land on the right answer. Floating-point element
+/// domains follow the ordinary numeric path. Row swaps to reach a nonzero pivot
+/// flip the sign; an all-zero pivot column means the matrix is singular
+/// (determinant 0).
+fn determinant_bareiss(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
+    let n = tensor.shape[0];
+    let mut m = tensor.data.clone();
+    let at = |row: usize, col: usize| row * n + col;
+    let mut prev = i64_number(1)?;
+    let mut negate = false;
+    for k in 0..n - 1 {
+        if cell_is_zero(cx, &m[at(k, k)])? {
+            let mut pivot_row = None;
+            for row in (k + 1)..n {
+                if !cell_is_zero(cx, &m[at(row, k)])? {
+                    pivot_row = Some(row);
+                    break;
+                }
+            }
+            let Some(row) = pivot_row else {
+                return i64_number(0);
+            };
+            for col in 0..n {
+                m.swap(at(k, col), at(row, col));
+            }
+            negate = !negate;
+        }
+        let pivot = m[at(k, k)].clone();
+        for i in (k + 1)..n {
+            for j in (k + 1)..n {
+                let scaled = mul(cx, m[at(i, j)].clone(), pivot.clone())?;
+                let cross = mul(cx, m[at(i, k)].clone(), m[at(k, j)].clone())?;
+                let numerator = sub(cx, scaled, cross)?;
+                m[at(i, j)] = div(cx, numerator, prev.clone())?;
+            }
+            m[at(i, k)] = i64_number(0)?;
+        }
+        prev = pivot;
+    }
+    let det = m[at(n - 1, n - 1)].clone();
+    if negate { neg(cx, det) } else { Ok(det) }
+}
+
+/// True when a scalar tensor cell is exactly the number zero. Used only to find
+/// a usable Bareiss pivot; an unrecognized canonical form is treated as nonzero
+/// so a real pivot is never skipped.
+fn cell_is_zero(cx: &mut sim_kernel::Cx, value: &Value) -> Result<bool> {
+    match value.object().as_expr(cx)? {
+        sim_kernel::Expr::Number(literal) => Ok(number_canonical_is_zero(&literal.canonical)),
+        _ => Ok(false),
+    }
+}
+
+fn number_canonical_is_zero(canonical: &str) -> bool {
+    let text = canonical.trim();
+    if let Ok(value) = text.parse::<f64>() {
+        return value == 0.0;
+    }
+    // Rational "num/den" is zero exactly when the numerator is zero.
+    if let Some((num, _)) = text.split_once('/') {
+        return num.trim().parse::<f64>().map(|v| v == 0.0).unwrap_or(false);
+    }
+    false
 }
 
 fn sum_products(cx: &mut sim_kernel::Cx, terms: Vec<(Value, Value)>) -> Result<Value> {

@@ -131,6 +131,41 @@ pub fn checked_element_count(shape: &[usize]) -> Result<usize> {
     })
 }
 
+/// The largest number of cells a tensor operation will materialize in one
+/// allocation. A dimension product can be far below `usize::MAX` and still be
+/// hopeless to allocate (a `[1_000_000, 1_000_000]` broadcast is `1e12` cells);
+/// this ceiling is the line past which the input is rejected rather than driven
+/// into an out-of-memory abort.
+pub const MAX_TENSOR_CELLS: usize = 1 << 28;
+
+/// The number of cells in a tensor of the given shape, failing closed both when
+/// the dimension product overflows `usize` (via [`checked_element_count`]) and
+/// when it exceeds [`MAX_TENSOR_CELLS`].
+///
+/// This is the form to use before sizing an allocation from untrusted
+/// dimensions -- a broadcast result shape, a `zeros`/`ones`/`eye` size -- where a
+/// legal-but-hostile shape whose product still fits in `usize` would otherwise
+/// OOM the process.
+///
+/// # Examples
+///
+/// ```
+/// use sim_lib_numbers_tensor::bounded_element_count;
+///
+/// assert_eq!(bounded_element_count(&[2, 3]).unwrap(), 6); // 2x3 matrix
+/// assert!(bounded_element_count(&[usize::MAX, 2]).is_err()); // overflow
+/// assert!(bounded_element_count(&[1_000_000, 1_000_000]).is_err()); // over ceiling
+/// ```
+pub fn bounded_element_count(shape: &[usize]) -> Result<usize> {
+    let cells = checked_element_count(shape)?;
+    if cells > MAX_TENSOR_CELLS {
+        return Err(sim_kernel::Error::Eval(format!(
+            "tensor shape {shape:?} has {cells} cells, exceeding the {MAX_TENSOR_CELLS}-cell limit"
+        )));
+    }
+    Ok(cells)
+}
+
 /// Extracts the canonical [`NumberLiteral`] of a scalar tensor cell `value`, or
 /// `None` if the value is not a number. Shared backing for the typed
 /// literal-cell parsers below.
