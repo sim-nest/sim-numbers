@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers bigint.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-bigint/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers bigint.
+The numbers/bigint domain: arbitrary-precision integer literals and values, their exact arithmetic, and promotion into rational.

@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers cas diff.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-cas-diff/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers cas diff.
+Symbolic differentiation and integration over the numbers/cas expression tree: the diff and integrate-sym functions plus an extensible registry of per-operator differentiation r.

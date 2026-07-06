@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor cmplxf.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor-cmplxf/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor cmplxf.
+Complex-float tensor specialization: a (real, imag) f64-pair tensor element type and its SpecTensor backend for the complex tensor domain.

@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers f64.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-f64/Cargo.toml`
-- Publish: `false`
-- Targets: `custom-build, lib`
+- Publish: `true`
+- Targets: `cdylib, custom-build, rlib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers f64.
+The numbers/f64 domain: double-precision floating-point literals and values, their scalar arithmetic, and promotion into complex.

@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers rational.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-rational/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers rational.
+The numbers/rational domain: exact rational literals and values built over bigint numerator/denominator pairs, their reduced arithmetic, and promotion edges to and from the inte.

@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers arith.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-arith/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers arith.
+Cross-domain arithmetic: the math/add, math/sub, math/mul, math/div, and reduction entry points that coerce mixed-domain operands through the promotion lattice and route symboli.

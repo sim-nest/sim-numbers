@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor f64.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor-f64/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor f64.
+f64 tensor specialization: a contiguous f64 tensor element type and its SpecTensor backend for the f64 tensor domain.

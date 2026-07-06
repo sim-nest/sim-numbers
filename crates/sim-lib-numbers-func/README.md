@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers func.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-func/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers func.
+Function number domain: callable function values built over CAS or native bodies, with fn, call, and grad operations for the Func domain.

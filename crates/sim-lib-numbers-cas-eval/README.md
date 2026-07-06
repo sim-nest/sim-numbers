@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers cas eval.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-cas-eval/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers cas eval.
+Evaluation of numbers/cas symbolic expressions: the eval-cas function that walks a CasExpr against an environment, in either numeric or symbolic mode, and the surface Expr/CasEx.

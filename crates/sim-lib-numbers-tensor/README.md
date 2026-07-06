@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor.
+The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized.

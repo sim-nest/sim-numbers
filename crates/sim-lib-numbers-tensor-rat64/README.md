@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor rat64.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor-rat64/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor rat64.
+Rational-i64 tensor specialization: a normalized (numerator, denominator) i64-pair tensor element type and its SpecTensor backend for the rational tensor domain.

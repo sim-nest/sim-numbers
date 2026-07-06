@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers ad.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-ad/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers ad.
+Automatic differentiation primitives: forward-mode dual numbers, a reverse-mode evaluation tape, and the Scalarish numeric trait they share.

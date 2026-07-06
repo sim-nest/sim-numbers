@@ -1,0 +1,380 @@
+{
+  "generator": "xtask crate-catalog v1",
+  "package_count": 31,
+  "packages": [
+    {
+      "description": "SIM workspace package for sim lib numbers ad.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-ad/Cargo.toml",
+      "name": "sim-lib-numbers-ad",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-ad/README.md",
+      "root": "crates/sim-lib-numbers-ad",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers arith.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-arith/Cargo.toml",
+      "name": "sim-lib-numbers-arith",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-arith/README.md",
+      "root": "crates/sim-lib-numbers-arith",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers bigint.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-bigint/Cargo.toml",
+      "name": "sim-lib-numbers-bigint",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-bigint/README.md",
+      "root": "crates/sim-lib-numbers-bigint",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers bool.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-bool/Cargo.toml",
+      "name": "sim-lib-numbers-bool",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-bool/README.md",
+      "root": "crates/sim-lib-numbers-bool",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers cas diff.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-cas-diff/Cargo.toml",
+      "name": "sim-lib-numbers-cas-diff",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-cas-diff/README.md",
+      "root": "crates/sim-lib-numbers-cas-diff",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers cas eval.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-cas-eval/Cargo.toml",
+      "name": "sim-lib-numbers-cas-eval",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-cas-eval/README.md",
+      "root": "crates/sim-lib-numbers-cas-eval",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers cas.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-cas/Cargo.toml",
+      "name": "sim-lib-numbers-cas",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-cas/README.md",
+      "root": "crates/sim-lib-numbers-cas",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers codec.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-codec/Cargo.toml",
+      "name": "sim-lib-numbers-codec",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-codec/README.md",
+      "root": "crates/sim-lib-numbers-codec",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers complex.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-complex/Cargo.toml",
+      "name": "sim-lib-numbers-complex",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-complex/README.md",
+      "root": "crates/sim-lib-numbers-complex",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spe.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-core/Cargo.toml",
+      "name": "sim-lib-numbers-core",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-core/README.md",
+      "root": "crates/sim-lib-numbers-core",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers exotic.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-exotic/Cargo.toml",
+      "name": "sim-lib-numbers-exotic",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-exotic/README.md",
+      "root": "crates/sim-lib-numbers-exotic",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers f64.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-f64/Cargo.toml",
+      "name": "sim-lib-numbers-f64",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-f64/README.md",
+      "root": "crates/sim-lib-numbers-f64",
+      "target_kinds": [
+        "cdylib",
+        "custom-build",
+        "rlib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers fixed.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-fixed/Cargo.toml",
+      "name": "sim-lib-numbers-fixed",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-fixed/README.md",
+      "root": "crates/sim-lib-numbers-fixed",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers float.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-float/Cargo.toml",
+      "name": "sim-lib-numbers-float",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-float/README.md",
+      "root": "crates/sim-lib-numbers-float",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers func.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-func/Cargo.toml",
+      "name": "sim-lib-numbers-func",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-func/README.md",
+      "root": "crates/sim-lib-numbers-func",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers i64.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-i64/Cargo.toml",
+      "name": "sim-lib-numbers-i64",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-i64/README.md",
+      "root": "crates/sim-lib-numbers-i64",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers numeric.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-numeric/Cargo.toml",
+      "name": "sim-lib-numbers-numeric",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-numeric/README.md",
+      "root": "crates/sim-lib-numbers-numeric",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers prelude.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-prelude/Cargo.toml",
+      "name": "sim-lib-numbers-prelude",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-prelude/README.md",
+      "root": "crates/sim-lib-numbers-prelude",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers quad.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-quad/Cargo.toml",
+      "name": "sim-lib-numbers-quad",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-quad/README.md",
+      "root": "crates/sim-lib-numbers-quad",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers rational.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-rational/Cargo.toml",
+      "name": "sim-lib-numbers-rational",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-rational/README.md",
+      "root": "crates/sim-lib-numbers-rational",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers rk.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-rk/Cargo.toml",
+      "name": "sim-lib-numbers-rk",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-rk/README.md",
+      "root": "crates/sim-lib-numbers-rk",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "Statistical and probability helpers for the SIM number stack.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-stats/Cargo.toml",
+      "name": "sim-lib-numbers-stats",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-stats/README.md",
+      "root": "crates/sim-lib-numbers-stats",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor bcast.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-bcast/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-bcast",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-bcast/README.md",
+      "root": "crates/sim-lib-numbers-tensor-bcast",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor bit.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-bit/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-bit",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-bit/README.md",
+      "root": "crates/sim-lib-numbers-tensor-bit",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor cmplxf.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-cmplxf/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-cmplxf",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-cmplxf/README.md",
+      "root": "crates/sim-lib-numbers-tensor-cmplxf",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor f64.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-f64",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-f64/README.md",
+      "root": "crates/sim-lib-numbers-tensor-f64",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor i64.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-i64/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-i64",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-i64/README.md",
+      "root": "crates/sim-lib-numbers-tensor-i64",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor linalg.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-linalg/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-linalg",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-linalg/README.md",
+      "root": "crates/sim-lib-numbers-tensor-linalg",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor rat64.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-rat64/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-rat64",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-rat64/README.md",
+      "root": "crates/sim-lib-numbers-tensor-rat64",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for sim lib numbers tensor.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor/Cargo.toml",
+      "name": "sim-lib-numbers-tensor",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor/README.md",
+      "root": "crates/sim-lib-numbers-tensor",
+      "target_kinds": [
+        "lib"
+      ]
+    },
+    {
+      "description": "SIM workspace package for xtask.",
+      "generated_readme": true,
+      "manifest": "xtask/Cargo.toml",
+      "name": "xtask",
+      "publish": "false",
+      "readme": "xtask/README.md",
+      "root": "xtask",
+      "target_kinds": [
+        "bin"
+      ]
+    }
+  ]
+}

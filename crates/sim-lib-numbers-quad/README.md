@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers quad.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-quad/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers quad.
+Quadrature and finite-difference backends for the numeric domain: fixed and adaptive integration rules plus finite-difference differentiators, packaged as a registered numeric p.

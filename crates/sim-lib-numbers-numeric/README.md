@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers numeric.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-numeric/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers numeric.
+Numeric evaluation surface: the numeric domain exposes numeric-diff, integrate, ode-solve, and composed pipelines over a registry of pluggable differentiator, quadrature, and OD.

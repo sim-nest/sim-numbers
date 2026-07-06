@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers complex.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-complex/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers complex.
+The numbers/complex domain: complex literals and values, their arithmetic, and the promotion edges from i64, f64, and rational into the complex sink of the scalar lattice.

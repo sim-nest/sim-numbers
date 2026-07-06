@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers float.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-float/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers float.
+The numbers/f32 domain: single-precision floating-point literals and values, their scalar arithmetic, and promotion into f64.

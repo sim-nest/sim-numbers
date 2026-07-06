@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor bcast.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor-bcast/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor bcast.
+Tensor broadcasting specialization: element-wise binary and unary tensor operations with NumPy-style shape broadcasting and promotion rules.

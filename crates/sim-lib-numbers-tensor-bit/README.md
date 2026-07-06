@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor bit.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor-bit/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor bit.
+Bit-tensor specialization: a packed-word boolean tensor element type and its SpecTensor backend, with bitwise operations over the tensor domain.

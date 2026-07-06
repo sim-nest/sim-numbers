@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers bool.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-bool/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers bool.
+The numbers/bool domain: boolean literals and values as the base of the number-promotion lattice, with edges widening into the integer and float domains.

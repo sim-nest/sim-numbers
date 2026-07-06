@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers tensor linalg.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-tensor-linalg/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers tensor linalg.
+Linear-algebra operations over the tensor domain: dot, matmul, cross, transpose, det, inv, trace, norm, and the eye/zeros/ones constructors, registered as a tensor library.

@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers fixed.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-fixed/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers fixed.
+The fixed-width integer domains (numbers/i8 .. numbers/i128, numbers/u8 .. numbers/u128): their literals, values, and the widening promotion edges through the signed and unsigne.

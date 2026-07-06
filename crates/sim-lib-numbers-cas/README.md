@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers cas.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-cas/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers cas.
+The numbers/cas domain: the core computer-algebra layer. Defines the symbolic expression tree (CasExpr), its value citizen, the conversions to and from surface Expr/Value, and t.

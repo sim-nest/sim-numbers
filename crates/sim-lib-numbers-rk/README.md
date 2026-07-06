@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers rk.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-rk/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers rk.
+Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric ode-solve plugins.

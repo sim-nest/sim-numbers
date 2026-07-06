@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers prelude.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-prelude/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers prelude.
+Umbrella library for the sim-numbers family: NumbersPreludeLib installs the standard number domains and tensor backends (arithmetic, f64/i64/bigint, rational, complex, CAS, func.

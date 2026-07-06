@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers i64.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-i64/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers i64.
+The numbers/i64 domain: 64-bit signed-integer literals and values, their scalar arithmetic, and promotion edges into f64 and rational.

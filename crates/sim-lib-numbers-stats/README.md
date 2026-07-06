@@ -7,9 +7,9 @@ Statistical and probability helpers for the SIM number stack.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-stats/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-Statistical and probability helpers for the SIM number stack.
+Probability, descriptive statistics, and fairness metric helpers for f64 number-domain data.

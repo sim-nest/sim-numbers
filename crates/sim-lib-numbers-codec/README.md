@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers codec.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-codec/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers codec.
+The number-literal codec surface: helpers that build the numeric-plugin-v1 descriptor symbols and table values advertising a numeric codec or method provider to the runtime.

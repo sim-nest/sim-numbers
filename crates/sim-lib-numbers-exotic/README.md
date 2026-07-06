@@ -7,9 +7,9 @@ SIM workspace package for sim lib numbers exotic.
 ## Package Metadata
 
 - Manifest: `crates/sim-lib-numbers-exotic/Cargo.toml`
-- Publish: `false`
+- Publish: `true`
 - Targets: `lib`
 
 ## Crate Documentation
 
-SIM workspace package for sim lib numbers exotic.
+Exotic number domains, currently the lazy continued-fraction domain (numbers/cf): infinite-precision reals carried as continued-fraction coefficient streams, their builtin const.
