@@ -17,6 +17,7 @@ sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 sim-shape = { version = "0.1.0" }
 
 [dev-dependencies]
+sim-kernel = { version = "0.1.0", features = ["test-support"] }
 sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
 sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
 sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
