@@ -1,5 +1,40 @@
 # sim-numbers
 
+A tower of number types -- exact fractions, arbitrary-precision integers,
+complex, symbolic algebra, and n-dimensional tensors -- that add up together
+under one shared arithmetic surface for your Rust runtime.
+
+SIM ships a CLI binary `sim` (`cargo install sim-run`); for the full guided
+walkthrough of the constellation see `sim-say`. The crates below are the number
+**libraries** those runtimes load.
+
+## Example
+
+Add one of the number-domain crates and use it directly. The rational domain
+reduces exact fractions to lowest terms as it parses them:
+
+```bash
+cargo add sim-lib-numbers-rational num-bigint
+```
+
+```rust
+use num_bigint::BigInt;
+use sim_lib_numbers_rational::parse_rational_parts;
+
+// "6/8" parses and reduces to the normalized pair 3/4.
+assert_eq!(
+    parse_rational_parts("6/8"),
+    Some((BigInt::from(3), BigInt::from(4)))
+);
+// A zero denominator is rejected.
+assert_eq!(parse_rational_parts("1/0"), None);
+```
+
+(From the `parse_rational_parts` doctest in
+`crates/sim-lib-numbers-rational/src/implementation/ops.rs:23`.)
+
+## How it works
+
 `sim-numbers` is the number surface of the SIM constellation. SIM is an
 expandable Rust runtime built around a small protocol kernel plus a large set
 of loadable libraries: the kernel defines contracts, libraries provide
