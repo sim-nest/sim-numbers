@@ -1,1 +1,1 @@
-(quote (numbers/bool true false math/add math/mul promotion))
+(math/mul true 6)

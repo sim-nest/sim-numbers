@@ -1,8 +1,11 @@
 id = "bigint-domain"
-title = "Bigint domain descriptor"
+title = "Overflow promotes into bigint"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "bigint"]
-requires = ["numbers/bigint", "codec/lisp"]
+tags = ["numbers", "bigint", "arithmetic", "promotion"]
+requires = ["numbers/bigint", "numbers/arith", "codec/lisp"]
+[[expect]]
+form = 0
+result = "18446744073709551616"

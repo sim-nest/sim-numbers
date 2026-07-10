@@ -1,3 +1,6 @@
-# Tensor constructor
+# Construct a 2x2 integer tensor
 
-This recipe shows the `#(numbers/Tensor v1 (2) (1 2) numbers/i64)` constructor form.
+Build a shaped `2x2` `i64` tensor from its reader form
+`#(numbers/Tensor v1 (2 2) (1 2 3 4) numbers/i64)`. The tensor domain constructs a real
+typed n-dimensional value through read-construct and renders its row structure as
+`((1 2) (3 4))` -- a live shaped value, not a quoted shape descriptor.

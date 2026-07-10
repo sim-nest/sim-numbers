@@ -22,5 +22,9 @@ pub use spec::{
     parse_rational_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
+/// Cookbook recipes for this domain, embedded at build time.
+pub static RECIPES: sim_cookbook::EmbeddedDir =
+    include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));
+
 #[cfg(test)]
 mod tests;

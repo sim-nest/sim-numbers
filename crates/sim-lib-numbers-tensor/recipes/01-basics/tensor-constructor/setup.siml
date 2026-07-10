@@ -1,1 +1,1 @@
-(quote (#(numbers/Tensor v1 (2) (1 2) numbers/i64) index reshape))
+#(numbers/Tensor v1 (2 2) (1 2 3 4) numbers/i64)

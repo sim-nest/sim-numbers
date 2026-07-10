@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-tensor"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MPL-2.0"
 description = "SIM workspace package for sim lib numbers tensor."
@@ -12,6 +12,7 @@ homepage = "https://github.com/sim-nest/sim-numbers"
 [dependencies]
 sim-citizen = { version = "0.1.0" }
 sim-citizen-derive = { version = "0.1.0" }
+sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 sim-shape = { version = "0.1.0" }
@@ -22,3 +23,6 @@ sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
 sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
 sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
 sim-lib-numbers-rational = { version = "0.1.0", path = "../sim-lib-numbers-rational" }
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }

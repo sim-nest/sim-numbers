@@ -1,8 +1,11 @@
 id = "tensor-constructor"
-title = "Tensor constructor"
+title = "Construct a 2x2 integer tensor"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "tensor", "citizen"]
-requires = ["numbers/tensor", "codec/lisp"]
+tags = ["numbers", "tensor", "construct"]
+requires = ["numbers/tensor", "numbers/i64", "codec/lisp"]
+[[expect]]
+form = 0
+result = "((1 2) (3 4))"

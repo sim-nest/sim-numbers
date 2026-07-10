@@ -1,1 +1,1 @@
-(quote (numbers/bigint overflow-promotion exact-int))
+(math/pow 2 64)

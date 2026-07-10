@@ -1,8 +1,11 @@
 id = "i64-domain"
-title = "I64 domain descriptor"
+title = "Add 64-bit integers"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "i64"]
-requires = ["numbers/i64", "codec/lisp"]
+tags = ["numbers", "i64", "arithmetic"]
+requires = ["numbers/i64", "numbers/arith", "codec/lisp"]
+[[expect]]
+form = 0
+result = "21"
