@@ -1,8 +1,11 @@
 id = "rat64-tensor"
-title = "Rat64 tensor descriptor"
+title = "Construct a rational-cell tensor"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "tensor", "rational"]
-requires = ["numbers/tensor-rat64", "codec/lisp"]
+tags = ["numbers", "tensor", "rational", "construct"]
+requires = ["numbers/tensor-rat64", "numbers/tensor", "numbers/rational", "codec/lisp"]
+[[expect]]
+form = 0
+result = "(1/2 2/3)"

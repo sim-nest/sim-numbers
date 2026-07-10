@@ -1,8 +1,6 @@
-# Data Analysis Agent
+# Data-analysis trace (descriptor)
 
-This recipe records deterministic data analysis as SIM data. The setup quotes a
-synthetic table, an ordinary least-squares fit over clean rows, anomaly
-detection for an outlier row, and confidence-scored insights.
-
-The fixture is local and synthetic. It shows how numeric data records drive a
-stable analysis result without prompt-only examples or live data access.
+A deterministic, offline synthetic trace of a data-analysis agent: OLS regression, anomaly
+detection, and confidence-scored insights over a fixture table. It demonstrates the SHAPE
+of the pipeline; the statistical operators run outside the sandbox eval stack, so the
+trace is documented rather than executed live.

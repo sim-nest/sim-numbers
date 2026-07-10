@@ -1,6 +1,5 @@
-# Composed pipeline
+# Composed numeric pipeline (descriptor)
 
-This recipe records the first-class numeric pipeline surface: define a function,
-compose it with `rk4` for ODE solving, run the result, inspect the result table,
-then compose a function with `simpson` for quadrature and compare the numeric
-result.
+This composes several numeric methods (quadrature into an ODE step) into one pipeline.
+The composed solvers iterate outside the sandbox eval stack, so this recipe documents the
+pipeline shape rather than running it live.

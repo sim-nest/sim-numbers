@@ -4,5 +4,5 @@ codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "tensor", "i64"]
+tags = ["numbers", "tensor", "i64", "sandbox-descriptor"]
 requires = ["numbers/tensor-i64", "codec/lisp"]

@@ -1,8 +1,11 @@
 id = "cmplxf-tensor"
-title = "Complex tensor descriptor"
+title = "Construct a complex-cell tensor"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "tensor", "complex"]
-requires = ["numbers/tensor-cmplxf", "codec/lisp"]
+tags = ["numbers", "tensor", "complex", "construct"]
+requires = ["numbers/tensor-cmplxf", "numbers/tensor", "numbers/complex", "codec/lisp"]
+[[expect]]
+form = 0
+result = "(1+2i 3+4i)"

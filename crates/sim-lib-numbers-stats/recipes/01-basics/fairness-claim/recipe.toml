@@ -4,5 +4,5 @@ codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 20
-tags = ["numbers", "stats", "fairness", "claim"]
+tags = ["numbers", "stats", "fairness", "claim", "sandbox-descriptor"]
 requires = ["numbers/stats", "numbers/f64", "codec/lisp"]

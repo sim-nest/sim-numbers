@@ -1,9 +1,6 @@
-# Financial Advisory Agent
+# Financial-advisory trace (descriptor)
 
-This recipe records deterministic financial-advisory screening as SIM data. The
-setup quotes a synthetic price series, fixed-cent and rational basis-point
-domains, volatility, value-at-risk, maximum drawdown, and compliance gates.
-
-The fixture is local and synthetic. It carries not-financial-advice metadata,
-keeps the result educational, and requires human approval before any trade-like
-action.
+A deterministic, offline synthetic trace of a financial-advisory agent: volatility, VaR, and
+drawdown over a synthetic price series, with suitability and concentration gates. Synthetic,
+not financial advice. It demonstrates the pipeline shape; its statistical operators run
+outside the sandbox eval stack, so the trace is documented rather than executed live.

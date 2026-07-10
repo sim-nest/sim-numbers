@@ -4,5 +4,5 @@ codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "float"]
+tags = ["numbers", "float", "sandbox-descriptor"]
 requires = ["numbers/float", "codec/lisp"]
