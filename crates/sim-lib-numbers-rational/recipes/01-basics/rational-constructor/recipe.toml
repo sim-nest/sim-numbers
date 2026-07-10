@@ -1,8 +1,11 @@
 id = "rational-constructor"
-title = "Rational constructor"
+title = "Add exact rationals"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "rational", "citizen"]
-requires = ["numbers/rational", "codec/lisp"]
+tags = ["numbers", "rational", "arithmetic"]
+requires = ["numbers/rational", "numbers/arith", "codec/lisp"]
+[[expect]]
+form = 0
+result = "5/6"

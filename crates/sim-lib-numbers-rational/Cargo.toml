@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-rational"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MPL-2.0"
 description = "SIM workspace package for sim lib numbers rational."
@@ -10,6 +10,7 @@ repository = "https://github.com/sim-nest/sim-numbers"
 homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
+sim-cookbook = { version = "0.1.0" }
 num-bigint = "0.4"
 sim-citizen = { version = "0.1.0" }
 sim-citizen-derive = { version = "0.1.0" }
@@ -25,3 +26,6 @@ sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
 sim-lib-numbers-bigint = { version = "0.1.0", path = "../sim-lib-numbers-bigint" }
 sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
 sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }
