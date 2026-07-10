@@ -1,1 +1,1 @@
-(quote (#(numbers/Complex v1 1.0 2.0) numbers/complex))
+(math/mul #(numbers/Complex v1 0.0 1.0) #(numbers/Complex v1 0.0 1.0))

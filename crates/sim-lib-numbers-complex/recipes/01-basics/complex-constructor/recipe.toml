@@ -1,8 +1,11 @@
 id = "complex-constructor"
-title = "Complex constructor"
+title = "Multiply complex numbers"
 codec = "lisp"
 setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
-tags = ["numbers", "complex", "citizen"]
-requires = ["numbers/complex", "codec/lisp"]
+tags = ["numbers", "complex", "arithmetic"]
+requires = ["numbers/complex", "numbers/arith", "codec/lisp"]
+[[expect]]
+form = 0
+result = "-1+0i"
