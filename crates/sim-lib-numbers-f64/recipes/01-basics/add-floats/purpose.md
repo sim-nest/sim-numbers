@@ -1,4 +1,5 @@
 # Add floats
 
-This recipe checks that the f64 domain and arithmetic surface can add two
-literal values and return a deterministic f64 result.
+Add two f64 literals through the readable `math/add` surface. The f64 domain and
+the arithmetic library compute `1.5 + 2.0` and return the deterministic result
+`3.5`.
