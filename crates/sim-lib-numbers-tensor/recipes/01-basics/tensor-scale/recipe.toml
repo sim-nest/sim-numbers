@@ -1,0 +1,11 @@
+id = "tensor-scale"
+title = "Scale a tensor by a scalar"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "tensor", "compute"]
+requires = ["numbers/tensor", "numbers/tensor-bcast", "numbers/i64", "codec/lisp"]
+[[expect]]
+form = 0
+result = "[6 8]"

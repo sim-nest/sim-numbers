@@ -1,0 +1,1 @@
+(cas/simplify #(numbers/Cas v1 (* 0 x)))

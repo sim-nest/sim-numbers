@@ -1,0 +1,11 @@
+id = "cas-simplify"
+title = "Simplify a symbolic CAS product"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "cas", "symbolic", "compute"]
+requires = ["numbers/cas", "codec/lisp"]
+[[expect]]
+form = 0
+result = "0"
