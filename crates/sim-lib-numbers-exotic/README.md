@@ -8,7 +8,7 @@ SIM workspace package for sim lib numbers exotic.
 
 - Manifest: `crates/sim-lib-numbers-exotic/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 

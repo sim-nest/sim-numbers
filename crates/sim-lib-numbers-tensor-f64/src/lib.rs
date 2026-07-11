@@ -212,6 +212,10 @@ pub fn tensor_spec_symbol() -> Symbol {
     spec_tensor_symbol("f64")
 }
 
+/// Cookbook recipes for this lib, embedded at build time.
+pub static RECIPES: sim_cookbook::EmbeddedDir =
+    include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));
+
 #[cfg(test)]
 mod tests {
     use sim_kernel::Lib;

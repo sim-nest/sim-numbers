@@ -8,7 +8,7 @@ SIM workspace package for sim lib numbers quad.
 
 - Manifest: `crates/sim-lib-numbers-quad/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 

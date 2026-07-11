@@ -8,7 +8,7 @@ SIM workspace package for sim lib numbers prelude.
 
 - Manifest: `crates/sim-lib-numbers-prelude/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 

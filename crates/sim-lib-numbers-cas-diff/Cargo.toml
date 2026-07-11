@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-cas-diff"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MPL-2.0"
 description = "SIM workspace package for sim lib numbers cas diff."
@@ -10,6 +10,7 @@ repository = "https://github.com/sim-nest/sim-numbers"
 homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
+sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-cas = { version = "0.1.0", path = "../sim-lib-numbers-cas" }
 sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
@@ -17,3 +18,6 @@ sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 [dev-dependencies]
 sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
 sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }
