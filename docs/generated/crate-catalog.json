@@ -23,6 +23,7 @@
       "readme": "crates/sim-lib-numbers-arith/README.md",
       "root": "crates/sim-lib-numbers-arith",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -35,6 +36,7 @@
       "readme": "crates/sim-lib-numbers-bigint/README.md",
       "root": "crates/sim-lib-numbers-bigint",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -47,6 +49,7 @@
       "readme": "crates/sim-lib-numbers-bool/README.md",
       "root": "crates/sim-lib-numbers-bool",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -83,6 +86,7 @@
       "readme": "crates/sim-lib-numbers-cas/README.md",
       "root": "crates/sim-lib-numbers-cas",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -107,6 +111,7 @@
       "readme": "crates/sim-lib-numbers-complex/README.md",
       "root": "crates/sim-lib-numbers-complex",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -181,6 +186,7 @@
       "readme": "crates/sim-lib-numbers-func/README.md",
       "root": "crates/sim-lib-numbers-func",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -193,6 +199,7 @@
       "readme": "crates/sim-lib-numbers-i64/README.md",
       "root": "crates/sim-lib-numbers-i64",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -241,6 +248,7 @@
       "readme": "crates/sim-lib-numbers-rational/README.md",
       "root": "crates/sim-lib-numbers-rational",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -301,6 +309,7 @@
       "readme": "crates/sim-lib-numbers-tensor-cmplxf/README.md",
       "root": "crates/sim-lib-numbers-tensor-cmplxf",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -349,6 +358,7 @@
       "readme": "crates/sim-lib-numbers-tensor-rat64/README.md",
       "root": "crates/sim-lib-numbers-tensor-rat64",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -361,6 +371,7 @@
       "readme": "crates/sim-lib-numbers-tensor/README.md",
       "root": "crates/sim-lib-numbers-tensor",
       "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },

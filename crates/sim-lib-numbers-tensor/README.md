@@ -8,7 +8,7 @@ SIM workspace package for sim lib numbers tensor.
 
 - Manifest: `crates/sim-lib-numbers-tensor/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 

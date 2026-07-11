@@ -34,6 +34,9 @@
     "crates/sim-lib-numbers-cas/recipes/01-basics/cas-constructor/purpose.md",
     "crates/sim-lib-numbers-cas/recipes/01-basics/cas-constructor/recipe.toml",
     "crates/sim-lib-numbers-cas/recipes/01-basics/cas-constructor/setup.siml",
+    "crates/sim-lib-numbers-cas/recipes/01-basics/cas-simplify/purpose.md",
+    "crates/sim-lib-numbers-cas/recipes/01-basics/cas-simplify/recipe.toml",
+    "crates/sim-lib-numbers-cas/recipes/01-basics/cas-simplify/setup.siml",
     "crates/sim-lib-numbers-cas/recipes/01-basics/chapter.toml",
     "crates/sim-lib-numbers-cas/recipes/book.toml",
     "crates/sim-lib-numbers-codec/recipes/01-basics/chapter.toml",
@@ -173,6 +176,9 @@
     "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/purpose.md",
     "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml",
     "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/setup.siml",
+    "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/purpose.md",
+    "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/recipe.toml",
+    "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/setup.siml",
     "crates/sim-lib-numbers-tensor/recipes/book.toml"
   ]
 }

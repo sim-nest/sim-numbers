@@ -8,7 +8,7 @@ SIM workspace package for sim lib numbers bigint.
 
 - Manifest: `crates/sim-lib-numbers-bigint/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 
