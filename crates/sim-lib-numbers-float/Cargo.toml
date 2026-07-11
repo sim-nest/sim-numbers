@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-float"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 license = "MPL-2.0"
 description = "SIM workspace package for sim lib numbers float."
@@ -10,7 +10,11 @@ repository = "https://github.com/sim-nest/sim-numbers"
 homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
+sim-cookbook = { version = "0.1.0" }
 sim-citizen-derive = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 sim-shape = { version = "0.1.0" }
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }

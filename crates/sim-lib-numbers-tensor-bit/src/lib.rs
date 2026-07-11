@@ -36,3 +36,6 @@
 mod bit_tensor;
 
 pub use bit_tensor::{BitTensor, BitTensorLib, tensor_lib_symbol, tensor_spec_symbol};
+/// Cookbook recipes for this lib, embedded at build time.
+pub static RECIPES: sim_cookbook::EmbeddedDir =
+    include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));

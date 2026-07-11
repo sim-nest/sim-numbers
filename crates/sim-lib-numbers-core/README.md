@@ -8,7 +8,7 @@ Shared substrate for scalar number domains: the number-value shape and browse ta
 
 - Manifest: `crates/sim-lib-numbers-core/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 

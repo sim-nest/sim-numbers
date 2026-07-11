@@ -8,7 +8,7 @@ SIM workspace package for sim lib numbers cas eval.
 
 - Manifest: `crates/sim-lib-numbers-cas-eval/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 

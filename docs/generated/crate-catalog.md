@@ -6,34 +6,34 @@ Generated from Cargo metadata by `xtask crate-catalog v1`.
 
 | Package | Publish | Targets | Description |
 | --- | --- | --- | --- |
-| `sim-lib-numbers-ad` | `true` | `lib` | SIM workspace package for sim lib numbers ad. |
+| `sim-lib-numbers-ad` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers ad. |
 | `sim-lib-numbers-arith` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers arith. |
 | `sim-lib-numbers-bigint` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers bigint. |
 | `sim-lib-numbers-bool` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers bool. |
-| `sim-lib-numbers-cas-diff` | `true` | `lib` | SIM workspace package for sim lib numbers cas diff. |
-| `sim-lib-numbers-cas-eval` | `true` | `lib` | SIM workspace package for sim lib numbers cas eval. |
+| `sim-lib-numbers-cas-diff` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers cas diff. |
+| `sim-lib-numbers-cas-eval` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers cas eval. |
 | `sim-lib-numbers-cas` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers cas. |
-| `sim-lib-numbers-codec` | `true` | `lib` | SIM workspace package for sim lib numbers codec. |
+| `sim-lib-numbers-codec` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers codec. |
 | `sim-lib-numbers-complex` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers complex. |
-| `sim-lib-numbers-core` | `true` | `lib` | Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spe. |
-| `sim-lib-numbers-exotic` | `true` | `lib` | SIM workspace package for sim lib numbers exotic. |
+| `sim-lib-numbers-core` | `true` | `custom-build, lib` | Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spe. |
+| `sim-lib-numbers-exotic` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers exotic. |
 | `sim-lib-numbers-f64` | `true` | `cdylib, custom-build, rlib` | SIM workspace package for sim lib numbers f64. |
-| `sim-lib-numbers-fixed` | `true` | `lib` | SIM workspace package for sim lib numbers fixed. |
-| `sim-lib-numbers-float` | `true` | `lib` | SIM workspace package for sim lib numbers float. |
+| `sim-lib-numbers-fixed` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers fixed. |
+| `sim-lib-numbers-float` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers float. |
 | `sim-lib-numbers-func` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers func. |
 | `sim-lib-numbers-i64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers i64. |
-| `sim-lib-numbers-numeric` | `true` | `lib` | SIM workspace package for sim lib numbers numeric. |
-| `sim-lib-numbers-prelude` | `true` | `lib` | SIM workspace package for sim lib numbers prelude. |
-| `sim-lib-numbers-quad` | `true` | `lib` | SIM workspace package for sim lib numbers quad. |
+| `sim-lib-numbers-numeric` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers numeric. |
+| `sim-lib-numbers-prelude` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers prelude. |
+| `sim-lib-numbers-quad` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers quad. |
 | `sim-lib-numbers-rational` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers rational. |
-| `sim-lib-numbers-rk` | `true` | `lib` | SIM workspace package for sim lib numbers rk. |
-| `sim-lib-numbers-stats` | `true` | `lib` | Statistical and probability helpers for the SIM number stack. |
-| `sim-lib-numbers-tensor-bcast` | `true` | `lib` | SIM workspace package for sim lib numbers tensor bcast. |
-| `sim-lib-numbers-tensor-bit` | `true` | `lib` | SIM workspace package for sim lib numbers tensor bit. |
+| `sim-lib-numbers-rk` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers rk. |
+| `sim-lib-numbers-stats` | `true` | `custom-build, lib` | Statistical and probability helpers for the SIM number stack. |
+| `sim-lib-numbers-tensor-bcast` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor bcast. |
+| `sim-lib-numbers-tensor-bit` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor bit. |
 | `sim-lib-numbers-tensor-cmplxf` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor cmplxf. |
-| `sim-lib-numbers-tensor-f64` | `true` | `lib` | SIM workspace package for sim lib numbers tensor f64. |
-| `sim-lib-numbers-tensor-i64` | `true` | `lib` | SIM workspace package for sim lib numbers tensor i64. |
-| `sim-lib-numbers-tensor-linalg` | `true` | `lib` | SIM workspace package for sim lib numbers tensor linalg. |
+| `sim-lib-numbers-tensor-f64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor f64. |
+| `sim-lib-numbers-tensor-i64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor i64. |
+| `sim-lib-numbers-tensor-linalg` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor linalg. |
 | `sim-lib-numbers-tensor-rat64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor rat64. |
 | `sim-lib-numbers-tensor` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor. |
 | `xtask` | `false` | `bin` | SIM workspace package for xtask. |

@@ -8,7 +8,7 @@ Statistical and probability helpers for the SIM number stack.
 
 - Manifest: `crates/sim-lib-numbers-stats/Cargo.toml`
 - Publish: `true`
-- Targets: `lib`
+- Targets: `custom-build, lib`
 
 ## Crate Documentation
 
