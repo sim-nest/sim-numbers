@@ -194,7 +194,7 @@ fn diff_dispatch(
     opts: DiffOpts,
 ) -> Result<Value> {
     let func = expect_unary_func(&func_value, &var)?;
-    if opts.method == Symbol::new("auto") && func.body_cas.is_some() {
+    if opts.method == Symbol::new("auto") && func.body_cas().is_some() {
         let derivative = cx.call_function(
             &Symbol::new("diff"),
             Args::new(vec![func_value.clone(), cx.factory().symbol(var.clone())?]),

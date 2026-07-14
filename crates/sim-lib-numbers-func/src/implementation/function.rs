@@ -11,7 +11,7 @@ use sim_kernel::{
 use sim_lib_numbers_cas::{cas_expr_to_surface_expr, expr_to_cas_expr};
 
 use super::domain::{func_class_symbol, value_shape_symbol};
-use super::value::{Func, FuncMetadata, build_func_value};
+use super::value::{Func, build_func_value};
 
 /// Returns the symbol bound to the `fn` function-builder callable.
 ///
@@ -80,10 +80,7 @@ impl Callable for FnBuilder {
         let vars = parse_vars_expr(vars_expr)?;
         let body_cas = expr_to_cas_expr(cx, body_expr)?
             .ok_or_else(|| Error::Eval("fn body must be CAS-compatible".to_owned()))?;
-        build_func_value(
-            cx,
-            Func::new(vars, Some(body_cas), None, FuncMetadata::default()),
-        )
+        build_func_value(cx, Func::symbolic(vars, body_cas))
     }
 }
 
@@ -237,10 +234,7 @@ impl Callable for FuncValueClass {
         let body_expr = body_value.object().as_expr(cx)?;
         let body_cas = expr_to_cas_expr(cx, &body_expr)?
             .ok_or_else(|| Error::Eval("numbers/Func body must be CAS-compatible".to_owned()))?;
-        build_func_value(
-            cx,
-            Func::new(vars, Some(body_cas), None, FuncMetadata::default()),
-        )
+        build_func_value(cx, Func::symbolic(vars, body_cas))
     }
 }
 
@@ -290,7 +284,7 @@ impl ReadConstructor for FuncValueClass {
 
 impl ObjectEncode for Func {
     fn object_encoding(&self, cx: &mut Cx) -> Result<ObjectEncoding> {
-        let Some(body_cas) = &self.body_cas else {
+        let Some(body_cas) = self.body_cas() else {
             return Err(Error::Eval(
                 "native-only functions do not have a read-construct encoding".to_owned(),
             ));

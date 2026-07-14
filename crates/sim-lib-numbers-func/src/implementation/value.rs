@@ -1,5 +1,5 @@
-//! The `Func` function value: variables plus an optional CAS or native body,
-//! with its metadata and arithmetic over function values.
+//! The `Func` function value: variables plus a labelled CAS/native body, with
+//! its metadata and arithmetic over function values.
 
 use std::{any::Any, sync::Arc};
 
@@ -31,33 +31,29 @@ pub struct FuncMetadata {
     pub payload: Option<Value>,
 }
 
+#[derive(Clone)]
+enum FuncBody {
+    Symbolic(CasExpr),
+    Native(NativeFn),
+    Dual { cas: CasExpr, native: NativeFn },
+}
+
 /// A callable function value in the `Func` number domain: its bound variables
-/// plus an optional symbolic (CAS) body and/or native body.
+/// plus one labelled symbolic, native, or internal dual body.
 #[derive(Clone)]
 pub struct Func {
     /// The ordered parameter symbols bound when the function is invoked.
     pub vars: Vec<Symbol>,
-    /// The symbolic body, when the function can be expressed as a CAS expression.
-    pub body_cas: Option<CasExpr>,
-    /// The native body, used when no symbolic body is available.
-    pub body_native: Option<NativeFn>,
+    body: FuncBody,
     /// Out-of-band metadata describing the function.
     pub metadata: FuncMetadata,
 }
 
 impl Func {
-    /// Builds a function from its variables, optional symbolic and native
-    /// bodies, and metadata.
-    pub fn new(
-        vars: Vec<Symbol>,
-        body_cas: Option<CasExpr>,
-        body_native: Option<NativeFn>,
-        metadata: FuncMetadata,
-    ) -> Self {
+    fn new(vars: Vec<Symbol>, body: FuncBody, metadata: FuncMetadata) -> Self {
         Self {
             vars,
-            body_cas,
-            body_native,
+            body,
             metadata,
         }
     }
@@ -69,7 +65,7 @@ impl Func {
 
     /// Builds a function with a symbolic (CAS) body and caller-supplied metadata.
     pub fn symbolic_with(vars: Vec<Symbol>, body_cas: CasExpr, metadata: FuncMetadata) -> Self {
-        Self::new(vars, Some(body_cas), None, metadata)
+        Self::new(vars, FuncBody::Symbolic(body_cas), metadata)
     }
 
     /// Builds a function with a native (Rust closure) body and default metadata.
@@ -86,8 +82,8 @@ impl Func {
     ///     Arc::new(|_cx, args| Ok(args[0].clone())),
     /// );
     /// assert_eq!(func.vars, vec![Symbol::new("x")]);
-    /// assert!(func.body_cas.is_none());
-    /// assert!(func.body_native.is_some());
+    /// assert!(func.body_cas().is_none());
+    /// assert!(func.is_native());
     /// ```
     pub fn native(vars: Vec<Symbol>, body_native: NativeFn) -> Self {
         Self::native_with(vars, body_native, FuncMetadata::default())
@@ -95,12 +91,45 @@ impl Func {
 
     /// Builds a function with a native body and caller-supplied metadata.
     pub fn native_with(vars: Vec<Symbol>, body_native: NativeFn, metadata: FuncMetadata) -> Self {
-        Self::new(vars, None, Some(body_native), metadata)
+        Self::new(vars, FuncBody::Native(body_native), metadata)
+    }
+
+    /// Builds an internal dual-body function whose native body is derived from
+    /// the same operation as the symbolic body.
+    pub(crate) fn dual_with(
+        vars: Vec<Symbol>,
+        body_cas: CasExpr,
+        body_native: NativeFn,
+        metadata: FuncMetadata,
+    ) -> Self {
+        Self::new(
+            vars,
+            FuncBody::Dual {
+                cas: body_cas,
+                native: body_native,
+            },
+            metadata,
+        )
     }
 
     /// Returns the symbolic body advertised by this function, when available.
     pub fn body_cas(&self) -> Option<&CasExpr> {
-        self.body_cas.as_ref()
+        match &self.body {
+            FuncBody::Symbolic(body) | FuncBody::Dual { cas: body, .. } => Some(body),
+            FuncBody::Native(_) => None,
+        }
+    }
+
+    fn body_native(&self) -> Option<&NativeFn> {
+        match &self.body {
+            FuncBody::Native(body) | FuncBody::Dual { native: body, .. } => Some(body),
+            FuncBody::Symbolic(_) => None,
+        }
+    }
+
+    /// Returns whether this function carries a native body.
+    pub fn is_native(&self) -> bool {
+        self.body_native().is_some()
     }
 
     fn invoke(&self, cx: &mut Cx, args: &[Value]) -> Result<Value> {
@@ -111,14 +140,12 @@ impl Func {
                 args.len()
             )));
         }
-        if let Some(body_native) = &self.body_native {
+        if let Some(body_native) = self.body_native() {
             return body_native(cx, args);
         }
-        let Some(body_cas) = &self.body_cas else {
-            return Err(Error::Eval(
-                "function has neither symbolic nor native body".to_owned(),
-            ));
-        };
+        let body_cas = self
+            .body_cas()
+            .expect("FuncBody always contains a symbolic or native body");
         let env = child_env_with_args(cx.env(), &self.vars, args)?;
         cx.with_env(env.clone(), |cx| eval_cas(cx, body_cas, &env))
     }
@@ -126,7 +153,7 @@ impl Func {
 
 impl Object for Func {
     fn display(&self, cx: &mut Cx) -> Result<String> {
-        if let Some(body_cas) = &self.body_cas {
+        if let Some(body_cas) = self.body_cas() {
             return Ok(format!(
                 "#<func {:?} -> {:?}>",
                 self.vars,
@@ -152,7 +179,7 @@ impl sim_kernel::ObjectCompat for Func {
         )
     }
     fn as_expr(&self, cx: &mut Cx) -> Result<Expr> {
-        let Some(body_cas) = &self.body_cas else {
+        let Some(body_cas) = self.body_cas() else {
             return Ok(Expr::Extension {
                 tag: func_class_symbol(),
                 payload: Box::new(Expr::String("#<native-func>".to_owned())),
@@ -175,17 +202,16 @@ impl sim_kernel::ObjectCompat for Func {
                 .collect::<Result<Vec<_>>>()?,
         )?;
         let body_expr = self
-            .body_cas
-            .as_ref()
+            .body_cas()
             .map(|body| cas_expr_to_surface_expr(cx, body))
             .transpose()?;
-        let body = match &self.body_cas {
+        let body = match self.body_cas() {
             Some(_) => cx
                 .factory()
                 .expr(body_expr.expect("body expr should exist when body_cas is present"))?,
             None => cx.factory().nil()?,
         };
-        let native = cx.factory().bool(self.body_native.is_some())?;
+        let native = cx.factory().bool(self.is_native())?;
         cx.factory().table(vec![
             (Symbol::new("kind"), cx.factory().string("func".to_owned())?),
             (Symbol::new("vars"), vars),
@@ -252,15 +278,7 @@ pub fn build_func_value(cx: &mut Cx, func: Func) -> Result<Value> {
 }
 
 pub(crate) fn build_constant_func_value(cx: &mut Cx, value: Value) -> Result<Value> {
-    build_func_value(
-        cx,
-        Func::new(
-            Vec::new(),
-            Some(CasExpr::Num(value)),
-            None,
-            FuncMetadata::default(),
-        ),
-    )
+    build_func_value(cx, Func::symbolic(Vec::new(), CasExpr::Num(value)))
 }
 
 pub(crate) fn register_value_ops(linker: &mut sim_kernel::Linker<'_>) {
@@ -346,7 +364,7 @@ fn apply_binary_func_op(cx: &mut Cx, operator: Symbol, left: Value, right: Value
         .clone();
     let vars = union_vars(&left_func.vars, &right_func.vars);
     let closure_vars = vars.clone();
-    let body_cas = match (&left_func.body_cas, &right_func.body_cas) {
+    let body_cas = match (left_func.body_cas(), right_func.body_cas()) {
         (Some(left_body), Some(right_body)) => Some(simplify_expr(
             cx,
             CasExpr::Op(
@@ -363,11 +381,11 @@ fn apply_binary_func_op(cx: &mut Cx, operator: Symbol, left: Value, right: Value
         let right_value = right_func.invoke(cx, &right_args)?;
         cx.apply_value_number_binary_op(&operator, left_value, right_value)
     });
-    let body_native = body_cas.is_none().then_some(native);
-    build_func_value(
-        cx,
-        Func::new(vars, body_cas, body_native, FuncMetadata::default()),
-    )
+    let func = match body_cas {
+        Some(body_cas) => Func::dual_with(vars, body_cas, native, FuncMetadata::default()),
+        None => Func::native(vars, native),
+    };
+    build_func_value(cx, func)
 }
 
 fn apply_unary_func_op(cx: &mut Cx, value: Value) -> Result<Value> {
@@ -377,8 +395,8 @@ fn apply_unary_func_op(cx: &mut Cx, value: Value) -> Result<Value> {
         .ok_or_else(|| Error::Eval("operand was not a function value".to_owned()))?
         .clone();
     let body_cas = func
-        .body_cas
-        .clone()
+        .body_cas()
+        .cloned()
         .map(|body| {
             simplify_expr(
                 cx,
@@ -391,16 +409,13 @@ fn apply_unary_func_op(cx: &mut Cx, value: Value) -> Result<Value> {
         let out = native_func.invoke(cx, args)?;
         cx.apply_value_number_unary_op(&Symbol::qualified("math", "neg"), out)
     });
-    let body_native = body_cas.is_none().then_some(native);
-    build_func_value(
-        cx,
-        Func::new(
-            func.vars.clone(),
-            body_cas,
-            body_native,
-            FuncMetadata::default(),
-        ),
-    )
+    let func = match body_cas {
+        Some(body_cas) => {
+            Func::dual_with(func.vars.clone(), body_cas, native, FuncMetadata::default())
+        }
+        None => Func::native(func.vars.clone(), native),
+    };
+    build_func_value(cx, func)
 }
 
 fn union_vars(left: &[Symbol], right: &[Symbol]) -> Vec<Symbol> {
