@@ -54,7 +54,7 @@ fn fixture_value(cx: &mut Cx, args: Args, symbol: &Symbol, expr: Expr) -> Result
 }
 
 fn data_analysis_report() -> Expr {
-    let number = domains::f64();
+    let number = domains::i64();
     list(vec![
         sym("data-analysis-report"),
         atoms(&number, &["id", "a30-010-data-analysis"]),
@@ -99,7 +99,7 @@ fn data_analysis_report() -> Expr {
 }
 
 fn healthcare_intelligence_trace() -> Expr {
-    let number = domains::f64();
+    let number = domains::i64();
     list(vec![
         sym("healthcare-intelligence-trace"),
         atoms(&number, &["id", "a30-024-healthcare-intelligence"]),
@@ -110,10 +110,11 @@ fn healthcare_intelligence_trace() -> Expr {
             atoms(&number, &["non-medical-advice", "yes"]),
             atoms(&number, &["review-required", "yes"]),
         ]),
-        atoms(
-            &number,
-            &["prior", "condition", "dehydration", "probability", "20"],
-        ),
+        list(vec![
+            sym("prior"),
+            atoms(&number, &["condition", "dehydration"]),
+            atoms(&number, &["probability", "20"]),
+        ]),
         list(vec![
             sym("bayesian-update"),
             atoms(
@@ -197,25 +198,25 @@ fn financial_advisory_trace() -> Expr {
             atoms(&number, &["return-domain", "rational-basis-points"]),
             atoms(&number, &["tensor", "shape-days-8"]),
         ]),
-        atoms(
-            &number,
-            &[
-                "price-series",
-                "symbol",
-                "sim-basket",
-                "currency",
-                "usd",
-                "close-cents",
-                "10000",
-                "10120",
-                "10050",
-                "10240",
-                "9900",
-                "9820",
-                "9950",
-                "10080",
-            ],
-        ),
+        list(vec![
+            sym("price-series"),
+            atoms(&number, &["symbol", "sim-basket"]),
+            atoms(&number, &["currency", "usd"]),
+            atoms(
+                &number,
+                &[
+                    "close-cents",
+                    "10000",
+                    "10120",
+                    "10050",
+                    "10240",
+                    "9900",
+                    "9820",
+                    "9950",
+                    "10080",
+                ],
+            ),
+        ]),
         list(vec![
             sym("risk-metrics"),
             atoms(&number, &["volatility-bps", "1420"]),
@@ -264,7 +265,7 @@ fn financial_advisory_trace() -> Expr {
 }
 
 fn education_intelligence_trace() -> Expr {
-    let number = domains::f64();
+    let number = domains::i64();
     list(vec![
         sym("education-intelligence-trace"),
         atoms(&number, &["id", "a30-028-education-intelligence"]),
