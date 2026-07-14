@@ -5,4 +5,4 @@ setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
 tags = ["numbers", "cas", "eval", "sandbox-descriptor"]
-requires = ["numbers/cas-eval", "codec/lisp"]
+requires = ["numbers/cas-eval", "numbers/cas", "numbers/i64", "numbers/arith", "codec/lisp"]

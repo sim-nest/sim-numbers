@@ -1,1 +1,5 @@
-(quote (numbers/core value-shape number-domain table))
+(expr:map
+  [kind "number-domain-table"]
+  [domain numbers/i64]
+  [value-shape numbers/i64-value]
+  [literal-class numbers/i64-literal])

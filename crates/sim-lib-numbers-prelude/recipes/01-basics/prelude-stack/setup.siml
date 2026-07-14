@@ -1,1 +1,4 @@
-(quote (numbers/prelude load-all deterministic-stack))
+(expr:map
+  [kind "numbers-prelude"]
+  [installs [numbers/arith numbers/f64 numbers/i64 numbers/numeric numbers/tensor]]
+  [mode deterministic-stack])

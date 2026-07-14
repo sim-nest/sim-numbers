@@ -5,4 +5,4 @@ setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
 tags = ["numbers", "exotic", "cf", "sandbox-descriptor"]
-requires = ["numbers/cf", "codec/lisp"]
+requires = ["numbers/cf", "numbers/f64", "numbers/i64", "codec/lisp"]

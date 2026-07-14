@@ -1,1 +1,1 @@
-(quote (#(numbers/Tensor v1 (2) (8 13) numbers/i64) checked-add-scalar))
+numbers/tensor-spec/i64

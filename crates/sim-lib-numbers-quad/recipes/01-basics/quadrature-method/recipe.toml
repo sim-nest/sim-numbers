@@ -5,4 +5,4 @@ setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
 tags = ["numbers", "quad", "sandbox-descriptor"]
-requires = ["numbers/quad", "codec/lisp"]
+requires = ["numbers/quad", "numbers/numeric", "numbers/func", "numbers/f64", "numbers/arith", "codec/lisp"]

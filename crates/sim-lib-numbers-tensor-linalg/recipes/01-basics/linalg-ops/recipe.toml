@@ -5,4 +5,4 @@ setup = "setup.siml"
 purpose = "purpose.md"
 order = 10
 tags = ["numbers", "tensor", "linalg", "sandbox-descriptor"]
-requires = ["numbers/tensor-linalg", "codec/lisp"]
+requires = ["numbers/tensor-linalg", "numbers/tensor", "numbers/i64", "numbers/arith", "codec/lisp"]

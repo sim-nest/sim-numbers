@@ -1,1 +1,7 @@
-(quote (numbers/codec numeric-plugin-descriptor codec-neutral))
+(expr:map
+  [kind "numeric-plugin"]
+  [method numbers/quad/simpson]
+  [plugin-kind "quadrature"]
+  [adaptive false]
+  [provider numbers/quad]
+  [api "numeric-plugin-v1"])

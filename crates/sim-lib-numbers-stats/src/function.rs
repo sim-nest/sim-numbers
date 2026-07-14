@@ -7,7 +7,7 @@ use sim_kernel::{
     Lib, LibManifest, LibTarget, Linker, Object, RawArgs, Result, Symbol, Value, Version,
 };
 
-use super::runtime;
+use super::{agent_fixtures, runtime};
 
 /// Returns the symbol bound to the `stats/disparate-impact-claim` operation.
 pub fn stats_disparate_impact_claim_symbol() -> Symbol {
@@ -34,13 +34,17 @@ pub fn stats_claims_symbol() -> Symbol {
     Symbol::qualified("stats", "claims")
 }
 
-fn function_symbols() -> [Symbol; 5] {
+fn function_symbols() -> [Symbol; 9] {
     [
         stats_mean_claim_symbol(),
         stats_variance_claim_symbol(),
         stats_entropy_claim_symbol(),
         stats_disparate_impact_claim_symbol(),
         stats_claims_symbol(),
+        agent_fixtures::fixture_symbols()[0].clone(),
+        agent_fixtures::fixture_symbols()[1].clone(),
+        agent_fixtures::fixture_symbols()[2].clone(),
+        agent_fixtures::fixture_symbols()[3].clone(),
     ]
 }
 
@@ -98,6 +102,9 @@ impl Callable for StatsFunction {
         }
         if self.symbol == stats_claims_symbol() {
             return runtime::call_stats_claims(cx, args);
+        }
+        if let Some(value) = agent_fixtures::call_fixture(cx, &self.symbol, args)? {
+            return Ok(value);
         }
         unreachable!("unregistered stats function {}", self.symbol)
     }
