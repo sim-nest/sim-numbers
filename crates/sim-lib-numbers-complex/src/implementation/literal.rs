@@ -1,6 +1,6 @@
 //! The `numbers/complex` domain object and `ComplexNumbersLib`: the domain and
 //! operator symbols and the `Lib` that registers the domain, its shapes, value
-//! class, ops, and incoming promotion edges.
+//! class, ops, and inbound promotion edges.
 
 use std::sync::Arc;
 
@@ -188,7 +188,7 @@ impl sim_kernel::ObjectCompat for ComplexNumberDomain {
 }
 
 /// The library that installs the `numbers/complex` domain: its literal class
-/// and shapes, the `ComplexValue` class, the complex ops, and the incoming
+/// and shapes, the `ComplexValue` class, the complex ops, and the inbound
 /// promotion rules from `f64`, `i64`, and `rational`.
 ///
 /// # Examples

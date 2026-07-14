@@ -10,7 +10,7 @@ Sometimes you want to keep the x in your equation rather than pin it to a value 
 
 - You can keep unknowns as unknowns and solve at the moment that suits you.
 - Tangled expressions collapse to clean, readable forms automatically.
-- Symbolic and numeric views convert back and forth without friction.
+- Symbolic and numeric views meet through one shared formula surface.
 
 ## Where it fits
 

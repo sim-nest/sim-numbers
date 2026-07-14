@@ -95,7 +95,8 @@ fn simplify(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
 }
 
 /// Extract a bare or singly-quoted symbol from a CAS value, if it is one.
-/// Shared by the differentiation and integration function rules (OVERLAP6.10).
+///
+/// Shared by the differentiation and integration function rules.
 pub fn extract_symbolish(cx: &mut Cx, value: &Value) -> Result<Option<Symbol>> {
     match value.object().as_expr(cx)? {
         Expr::Symbol(symbol) => Ok(Some(symbol)),

@@ -4,7 +4,7 @@ In one line: It gives you fast grids of ordinary decimal numbers, the common cas
 
 ## What it gives you
 
-Most grid math, from data analysis to simulation, runs on plain decimal numbers. This provides a grid specialized to hold those decimals in a single tight, contiguous block and to run math across them at speed. Because the values sit together in memory rather than scattered, operations sweep through them quickly. It converts cleanly to and from the system's general grid form, so this fast version and the uniform one interchange without friction. If the number of values you supply does not fit the shape you declared, it declines rather than proceed with mismatched data, keeping results sound.
+Most grid math, from data analysis to simulation, runs on plain decimal numbers. This provides a grid specialized to hold those decimals in a single tight, contiguous block and to run math across them at speed. Because the values sit together in memory rather than scattered, operations sweep through them quickly. It converts cleanly to and from the system's general grid form, so this fast version and the uniform one use the same interface. If the number of values you supply does not fit the shape you declared, it declines rather than proceed with mismatched data, keeping results sound.
 
 ## Why you will be glad
 
