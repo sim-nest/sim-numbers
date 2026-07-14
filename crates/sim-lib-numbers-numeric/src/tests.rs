@@ -1,11 +1,15 @@
 use std::sync::Arc;
 
 use sim_kernel::{
-    Args, Cx, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral, QuoteMode, Symbol,
+    Args, Cx, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral, QuoteMode, Symbol, Value,
 };
-use sim_lib_numbers_func::Func;
+use sim_lib_numbers_cas::CasExpr;
+use sim_lib_numbers_func::{Func, FuncMetadata};
 
-use crate::{ComposedPipeline, NumericNumbersLib, PipelineKind, StateKind, numeric_compose_symbol};
+use crate::{
+    ComposedPipeline, DiffOpts, Differentiator, NumericKind, NumericNumbersLib, NumericPlugin,
+    PipelineKind, StateKind, numeric_compose_symbol, register_differentiator,
+};
 
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -37,6 +41,107 @@ fn quoted(name: &str) -> Expr {
         mode: QuoteMode::Quote,
         expr: Box::new(Expr::Symbol(Symbol::new(name))),
     }
+}
+
+fn f64_value(cx: &mut Cx, canonical: &str) -> Value {
+    cx.factory()
+        .number_literal(Symbol::qualified("numbers", "f64"), canonical.to_owned())
+        .unwrap()
+}
+
+fn value_to_f64(cx: &mut Cx, value: &Value) -> f64 {
+    value.object().display(cx).unwrap().parse::<f64>().unwrap()
+}
+
+struct ExactTestDifferentiator {
+    name: Symbol,
+    sentinel: &'static str,
+}
+
+impl NumericPlugin for ExactTestDifferentiator {
+    fn name(&self) -> Symbol {
+        self.name.clone()
+    }
+
+    fn kind(&self) -> NumericKind {
+        NumericKind::Differentiator
+    }
+}
+
+impl Differentiator for ExactTestDifferentiator {
+    fn diff_at(
+        &self,
+        cx: &mut Cx,
+        _f: &Func,
+        _var: &Symbol,
+        _point: &Value,
+        _opt: DiffOpts,
+    ) -> sim_kernel::Result<Value> {
+        Ok(f64_value(cx, self.sentinel))
+    }
+}
+
+fn register_exact_test_differentiator(name: &str, sentinel: &'static str) -> Symbol {
+    let name = Symbol::new(name);
+    register_differentiator(Arc::new(ExactTestDifferentiator {
+        name: name.clone(),
+        sentinel,
+    }))
+    .unwrap();
+    name
+}
+
+fn native_quadratic_func(cx: &mut Cx, metadata: FuncMetadata) -> Value {
+    cx.factory()
+        .opaque(Arc::new(Func::native_with(
+            vec![Symbol::new("x")],
+            Arc::new(|cx, args| {
+                let [x] = args else {
+                    return Err(Error::Eval("expected one arg".to_owned()));
+                };
+                let x2 = cx.apply_value_number_binary_op(
+                    &Symbol::qualified("math", "mul"),
+                    x.clone(),
+                    x.clone(),
+                )?;
+                cx.apply_value_number_binary_op(&Symbol::qualified("math", "add"), x2, x.clone())
+            }),
+            metadata,
+        )))
+        .unwrap()
+}
+
+fn symbolic_quadratic_func(cx: &mut Cx, metadata: FuncMetadata) -> Value {
+    let x = Symbol::new("x");
+    let body = CasExpr::Op(
+        Symbol::qualified("math", "add"),
+        vec![
+            CasExpr::Op(
+                Symbol::qualified("math", "mul"),
+                vec![CasExpr::Var(x.clone()), CasExpr::Var(x.clone())],
+            ),
+            CasExpr::Var(x.clone()),
+        ],
+    );
+    cx.factory()
+        .opaque(Arc::new(Func::symbolic_with(vec![x], body, metadata)))
+        .unwrap()
+}
+
+fn numeric_diff_at_three(cx: &mut Cx, func: Value, method: Option<Symbol>) -> Value {
+    let var = cx.factory().symbol(Symbol::new("x")).unwrap();
+    let point = f64_value(cx, "3.0");
+    let mut args = vec![func, var, point];
+    if let Some(method) = method {
+        let method = cx.factory().symbol(method).unwrap();
+        let options = cx
+            .factory()
+            .table(vec![(Symbol::new(":method"), method)])
+            .unwrap();
+        args.push(options);
+    }
+    cx.call_function(&Symbol::new("numeric-diff"), Args::new(args))
+        .unwrap()
 }
 
 fn native_identity_func(cx: &mut Cx) -> sim_kernel::Value {
@@ -196,6 +301,85 @@ fn native_func_can_be_passed_to_numeric_diff() {
         .parse::<f64>()
         .unwrap();
     assert!((rendered - 7.0).abs() < 1.0e-3);
+}
+
+#[test]
+fn auto_uses_hinted_differentiator_before_finite_difference() {
+    let mut cx = test_cx();
+    let method = register_exact_test_differentiator("test-exact-review15-02", "42.25");
+    let func = native_quadratic_func(
+        &mut cx,
+        FuncMetadata {
+            differentiator_hint: Some(method),
+            ..FuncMetadata::default()
+        },
+    );
+
+    let out = numeric_diff_at_three(&mut cx, func, None);
+
+    assert!((value_to_f64(&mut cx, &out) - 42.25).abs() < f64::EPSILON);
+    let diagnostics = cx.take_diagnostics();
+    assert!(diagnostics.iter().any(|diagnostic| {
+        diagnostic
+            .message
+            .contains("method=auto->test-exact-review15-02")
+    }));
+}
+
+#[test]
+fn explicit_registered_differentiator_still_routes_directly() {
+    let mut cx = test_cx();
+    let method = register_exact_test_differentiator("test-explicit-review15-02", "42.25");
+    let func = native_quadratic_func(&mut cx, FuncMetadata::default());
+
+    let out = numeric_diff_at_three(&mut cx, func, Some(method));
+
+    assert!((value_to_f64(&mut cx, &out) - 42.25).abs() < f64::EPSILON);
+    let diagnostics = cx.take_diagnostics();
+    assert!(diagnostics.iter().any(|diagnostic| {
+        diagnostic
+            .message
+            .contains("method=test-explicit-review15-02")
+    }));
+}
+
+#[test]
+fn auto_without_hint_still_finite_difference() {
+    let mut cx = test_cx();
+    let func = native_quadratic_func(&mut cx, FuncMetadata::default());
+
+    let out = numeric_diff_at_three(&mut cx, func, None);
+
+    assert!((value_to_f64(&mut cx, &out) - 7.0).abs() < 1.0e-3);
+    let diagnostics = cx.take_diagnostics();
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.message.contains("method=auto steps=2"))
+    );
+}
+
+#[test]
+fn symbolic_body_still_wins_over_hint() {
+    let mut cx = test_cx();
+    let method = register_exact_test_differentiator("test-symbolic-loser-review15-02", "42.25");
+    let func = symbolic_quadratic_func(
+        &mut cx,
+        FuncMetadata {
+            differentiator_hint: Some(method),
+            ..FuncMetadata::default()
+        },
+    );
+
+    let out = numeric_diff_at_three(&mut cx, func, None);
+
+    assert_eq!(out.object().display(&mut cx).unwrap(), "7");
+    let diagnostics = cx.take_diagnostics();
+    assert!(
+        diagnostics
+            .iter()
+            .any(|diagnostic| diagnostic.message.contains("method=auto steps=1"))
+    );
 }
 
 #[test]
