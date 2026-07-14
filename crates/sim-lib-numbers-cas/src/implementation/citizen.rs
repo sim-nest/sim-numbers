@@ -186,15 +186,12 @@ fn install_cas_value_citizen(linker: &mut Linker<'_>) -> Result<()> {
 }
 
 fn conformance_cas_value_citizen(cx: &mut Cx) -> Result<()> {
+    let one = cx
+        .factory()
+        .number_literal(domains::i64(), "1".to_owned())?;
     let expr = CasExpr::Op(
         Symbol::qualified("math", "add"),
-        vec![
-            CasExpr::Var(Symbol::new("x")),
-            CasExpr::Num(
-                cx.factory()
-                    .number_literal(domains::i64(), "1".to_owned())?,
-            ),
-        ],
+        vec![CasExpr::Var(Symbol::new("x")), CasExpr::num(cx, one)?],
     );
     let value = cas_expr_to_value(cx, expr)?;
     sim_citizen::check_value_fixture_with_wrong_version(

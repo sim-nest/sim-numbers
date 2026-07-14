@@ -54,7 +54,7 @@ pub fn diff_cas(cx: &mut Cx, expr: &CasExpr, var: &Symbol) -> Result<CasExpr> {
                         math("pow"),
                         vec![
                             op(Symbol::new("cos"), vec![arg.clone()]),
-                            CasExpr::Num(number_constant(cx, "2")?),
+                            num_constant(cx, "2")?,
                         ],
                     ),
                 ],
@@ -128,10 +128,7 @@ fn diff_div(cx: &mut Cx, args: &[CasExpr], var: &Symbol) -> Result<CasExpr> {
             math("div"),
             vec![
                 op(math("mul"), vec![neg_one(cx)?, diff_cas(cx, arg, var)?]),
-                op(
-                    math("pow"),
-                    vec![arg.clone(), CasExpr::Num(number_constant(cx, "2")?)],
-                ),
+                op(math("pow"), vec![arg.clone(), num_constant(cx, "2")?]),
             ],
         )),
         [left, right] => {
@@ -147,10 +144,7 @@ fn diff_div(cx: &mut Cx, args: &[CasExpr], var: &Symbol) -> Result<CasExpr> {
                             op(math("mul"), vec![left.clone(), right_diff]),
                         ],
                     ),
-                    op(
-                        math("pow"),
-                        vec![right.clone(), CasExpr::Num(number_constant(cx, "2")?)],
-                    ),
+                    op(math("pow"), vec![right.clone(), num_constant(cx, "2")?]),
                 ],
             ))
         }
@@ -167,8 +161,11 @@ fn diff_pow(cx: &mut Cx, args: &[CasExpr], var: &Symbol) -> Result<CasExpr> {
         return Ok(op(
             math("mul"),
             vec![
-                CasExpr::Num(value.clone()),
-                op(math("pow"), vec![base.clone(), CasExpr::Num(decremented)]),
+                CasExpr::num(cx, value.clone())?,
+                op(
+                    math("pow"),
+                    vec![base.clone(), CasExpr::num(cx, decremented)?],
+                ),
                 base_diff,
             ],
         ));
@@ -225,15 +222,20 @@ fn two_args<'a>(args: &'a [CasExpr], operator: &Symbol) -> Result<[&'a CasExpr; 
 }
 
 fn zero(cx: &mut Cx) -> Result<CasExpr> {
-    Ok(CasExpr::Num(number_constant(cx, "0")?))
+    num_constant(cx, "0")
 }
 
 fn one(cx: &mut Cx) -> Result<CasExpr> {
-    Ok(CasExpr::Num(number_constant(cx, "1")?))
+    num_constant(cx, "1")
 }
 
 fn neg_one(cx: &mut Cx) -> Result<CasExpr> {
-    Ok(CasExpr::Num(number_constant(cx, "-1")?))
+    num_constant(cx, "-1")
+}
+
+fn num_constant(cx: &mut Cx, canonical: &str) -> Result<CasExpr> {
+    let value = number_constant(cx, canonical)?;
+    CasExpr::num(cx, value)
 }
 
 fn number_constant(cx: &mut Cx, canonical: &str) -> Result<Value> {

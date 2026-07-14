@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
 use sim_kernel::{
-    Args, Callable, Cx, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral, QuoteMode, Symbol,
+    Args, Callable, Cx, DefaultFactory, EagerPolicy, Error, Expr, LengthResult, NumberLiteral,
+    QuoteMode, Symbol,
 };
 
-use crate::{Func, FuncMetadata, FuncNumbersLib};
+use crate::{Func, FuncMetadata, FuncNumbersLib, grad_symbol};
 
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -32,6 +33,20 @@ fn number(text: &str) -> Expr {
 fn number_value(cx: &mut Cx, text: &str) -> sim_kernel::Value {
     cx.factory()
         .number_literal(Symbol::qualified("numbers", "i64"), text.to_owned())
+        .unwrap()
+}
+
+fn zero_func_value(cx: &mut Cx) -> sim_kernel::Value {
+    let zero = number_value(cx, "0");
+    let zero = sim_lib_numbers_cas::CasExpr::num(cx, zero).unwrap();
+    cx.factory()
+        .opaque(Arc::new(Func::symbolic(Vec::new(), zero)))
+        .unwrap()
+}
+
+fn promote_to_func_via_add(cx: &mut Cx, value: sim_kernel::Value) -> sim_kernel::Value {
+    let zero = zero_func_value(cx);
+    cx.apply_value_number_binary_op(&Symbol::qualified("math", "add"), value, zero)
         .unwrap()
 }
 
@@ -231,4 +246,37 @@ fn body_mismatch_unrepresentable() {
     );
     assert!(!symbolic.is_native());
     assert!(symbolic.body_cas().is_some());
+}
+
+#[test]
+fn promote_symbolic_cas_lifts_free_var() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let cas = sim_lib_numbers_cas::cas_expr_to_value(
+        &mut cx,
+        sim_lib_numbers_cas::CasExpr::Var(x.clone()),
+    )
+    .unwrap();
+
+    let promoted = promote_to_func_via_add(&mut cx, cas);
+    let func = promoted.object().downcast_ref::<Func>().unwrap();
+    assert_eq!(func.vars, vec![x]);
+
+    let gradient = cx
+        .call_function(&grad_symbol(), Args::new(vec![promoted]))
+        .unwrap();
+    let gradient = gradient.object().as_list().expect("grad returns a list");
+    assert_eq!(gradient.len(&mut cx).unwrap(), LengthResult::Known(1));
+}
+
+#[test]
+fn promote_concrete_number_is_nullary() {
+    let mut cx = test_cx();
+    let three = number_value(&mut cx, "3");
+    let promoted = promote_to_func_via_add(&mut cx, three);
+    let func = promoted.object().downcast_ref::<Func>().unwrap();
+    assert!(func.vars.is_empty());
+
+    let out = cx.call_value(promoted, Args::new(Vec::new())).unwrap();
+    assert_eq!(out.object().as_expr(&mut cx).unwrap(), number("3"));
 }

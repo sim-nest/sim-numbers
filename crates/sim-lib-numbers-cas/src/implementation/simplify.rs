@@ -25,7 +25,7 @@ pub fn value_to_cas_expr(cx: &mut Cx, value: Value) -> Result<CasExpr> {
         return Ok(cas.expr().clone());
     }
     if cx.number_value_ref(value.clone())?.is_some() {
-        return Ok(CasExpr::Num(value));
+        return CasExpr::num(cx, value);
     }
     let expr = value.object().as_expr(cx)?;
     if let Some(parsed) = expr_to_cas_expr(cx, &expr)? {
@@ -58,10 +58,12 @@ pub fn value_to_cas_expr(cx: &mut Cx, value: Value) -> Result<CasExpr> {
 /// ```
 pub fn expr_to_cas_expr(cx: &mut Cx, expr: &Expr) -> Result<Option<CasExpr>> {
     Ok(match expr {
-        Expr::Number(number) => Some(CasExpr::Num(
-            cx.factory()
-                .number_literal(number.domain.clone(), number.canonical.clone())?,
-        )),
+        Expr::Number(number) => {
+            let value = cx
+                .factory()
+                .number_literal(number.domain.clone(), number.canonical.clone())?;
+            Some(CasExpr::num(cx, value)?)
+        }
         Expr::Symbol(symbol) => Some(CasExpr::Var(symbol.clone())),
         Expr::Call { operator, args } => {
             let Expr::Symbol(operator) = operator.as_ref() else {
@@ -94,7 +96,7 @@ pub fn expr_to_cas_expr(cx: &mut Cx, expr: &Expr) -> Result<Option<CasExpr>> {
 /// on) for `math/add`, `math/mul`, and `math/pow`.
 pub fn simplify_expr(cx: &mut Cx, expr: CasExpr) -> Result<CasExpr> {
     match expr {
-        CasExpr::Num(value) => Ok(CasExpr::Num(value)),
+        CasExpr::Num(value) => CasExpr::num(cx, value),
         CasExpr::Var(symbol) => Ok(CasExpr::Var(symbol)),
         CasExpr::Op(operator, args) => {
             let args = args
@@ -125,7 +127,8 @@ fn simplify_add(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
         .into_iter()
         .partition(|arg| foldable_numeric(cx, arg).unwrap_or(false));
     if has_symbolic && foldable.len() > 1 {
-        others.push(CasExpr::Num(fold_numeric_values(cx, &operator, foldable)?));
+        let folded = fold_numeric_values(cx, &operator, foldable)?;
+        others.push(CasExpr::num(cx, folded)?);
     } else {
         others.splice(0..0, foldable);
     }
@@ -155,7 +158,7 @@ fn simplify_mul(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
         if let CasExpr::Num(value) = arg
             && is_literal_zero(cx, value)?
         {
-            return Ok(CasExpr::Num(value.clone()));
+            return CasExpr::num(cx, value.clone());
         }
     }
 
@@ -164,7 +167,8 @@ fn simplify_mul(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
         .into_iter()
         .partition(|arg| foldable_numeric(cx, arg).unwrap_or(false));
     if has_symbolic && foldable.len() > 1 {
-        others.push(CasExpr::Num(fold_numeric_values(cx, &operator, foldable)?));
+        let folded = fold_numeric_values(cx, &operator, foldable)?;
+        others.push(CasExpr::num(cx, folded)?);
     } else {
         others.splice(0..0, foldable);
     }
@@ -187,7 +191,8 @@ fn simplify_pow(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
     };
     if let CasExpr::Num(value) = exponent {
         if is_literal_zero(cx, value)? {
-            return Ok(CasExpr::Num(number_constant(cx, "1")?));
+            let one = number_constant(cx, "1")?;
+            return CasExpr::num(cx, one);
         }
         if is_literal_one(cx, value)? {
             return Ok(base.clone());
@@ -197,7 +202,7 @@ fn simplify_pow(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
         && is_literal_zero(cx, base_value)?
         && is_positive_literal(cx, exponent_value)?
     {
-        return Ok(CasExpr::Num(base_value.clone()));
+        return CasExpr::num(cx, base_value.clone());
     }
     simplify_generic(cx, operator, args)
 }
@@ -207,21 +212,25 @@ fn simplify_generic(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result
         .iter()
         .all(|arg| foldable_numeric(cx, arg).unwrap_or(false));
     if all_foldable && !args.is_empty() {
-        return Ok(CasExpr::Num(fold_numeric_values(cx, &operator, args)?));
+        let folded = fold_numeric_values(cx, &operator, args)?;
+        return CasExpr::num(cx, folded);
     }
     Ok(CasExpr::Op(operator, args))
 }
 
 fn finalize_commutative(cx: &mut Cx, operator: Symbol, mut args: Vec<CasExpr>) -> Result<CasExpr> {
     match args.len() {
-        0 => Ok(CasExpr::Num(number_constant(
-            cx,
-            if operator == Symbol::qualified("math", "add") {
-                "0"
-            } else {
-                "1"
-            },
-        )?)),
+        0 => {
+            let value = number_constant(
+                cx,
+                if operator == Symbol::qualified("math", "add") {
+                    "0"
+                } else {
+                    "1"
+                },
+            )?;
+            CasExpr::num(cx, value)
+        }
         1 => Ok(args.pop().unwrap()),
         _ => {
             // Lower every sort key up front so a fallible lowering propagates as

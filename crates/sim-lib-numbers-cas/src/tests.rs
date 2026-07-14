@@ -8,7 +8,7 @@ use sim_kernel::{
 };
 
 use crate::{
-    CasExpr, CasNumbersLib, cas_simplify_symbol, cas_value_class_symbol, cas_var_symbol,
+    CasExpr, CasNumbersLib, cas_simplify_symbol, cas_value_class_symbol, cas_var_symbol, free_vars,
     simplify_expr,
 };
 
@@ -157,15 +157,15 @@ fn cas_simplifier_absorbs_zero_product() {
 fn cas_simplify_propagates_sort_key_error_instead_of_panicking() {
     use std::any::Any;
 
-    use sim_kernel::{Cx, Error, Object, ObjectCompat, Result};
+    use sim_kernel::{Cx, Error, NumberValue, Object, ObjectCompat, Result};
 
-    // A cell value whose surface-`Expr` lowering fails, so computing its CAS
+    // A number value whose surface-`Expr` lowering fails, so computing its CAS
     // sort key errors on the public simplify path.
-    struct UnlowerableCell;
+    struct UnlowerableNumber;
 
-    impl Object for UnlowerableCell {
+    impl Object for UnlowerableNumber {
         fn display(&self, _cx: &mut Cx) -> Result<String> {
-            Ok("#<unlowerable>".to_owned())
+            Ok("#<unlowerable-number>".to_owned())
         }
 
         fn as_any(&self) -> &dyn Any {
@@ -173,24 +173,64 @@ fn cas_simplify_propagates_sort_key_error_instead_of_panicking() {
         }
     }
 
-    impl ObjectCompat for UnlowerableCell {
+    impl ObjectCompat for UnlowerableNumber {
         fn as_expr(&self, _cx: &mut Cx) -> Result<Expr> {
             Err(Error::Eval(
-                "unlowerable cell cannot lower to a surface expr".to_owned(),
+                "unlowerable number cannot lower to a surface expr".to_owned(),
             ))
+        }
+
+        fn as_number_value(&self) -> Option<&dyn NumberValue> {
+            Some(self)
+        }
+    }
+
+    impl NumberValue for UnlowerableNumber {
+        fn number_domain(&self, _cx: &mut Cx) -> Result<Symbol> {
+            Ok(Symbol::qualified("numbers", "i64"))
         }
     }
 
     let mut cx = cx();
-    let cell = cx.factory().opaque(Arc::new(UnlowerableCell)).unwrap();
-    // A commutative op with two retained operands reaches the sort; the cell's
+    let cell = cx.factory().opaque(Arc::new(UnlowerableNumber)).unwrap();
+    let cell = CasExpr::num(&mut cx, cell).unwrap();
+    // A commutative op with two retained operands reaches the sort; the number's
     // key lowering must surface as an Err rather than a panic.
     let tree = CasExpr::Op(
         Symbol::qualified("math", "add"),
-        vec![CasExpr::Num(cell), CasExpr::Var(Symbol::new("x"))],
+        vec![cell, CasExpr::Var(Symbol::new("x"))],
     );
     let result = simplify_expr(&mut cx, tree);
     assert!(result.is_err());
+}
+
+#[test]
+fn free_vars_preserves_first_seen_order() {
+    let tree = CasExpr::Op(
+        Symbol::qualified("math", "add"),
+        vec![
+            CasExpr::Var(Symbol::new("y")),
+            CasExpr::Op(
+                Symbol::qualified("math", "mul"),
+                vec![
+                    CasExpr::Var(Symbol::new("x")),
+                    CasExpr::Var(Symbol::new("y")),
+                ],
+            ),
+        ],
+    );
+
+    assert_eq!(free_vars(&tree), vec![Symbol::new("y"), Symbol::new("x")]);
+}
+
+#[test]
+fn num_rejects_non_number_value() {
+    let mut cx = cx();
+    let text = cx.factory().string("not-a-number".to_owned()).unwrap();
+    assert!(CasExpr::num(&mut cx, text).is_err());
+
+    let list = cx.factory().list(Vec::new()).unwrap();
+    assert!(CasExpr::num(&mut cx, list).is_err());
 }
 
 #[test]

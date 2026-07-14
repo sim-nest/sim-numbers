@@ -4,7 +4,7 @@
 use std::{any::Any, cmp::Ordering, sync::Arc};
 
 use sim_kernel::{
-    ClassRef, Cx, DefaultFactory, Expr, Factory, LengthResult, ListValue, NumberLiteral,
+    ClassRef, Cx, DefaultFactory, Error, Expr, Factory, LengthResult, ListValue, NumberLiteral,
     NumberValue, Object, ObjectCompat, ObjectEncode, ObjectEncoding, Result, Symbol, Value,
 };
 
@@ -12,11 +12,10 @@ use super::{citizen::cas_value_class_symbol, domain::cas_domain_symbol};
 
 /// A node in the symbolic expression tree.
 ///
-/// A `CasExpr` is either a wrapped concrete number [`Value`], a free variable,
-/// or an operator applied to argument subtrees. This is the internal algebraic
-/// form; surface `Expr`/`Value` conversions go through [`expr_to_cas_expr`],
-/// [`value_to_cas_expr`], [`cas_expr_to_value`], and
-/// [`cas_expr_to_surface_expr`].
+/// A `CasExpr` is either a concrete number [`Value`], a free variable, or an
+/// operator applied to argument subtrees. This is the internal algebraic form;
+/// surface `Expr`/`Value` conversions go through [`expr_to_cas_expr`],
+/// [`value_to_cas_expr`], [`cas_expr_to_value`], and [`cas_expr_to_surface_expr`].
 ///
 /// [`expr_to_cas_expr`]: crate::expr_to_cas_expr
 /// [`value_to_cas_expr`]: crate::value_to_cas_expr
@@ -28,6 +27,47 @@ pub enum CasExpr {
     Var(Symbol),
     /// An operator (such as `math/add`) applied to argument subtrees.
     Op(Symbol, Vec<CasExpr>),
+}
+
+impl CasExpr {
+    /// Builds a concrete number leaf.
+    ///
+    /// Returns an error when `value` does not implement the number-value
+    /// protocol. `CasExpr::Num` is a number leaf, not a generic value escape
+    /// hatch.
+    pub fn num(cx: &mut Cx, value: Value) -> Result<Self> {
+        if cx.number_value_ref(value.clone())?.is_some() {
+            Ok(Self::Num(value))
+        } else {
+            Err(Error::Eval(format!(
+                "CasExpr::Num expected a number value, found {}",
+                value.object().display(cx)?
+            )))
+        }
+    }
+}
+
+/// Returns free variables in deterministic first-seen order.
+pub fn free_vars(expr: &CasExpr) -> Vec<Symbol> {
+    fn walk(expr: &CasExpr, out: &mut Vec<Symbol>) {
+        match expr {
+            CasExpr::Num(_) => {}
+            CasExpr::Var(symbol) => {
+                if !out.contains(symbol) {
+                    out.push(symbol.clone());
+                }
+            }
+            CasExpr::Op(_, args) => {
+                for arg in args {
+                    walk(arg, out);
+                }
+            }
+        }
+    }
+
+    let mut out = Vec::new();
+    walk(expr, &mut out);
+    out
 }
 
 #[derive(Clone, Debug)]

@@ -126,7 +126,10 @@ fn integrate_power_with_max_exponent_errors_instead_of_overflowing() {
         .unwrap();
     let expr = CasExpr::Op(
         Symbol::qualified("math", "pow"),
-        vec![CasExpr::Var(Symbol::new("x")), CasExpr::Num(exponent)],
+        vec![
+            CasExpr::Var(Symbol::new("x")),
+            CasExpr::num(&mut cx, exponent).unwrap(),
+        ],
     );
     let err = integrate_cas(&mut cx, &expr, &Symbol::new("x")).unwrap_err();
     assert!(

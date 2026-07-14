@@ -21,7 +21,7 @@ pub fn integrate_cas(cx: &mut Cx, expr: &CasExpr, var: &Symbol) -> Result<CasExp
     let integral = match expr {
         CasExpr::Num(value) => op(
             math("mul"),
-            vec![CasExpr::Num(value.clone()), CasExpr::Var(var.clone())],
+            vec![CasExpr::num(cx, value.clone())?, CasExpr::Var(var.clone())],
         ),
         CasExpr::Var(symbol) if symbol == var => integrate_power_of_var(cx, 1, var)?,
         CasExpr::Var(symbol) => op(
@@ -98,16 +98,15 @@ fn integrate_power_of_var(cx: &mut Cx, exponent: i64, var: &Symbol) -> Result<Ca
             integrate_sym_symbol()
         ))
     })?;
+    let coefficient = rational_constant(cx, 1, next)?;
+    let exponent = integer_constant(cx, next)?;
     Ok(op(
         math("mul"),
         vec![
-            CasExpr::Num(rational_constant(cx, 1, next)?),
+            CasExpr::num(cx, coefficient)?,
             op(
                 math("pow"),
-                vec![
-                    CasExpr::Var(var.clone()),
-                    CasExpr::Num(integer_constant(cx, next)?),
-                ],
+                vec![CasExpr::Var(var.clone()), CasExpr::num(cx, exponent)?],
             ),
         ],
     ))
