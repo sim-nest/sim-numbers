@@ -8,8 +8,8 @@
 mod implementation;
 
 pub use implementation::{
-    Func, FuncMetadata, FuncNumbersLib, NativeFn, call_symbol, fn_symbol, func_class_symbol,
-    func_domain_symbol, grad_symbol,
+    Func, FuncMetadata, FuncNumbersLib, NativeFn, SymbolicStatus, call_symbol, fn_symbol,
+    func_class_symbol, func_domain_symbol, grad_symbol,
 };
 
 #[cfg(test)]

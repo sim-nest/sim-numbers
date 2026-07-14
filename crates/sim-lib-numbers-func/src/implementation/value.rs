@@ -36,8 +36,62 @@ pub struct FuncMetadata {
 #[derive(Clone)]
 enum FuncBody {
     Symbolic(CasExpr),
-    Native(NativeFn),
-    Dual { cas: CasExpr, native: NativeFn },
+    Native {
+        native: NativeFn,
+        symbolic_status: SymbolicStatus,
+    },
+    Dual {
+        cas: CasExpr,
+        native: NativeFn,
+    },
+}
+
+/// Whether a [`Func`] exposes an exact symbolic body, is differentiable through
+/// a named hint, or has lost its symbolic body for a named reason.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SymbolicStatus {
+    /// A CAS body is available and can be inspected by symbolic tools.
+    Available,
+    /// The function is native-only, but metadata names a differentiator that
+    /// can handle it numerically or exactly outside the CAS path.
+    ProvidedByHint,
+    /// The function is native-only because symbolic information was lost.
+    Lost {
+        /// The machine-readable reason for the loss.
+        reason: Symbol,
+    },
+}
+
+impl SymbolicStatus {
+    /// Reason used for ordinary native functions with no symbolic body.
+    pub fn native_only() -> Self {
+        Self::Lost {
+            reason: Symbol::qualified("numbers/func", "native-only"),
+        }
+    }
+
+    /// Reason used when arithmetic combines a symbolic body with a native-only
+    /// body and must keep only the executable native result.
+    pub fn mixed_native() -> Self {
+        Self::Lost {
+            reason: Symbol::qualified("numbers/func", "mixed-native"),
+        }
+    }
+
+    fn status_symbol(&self) -> Symbol {
+        match self {
+            Self::Available => Symbol::qualified("numbers/func", "available"),
+            Self::ProvidedByHint => Symbol::qualified("numbers/func", "provided-by-hint"),
+            Self::Lost { .. } => Symbol::qualified("numbers/func", "lost"),
+        }
+    }
+
+    fn reason(&self) -> Option<&Symbol> {
+        match self {
+            Self::Lost { reason } => Some(reason),
+            _ => None,
+        }
+    }
 }
 
 /// A callable function value in the `Func` number domain: its bound variables
@@ -93,7 +147,28 @@ impl Func {
 
     /// Builds a function with a native body and caller-supplied metadata.
     pub fn native_with(vars: Vec<Symbol>, body_native: NativeFn, metadata: FuncMetadata) -> Self {
-        Self::new(vars, FuncBody::Native(body_native), metadata)
+        let status = if metadata.differentiator_hint.is_some() {
+            SymbolicStatus::ProvidedByHint
+        } else {
+            SymbolicStatus::native_only()
+        };
+        Self::native_with_status(vars, body_native, metadata, status)
+    }
+
+    fn native_with_status(
+        vars: Vec<Symbol>,
+        body_native: NativeFn,
+        metadata: FuncMetadata,
+        symbolic_status: SymbolicStatus,
+    ) -> Self {
+        Self::new(
+            vars,
+            FuncBody::Native {
+                native: body_native,
+                symbolic_status,
+            },
+            metadata,
+        )
     }
 
     /// Builds an internal dual-body function whose native body is derived from
@@ -118,13 +193,15 @@ impl Func {
     pub fn body_cas(&self) -> Option<&CasExpr> {
         match &self.body {
             FuncBody::Symbolic(body) | FuncBody::Dual { cas: body, .. } => Some(body),
-            FuncBody::Native(_) => None,
+            FuncBody::Native { .. } => None,
         }
     }
 
     fn body_native(&self) -> Option<&NativeFn> {
         match &self.body {
-            FuncBody::Native(body) | FuncBody::Dual { native: body, .. } => Some(body),
+            FuncBody::Native { native: body, .. } | FuncBody::Dual { native: body, .. } => {
+                Some(body)
+            }
             FuncBody::Symbolic(_) => None,
         }
     }
@@ -132,6 +209,37 @@ impl Func {
     /// Returns whether this function carries a native body.
     pub fn is_native(&self) -> bool {
         self.body_native().is_some()
+    }
+
+    /// Returns the symbolic-body status for this function.
+    pub fn symbolic_status(&self) -> SymbolicStatus {
+        match &self.body {
+            FuncBody::Symbolic(_) | FuncBody::Dual { .. } => SymbolicStatus::Available,
+            FuncBody::Native {
+                symbolic_status, ..
+            } => symbolic_status.clone(),
+        }
+    }
+
+    fn native_extension_payload(&self) -> Expr {
+        let status = self.symbolic_status();
+        let mut fields = vec![(
+            Expr::Symbol(Symbol::new("symbolic-status")),
+            Expr::Symbol(status.status_symbol()),
+        )];
+        if let Some(reason) = status.reason() {
+            fields.push((
+                Expr::Symbol(Symbol::new("symbolic-loss-reason")),
+                Expr::Symbol(reason.clone()),
+            ));
+        }
+        if let Some(hint) = &self.metadata.differentiator_hint {
+            fields.push((
+                Expr::Symbol(Symbol::new("differentiator-hint")),
+                Expr::Symbol(hint.clone()),
+            ));
+        }
+        Expr::Map(fields)
     }
 
     fn invoke(&self, cx: &mut Cx, args: &[Value]) -> Result<Value> {
@@ -184,7 +292,7 @@ impl sim_kernel::ObjectCompat for Func {
         let Some(body_cas) = self.body_cas() else {
             return Ok(Expr::Extension {
                 tag: func_class_symbol(),
-                payload: Box::new(Expr::String("#<native-func>".to_owned())),
+                payload: Box::new(self.native_extension_payload()),
             });
         };
         Ok(Expr::Call {
@@ -214,12 +322,24 @@ impl sim_kernel::ObjectCompat for Func {
             None => cx.factory().nil()?,
         };
         let native = cx.factory().bool(self.is_native())?;
-        cx.factory().table(vec![
+        let symbolic_status = self.symbolic_status();
+        let mut fields = vec![
             (Symbol::new("kind"), cx.factory().string("func".to_owned())?),
             (Symbol::new("vars"), vars),
             (Symbol::new("body"), body),
             (Symbol::new("native"), native),
-        ])
+            (
+                Symbol::new("symbolic-status"),
+                cx.factory().symbol(symbolic_status.status_symbol())?,
+            ),
+        ];
+        if let Some(reason) = symbolic_status.reason() {
+            fields.push((
+                Symbol::new("symbolic-loss-reason"),
+                cx.factory().symbol(reason.clone())?,
+            ));
+        }
+        cx.factory().table(fields)
     }
     fn as_callable(&self) -> Option<&dyn Callable> {
         Some(self)
@@ -387,7 +507,12 @@ fn apply_binary_func_op(cx: &mut Cx, operator: Symbol, left: Value, right: Value
     });
     let func = match body_cas {
         Some(body_cas) => Func::dual_with(vars, body_cas, native, FuncMetadata::default()),
-        None => Func::native(vars, native),
+        None => Func::native_with_status(
+            vars,
+            native,
+            FuncMetadata::default(),
+            SymbolicStatus::mixed_native(),
+        ),
     };
     build_func_value(cx, func)
 }

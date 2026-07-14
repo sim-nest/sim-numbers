@@ -7,7 +7,7 @@ use sim_kernel::{
 use sim_lib_numbers_cas::{CasExpr, canonical_eq, expr_to_cas_expr};
 use sim_lib_numbers_cas_diff::{diff_symbol, integrate_sym_symbol};
 
-use crate::{Func, FuncMetadata, FuncNumbersLib, fn_symbol, grad_symbol};
+use crate::{Func, FuncMetadata, FuncNumbersLib, SymbolicStatus, fn_symbol, grad_symbol};
 
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -61,6 +61,25 @@ fn cas_number(cx: &mut Cx, text: &str) -> CasExpr {
 fn symbolic_func_value(cx: &mut Cx, vars: Vec<Symbol>, body: CasExpr) -> sim_kernel::Value {
     cx.factory()
         .opaque(Arc::new(Func::symbolic(vars, body)))
+        .unwrap()
+}
+
+fn native_increment_func_value(cx: &mut Cx) -> sim_kernel::Value {
+    cx.factory()
+        .opaque(Arc::new(Func::native(
+            vec![Symbol::new("x")],
+            Arc::new(|cx, args| {
+                let [value] = args else {
+                    return Err(Error::Eval("expected one arg".to_owned()));
+                };
+                cx.apply_value_number_binary_op(
+                    &Symbol::qualified("math", "add"),
+                    value.clone(),
+                    cx.factory()
+                        .number_literal(Symbol::qualified("numbers", "i64"), "1".to_owned())?,
+                )
+            }),
+        )))
         .unwrap()
 }
 
@@ -145,6 +164,61 @@ fn function_plus_constant_remains_callable() {
 }
 
 #[test]
+fn symbolic_plus_symbolic_stays_symbolic() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let left = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x.clone()));
+    let right = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x.clone()));
+
+    let sum = cx
+        .apply_value_number_binary_op(&Symbol::qualified("math", "add"), left, right)
+        .unwrap();
+    let func = sum.object().downcast_ref::<Func>().unwrap();
+
+    assert!(func.body_cas().is_some());
+    assert_eq!(func.symbolic_status(), SymbolicStatus::Available);
+}
+
+#[test]
+fn symbolic_plus_native_reports_mixed_native_loss() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let symbolic = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x));
+    let native = native_increment_func_value(&mut cx);
+
+    let mixed = cx
+        .apply_value_number_binary_op(&Symbol::qualified("math", "add"), symbolic, native)
+        .unwrap();
+    let func = mixed.object().downcast_ref::<Func>().unwrap();
+
+    assert!(func.body_cas().is_none());
+    assert_eq!(func.symbolic_status(), SymbolicStatus::mixed_native());
+    let err = cx
+        .call_function(
+            &diff_symbol(),
+            Args::new(vec![mixed, cx.factory().expr(quoted("x")).unwrap()]),
+        )
+        .unwrap_err();
+    assert!(matches!(err, Error::Eval(message) if message.contains("numbers/func/mixed-native")));
+}
+
+#[test]
+fn mixed_native_eval_unchanged() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let symbolic = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x));
+    let native = native_increment_func_value(&mut cx);
+
+    let mixed = cx
+        .apply_value_number_binary_op(&Symbol::qualified("math", "add"), symbolic, native)
+        .unwrap();
+    let arg = number_value(&mut cx, "4");
+    let out = cx.call_value(mixed, Args::new(vec![arg])).unwrap();
+
+    assert_eq!(out.object().as_expr(&mut cx).unwrap(), number("9"));
+}
+
+#[test]
 fn native_only_functions_report_not_differentiable() {
     let mut cx = test_cx();
     let native = cx
@@ -178,7 +252,7 @@ fn native_only_functions_report_not_differentiable() {
             ]),
         )
         .unwrap_err();
-    assert!(matches!(err, Error::Eval(message) if message.contains("NotDifferentiable")));
+    assert!(matches!(err, Error::Eval(message) if message.contains("numbers/func/native-only")));
 }
 
 #[test]
@@ -318,6 +392,7 @@ fn native_with_preserves_metadata() {
         func.metadata.differentiator_hint,
         Some(Symbol::qualified("test", "diff"))
     );
+    assert_eq!(func.symbolic_status(), SymbolicStatus::ProvidedByHint);
     let payload = func.metadata.payload.as_ref().expect("payload");
     assert_eq!(
         payload.object().as_expr(&mut cx).unwrap(),

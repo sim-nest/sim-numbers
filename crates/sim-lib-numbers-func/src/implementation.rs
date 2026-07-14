@@ -9,4 +9,4 @@ mod value;
 
 pub use domain::{FuncNumbersLib, func_class_symbol, func_domain_symbol};
 pub use function::{call_symbol, fn_symbol, grad_symbol};
-pub use value::{Func, FuncMetadata, NativeFn};
+pub use value::{Func, FuncMetadata, NativeFn, SymbolicStatus};
