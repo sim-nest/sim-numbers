@@ -1,11 +1,17 @@
-use std::sync::Arc;
+use std::{
+    any::Any,
+    sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering},
+    },
+};
 
 use sim_codec::{Input, decode_with_codec, encode_value_with_codec};
 use sim_codec_lisp::{LispCodecLib, encode_object_lisp};
 use sim_kernel::{
     Args, CapabilitySet, CodecId, DefaultFactory, EagerPolicy, EncodeOptions, EncodePosition, Expr,
-    NumberLiteral, QuoteMode, ReadPolicy, Symbol, TrustLevel, Value, WriteCx,
-    read_construct_capability,
+    NumberLiteral, NumberValue, Object, ObjectCompat, QuoteMode, ReadPolicy, Result, Symbol,
+    TrustLevel, Value, WriteCx, read_construct_capability,
 };
 
 use crate::{
@@ -39,6 +45,65 @@ fn number_value(cx: &mut sim_kernel::Cx, canonical: &str) -> Value {
 fn cas_number(cx: &mut sim_kernel::Cx, canonical: &str) -> CasExpr {
     let value = number_value(cx, canonical);
     CasExpr::num(cx, value).unwrap()
+}
+
+struct InspectErrorNumber {
+    inspections: AtomicUsize,
+}
+
+impl InspectErrorNumber {
+    fn new() -> Self {
+        Self {
+            inspections: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl Object for InspectErrorNumber {
+    fn display(&self, _cx: &mut sim_kernel::Cx) -> Result<String> {
+        Ok("#<inspect-error-number>".to_owned())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl ObjectCompat for InspectErrorNumber {
+    fn as_expr(&self, _cx: &mut sim_kernel::Cx) -> Result<Expr> {
+        Ok(Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "7".to_owned(),
+        }))
+    }
+
+    fn as_number_value(&self) -> Option<&dyn NumberValue> {
+        Some(self)
+    }
+}
+
+impl NumberValue for InspectErrorNumber {
+    fn number_domain(&self, _cx: &mut sim_kernel::Cx) -> Result<Symbol> {
+        if self.inspections.fetch_add(1, Ordering::SeqCst) == 0 {
+            return Err(sim_kernel::Error::Eval(
+                "test number inspection failed".to_owned(),
+            ));
+        }
+        Ok(Symbol::qualified("numbers", "i64"))
+    }
+
+    fn number_literal(&self, _cx: &mut sim_kernel::Cx) -> Result<Option<NumberLiteral>> {
+        Ok(Some(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "7".to_owned(),
+        }))
+    }
+}
+
+fn inspect_error_number(cx: &mut sim_kernel::Cx) -> Value {
+    cx.factory()
+        .opaque(Arc::new(InspectErrorNumber::new()))
+        .unwrap()
 }
 
 fn read_construct_policy() -> ReadPolicy {
@@ -356,10 +421,88 @@ fn cas_simplifier_absorbs_zero_product() {
 }
 
 #[test]
-fn cas_simplify_propagates_sort_key_error_instead_of_panicking() {
-    use std::any::Any;
+fn inspect_error_propagates_from_simplify() {
+    let mut cx = cx();
+    let tree = CasExpr::Op(
+        Symbol::qualified("math", "add"),
+        vec![CasExpr::Num(inspect_error_number(&mut cx)), var("x")],
+    );
 
-    use sim_kernel::{Cx, Error, NumberValue, Object, ObjectCompat, Result};
+    let err = simplify_expr(&mut cx, tree).unwrap_err();
+
+    assert!(err.to_string().contains("test number inspection failed"));
+}
+
+#[test]
+fn zero_pow_zero_not_one() {
+    let mut cx = cx();
+    let zero = cas_number(&mut cx, "0");
+    let tree = CasExpr::Op(
+        Symbol::qualified("math", "pow"),
+        vec![zero.clone(), zero.clone()],
+    );
+
+    let simplified = simplify_expr(&mut cx, tree).unwrap();
+
+    assert_eq!(
+        cas_expr_to_surface_expr(&mut cx, &simplified).unwrap(),
+        Expr::List(vec![
+            Expr::Symbol(Symbol::new("^")),
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "0".to_owned(),
+            }),
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "0".to_owned(),
+            }),
+        ])
+    );
+}
+
+#[test]
+fn constant_add_and_mul_fold() {
+    let mut cx = cx();
+    let add_args = vec![
+        cas_number(&mut cx, "1"),
+        cas_number(&mut cx, "2"),
+        cas_number(&mut cx, "3"),
+    ];
+    let add = simplify_expr(
+        &mut cx,
+        CasExpr::Op(Symbol::qualified("math", "add"), add_args),
+    )
+    .unwrap();
+    assert_eq!(
+        cas_expr_to_surface_expr(&mut cx, &add).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "6".to_owned(),
+        })
+    );
+
+    let mul_args = vec![
+        cas_number(&mut cx, "2"),
+        cas_number(&mut cx, "3"),
+        cas_number(&mut cx, "4"),
+    ];
+    let mul = simplify_expr(
+        &mut cx,
+        CasExpr::Op(Symbol::qualified("math", "mul"), mul_args),
+    )
+    .unwrap();
+    assert_eq!(
+        cas_expr_to_surface_expr(&mut cx, &mul).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "24".to_owned(),
+        })
+    );
+}
+
+#[test]
+fn cas_simplify_propagates_sort_key_error_instead_of_panicking() {
+    use sim_kernel::{Cx, Error};
 
     // A number value whose surface-`Expr` lowering fails, so computing its CAS
     // sort key errors on the public simplify path.

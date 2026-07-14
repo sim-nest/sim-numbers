@@ -68,11 +68,7 @@ fn eval_cas_with_mode(cx: &mut Cx, expr: &CasExpr, env: &Env, symbolic: bool) ->
                 .iter()
                 .map(|arg| eval_cas_with_mode(cx, arg, env, symbolic))
                 .collect::<Result<Vec<_>>>()?;
-            if symbolic
-                && values
-                    .iter()
-                    .any(|value| is_symbolic_value(cx, value).unwrap_or(false))
-            {
+            if symbolic && contains_symbolic_value(cx, &values)? {
                 return apply_symbolic(cx, operator.clone(), values);
             }
             cx.call_function(operator, Args::new(values))
@@ -85,6 +81,15 @@ fn is_symbolic_value(cx: &mut Cx, value: &Value) -> Result<bool> {
         cx.number_value_ref(value.clone())?,
         Some(number) if number.domain == domains::cas()
     ))
+}
+
+fn contains_symbolic_value(cx: &mut Cx, values: &[Value]) -> Result<bool> {
+    for value in values {
+        if is_symbolic_value(cx, value)? {
+            return Ok(true);
+        }
+    }
+    Ok(false)
 }
 
 fn apply_symbolic(cx: &mut Cx, operator: Symbol, values: Vec<Value>) -> Result<Value> {

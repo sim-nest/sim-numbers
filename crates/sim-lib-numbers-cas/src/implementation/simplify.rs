@@ -96,6 +96,10 @@ fn parse_cas_expr_lowered(cx: &mut Cx, expr: &Expr) -> Result<Option<CasExpr>> {
 /// Simplify a [`CasExpr`] tree, folding constants and applying the per-operator
 /// algebraic rules (associative flattening, identity/zero elimination, and so
 /// on) for `math/add`, `math/mul`, and `math/pow`.
+///
+/// The simplifier assumes finite algebraic operands for the additive identity,
+/// multiplicative identity, and zero-product rules. Exponentiation keeps the
+/// indeterminate literal form `0^0` unfolded instead of rewriting it to `1`.
 pub fn simplify_expr(cx: &mut Cx, expr: CasExpr) -> Result<CasExpr> {
     match expr {
         CasExpr::Num(value) => CasExpr::num(cx, value),
@@ -124,11 +128,8 @@ fn simplify_add(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
         }
     }
 
-    let has_symbolic = flat.iter().any(|arg| !matches!(arg, CasExpr::Num(_)));
-    let (foldable, mut others): (Vec<_>, Vec<_>) = flat
-        .into_iter()
-        .partition(|arg| foldable_numeric(cx, arg).unwrap_or(false));
-    if has_symbolic && foldable.len() > 1 {
+    let (foldable, mut others) = partition_foldable_numeric(cx, flat)?;
+    if !foldable.is_empty() && (others.is_empty() || foldable.len() > 1) {
         let folded = fold_numeric_values(cx, &operator, foldable)?;
         others.push(CasExpr::num(cx, folded)?);
     } else {
@@ -164,11 +165,8 @@ fn simplify_mul(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
         }
     }
 
-    let has_symbolic = flat.iter().any(|arg| !matches!(arg, CasExpr::Num(_)));
-    let (foldable, mut others): (Vec<_>, Vec<_>) = flat
-        .into_iter()
-        .partition(|arg| foldable_numeric(cx, arg).unwrap_or(false));
-    if has_symbolic && foldable.len() > 1 {
+    let (foldable, mut others) = partition_foldable_numeric(cx, flat)?;
+    if !foldable.is_empty() && (others.is_empty() || foldable.len() > 1) {
         let folded = fold_numeric_values(cx, &operator, foldable)?;
         others.push(CasExpr::num(cx, folded)?);
     } else {
@@ -193,6 +191,11 @@ fn simplify_pow(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
     };
     if let CasExpr::Num(value) = exponent {
         if is_literal_zero(cx, value)? {
+            if let CasExpr::Num(base_value) = base
+                && is_literal_zero(cx, base_value)?
+            {
+                return Ok(CasExpr::Op(operator, args));
+            }
             let one = number_constant(cx, "1")?;
             return CasExpr::num(cx, one);
         }
@@ -210,9 +213,7 @@ fn simplify_pow(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<Cas
 }
 
 fn simplify_generic(cx: &mut Cx, operator: Symbol, args: Vec<CasExpr>) -> Result<CasExpr> {
-    let all_foldable = args
-        .iter()
-        .all(|arg| foldable_numeric(cx, arg).unwrap_or(false));
+    let all_foldable = all_foldable_numeric(cx, &args)?;
     if all_foldable && !args.is_empty() {
         let folded = fold_numeric_values(cx, &operator, args)?;
         return CasExpr::num(cx, folded);
@@ -248,6 +249,31 @@ fn finalize_commutative(cx: &mut Cx, operator: Symbol, mut args: Vec<CasExpr>) -
             ))
         }
     }
+}
+
+fn partition_foldable_numeric(
+    cx: &mut Cx,
+    args: Vec<CasExpr>,
+) -> Result<(Vec<CasExpr>, Vec<CasExpr>)> {
+    let mut foldable = Vec::new();
+    let mut others = Vec::new();
+    for arg in args {
+        if foldable_numeric(cx, &arg)? {
+            foldable.push(arg);
+        } else {
+            others.push(arg);
+        }
+    }
+    Ok((foldable, others))
+}
+
+fn all_foldable_numeric(cx: &mut Cx, args: &[CasExpr]) -> Result<bool> {
+    for arg in args {
+        if !foldable_numeric(cx, arg)? {
+            return Ok(false);
+        }
+    }
+    Ok(true)
 }
 
 fn foldable_numeric(cx: &mut Cx, expr: &CasExpr) -> Result<bool> {

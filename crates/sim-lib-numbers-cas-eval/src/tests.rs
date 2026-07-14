@@ -1,8 +1,18 @@
-use std::sync::Arc;
+use std::{
+    any::Any,
+    sync::{
+        Arc,
+        atomic::{AtomicUsize, Ordering},
+    },
+};
 
-use sim_kernel::{Args, DefaultFactory, EagerPolicy, Env, Expr, NumberLiteral, QuoteMode, Symbol};
+use sim_kernel::{
+    Args, DefaultFactory, EagerPolicy, Env, Expr, NumberLiteral, NumberValue, Object, ObjectCompat,
+    QuoteMode, Result, Symbol, Value,
+};
+use sim_lib_numbers_cas::CasExpr;
 
-use crate::{CasEvalLib, cas_to_expr, eval_cas, eval_cas_symbol, expr_to_cas};
+use crate::{CasEvalLib, cas_to_expr, eval_cas, eval_cas_symbol, eval_cas_symbolic, expr_to_cas};
 
 fn cx() -> sim_kernel::Cx {
     let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -23,6 +33,65 @@ fn quoted(name: &str) -> Expr {
         mode: QuoteMode::Quote,
         expr: Box::new(Expr::Symbol(Symbol::new(name))),
     }
+}
+
+struct InspectErrorNumber {
+    inspections: AtomicUsize,
+}
+
+impl InspectErrorNumber {
+    fn new() -> Self {
+        Self {
+            inspections: AtomicUsize::new(0),
+        }
+    }
+}
+
+impl Object for InspectErrorNumber {
+    fn display(&self, _cx: &mut sim_kernel::Cx) -> Result<String> {
+        Ok("#<inspect-error-number>".to_owned())
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl ObjectCompat for InspectErrorNumber {
+    fn as_expr(&self, _cx: &mut sim_kernel::Cx) -> Result<Expr> {
+        Ok(Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "7".to_owned(),
+        }))
+    }
+
+    fn as_number_value(&self) -> Option<&dyn NumberValue> {
+        Some(self)
+    }
+}
+
+impl NumberValue for InspectErrorNumber {
+    fn number_domain(&self, _cx: &mut sim_kernel::Cx) -> Result<Symbol> {
+        if self.inspections.fetch_add(1, Ordering::SeqCst) == 0 {
+            return Err(sim_kernel::Error::Eval(
+                "test number inspection failed".to_owned(),
+            ));
+        }
+        Ok(Symbol::qualified("numbers", "i64"))
+    }
+
+    fn number_literal(&self, _cx: &mut sim_kernel::Cx) -> Result<Option<NumberLiteral>> {
+        Ok(Some(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "7".to_owned(),
+        }))
+    }
+}
+
+fn inspect_error_number(cx: &mut sim_kernel::Cx) -> Value {
+    cx.factory()
+        .opaque(Arc::new(InspectErrorNumber::new()))
+        .unwrap()
 }
 
 #[test]
@@ -70,6 +139,22 @@ fn evals_symbolic_sum_against_env() {
             canonical: "4".to_owned(),
         })
     );
+}
+
+#[test]
+fn inspect_error_propagates_from_symbolic_eval() {
+    let mut cx = cx();
+    let expr = CasExpr::Op(
+        Symbol::qualified("math", "add"),
+        vec![
+            CasExpr::Num(inspect_error_number(&mut cx)),
+            CasExpr::Var(Symbol::new("x")),
+        ],
+    );
+
+    let err = eval_cas_symbolic(&mut cx, &expr, &Env::default()).unwrap_err();
+
+    assert!(err.to_string().contains("test number inspection failed"));
 }
 
 #[test]
