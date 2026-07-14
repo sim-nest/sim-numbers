@@ -7,9 +7,12 @@ use sim_kernel::{
     Args, Callable, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, Object, Result, Symbol,
     Value,
 };
-use sim_lib_numbers_cas::{cas_expr_to_surface_expr, cas_expr_to_value, value_to_cas_expr};
+use sim_lib_numbers_cas::{
+    cas_expr_to_surface_expr, cas_expr_to_value, extract_symbolish, value_to_cas_expr,
+};
 use sim_lib_numbers_core::domains;
 
+use super::func_surface::func_surface_body;
 use super::integrate::{integrate_cas, integrate_sym_symbol};
 
 #[derive(Clone)]
@@ -72,35 +75,12 @@ impl Callable for IntegrateSymFunction {
     }
 }
 
-use sim_lib_numbers_cas::extract_symbolish;
-
 fn integrate_func_value(cx: &mut Cx, value: Value, var: &Symbol) -> Result<Value> {
-    let expr = value.object().as_expr(cx)?;
-    let Expr::Call { operator, args } = expr else {
-        return Err(Error::Eval(
-            "function value does not expose a symbolic body".to_owned(),
-        ));
-    };
-    let Expr::Symbol(operator) = operator.as_ref() else {
-        return Err(Error::Eval(
-            "function value does not expose a symbolic body".to_owned(),
-        ));
-    };
-    if *operator != Symbol::new("fn") {
-        return Err(Error::Eval(
-            "function value does not expose a symbolic body".to_owned(),
-        ));
-    }
-    let [vars_expr, body_expr] = args.as_slice() else {
-        return Err(Error::Eval(
-            "function value had an invalid fn surface".to_owned(),
-        ));
-    };
-    let body = value_to_cas_expr(cx, cx.factory().expr(body_expr.clone())?)?;
+    let (vars_expr, body) = func_surface_body(cx, &value)?;
     let integral = integrate_cas(cx, &body, var)?;
     let integral_expr = cas_expr_to_surface_expr(cx, &integral)?;
     cx.eval_expr(Expr::Call {
         operator: Box::new(Expr::Symbol(Symbol::new("fn"))),
-        args: vec![vars_expr.clone(), integral_expr],
+        args: vec![vars_expr, integral_expr],
     })
 }

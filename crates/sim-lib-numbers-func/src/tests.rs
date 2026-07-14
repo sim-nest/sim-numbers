@@ -4,8 +4,10 @@ use sim_kernel::{
     Args, Callable, Cx, DefaultFactory, EagerPolicy, Error, Expr, LengthResult, NumberLiteral,
     QuoteMode, Symbol,
 };
+use sim_lib_numbers_cas::{CasExpr, canonical_eq, expr_to_cas_expr};
+use sim_lib_numbers_cas_diff::{diff_symbol, integrate_sym_symbol};
 
-use crate::{Func, FuncMetadata, FuncNumbersLib, grad_symbol};
+use crate::{Func, FuncMetadata, FuncNumbersLib, fn_symbol, grad_symbol};
 
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -30,6 +32,13 @@ fn number(text: &str) -> Expr {
     })
 }
 
+fn quoted(name: &str) -> Expr {
+    Expr::Quote {
+        mode: QuoteMode::Quote,
+        expr: Box::new(Expr::Symbol(Symbol::new(name))),
+    }
+}
+
 fn number_value(cx: &mut Cx, text: &str) -> sim_kernel::Value {
     cx.factory()
         .number_literal(Symbol::qualified("numbers", "i64"), text.to_owned())
@@ -38,10 +47,34 @@ fn number_value(cx: &mut Cx, text: &str) -> sim_kernel::Value {
 
 fn zero_func_value(cx: &mut Cx) -> sim_kernel::Value {
     let zero = number_value(cx, "0");
-    let zero = sim_lib_numbers_cas::CasExpr::num(cx, zero).unwrap();
+    let zero = CasExpr::num(cx, zero).unwrap();
     cx.factory()
         .opaque(Arc::new(Func::symbolic(Vec::new(), zero)))
         .unwrap()
+}
+
+fn cas_number(cx: &mut Cx, text: &str) -> CasExpr {
+    let value = number_value(cx, text);
+    CasExpr::num(cx, value).unwrap()
+}
+
+fn symbolic_func_value(cx: &mut Cx, vars: Vec<Symbol>, body: CasExpr) -> sim_kernel::Value {
+    cx.factory()
+        .opaque(Arc::new(Func::symbolic(vars, body)))
+        .unwrap()
+}
+
+fn returned_func_body(cx: &mut Cx, value: &sim_kernel::Value) -> CasExpr {
+    let Expr::Call { operator, args } = value.object().as_expr(cx).unwrap() else {
+        panic!("expected returned function surface");
+    };
+    assert_eq!(operator.as_ref(), &Expr::Symbol(fn_symbol()));
+    let [_, body_expr] = args.as_slice() else {
+        panic!("expected fn surface to carry vars and a body");
+    };
+    expr_to_cas_expr(cx, body_expr)
+        .unwrap()
+        .expect("returned function body should be CAS-compatible")
 }
 
 fn promote_to_func_via_add(cx: &mut Cx, value: sim_kernel::Value) -> sim_kernel::Value {
@@ -149,6 +182,67 @@ fn native_only_functions_report_not_differentiable() {
 }
 
 #[test]
+fn diff_func_with_sin_body_survives_surface_bridge() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let func = symbolic_func_value(
+        &mut cx,
+        vec![x.clone()],
+        CasExpr::Op(Symbol::new("sin"), vec![CasExpr::Var(x.clone())]),
+    );
+    let var = cx.factory().expr(quoted("x")).unwrap();
+
+    let derivative = cx
+        .call_function(&diff_symbol(), Args::new(vec![func, var]))
+        .unwrap();
+    let body = returned_func_body(&mut cx, &derivative);
+    let expected = CasExpr::Op(Symbol::new("cos"), vec![CasExpr::Var(x)]);
+
+    assert!(canonical_eq(&mut cx, &body, &expected).unwrap());
+}
+
+#[test]
+fn integrate_func_with_pow_body_survives_surface_bridge() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let exponent = cas_number(&mut cx, "2");
+    let func = symbolic_func_value(
+        &mut cx,
+        vec![x.clone()],
+        CasExpr::Op(
+            Symbol::qualified("math", "pow"),
+            vec![CasExpr::Var(x.clone()), exponent],
+        ),
+    );
+    let var = cx.factory().expr(quoted("x")).unwrap();
+
+    let integral = cx
+        .call_function(&integrate_sym_symbol(), Args::new(vec![func, var]))
+        .unwrap();
+    let body = returned_func_body(&mut cx, &integral);
+    let coefficient = cx
+        .factory()
+        .number_literal(
+            Symbol::qualified("numbers", "f64"),
+            "0.3333333333333333".to_owned(),
+        )
+        .unwrap();
+    let cubed_exponent = cas_number(&mut cx, "3");
+    let expected = CasExpr::Op(
+        Symbol::qualified("math", "mul"),
+        vec![
+            CasExpr::num(&mut cx, coefficient).unwrap(),
+            CasExpr::Op(
+                Symbol::qualified("math", "pow"),
+                vec![CasExpr::Var(x), cubed_exponent],
+            ),
+        ],
+    );
+
+    assert!(canonical_eq(&mut cx, &body, &expected).unwrap());
+}
+
+#[test]
 fn native_wrong_arity_is_error_not_panic() {
     let mut cx = test_cx();
     let native = cx
@@ -240,10 +334,7 @@ fn body_mismatch_unrepresentable() {
     assert!(native.is_native());
     assert!(native.body_cas().is_none());
 
-    let symbolic = Func::symbolic(
-        vec![Symbol::new("x")],
-        sim_lib_numbers_cas::CasExpr::Var(Symbol::new("x")),
-    );
+    let symbolic = Func::symbolic(vec![Symbol::new("x")], CasExpr::Var(Symbol::new("x")));
     assert!(!symbolic.is_native());
     assert!(symbolic.body_cas().is_some());
 }
@@ -252,11 +343,7 @@ fn body_mismatch_unrepresentable() {
 fn promote_symbolic_cas_lifts_free_var() {
     let mut cx = test_cx();
     let x = Symbol::new("x");
-    let cas = sim_lib_numbers_cas::cas_expr_to_value(
-        &mut cx,
-        sim_lib_numbers_cas::CasExpr::Var(x.clone()),
-    )
-    .unwrap();
+    let cas = sim_lib_numbers_cas::cas_expr_to_value(&mut cx, CasExpr::Var(x.clone())).unwrap();
 
     let promoted = promote_to_func_via_add(&mut cx, cas);
     let func = promoted.object().downcast_ref::<Func>().unwrap();

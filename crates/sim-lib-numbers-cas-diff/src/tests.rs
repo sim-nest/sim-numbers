@@ -166,3 +166,9 @@ fn unknown_function_stays_as_diff_form() {
         ])
     );
 }
+
+#[test]
+fn cas_diff_does_not_depend_on_func_crate() {
+    let manifest = include_str!("../Cargo.toml");
+    assert!(!manifest.contains("sim-lib-numbers-func"));
+}

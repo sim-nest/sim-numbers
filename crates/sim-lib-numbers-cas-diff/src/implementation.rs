@@ -3,6 +3,7 @@
 //! the extensible differentiation-rule `registry`.
 
 mod diff;
+mod func_surface;
 mod function;
 mod integrate;
 mod integrate_function;
