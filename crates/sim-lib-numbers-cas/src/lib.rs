@@ -27,9 +27,10 @@
 //!     .factory()
 //!     .number_literal(Symbol::qualified("numbers", "i64"), "0".to_owned())
 //!     .unwrap();
+//! let zero_leaf = CasExpr::num(&mut cx, zero).unwrap();
 //! let tree = CasExpr::Op(
 //!     Symbol::qualified("math", "add"),
-//!     vec![CasExpr::Var(Symbol::new("x")), CasExpr::Num(zero)],
+//!     vec![CasExpr::Var(Symbol::new("x")), zero_leaf],
 //! );
 //! let simplified = simplify_expr(&mut cx, tree).unwrap();
 //! let surface = cas_expr_to_surface_expr(&mut cx, &simplified).unwrap();
@@ -41,7 +42,7 @@ mod implementation;
 pub use implementation::{
     CasExpr, CasNumbersLib, cas_domain_symbol, cas_expr_to_surface_expr, cas_expr_to_value,
     cas_simplify_symbol, cas_value_class_symbol, cas_var_symbol, expr_to_cas_expr,
-    extract_symbolish, literal_number, simplify_expr, value_to_cas_expr,
+    extract_symbolish, free_vars, literal_number, simplify_expr, value_to_cas_expr,
 };
 
 #[cfg(test)]

@@ -7,7 +7,9 @@ use sim_kernel::{
     Args, Callable, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NumberValue, Object,
     ObjectEncode, Result, ShapeRef, Symbol, Value, ValueNumberBinaryOp, ValueNumberUnaryOp,
 };
-use sim_lib_numbers_cas::{CasExpr, cas_expr_to_surface_expr, simplify_expr};
+use sim_lib_numbers_cas::{
+    CasExpr, cas_expr_to_surface_expr, free_vars, simplify_expr, value_to_cas_expr,
+};
 use sim_lib_numbers_cas_eval::eval_cas;
 use sim_shape::{AnyShape, ListShape, Shape, shape_value};
 
@@ -278,7 +280,9 @@ pub fn build_func_value(cx: &mut Cx, func: Func) -> Result<Value> {
 }
 
 pub(crate) fn build_constant_func_value(cx: &mut Cx, value: Value) -> Result<Value> {
-    build_func_value(cx, Func::symbolic(Vec::new(), CasExpr::Num(value)))
+    let body = value_to_cas_expr(cx, value)?;
+    let vars = free_vars(&body);
+    build_func_value(cx, Func::symbolic(vars, body))
 }
 
 pub(crate) fn register_value_ops(linker: &mut sim_kernel::Linker<'_>) {

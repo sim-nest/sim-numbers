@@ -337,7 +337,8 @@ fn value_promotions_for(names: &[&str], cost: u16) -> Vec<ValuePromotionRule> {
 }
 
 fn lift_value_to_cas(cx: &mut sim_kernel::Cx, value: Value) -> Result<Value> {
-    cas_expr_to_value(cx, CasExpr::Num(value))
+    let expr = CasExpr::num(cx, value)?;
+    cas_expr_to_value(cx, expr)
 }
 
 fn apply_cas_add(cx: &mut sim_kernel::Cx, left: Value, right: Value) -> Result<Value> {
