@@ -1,6 +1,8 @@
 //! Runtime dispatch for the numeric operations, resolving arguments and options
 //! to the selected registry plugin and invoking it.
 
+use std::sync::Arc;
+
 use sim_kernel::{Args, Cx, Error, Expr, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
 use sim_lib_numbers_func::Func;
@@ -11,7 +13,7 @@ use super::{
         parse_ode_exprs, parse_symbolish_value, parse_table_options, reject_unknown,
     },
     registry::global_numeric_registry,
-    traits::{DiffOpts, NumericKind, OdeOpts, OdeProblem, QuadOpts},
+    traits::{DiffOpts, Differentiator, NumericKind, OdeOpts, OdeProblem, QuadOpts},
 };
 
 pub fn call_numeric_diff(cx: &mut Cx, args: Args) -> Result<Value> {
@@ -186,6 +188,10 @@ fn call_integrate_values(cx: &mut Cx, args: Args, adaptive: bool) -> Result<Valu
     )
 }
 
+/// Dispatches numeric differentiation.
+///
+/// The `auto` method prefers, in order, a symbolic CAS body, a native
+/// function's registered `differentiator_hint`, then central finite difference.
 fn diff_dispatch(
     cx: &mut Cx,
     func_value: Value,
@@ -194,7 +200,9 @@ fn diff_dispatch(
     opts: DiffOpts,
 ) -> Result<Value> {
     let func = expect_unary_func(&func_value, &var)?;
-    if opts.method == Symbol::new("auto") && func.body_cas().is_some() {
+    let auto = Symbol::new("auto");
+    let is_auto = opts.method == auto;
+    if is_auto && func.body_cas().is_some() {
         let derivative = cx.call_function(
             &Symbol::new("diff"),
             Args::new(vec![func_value.clone(), cx.factory().symbol(var.clone())?]),
@@ -203,11 +211,15 @@ fn diff_dispatch(
         cx.push_info("numeric-diff method=auto steps=1");
         return Ok(out);
     }
-    if let Some(plugin) = global_numeric_registry()
-        .read()
-        .map_err(|_| Error::PoisonedLock("numeric registry"))?
-        .differentiator(&opts.method)
+    if is_auto
+        && let Some(hint) = &func.metadata.differentiator_hint
+        && let Some(plugin) = registered_differentiator(hint)?
     {
+        let out = plugin.diff_at(cx, &func, &var, &point, opts.clone())?;
+        cx.push_info(format!("numeric-diff method=auto->{} steps=exact", hint));
+        return Ok(out);
+    }
+    if let Some(plugin) = registered_differentiator(&opts.method)? {
         let out = plugin.diff_at(cx, &func, &var, &point, opts.clone())?;
         cx.push_info(format!(
             "numeric-diff method={} steps=2 h={}",
@@ -215,12 +227,19 @@ fn diff_dispatch(
         ));
         return Ok(out);
     }
-    if opts.method == Symbol::new("auto") {
+    if is_auto {
         let out = finite_diff_central(cx, func_value, point, opts.h)?;
         cx.push_info(format!("numeric-diff method=auto steps=2 h={}", opts.h));
         return Ok(out);
     }
     Err(unknown_method("differentiator", &opts.method))
+}
+
+fn registered_differentiator(method: &Symbol) -> Result<Option<Arc<dyn Differentiator>>> {
+    Ok(global_numeric_registry()
+        .read()
+        .map_err(|_| Error::PoisonedLock("numeric registry"))?
+        .differentiator(method))
 }
 
 fn integrate_dispatch(

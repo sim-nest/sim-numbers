@@ -32,9 +32,14 @@ pub enum NumericKind {
 }
 
 /// Options controlling a numeric-differentiation call.
+///
+/// `method = auto` first uses a symbolic CAS body when the function has one,
+/// then a registered differentiator named by the function's
+/// `differentiator_hint`, then central finite difference.
 #[derive(Clone, Debug)]
 pub struct DiffOpts {
-    /// The differentiator method to use, or `auto` to let the registry choose.
+    /// The differentiator method to use, or `auto` to follow the automatic
+    /// symbolic, hinted-exact, then finite-difference order.
     pub method: Symbol,
     /// The finite-difference step size.
     pub h: f64,
