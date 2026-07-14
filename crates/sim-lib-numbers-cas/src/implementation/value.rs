@@ -70,6 +70,16 @@ pub fn free_vars(expr: &CasExpr) -> Vec<Symbol> {
     out
 }
 
+/// Compares two CAS trees by their canonical surface expression.
+///
+/// This compares the algebraic surface form instead of relying on runtime
+/// `Value` identity inside number leaves.
+pub fn canonical_eq(cx: &mut Cx, left: &CasExpr, right: &CasExpr) -> Result<bool> {
+    let left = cas_expr_to_surface_expr(cx, left)?;
+    let right = cas_expr_to_surface_expr(cx, right)?;
+    Ok(left.canonical_eq(&right))
+}
+
 #[derive(Clone, Debug)]
 pub struct CasValue {
     pub(crate) expr: CasExpr,
@@ -263,6 +273,8 @@ fn display_operator(operator: &Symbol) -> Symbol {
         (Some("math"), "sub") => Symbol::new("-"),
         (Some("math"), "mul") => Symbol::new("*"),
         (Some("math"), "div") => Symbol::new("/"),
+        (Some("math"), "rem") => Symbol::new("%"),
+        (Some("math"), "neg") => Symbol::new("-"),
         (Some("math"), "pow") => Symbol::new("^"),
         _ => operator.clone(),
     }

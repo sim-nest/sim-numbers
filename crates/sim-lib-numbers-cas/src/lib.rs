@@ -40,9 +40,10 @@
 mod implementation;
 
 pub use implementation::{
-    CasExpr, CasNumbersLib, cas_domain_symbol, cas_expr_to_surface_expr, cas_expr_to_value,
-    cas_simplify_symbol, cas_value_class_symbol, cas_var_symbol, expr_to_cas_expr,
-    extract_symbolish, free_vars, literal_number, simplify_expr, value_to_cas_expr,
+    CasExpr, CasNumbersLib, canonical_eq, cas_domain_symbol, cas_expr_to_surface_expr,
+    cas_expr_to_value, cas_simplify_symbol, cas_value_class_symbol, cas_var_symbol,
+    expr_to_cas_expr, extract_symbolish, free_vars, literal_number, simplify_expr,
+    value_to_cas_expr,
 };
 
 #[cfg(test)]

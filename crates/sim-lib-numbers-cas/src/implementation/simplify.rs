@@ -2,6 +2,7 @@
 //! runtime values and surface `Expr` into the symbolic form the simplifier
 //! operates on.
 
+use sim_codec::lower_operator_nodes;
 use sim_kernel::{CanonicalKey, Cx, Error, Expr, NumberLiteral, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
 
@@ -39,8 +40,9 @@ pub fn value_to_cas_expr(cx: &mut Cx, value: Value) -> Result<CasExpr> {
 
 /// Parse a surface [`Expr`] into a symbolic [`CasExpr`], if it is CAS-shaped.
 ///
-/// Numbers, symbols (and quoted symbols), operator calls, and canonical Lisp
-/// lists map to their algebraic forms; anything else yields `None`.
+/// Numbers, symbols (and quoted symbols), operator nodes, symbol-headed calls,
+/// and symbol-headed lists map to their algebraic forms; anything else yields
+/// `None`.
 ///
 /// # Examples
 ///
@@ -57,6 +59,11 @@ pub fn value_to_cas_expr(cx: &mut Cx, value: Value) -> Result<CasExpr> {
 /// assert!(not_cas.is_none());
 /// ```
 pub fn expr_to_cas_expr(cx: &mut Cx, expr: &Expr) -> Result<Option<CasExpr>> {
+    let lowered = lower_operator_nodes(expr.clone());
+    parse_cas_expr_lowered(cx, &lowered)
+}
+
+fn parse_cas_expr_lowered(cx: &mut Cx, expr: &Expr) -> Result<Option<CasExpr>> {
     Ok(match expr {
         Expr::Number(number) => {
             let value = cx
@@ -69,15 +76,10 @@ pub fn expr_to_cas_expr(cx: &mut Cx, expr: &Expr) -> Result<Option<CasExpr>> {
             let Expr::Symbol(operator) = operator.as_ref() else {
                 return Ok(None);
             };
-            let args = args
-                .iter()
-                .map(|arg| {
-                    expr_to_cas_expr(cx, arg)?.ok_or_else(|| {
-                        Error::Eval(format!("cannot parse {:?} as a CAS operand", arg))
-                    })
-                })
-                .collect::<Result<Vec<_>>>()?;
-            Some(CasExpr::Op(normalize_operator(operator), args))
+            let Some(args) = parse_cas_args(cx, args)? else {
+                return Ok(None);
+            };
+            Some(CasExpr::Op(normalize_operator(operator, args.len()), args))
         }
         Expr::Quote {
             mode: sim_kernel::QuoteMode::Quote,
@@ -345,39 +347,30 @@ fn parse_surface_list(cx: &mut Cx, items: &[Expr]) -> Result<Option<CasExpr>> {
     let Expr::Symbol(operator) = head else {
         return Ok(None);
     };
-    let Some(operator) = canonical_operator(operator) else {
+    let Some(args) = parse_cas_args(cx, tail)? else {
         return Ok(None);
     };
-    let args = tail
-        .iter()
-        .map(|expr| {
-            expr_to_cas_expr(cx, expr)?.ok_or_else(|| {
-                Error::Eval("CAS surface list contained a non-CAS argument".to_owned())
-            })
-        })
-        .collect::<Result<Vec<_>>>()?;
+    let operator = normalize_operator(operator, args.len());
     Ok(Some(CasExpr::Op(operator, args)))
 }
 
-fn normalize_operator(operator: &Symbol) -> Symbol {
-    match operator.to_string().as_str() {
-        "+" | "math/add" => Symbol::qualified("math", "add"),
-        "-" | "math/sub" => Symbol::qualified("math", "sub"),
-        "*" | "math/mul" => Symbol::qualified("math", "mul"),
-        "/" | "math/div" => Symbol::qualified("math", "div"),
-        "^" | "math/pow" => Symbol::qualified("math", "pow"),
-        _ => operator.clone(),
-    }
+fn parse_cas_args(cx: &mut Cx, exprs: &[Expr]) -> Result<Option<Vec<CasExpr>>> {
+    let args = exprs
+        .iter()
+        .map(|expr| parse_cas_expr_lowered(cx, expr))
+        .collect::<Result<Vec<_>>>()?;
+    Ok(args.into_iter().collect::<Option<Vec<_>>>())
 }
 
-fn canonical_operator(symbol: &Symbol) -> Option<Symbol> {
-    Some(match (symbol.namespace.as_deref(), symbol.name.as_ref()) {
-        (Some("math"), "add" | "sub" | "mul" | "div" | "pow") => symbol.clone(),
-        (None, "+") => Symbol::qualified("math", "add"),
-        (None, "-") => Symbol::qualified("math", "sub"),
-        (None, "*") => Symbol::qualified("math", "mul"),
-        (None, "/") => Symbol::qualified("math", "div"),
-        (None, "^") => Symbol::qualified("math", "pow"),
-        _ => return None,
-    })
+fn normalize_operator(operator: &Symbol, arity: usize) -> Symbol {
+    match (operator.namespace.as_deref(), operator.name.as_ref(), arity) {
+        (None, "+", _) | (Some("math"), "add", _) => Symbol::qualified("math", "add"),
+        (None, "-", 1) | (Some("math"), "neg", _) => Symbol::qualified("math", "neg"),
+        (None, "-", _) | (Some("math"), "sub", _) => Symbol::qualified("math", "sub"),
+        (None, "*", _) | (Some("math"), "mul", _) => Symbol::qualified("math", "mul"),
+        (None, "/", _) | (Some("math"), "div", _) => Symbol::qualified("math", "div"),
+        (None, "%", _) | (Some("math"), "rem", _) => Symbol::qualified("math", "rem"),
+        (None, "^", _) | (Some("math"), "pow", _) => Symbol::qualified("math", "pow"),
+        _ => operator.clone(),
+    }
 }
