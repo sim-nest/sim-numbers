@@ -215,3 +215,20 @@ fn native_with_preserves_metadata() {
         Expr::String("payload".to_owned())
     );
 }
+
+#[test]
+fn body_mismatch_unrepresentable() {
+    let native = Func::native(
+        vec![Symbol::new("x")],
+        Arc::new(|_cx, args| Ok(args[0].clone())),
+    );
+    assert!(native.is_native());
+    assert!(native.body_cas().is_none());
+
+    let symbolic = Func::symbolic(
+        vec![Symbol::new("x")],
+        sim_lib_numbers_cas::CasExpr::Var(Symbol::new("x")),
+    );
+    assert!(!symbolic.is_native());
+    assert!(symbolic.body_cas().is_some());
+}

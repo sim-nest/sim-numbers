@@ -15,7 +15,7 @@ use sim_shape::shape_value;
 use super::function::{
     CallFunction, FnBuilder, GradFunction, build_func_class, call_symbol, fn_symbol, grad_symbol,
 };
-use super::value::{Func, FuncMetadata, build_constant_func_value, build_func_value};
+use super::value::{Func, build_constant_func_value, build_func_value};
 
 /// Returns the domain symbol that names the `Func` number domain (`numbers/func`).
 ///
@@ -267,15 +267,7 @@ fn install_func_value_citizen(linker: &mut Linker<'_>) -> Result<()> {
 
 fn conformance_func_value_citizen(cx: &mut sim_kernel::Cx) -> Result<()> {
     let var = Symbol::new("x");
-    let value = build_func_value(
-        cx,
-        Func::new(
-            vec![var.clone()],
-            Some(CasExpr::Var(var)),
-            None,
-            FuncMetadata::default(),
-        ),
-    )?;
+    let value = build_func_value(cx, Func::symbolic(vec![var.clone()], CasExpr::Var(var)))?;
     sim_citizen::check_value_fixture(cx, value)
 }
 
