@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
 use sim_kernel::{
-    Args, Cx, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral, QuoteMode, Symbol,
+    Args, Callable, Cx, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral, QuoteMode, Symbol,
 };
 
-use crate::{Func, FuncNumbersLib};
+use crate::{Func, FuncMetadata, FuncNumbersLib};
 
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -27,6 +27,12 @@ fn number(text: &str) -> Expr {
         domain: Symbol::qualified("numbers", "i64"),
         canonical: text.to_owned(),
     })
+}
+
+fn number_value(cx: &mut Cx, text: &str) -> sim_kernel::Value {
+    cx.factory()
+        .number_literal(Symbol::qualified("numbers", "i64"), text.to_owned())
+        .unwrap()
 }
 
 #[test]
@@ -125,4 +131,87 @@ fn native_only_functions_report_not_differentiable() {
         )
         .unwrap_err();
     assert!(matches!(err, Error::Eval(message) if message.contains("NotDifferentiable")));
+}
+
+#[test]
+fn native_wrong_arity_is_error_not_panic() {
+    let mut cx = test_cx();
+    let native = cx
+        .factory()
+        .opaque(Arc::new(Func::native(
+            vec![Symbol::new("x")],
+            Arc::new(|_cx, args| Ok(args[0].clone())),
+        )))
+        .unwrap();
+
+    let err = cx.call_value(native, Args::new(Vec::new())).unwrap_err();
+
+    assert!(
+        matches!(err, Error::Eval(message) if message == "function expected 1 arguments but received 0")
+    );
+}
+
+#[test]
+fn browse_args_shape_reports_func_arity() {
+    let mut cx = test_cx();
+    let func = Func::native(
+        vec![Symbol::new("x"), Symbol::new("y")],
+        Arc::new(|_cx, args| Ok(args[0].clone())),
+    );
+    let shape = func
+        .browse_args_shape(&mut cx)
+        .unwrap()
+        .expect("Func should report an argument shape");
+    let shape = shape.object().as_shape().expect("shape protocol");
+    let one = number_value(&mut cx, "1");
+    let two = number_value(&mut cx, "2");
+    let three = number_value(&mut cx, "3");
+
+    let exact = cx.factory().list(vec![one.clone(), two.clone()]).unwrap();
+    let too_short = cx.factory().list(vec![one.clone()]).unwrap();
+    let too_long = cx
+        .factory()
+        .list(vec![one.clone(), two.clone(), three])
+        .unwrap();
+
+    assert!(shape.check_value(&mut cx, exact).unwrap().accepted);
+    assert!(!shape.check_value(&mut cx, too_short).unwrap().accepted);
+    assert!(!shape.check_value(&mut cx, too_long).unwrap().accepted);
+
+    let func_value = cx.factory().opaque(Arc::new(func)).unwrap();
+    let out = cx
+        .call_value(func_value, Args::new(vec![one, two]))
+        .unwrap();
+    assert_eq!(out.object().as_expr(&mut cx).unwrap(), number("1"));
+}
+
+#[test]
+fn native_with_preserves_metadata() {
+    let mut cx = test_cx();
+    let payload = cx.factory().string("payload".to_owned()).unwrap();
+    let metadata = FuncMetadata {
+        source: Some(Symbol::qualified("test", "native")),
+        differentiator_hint: Some(Symbol::qualified("test", "diff")),
+        payload: Some(payload),
+    };
+
+    let func = Func::native_with(
+        vec![Symbol::new("x")],
+        Arc::new(|_cx, args| Ok(args[0].clone())),
+        metadata,
+    );
+
+    assert_eq!(
+        func.metadata.source,
+        Some(Symbol::qualified("test", "native"))
+    );
+    assert_eq!(
+        func.metadata.differentiator_hint,
+        Some(Symbol::qualified("test", "diff"))
+    );
+    let payload = func.metadata.payload.as_ref().expect("payload");
+    assert_eq!(
+        payload.object().as_expr(&mut cx).unwrap(),
+        Expr::String("payload".to_owned())
+    );
 }

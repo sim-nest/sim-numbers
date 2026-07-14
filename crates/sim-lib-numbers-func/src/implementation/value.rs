@@ -5,10 +5,11 @@ use std::{any::Any, sync::Arc};
 
 use sim_kernel::{
     Args, Callable, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NumberValue, Object,
-    ObjectEncode, Result, Symbol, Value, ValueNumberBinaryOp, ValueNumberUnaryOp,
+    ObjectEncode, Result, ShapeRef, Symbol, Value, ValueNumberBinaryOp, ValueNumberUnaryOp,
 };
 use sim_lib_numbers_cas::{CasExpr, cas_expr_to_surface_expr, simplify_expr};
 use sim_lib_numbers_cas_eval::eval_cas;
+use sim_shape::{AnyShape, ListShape, Shape, shape_value};
 
 use super::domain::{func_class_symbol, func_domain_symbol};
 use super::function::{child_env_with_args, vars_expr};
@@ -63,7 +64,12 @@ impl Func {
 
     /// Builds a function with a symbolic (CAS) body and default metadata.
     pub fn symbolic(vars: Vec<Symbol>, body_cas: CasExpr) -> Self {
-        Self::new(vars, Some(body_cas), None, FuncMetadata::default())
+        Self::symbolic_with(vars, body_cas, FuncMetadata::default())
+    }
+
+    /// Builds a function with a symbolic (CAS) body and caller-supplied metadata.
+    pub fn symbolic_with(vars: Vec<Symbol>, body_cas: CasExpr, metadata: FuncMetadata) -> Self {
+        Self::new(vars, Some(body_cas), None, metadata)
     }
 
     /// Builds a function with a native (Rust closure) body and default metadata.
@@ -84,10 +90,27 @@ impl Func {
     /// assert!(func.body_native.is_some());
     /// ```
     pub fn native(vars: Vec<Symbol>, body_native: NativeFn) -> Self {
-        Self::new(vars, None, Some(body_native), FuncMetadata::default())
+        Self::native_with(vars, body_native, FuncMetadata::default())
+    }
+
+    /// Builds a function with a native body and caller-supplied metadata.
+    pub fn native_with(vars: Vec<Symbol>, body_native: NativeFn, metadata: FuncMetadata) -> Self {
+        Self::new(vars, None, Some(body_native), metadata)
+    }
+
+    /// Returns the symbolic body advertised by this function, when available.
+    pub fn body_cas(&self) -> Option<&CasExpr> {
+        self.body_cas.as_ref()
     }
 
     fn invoke(&self, cx: &mut Cx, args: &[Value]) -> Result<Value> {
+        if args.len() != self.vars.len() {
+            return Err(Error::Eval(format!(
+                "function expected {} arguments but received {}",
+                self.vars.len(),
+                args.len()
+            )));
+        }
         if let Some(body_native) = &self.body_native {
             return body_native(cx, args);
         }
@@ -184,6 +207,18 @@ impl sim_kernel::ObjectCompat for Func {
 impl Callable for Func {
     fn call(&self, cx: &mut Cx, args: Args) -> Result<Value> {
         self.invoke(cx, args.values())
+    }
+
+    fn browse_args_shape(&self, _cx: &mut Cx) -> Result<Option<ShapeRef>> {
+        let items = self
+            .vars
+            .iter()
+            .map(|_| Arc::new(AnyShape) as Arc<dyn Shape>)
+            .collect();
+        Ok(Some(shape_value(
+            Symbol::qualified(func_class_symbol().to_string(), "args"),
+            Arc::new(ListShape::new(items)),
+        )))
     }
 }
 
