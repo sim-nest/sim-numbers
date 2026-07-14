@@ -9,9 +9,9 @@ use sim_kernel::{
 };
 use sim_lib_numbers_codec::{numeric_plugin_descriptor_symbol, numeric_plugin_descriptor_value};
 use sim_lib_numbers_core::domains;
-use sim_lib_numbers_func::Func;
 use sim_lib_numbers_numeric::{
-    NumericKind, NumericPlugin, OdeOpts, OdeProblem, OdeSolver, register_ode_solver,
+    NumericCallable, NumericKind, NumericPlugin, OdeOpts, OdeProblem, OdeSolver,
+    register_ode_solver,
 };
 
 use super::support::{abs_error, add, add_scaled, call_rhs, f64_value, scale, value_to_f64};
@@ -213,11 +213,11 @@ impl OdeSolver for RkPlugin {
     }
 }
 
-type FixedStepper = fn(&mut Cx, &Func, f64, &Value, f64, &OdeOpts) -> Result<Value>;
+type FixedStepper = fn(&mut Cx, &NumericCallable, f64, &Value, f64, &OdeOpts) -> Result<Value>;
 
 fn fixed_step(
     cx: &mut Cx,
-    dy: &Func,
+    dy: &NumericCallable,
     x0: f64,
     y0: Value,
     x1: f64,
@@ -257,7 +257,7 @@ fn fixed_step(
 
 fn step_forward_euler(
     cx: &mut Cx,
-    dy: &Func,
+    dy: &NumericCallable,
     x: f64,
     y: &Value,
     h: f64,
@@ -269,7 +269,7 @@ fn step_forward_euler(
 
 fn step_backward_euler(
     cx: &mut Cx,
-    dy: &Func,
+    dy: &NumericCallable,
     x: f64,
     y: &Value,
     h: f64,
@@ -292,7 +292,7 @@ fn step_backward_euler(
 
 fn step_midpoint(
     cx: &mut Cx,
-    dy: &Func,
+    dy: &NumericCallable,
     x: f64,
     y: &Value,
     h: f64,
@@ -304,7 +304,14 @@ fn step_midpoint(
     add_scaled(cx, y.clone(), k2, h)
 }
 
-fn step_rk4(cx: &mut Cx, dy: &Func, x: f64, y: &Value, h: f64, _opt: &OdeOpts) -> Result<Value> {
+fn step_rk4(
+    cx: &mut Cx,
+    dy: &NumericCallable,
+    x: f64,
+    y: &Value,
+    h: f64,
+    _opt: &OdeOpts,
+) -> Result<Value> {
     let k1 = rhs_at(cx, dy, x, y.clone())?;
     let y2 = add_scaled(cx, y.clone(), k1.clone(), 0.5 * h)?;
     let k2 = rhs_at(cx, dy, x + 0.5 * h, y2)?;
@@ -321,7 +328,7 @@ fn step_rk4(cx: &mut Cx, dy: &Func, x: f64, y: &Value, h: f64, _opt: &OdeOpts) -
 
 fn adaptive_rkf45(
     cx: &mut Cx,
-    dy: &Func,
+    dy: &NumericCallable,
     x0: f64,
     y0: Value,
     x1: f64,
@@ -365,7 +372,13 @@ fn adaptive_rkf45(
     Ok(out)
 }
 
-fn rkf45_step(cx: &mut Cx, dy: &Func, x: f64, y: &Value, h: f64) -> Result<(Value, f64)> {
+fn rkf45_step(
+    cx: &mut Cx,
+    dy: &NumericCallable,
+    x: f64,
+    y: &Value,
+    h: f64,
+) -> Result<(Value, f64)> {
     let k1 = rhs_at(cx, dy, x, y.clone())?;
     let y2 = add_scaled(cx, y.clone(), k1.clone(), h * 0.25)?;
     let k2 = rhs_at(cx, dy, x + h * 0.25, y2)?;
@@ -407,7 +420,7 @@ fn rkf45_step(cx: &mut Cx, dy: &Func, x: f64, y: &Value, h: f64) -> Result<(Valu
     Ok((fifth, err))
 }
 
-fn rhs_at(cx: &mut Cx, dy: &Func, x: f64, y: Value) -> Result<Value> {
+fn rhs_at(cx: &mut Cx, dy: &NumericCallable, x: f64, y: Value) -> Result<Value> {
     let x = f64_value(cx, x)?;
     call_rhs(cx, dy, x, y)
 }

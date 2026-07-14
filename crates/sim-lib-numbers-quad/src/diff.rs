@@ -5,9 +5,11 @@ use std::sync::Arc;
 
 use sim_kernel::{Cx, Result, Symbol, Value};
 use sim_lib_numbers_func::Func;
-use sim_lib_numbers_numeric::{DiffOpts, Differentiator, NumericKind, NumericPlugin};
+use sim_lib_numbers_numeric::{
+    DiffOpts, Differentiator, NumericCallable, NumericKind, NumericPlugin,
+};
 
-use super::support::{add, add_scaled, call_unary_func, div, f64_value, scale, sub, zero_like};
+use super::support::{add, add_scaled, call_unary_callable, div, f64_value, scale, sub, zero_like};
 
 #[derive(Clone, Copy)]
 enum Scheme {
@@ -57,23 +59,36 @@ impl Differentiator for FiniteDiffPlugin {
         &self,
         cx: &mut Cx,
         f: &Func,
+        var: &Symbol,
+        point: &Value,
+        opt: DiffOpts,
+    ) -> Result<Value> {
+        let value = cx.factory().opaque(Arc::new(f.clone()))?;
+        let callable = NumericCallable::unary(value, var.clone())?;
+        self.diff_callable_at(cx, &callable, var, point, opt)
+    }
+
+    fn diff_callable_at(
+        &self,
+        cx: &mut Cx,
+        f: &NumericCallable,
         _var: &Symbol,
         point: &Value,
         opt: DiffOpts,
     ) -> Result<Value> {
         match self.scheme {
             Scheme::Forward => {
-                let fx = call_unary_func(cx, f, point.clone())?;
+                let fx = call_unary_callable(cx, f, point.clone())?;
                 let point_h = offset(cx, point, opt.h)?;
-                let fh = call_unary_func(cx, f, point_h)?;
+                let fh = call_unary_callable(cx, f, point_h)?;
                 let numerator = sub(cx, fh, fx)?;
                 let denom = f64_value(cx, opt.h)?;
                 div(cx, numerator, denom)
             }
             Scheme::Backward => {
-                let fx = call_unary_func(cx, f, point.clone())?;
+                let fx = call_unary_callable(cx, f, point.clone())?;
                 let point_h = offset(cx, point, -opt.h)?;
-                let fh = call_unary_func(cx, f, point_h)?;
+                let fh = call_unary_callable(cx, f, point_h)?;
                 let numerator = sub(cx, fx, fh)?;
                 let denom = f64_value(cx, opt.h)?;
                 div(cx, numerator, denom)
@@ -92,25 +107,25 @@ impl Differentiator for FiniteDiffPlugin {
     }
 }
 
-fn central3(cx: &mut Cx, f: &Func, point: &Value, h: f64) -> Result<Value> {
+fn central3(cx: &mut Cx, f: &NumericCallable, point: &Value, h: f64) -> Result<Value> {
     let plus_point = offset(cx, point, h)?;
     let minus_point = offset(cx, point, -h)?;
-    let plus = call_unary_func(cx, f, plus_point)?;
-    let minus = call_unary_func(cx, f, minus_point)?;
+    let plus = call_unary_callable(cx, f, plus_point)?;
+    let minus = call_unary_callable(cx, f, minus_point)?;
     let numerator = sub(cx, plus, minus)?;
     let denom = f64_value(cx, 2.0 * h)?;
     div(cx, numerator, denom)
 }
 
-fn central5(cx: &mut Cx, f: &Func, point: &Value, h: f64) -> Result<Value> {
+fn central5(cx: &mut Cx, f: &NumericCallable, point: &Value, h: f64) -> Result<Value> {
     let p2 = offset(cx, point, 2.0 * h)?;
     let p1 = offset(cx, point, h)?;
     let m1 = offset(cx, point, -h)?;
     let m2 = offset(cx, point, -2.0 * h)?;
-    let p2 = call_unary_func(cx, f, p2)?;
-    let p1 = call_unary_func(cx, f, p1)?;
-    let m1 = call_unary_func(cx, f, m1)?;
-    let m2 = call_unary_func(cx, f, m2)?;
+    let p2 = call_unary_callable(cx, f, p2)?;
+    let p1 = call_unary_callable(cx, f, p1)?;
+    let m1 = call_unary_callable(cx, f, m1)?;
+    let m2 = call_unary_callable(cx, f, m2)?;
     let mut acc = zero_like(cx, p1.clone())?;
     acc = add_scaled(cx, acc, p2, -1.0)?;
     acc = add_scaled(cx, acc, p1, 8.0)?;

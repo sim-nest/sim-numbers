@@ -1,7 +1,8 @@
-use std::sync::Arc;
+use std::{any::Any, sync::Arc};
 
 use sim_kernel::{
-    Args, Cx, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral, QuoteMode, Symbol, Value,
+    Args, Callable, ClassRef, Cx, DefaultFactory, EagerPolicy, Error, Expr, Factory, NumberLiteral,
+    Object, QuoteMode, Symbol, Value,
 };
 use sim_lib_numbers_cas::CasExpr;
 use sim_lib_numbers_func::{Func, FuncMetadata};
@@ -51,6 +52,52 @@ fn f64_value(cx: &mut Cx, canonical: &str) -> Value {
 
 fn value_to_f64(cx: &mut Cx, value: &Value) -> f64 {
     value.object().display(cx).unwrap().parse::<f64>().unwrap()
+}
+
+#[derive(Clone)]
+struct PlainUnary {
+    name: &'static str,
+    f: fn(f64) -> f64,
+}
+
+impl Object for PlainUnary {
+    fn display(&self, _cx: &mut Cx) -> sim_kernel::Result<String> {
+        Ok(format!("#<plain-callable {}>", self.name))
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl sim_kernel::ObjectCompat for PlainUnary {
+    fn class(&self, _cx: &mut Cx) -> sim_kernel::Result<ClassRef> {
+        DefaultFactory.class_stub(
+            sim_kernel::CORE_FUNCTION_CLASS_ID,
+            Symbol::qualified("core", "Function"),
+        )
+    }
+
+    fn as_callable(&self) -> Option<&dyn Callable> {
+        Some(self)
+    }
+}
+
+impl Callable for PlainUnary {
+    fn call(&self, cx: &mut Cx, args: Args) -> sim_kernel::Result<Value> {
+        let values = args.into_vec();
+        let [x] = values.as_slice() else {
+            return Err(Error::Eval("plain unary expected one arg".to_owned()));
+        };
+        let x = value_to_f64(cx, x);
+        Ok(f64_value(cx, (self.f)(x).to_string().as_str()))
+    }
+}
+
+fn plain_unary(cx: &mut Cx, name: &'static str, f: fn(f64) -> f64) -> Value {
+    cx.factory()
+        .opaque(Arc::new(PlainUnary { name, f }))
+        .unwrap()
 }
 
 struct ExactTestDifferentiator {
@@ -304,6 +351,16 @@ fn native_func_can_be_passed_to_numeric_diff() {
 }
 
 #[test]
+fn numeric_diff_accepts_plain_callable() {
+    let mut cx = test_cx();
+    let func = plain_unary(&mut cx, "plain-quadratic-auto", |x| x * x + x);
+
+    let out = numeric_diff_at_three(&mut cx, func, None);
+
+    assert!((value_to_f64(&mut cx, &out) - 7.0).abs() < 1.0e-3);
+}
+
+#[test]
 fn auto_uses_hinted_differentiator_before_finite_difference() {
     let mut cx = test_cx();
     let method = register_exact_test_differentiator("test-exact-review15-02", "42.25");
@@ -383,7 +440,7 @@ fn symbolic_body_still_wins_over_hint() {
 }
 
 #[test]
-fn symbolic_func_prefers_symbolic_derivative_before_numeric_fallback() {
+fn symbolic_func_still_uses_exact_diff() {
     let mut cx = test_cx();
     let out = cx
         .eval_expr(Expr::Call {

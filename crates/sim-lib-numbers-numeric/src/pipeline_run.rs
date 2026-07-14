@@ -4,13 +4,12 @@ use std::{collections::BTreeMap, sync::Arc};
 
 use sim_kernel::{Args, Cx, Error, Expr, Result, Symbol, Value, value_from_ref};
 use sim_lib_numbers_core::domains;
-use sim_lib_numbers_func::Func;
 
 use super::{
     options::parse_symbolish_value,
     pipeline::{ComposedPipeline, PipelineKind, StateKind},
     registry::global_numeric_registry,
-    traits::{NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
+    traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
 };
 
 pub fn call_numeric_run_composed(cx: &mut Cx, args: Args) -> Result<Value> {
@@ -166,18 +165,7 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
         unreachable!("ODE pipeline parser builds ODE run args");
     };
     let func_value = value_from_ref(cx, &pipeline.func_ref)?;
-    let func = func_value
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| {
-            Error::Eval("numeric/run-composed pipeline function must resolve to Func".to_owned())
-        })?
-        .clone();
-    let [var, y_var] = func.vars.as_slice() else {
-        return Err(Error::Eval(
-            "numeric/run-composed ODE pipelines require a binary Func".to_owned(),
-        ));
-    };
+    let dy = NumericCallable::sampled_binary(func_value, Symbol::new("x"), Symbol::new("y"))?;
     let method = resolve_ode_method(&pipeline.method);
     let plugin = {
         let registry = global_numeric_registry()
@@ -201,9 +189,9 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     let points = plugin.solve(
         cx,
         OdeProblem {
-            dy: &func,
-            var,
-            y_var,
+            dy: &dy,
+            var: &dy.vars()[0],
+            y_var: &dy.vars()[1],
             x0: &t0,
             y0: &y0,
             x_end: &t1,
@@ -249,23 +237,12 @@ fn run_quad_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
         unreachable!("quadrature pipeline parser builds quadrature run args");
     };
     let func_value = value_from_ref(cx, &pipeline.func_ref)?;
-    let func = func_value
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| {
-            Error::Eval("numeric/run-composed pipeline function must resolve to Func".to_owned())
-        })?
-        .clone();
-    let [var] = func.vars.as_slice() else {
-        return Err(Error::Eval(
-            "numeric/run-composed quadrature pipelines require a unary Func".to_owned(),
-        ));
-    };
+    let func = NumericCallable::sampled_unary(func_value, Symbol::new("x"))?;
     let selection = select_quad_plugin(&pipeline.method, n, tol)?;
     let value = selection.plugin.integrate(
         cx,
         &func,
-        var,
+        &func.vars()[0],
         &a,
         &b,
         QuadOpts {

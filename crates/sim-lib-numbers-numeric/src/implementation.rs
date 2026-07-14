@@ -25,6 +25,6 @@ pub use registry::{
     global_numeric_registry, register_differentiator, register_ode_solver, register_quadrature,
 };
 pub use traits::{
-    DiffOpts, Differentiator, NumericKind, NumericPlugin, OdeOpts, OdeProblem, OdeSolver, QuadOpts,
-    Quadrature,
+    DiffOpts, Differentiator, NumericCallable, NumericKind, NumericPlugin, OdeOpts, OdeProblem,
+    OdeSolver, QuadOpts, Quadrature,
 };

@@ -1,6 +1,9 @@
-use std::sync::Arc;
+use std::{any::Any, sync::Arc};
 
-use sim_kernel::{Args, Cx, DefaultFactory, EagerPolicy, Error, Symbol, Value};
+use sim_kernel::{
+    Args, Callable, ClassRef, Cx, DefaultFactory, EagerPolicy, Error, Factory, Object, Symbol,
+    Value,
+};
 use sim_lib_numbers_func::Func;
 use sim_lib_numbers_numeric::NumericNumbersLib;
 
@@ -25,6 +28,52 @@ fn f64_value(cx: &mut Cx, value: f64) -> Value {
 
 fn value_to_f64(cx: &mut Cx, value: &Value) -> f64 {
     value.object().display(cx).unwrap().parse::<f64>().unwrap()
+}
+
+#[derive(Clone)]
+struct PlainUnary {
+    name: &'static str,
+    f: fn(f64) -> f64,
+}
+
+impl Object for PlainUnary {
+    fn display(&self, _cx: &mut Cx) -> sim_kernel::Result<String> {
+        Ok(format!("#<plain-callable {}>", self.name))
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl sim_kernel::ObjectCompat for PlainUnary {
+    fn class(&self, _cx: &mut Cx) -> sim_kernel::Result<ClassRef> {
+        DefaultFactory.class_stub(
+            sim_kernel::CORE_FUNCTION_CLASS_ID,
+            Symbol::qualified("core", "Function"),
+        )
+    }
+
+    fn as_callable(&self) -> Option<&dyn Callable> {
+        Some(self)
+    }
+}
+
+impl Callable for PlainUnary {
+    fn call(&self, cx: &mut Cx, args: Args) -> sim_kernel::Result<Value> {
+        let values = args.into_vec();
+        let [x] = values.as_slice() else {
+            return Err(Error::Eval("plain unary expected one arg".to_owned()));
+        };
+        let x = value_to_f64(cx, x);
+        Ok(f64_value(cx, (self.f)(x)))
+    }
+}
+
+fn plain_unary(cx: &mut Cx, name: &'static str, f: fn(f64) -> f64) -> Value {
+    cx.factory()
+        .opaque(Arc::new(PlainUnary { name, f }))
+        .unwrap()
 }
 
 fn unary_native<F>(f: F) -> Func
@@ -130,4 +179,53 @@ fn quadratures_integrate_sine_to_two() {
         };
         assert!((value - 2.0).abs() < tol, "{method} -> {value}");
     }
+}
+
+#[test]
+fn integrate_accepts_plain_callable() {
+    let mut cx = test_cx();
+    let func = plain_unary(&mut cx, "plain-sin", f64::sin);
+    let method = cx.factory().symbol(Symbol::new("simpson")).unwrap();
+    let n = f64_value(&mut cx, 128.0);
+    let options = cx
+        .factory()
+        .table(vec![
+            (Symbol::new(":method"), method),
+            (Symbol::new(":n"), n),
+        ])
+        .unwrap();
+    let var = cx.factory().symbol(Symbol::new("x")).unwrap();
+    let lo = f64_value(&mut cx, 0.0);
+    let hi = f64_value(&mut cx, std::f64::consts::PI);
+
+    let out = cx
+        .call_function(
+            &Symbol::new("integrate"),
+            Args::new(vec![func, var, lo, hi, options]),
+        )
+        .unwrap();
+
+    assert!((value_to_f64(&mut cx, &out) - 2.0).abs() < 1.0e-8);
+}
+
+#[test]
+fn numeric_diff_named_method_accepts_plain_callable() {
+    let mut cx = test_cx();
+    let func = plain_unary(&mut cx, "plain-quadratic", |x| x * x + x);
+    let method = cx.factory().symbol(Symbol::new("central-5")).unwrap();
+    let options = cx
+        .factory()
+        .table(vec![(Symbol::new(":method"), method)])
+        .unwrap();
+    let var = cx.factory().symbol(Symbol::new("x")).unwrap();
+    let point = f64_value(&mut cx, 3.0);
+
+    let out = cx
+        .call_function(
+            &Symbol::new("numeric-diff"),
+            Args::new(vec![func, var, point, options]),
+        )
+        .unwrap();
+
+    assert!((value_to_f64(&mut cx, &out) - 7.0).abs() < 1.0e-3);
 }

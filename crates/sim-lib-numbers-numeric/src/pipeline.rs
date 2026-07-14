@@ -6,7 +6,6 @@ use sim_kernel::{
     Args, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, HandleStore, Object, Ref, Result,
     Symbol, Term, Value,
 };
-use sim_lib_numbers_func::Func;
 
 use super::{options::parse_symbolish_value, registry::global_numeric_registry};
 
@@ -150,14 +149,14 @@ pub fn call_numeric_run_composed_exprs(cx: &mut Cx, args: Vec<Expr>) -> Result<V
 fn compose_from_values(cx: &mut Cx, values: &[Value]) -> Result<ComposedPipeline> {
     match values {
         [func, kind, method, state] if !is_compose_key_value(cx, kind)? => {
-            let func_ref = require_func_ref(cx, "numeric/compose", func)?;
+            let func_ref = require_callable_ref(cx, "numeric/compose", func)?;
             let kind = require_pipeline_kind_value(cx, "numeric/compose", kind)?;
             let method = require_symbol_value(cx, "numeric/compose", method)?;
             let state = require_state_kind_value(cx, "numeric/compose", state)?;
             finish_compose(func_ref, kind, method, state)
         }
         [func, rest @ ..] if rest.len().is_multiple_of(2) => {
-            let func_ref = require_func_ref(cx, "numeric/compose", func)?;
+            let func_ref = require_callable_ref(cx, "numeric/compose", func)?;
             let mut options = BTreeMap::<String, Value>::new();
             for pair in rest.chunks(2) {
                 let key = require_compose_key_value(cx, &pair[0])?;
@@ -181,7 +180,7 @@ fn compose_from_exprs(cx: &mut Cx, args: &[Expr]) -> Result<ComposedPipeline> {
         ));
     };
     let func = cx.eval_expr(func_expr.clone())?;
-    let func_ref = require_func_ref(cx, "numeric/compose", &func)?;
+    let func_ref = require_callable_ref(cx, "numeric/compose", &func)?;
     if let [kind_expr, method_expr, state_expr] = rest
         && !is_compose_key_expr(kind_expr)
     {
@@ -210,10 +209,10 @@ fn compose_from_exprs(cx: &mut Cx, args: &[Expr]) -> Result<ComposedPipeline> {
     finish_compose(func_ref, kind, method, state)
 }
 
-fn require_func_ref(cx: &mut Cx, name: &str, value: &Value) -> Result<Ref> {
-    value.object().downcast_ref::<Func>().ok_or_else(|| {
+fn require_callable_ref(cx: &mut Cx, name: &str, value: &Value) -> Result<Ref> {
+    value.object().as_callable().ok_or_else(|| {
         Error::Eval(format!(
-            "{name} expects its first argument to be a Func value"
+            "{name} expects its first argument to be a Func or ordinary callable value"
         ))
     })?;
     Ok(Ref::Handle(cx.handles_mut().intern(value.clone())))
