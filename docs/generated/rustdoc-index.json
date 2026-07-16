@@ -1,5 +1,222 @@
 {
-  "schema": "sim.rustdoc-index.v1",
-  "repo": "sim-numbers",
-  "target_doc": "target/doc/"
+  "generator": "xtask repo-contract v1",
+  "packages": [
+    {
+      "crate_name": "sim_lib_numbers_ad",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-ad/Cargo.toml",
+      "package": "sim-lib-numbers-ad",
+      "summary": "Automatic differentiation primitives: forward-mode dual numbers, a reverse-mode evaluation tape, and the Scalarish numeric trait they share."
+    },
+    {
+      "crate_name": "sim_lib_numbers_arith",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-arith/Cargo.toml",
+      "package": "sim-lib-numbers-arith",
+      "summary": "Cross-domain arithmetic: the math/add, math/sub, math/mul, math/div, and reduction entry points that coerce mixed-domain operands through the promotion lattice and route symbolic inputs to the CAS when it is loaded."
+    },
+    {
+      "crate_name": "sim_lib_numbers_bigint",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-bigint/Cargo.toml",
+      "package": "sim-lib-numbers-bigint",
+      "summary": "The numbers/bigint domain: arbitrary-precision integer literals and values, their exact arithmetic, and promotion into rational."
+    },
+    {
+      "crate_name": "sim_lib_numbers_bool",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-bool/Cargo.toml",
+      "package": "sim-lib-numbers-bool",
+      "summary": "The numbers/bool domain: boolean literals and values as the base of the number-promotion lattice, with edges widening into the integer and float domains."
+    },
+    {
+      "crate_name": "sim_lib_numbers_cas",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-cas/Cargo.toml",
+      "package": "sim-lib-numbers-cas",
+      "summary": "The numbers/cas domain: the core computer-algebra layer. Defines the symbolic expression tree (CasExpr), its value citizen, the conversions to and from surface Expr/Value, and the cas/var and cas/simplify functions other CAS crates build on."
+    },
+    {
+      "crate_name": "sim_lib_numbers_cas_diff",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-cas-diff/Cargo.toml",
+      "package": "sim-lib-numbers-cas-diff",
+      "summary": "Symbolic differentiation and integration over the numbers/cas expression tree: the diff and integrate-sym functions plus an extensible registry of per-operator differentiation rules."
+    },
+    {
+      "crate_name": "sim_lib_numbers_cas_eval",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-cas-eval/Cargo.toml",
+      "package": "sim-lib-numbers-cas-eval",
+      "summary": "Evaluation of numbers/cas symbolic expressions: the eval-cas function that walks a CasExpr against an environment, in either numeric or symbolic mode, and the surface Expr/CasExpr bridge it uses."
+    },
+    {
+      "crate_name": "sim_lib_numbers_codec",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-codec/Cargo.toml",
+      "package": "sim-lib-numbers-codec",
+      "summary": "The number-literal codec surface: helpers that build the numeric-plugin-v1 descriptor symbols and table values advertising a numeric codec or method provider to the runtime."
+    },
+    {
+      "crate_name": "sim_lib_numbers_complex",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-complex/Cargo.toml",
+      "package": "sim-lib-numbers-complex",
+      "summary": "The numbers/complex domain: complex literals and values, their arithmetic, and the promotion edges from i64, f64, and rational into the complex sink of the scalar lattice."
+    },
+    {
+      "crate_name": "sim_lib_numbers_core",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-core/Cargo.toml",
+      "package": "sim-lib-numbers-core",
+      "summary": "Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spec, literal matcher, and op-loop installer (scalar). The canonical number-domain symbol registry and promotion-lattice documentation live in domains."
+    },
+    {
+      "crate_name": "sim_lib_numbers_exotic",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-exotic/Cargo.toml",
+      "package": "sim-lib-numbers-exotic",
+      "summary": "Exotic number domains, currently the lazy continued-fraction domain (numbers/cf): infinite-precision reals carried as continued-fraction coefficient streams, their builtin constants, and the as-f64 truncation function."
+    },
+    {
+      "crate_name": "sim_lib_numbers_f64",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-f64/Cargo.toml",
+      "package": "sim-lib-numbers-f64",
+      "summary": "Double-precision float number domain with arithmetic and complex promotion."
+    },
+    {
+      "crate_name": "sim_lib_numbers_fixed",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-fixed/Cargo.toml",
+      "package": "sim-lib-numbers-fixed",
+      "summary": "The fixed-width integer domains (numbers/i8 .. numbers/i128, numbers/u8 .. numbers/u128): their literals, values, and the widening promotion edges through the signed and unsigned integer lattice."
+    },
+    {
+      "crate_name": "sim_lib_numbers_float",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-float/Cargo.toml",
+      "package": "sim-lib-numbers-float",
+      "summary": "The numbers/f32 domain: single-precision floating-point literals and values, their scalar arithmetic, and promotion into f64."
+    },
+    {
+      "crate_name": "sim_lib_numbers_func",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-func/Cargo.toml",
+      "package": "sim-lib-numbers-func",
+      "summary": "Function number domain: callable function values built over CAS or native bodies, with fn, call, and grad operations for the Func domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_i64",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-i64/Cargo.toml",
+      "package": "sim-lib-numbers-i64",
+      "summary": "The numbers/i64 domain: 64-bit signed-integer literals and values, their scalar arithmetic, and promotion edges into f64 and rational."
+    },
+    {
+      "crate_name": "sim_lib_numbers_numeric",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-numeric/Cargo.toml",
+      "package": "sim-lib-numbers-numeric",
+      "summary": "Numeric evaluation surface: the numeric domain exposes numeric-diff, integrate, ode-solve, and composed pipelines over a registry of pluggable differentiator, quadrature, and ODE-solver backends."
+    },
+    {
+      "crate_name": "sim_lib_numbers_prelude",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-prelude/Cargo.toml",
+      "package": "sim-lib-numbers-prelude",
+      "summary": "Umbrella library for the sim-numbers family: NumbersPreludeLib installs the standard number domains and tensor backends (arithmetic, f64/i64/bigint, rational, complex, CAS, func, tensor and its specializations, numeric, quad, and rk) into a runtime in one call."
+    },
+    {
+      "crate_name": "sim_lib_numbers_quad",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-quad/Cargo.toml",
+      "package": "sim-lib-numbers-quad",
+      "summary": "Quadrature and finite-difference backends for the numeric domain: fixed and adaptive integration rules plus finite-difference differentiators, packaged as a registered numeric plugin library."
+    },
+    {
+      "crate_name": "sim_lib_numbers_rational",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-rational/Cargo.toml",
+      "package": "sim-lib-numbers-rational",
+      "summary": "The numbers/rational domain: exact rational literals and values built over bigint numerator/denominator pairs, their reduced arithmetic, and promotion edges to and from the integer and f64 domains."
+    },
+    {
+      "crate_name": "sim_lib_numbers_rk",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-rk/Cargo.toml",
+      "package": "sim-lib-numbers-rk",
+      "summary": "Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric ode-solve plugins."
+    },
+    {
+      "crate_name": "sim_lib_numbers_stats",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-stats/Cargo.toml",
+      "package": "sim-lib-numbers-stats",
+      "summary": "Probability, descriptive statistics, and fairness metric helpers for f64 number-domain data."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor/Cargo.toml",
+      "package": "sim-lib-numbers-tensor",
+      "summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_bcast",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-bcast/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-bcast",
+      "summary": "Tensor broadcasting specialization: element-wise binary and unary tensor operations with NumPy-style shape broadcasting and promotion rules."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_bit",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-bit/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-bit",
+      "summary": "Bit-tensor specialization: a packed-word boolean tensor element type and its SpecTensor backend, with bitwise operations over the tensor domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_cmplxf",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-cmplxf/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-cmplxf",
+      "summary": "Complex-float tensor specialization: a (real, imag) f64-pair tensor element type and its SpecTensor backend for the complex tensor domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_f64",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-f64",
+      "summary": "f64 tensor specialization: a contiguous f64 tensor element type and its SpecTensor backend for the f64 tensor domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_i64",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-i64/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-i64",
+      "summary": "i64 tensor specialization: a contiguous i64 tensor element type and its SpecTensor backend, with overflow-checked operations that fall back to the bigint domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_linalg",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-linalg/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-linalg",
+      "summary": "Linear-algebra operations over the tensor domain: dot, matmul, cross, transpose, det, inv, trace, norm, and the eye/zeros/ones constructors, registered as a tensor library."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_rat64",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-rat64/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-rat64",
+      "summary": "Rational-i64 tensor specialization: a normalized (numerator, denominator) i64-pair tensor element type and its SpecTensor backend for the rational tensor domain."
+    },
+    {
+      "crate_name": "xtask",
+      "group": "workspace",
+      "manifest": "xtask/Cargo.toml",
+      "package": "xtask",
+      "summary": "Repository automation wrapper for sim-numbers generated documentation."
+    }
+  ]
 }
