@@ -20,7 +20,7 @@
 //!
 //! let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
 //! let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
-//! assert_eq!(roundtrip.to_uniform().data.len(), 2);
+//! assert_eq!(roundtrip.to_uniform().data().len(), 2);
 //! ```
 //!
 //! A mismatched element count fails closed:
@@ -76,11 +76,10 @@ impl SpecTensor for Rat64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|(num, den)| {
                     DefaultFactory
@@ -88,14 +87,15 @@ impl SpecTensor for Rat64Tensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("rational tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_rational_literal_cell)
                 .collect::<Option<Vec<_>>>()?
@@ -202,7 +202,7 @@ mod tests {
     #[test]
     fn rationals_are_normalized() {
         let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
-        assert_eq!(tensor.to_uniform().data.len(), 2);
+        assert_eq!(tensor.to_uniform().data().len(), 2);
         let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
         assert_eq!(roundtrip.data, vec![(1, 2), (3, 4)]);
     }

@@ -70,11 +70,10 @@ impl SpecTensor for ComplexFTensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|(real, imag)| {
                     DefaultFactory
@@ -82,14 +81,15 @@ impl SpecTensor for ComplexFTensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("complex tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_complex_literal_cell)
                 .collect::<Option<Vec<_>>>()?,

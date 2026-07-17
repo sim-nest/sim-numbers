@@ -142,7 +142,7 @@ fn apply_tensor_binary(cx: &mut Cx, operator: Symbol, left: Value, right: Value)
         .ok_or_else(|| Error::Eval("left operand was not a tensor value".to_owned()))?;
     let right = tensor_value_ref(&right)
         .ok_or_else(|| Error::Eval("right operand was not a tensor value".to_owned()))?;
-    let shape = broadcast_shape(&left.shape, &right.shape)?;
+    let shape = broadcast_shape(left.shape(), right.shape())?;
     // Size and materialize the result from the checked, ceiling-bounded cell
     // count: a legal pair like [1_000_000, 1] x [1, 1_000_000] broadcasts to a
     // 1e12-cell shape that fits in usize but would OOM if allocated. Fail closed
@@ -160,13 +160,13 @@ fn apply_tensor_binary(cx: &mut Cx, operator: Symbol, left: Value, right: Value)
 fn apply_tensor_neg(cx: &mut Cx, value: Value) -> Result<Value> {
     let tensor = tensor_value_ref(&value)
         .ok_or_else(|| Error::Eval("neg expects a tensor value".to_owned()))?;
-    let mut cells = Vec::with_capacity(tensor.data.len());
+    let mut cells = Vec::with_capacity(tensor.data().len());
     for cell in flatten_tensor_scalar_cells(tensor) {
         cells.push(cx.apply_value_number_unary_op(&Symbol::qualified("math", "neg"), cell)?);
     }
     build_tensor_value(
         cx,
-        tensor.shape.clone(),
+        tensor.shape().to_vec(),
         Some(tensor_dtype(tensor).clone()),
         cells,
     )
@@ -194,9 +194,10 @@ fn broadcast_shape(left: &[usize], right: &[usize]) -> Result<Vec<usize>> {
 }
 
 fn select_cell(tensor: &Tensor, coord: &[usize], result_shape: &[usize]) -> Result<Value> {
-    let rank_gap = result_shape.len().saturating_sub(tensor.shape.len());
-    let mut local = Vec::with_capacity(tensor.shape.len());
-    for (axis, dim) in tensor.shape.iter().enumerate() {
+    let shape = tensor.shape();
+    let rank_gap = result_shape.len().saturating_sub(shape.len());
+    let mut local = Vec::with_capacity(shape.len());
+    for (axis, dim) in shape.iter().enumerate() {
         let result_axis = axis + rank_gap;
         let coord_value = coord
             .get(result_axis)
@@ -204,9 +205,9 @@ fn select_cell(tensor: &Tensor, coord: &[usize], result_shape: &[usize]) -> Resu
             .ok_or_else(|| Error::Eval("tensor broadcast axis mismatch".to_owned()))?;
         local.push(if *dim == 1 { 0 } else { coord_value });
     }
-    let flat = Tensor::flat_offset(&tensor.shape, &local)?;
+    let flat = Tensor::flat_offset(shape, &local)?;
     tensor
-        .data
+        .data()
         .get(flat)
         .cloned()
         .ok_or_else(|| Error::Eval("tensor broadcast selected an invalid cell".to_owned()))

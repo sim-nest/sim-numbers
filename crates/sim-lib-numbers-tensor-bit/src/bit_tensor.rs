@@ -80,25 +80,25 @@ impl SpecTensor for BitTensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .to_bools()
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.to_bools()
                 .into_iter()
                 .map(bool_value)
                 .collect::<Option<Vec<_>>>()
                 .expect("bool tensor values should always encode"),
-        }
+        )
+        .expect("bit tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         let bits = tensor
-            .data
+            .data()
             .iter()
             .map(parse_bool_cell)
             .collect::<Option<Vec<_>>>()?;
-        Self::from_bools(tensor.shape.clone(), &bits)
+        Self::from_bools(tensor.shape().to_vec(), &bits)
     }
 }
 
@@ -216,7 +216,7 @@ mod tests {
         let out = left.bit_and(&right).unwrap();
         assert_eq!(out.to_bools(), vec![true, false, false, true]);
         let uniform = out.to_uniform();
-        assert_eq!(uniform.shape, vec![4]);
+        assert_eq!(uniform.shape(), &[4]);
     }
 
     #[test]

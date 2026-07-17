@@ -90,11 +90,10 @@ impl I64Tensor {
             match value.checked_add(scalar) {
                 Some(sum) => out.push(sum),
                 None => {
-                    return I64AddResult::Uniform(Tensor {
-                        shape: self.shape.clone(),
-                        dtype: domains::bigint(),
-                        data: self
-                            .data
+                    let tensor = Tensor::new_exact(
+                        self.shape.clone(),
+                        domains::bigint(),
+                        self.data
                             .iter()
                             .map(|cell| {
                                 DefaultFactory
@@ -105,7 +104,9 @@ impl I64Tensor {
                                     .unwrap()
                             })
                             .collect(),
-                    });
+                    )
+                    .expect("bigint overflow fallback should build a valid uniform tensor");
+                    return I64AddResult::Uniform(tensor);
                 }
             }
         }
@@ -126,11 +127,10 @@ impl SpecTensor for I64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|value| {
                     DefaultFactory
@@ -138,14 +138,15 @@ impl SpecTensor for I64Tensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("i64 tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_i64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,
@@ -233,8 +234,8 @@ mod tests {
         let out = tensor.checked_add_scalar(1);
         match out {
             I64AddResult::Uniform(tensor) => {
-                assert_eq!(tensor.dtype, domains::bigint());
-                assert_eq!(tensor.shape, vec![2]);
+                assert_eq!(tensor.dtype(), &domains::bigint());
+                assert_eq!(tensor.shape(), &[2]);
             }
             I64AddResult::Specialized(_) => panic!("expected bigint widening"),
         }

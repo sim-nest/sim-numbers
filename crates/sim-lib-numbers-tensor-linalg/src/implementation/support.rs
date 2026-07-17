@@ -11,7 +11,7 @@ pub fn expect_tensor(value: &Value) -> Result<&Tensor> {
 
 pub fn expect_vector(value: &Value) -> Result<&Tensor> {
     let tensor = expect_tensor(value)?;
-    if tensor.shape.len() != 1 {
+    if tensor.shape().len() != 1 {
         return Err(Error::Eval("expected a rank-1 tensor".to_owned()));
     }
     Ok(tensor)
@@ -19,7 +19,7 @@ pub fn expect_vector(value: &Value) -> Result<&Tensor> {
 
 pub fn expect_matrix(value: &Value) -> Result<&Tensor> {
     let tensor = expect_tensor(value)?;
-    if tensor.shape.len() != 2 {
+    if tensor.shape().len() != 2 {
         return Err(Error::Eval("expected a rank-2 tensor".to_owned()));
     }
     Ok(tensor)

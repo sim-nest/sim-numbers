@@ -77,20 +77,21 @@ impl F64Tensor {
     /// and exists mainly for comparison.
     pub fn add_uniform_scalar_slow(&self, scalar: f64) -> Tensor {
         let uniform = self.to_uniform();
-        Tensor {
-            shape: uniform.shape,
-            dtype: uniform.dtype,
-            data: uniform
-                .data
-                .into_iter()
+        Tensor::new_exact(
+            uniform.shape().to_vec(),
+            uniform.dtype().clone(),
+            uniform
+                .data()
+                .iter()
                 .map(|value| {
-                    let literal = parse_f64_literal_cell(&value).unwrap();
+                    let literal = parse_f64_literal_cell(value).unwrap();
                     DefaultFactory
                         .number_literal(domains::f64(), (literal + scalar).to_string())
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("uniform f64 tensor conversion should stay valid")
     }
 
     /// Times both add-scalar paths once and returns `(fast_ns, slow_ns)`.
@@ -121,11 +122,10 @@ impl SpecTensor for F64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|value| {
                     DefaultFactory
@@ -133,14 +133,15 @@ impl SpecTensor for F64Tensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("f64 tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_f64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,

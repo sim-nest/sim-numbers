@@ -6,7 +6,7 @@ use sim_kernel::{
 };
 
 use crate::{
-    TensorNumbersLib, build_tensor_value, number_domain, tensor_value_class_symbol,
+    Tensor, TensorNumbersLib, build_tensor_value, number_domain, tensor_value_class_symbol,
     tensor_value_ref,
 };
 
@@ -139,6 +139,70 @@ fn tensor_constructor_infers_join_dtype_for_mixed_cells() {
     assert!(dtype != Symbol::qualified("numbers", "tensor"));
     assert!(cx.registry().number_domain_by_symbol(&dtype).is_some());
     assert_eq!(number_domain(), Symbol::qualified("numbers", "tensor"));
+}
+
+#[test]
+fn tensor_constructor_rejects_inferred_impossible_join() {
+    let mut cx = test_cx();
+    let result = build_tensor_value(
+        &mut cx,
+        vec![2],
+        None,
+        vec![
+            DefaultFactory
+                .number_literal(Symbol::qualified("test", "left"), "1".to_owned())
+                .unwrap(),
+            DefaultFactory
+                .number_literal(Symbol::qualified("test", "right"), "2".to_owned())
+                .unwrap(),
+        ],
+    );
+    let err = match result {
+        Ok(_) => panic!("unregistered, unrelated domains must not infer a dtype"),
+        Err(err) => err,
+    };
+    assert!(err.to_string().contains("no join domain exists"));
+}
+
+#[test]
+fn tensor_constructor_rejects_explicit_impossible_dtype() {
+    let mut cx = test_cx();
+    let result = build_tensor_value(
+        &mut cx,
+        vec![2],
+        Some(Symbol::qualified("numbers", "bool")),
+        vec![number("i64", "1"), number("f64", "2.0")],
+    );
+    let err = match result {
+        Ok(_) => panic!("explicit dtype must accept every cell"),
+        Err(err) => err,
+    };
+    assert!(err.to_string().contains("not a valid join"));
+}
+
+#[test]
+fn checked_tensor_constructor_rejects_invalid_direct_construction() {
+    let mut cx = test_cx();
+    let missing_scalar_cell = match Tensor::new_checked(
+        &mut cx,
+        Vec::new(),
+        Symbol::qualified("numbers", "i64"),
+        Vec::new(),
+    ) {
+        Ok(_) => panic!("rank-0 tensor without a cell must fail"),
+        Err(err) => err,
+    };
+    assert!(missing_scalar_cell.to_string().contains("expects 1 cells"));
+
+    let mismatched_cell_dtype = match Tensor::new_exact(
+        vec![1],
+        Symbol::qualified("numbers", "i64"),
+        vec![number("f64", "1.0")],
+    ) {
+        Ok(_) => panic!("exact constructor must reject mismatched cell dtype"),
+        Err(err) => err,
+    };
+    assert!(mismatched_cell_dtype.to_string().contains("does not match"));
 }
 
 #[test]
@@ -280,7 +344,7 @@ fn tensor_citizen_fixtures_cover_typed_cell_domains() {
                 .collect(),
         )
         .unwrap();
-        assert_eq!(tensor_value_ref(&tensor).unwrap().dtype, domain);
+        assert_eq!(tensor_value_ref(&tensor).unwrap().dtype(), &domain);
         sim_citizen::check_value_fixture(&mut cx, tensor).unwrap();
     }
 }
