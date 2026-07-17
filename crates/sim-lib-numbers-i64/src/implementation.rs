@@ -83,7 +83,8 @@ fn cmp_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/i64 number-domain marker; reconstruct by loading the i64 number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/i64"
 )]
 /// The exact 64-bit signed-integer number domain: parses integer literals and
 /// declares promotion edges into [`f64`](domains::f64) and

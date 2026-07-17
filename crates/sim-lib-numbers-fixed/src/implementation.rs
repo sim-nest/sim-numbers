@@ -206,7 +206,8 @@ fn install_domain(linker: &mut Linker<'_>, spec: DomainSpec) -> Result<()> {
 
 #[sim_citizen_derive::non_citizen(
     reason = "fixed-width number-domain marker; reconstruct by loading the fixed number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/fixed"
 )]
 struct FixedNumberDomain {
     spec: DomainSpec,

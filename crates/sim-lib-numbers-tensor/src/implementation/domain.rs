@@ -39,7 +39,8 @@ fn value_shape_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/tensor number-domain marker; reconstruct by loading the tensor number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/tensor"
 )]
 struct TensorNumberDomain;
 
@@ -144,7 +145,8 @@ impl sim_shape::Shape for TensorLiteralShape {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/tensor literal class marker; tensor values use the numbers/Tensor citizen descriptor",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/Tensor"
 )]
 struct TensorLiteralClass;
 

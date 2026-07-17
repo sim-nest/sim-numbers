@@ -49,7 +49,8 @@ pub fn value_shape_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/func number-domain marker; reconstruct by loading the function number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/func"
 )]
 pub struct FuncNumberDomain;
 

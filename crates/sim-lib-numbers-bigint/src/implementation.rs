@@ -66,7 +66,8 @@ pub(crate) fn rational_domain() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/bigint number-domain marker; reconstruct by loading the bigint number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/bigint"
 )]
 /// The arbitrary-precision signed-integer number domain: parses unbounded
 /// integer literals, performs exact arithmetic, and declares the promotion

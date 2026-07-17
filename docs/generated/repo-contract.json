@@ -240,6 +240,7 @@
   "non_citizen_exemptions": [
     {
       "crate": "sim-lib-numbers-bigint",
+      "descriptor": "numbers/bigint",
       "file": "crates/sim-lib-numbers-bigint/src/implementation.rs",
       "kind": "marker",
       "line": 67,
@@ -247,6 +248,7 @@
     },
     {
       "crate": "sim-lib-numbers-bool",
+      "descriptor": "numbers/bool",
       "file": "crates/sim-lib-numbers-bool/src/implementation.rs",
       "kind": "marker",
       "line": 67,
@@ -254,6 +256,7 @@
     },
     {
       "crate": "sim-lib-numbers-cas",
+      "descriptor": "numbers/cas",
       "file": "crates/sim-lib-numbers-cas/src/implementation/domain.rs",
       "kind": "marker",
       "line": 44,
@@ -261,6 +264,7 @@
     },
     {
       "crate": "sim-lib-numbers-complex",
+      "descriptor": "numbers/complex",
       "file": "crates/sim-lib-numbers-complex/src/implementation/literal.rs",
       "kind": "marker",
       "line": 101,
@@ -268,6 +272,7 @@
     },
     {
       "crate": "sim-lib-numbers-exotic",
+      "descriptor": "numbers/cf",
       "file": "crates/sim-lib-numbers-exotic/src/implementation/domain.rs",
       "kind": "marker",
       "line": 48,
@@ -275,6 +280,7 @@
     },
     {
       "crate": "sim-lib-numbers-exotic",
+      "descriptor": "numbers/cf",
       "file": "crates/sim-lib-numbers-exotic/src/implementation/value.rs",
       "kind": "handle",
       "line": 39,
@@ -282,6 +288,7 @@
     },
     {
       "crate": "sim-lib-numbers-exotic",
+      "descriptor": "numbers/cf",
       "file": "crates/sim-lib-numbers-exotic/src/implementation/value.rs",
       "kind": "handle",
       "line": 328,
@@ -289,6 +296,7 @@
     },
     {
       "crate": "sim-lib-numbers-f64",
+      "descriptor": "numbers/f64",
       "file": "crates/sim-lib-numbers-f64/src/implementation.rs",
       "kind": "marker",
       "line": 46,
@@ -296,6 +304,7 @@
     },
     {
       "crate": "sim-lib-numbers-fixed",
+      "descriptor": "numbers/fixed",
       "file": "crates/sim-lib-numbers-fixed/src/implementation.rs",
       "kind": "marker",
       "line": 207,
@@ -303,6 +312,7 @@
     },
     {
       "crate": "sim-lib-numbers-float",
+      "descriptor": "numbers/f32",
       "file": "crates/sim-lib-numbers-float/src/implementation.rs",
       "kind": "marker",
       "line": 48,
@@ -310,6 +320,7 @@
     },
     {
       "crate": "sim-lib-numbers-func",
+      "descriptor": "numbers/func",
       "file": "crates/sim-lib-numbers-func/src/implementation/domain.rs",
       "kind": "marker",
       "line": 50,
@@ -317,6 +328,7 @@
     },
     {
       "crate": "sim-lib-numbers-i64",
+      "descriptor": "numbers/i64",
       "file": "crates/sim-lib-numbers-i64/src/implementation.rs",
       "kind": "marker",
       "line": 84,
@@ -324,6 +336,7 @@
     },
     {
       "crate": "sim-lib-numbers-rational",
+      "descriptor": "numbers/rational",
       "file": "crates/sim-lib-numbers-rational/src/implementation/domain.rs",
       "kind": "marker",
       "line": 90,
@@ -331,6 +344,7 @@
     },
     {
       "crate": "sim-lib-numbers-tensor",
+      "descriptor": "numbers/tensor",
       "file": "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "kind": "marker",
       "line": 40,
@@ -338,9 +352,10 @@
     },
     {
       "crate": "sim-lib-numbers-tensor",
+      "descriptor": "numbers/Tensor",
       "file": "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "kind": "marker",
-      "line": 145,
+      "line": 146,
       "reason": "numbers/tensor literal class marker; tensor values use the numbers/Tensor citizen descriptor"
     }
   ],
@@ -2342,10 +2357,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "4e15065738c058cec299693f23d929226ec3f539",
+    "git_commit": "73a6495094252fbbc1f31506377e95b2a7fed402",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "4e15065738c058cec299693f23d929226ec3f539",
+    "source_commit": "73a6495094252fbbc1f31506377e95b2a7fed402",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2358,7 +2373,7 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "519b5f6a3c9d7984",
+    "workspace_hash": "b1d860aa89081edf",
     "workspace_hash_algorithm": "fnv1a64",
     "workspace_hash_input_count": 279,
     "workspace_hash_inputs": [

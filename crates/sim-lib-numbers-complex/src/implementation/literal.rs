@@ -100,7 +100,8 @@ pub fn product_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/complex number-domain marker; reconstruct by loading the complex number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/complex"
 )]
 /// The complex number domain at the sink of the scalar promotion lattice:
 /// parses `a+bi` literals and accepts the widening edges from `f64`, `i64`, and

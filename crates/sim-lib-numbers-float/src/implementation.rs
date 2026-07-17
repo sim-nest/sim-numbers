@@ -47,7 +47,8 @@ pub(crate) fn f64_domain() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/f32 number-domain marker; reconstruct by loading the float number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/f32"
 )]
 /// The single-precision 32-bit floating-point number domain: parses decimal
 /// literals and declares the widening promotion edge into [`f64`](domains::f64).
