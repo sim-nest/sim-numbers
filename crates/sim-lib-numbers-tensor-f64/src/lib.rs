@@ -38,8 +38,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_f64_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_f64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A tensor whose cells are native `f64` values in a contiguous buffer.
@@ -59,7 +59,8 @@ impl F64Tensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<f64>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then_some(Self { shape, data })
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then_some(Self { shape, data })
     }
 
     /// Adds a scalar to every cell, operating directly on the native buffer.
@@ -236,6 +237,11 @@ mod tests {
         );
         let roundtrip = F64Tensor::from_uniform(&added.to_uniform()).unwrap();
         assert_eq!(roundtrip, added);
+    }
+
+    #[test]
+    fn constructor_rejects_overflowing_shape() {
+        assert!(F64Tensor::new(vec![usize::MAX, 2], Vec::new()).is_none());
     }
 
     #[test]

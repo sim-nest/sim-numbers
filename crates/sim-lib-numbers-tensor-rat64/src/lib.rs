@@ -36,8 +36,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_rational_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_rational_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A rational tensor whose cells are `(numerator, denominator)` `i64` pairs.
@@ -59,7 +59,8 @@ impl Rat64Tensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<(i64, i64)>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then(|| Self {
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then(|| Self {
             shape,
             data: data.into_iter().map(normalize).collect(),
         })
@@ -205,6 +206,11 @@ mod tests {
         assert_eq!(tensor.to_uniform().data().len(), 2);
         let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
         assert_eq!(roundtrip.data, vec![(1, 2), (3, 4)]);
+    }
+
+    #[test]
+    fn constructor_rejects_overflowing_shape() {
+        assert!(Rat64Tensor::new(vec![usize::MAX, 2], Vec::new()).is_none());
     }
 
     #[test]

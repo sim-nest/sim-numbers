@@ -35,8 +35,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_complex_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_complex_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A complex tensor whose cells are `(real, imag)` `f64` pairs.
@@ -56,7 +56,8 @@ impl ComplexFTensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<(f64, f64)>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then_some(Self { shape, data })
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then_some(Self { shape, data })
     }
 }
 
@@ -176,6 +177,11 @@ mod tests {
         let tensor = ComplexFTensor::new(vec![2], vec![(1.0, 2.0), (3.5, -4.0)]).unwrap();
         let roundtrip = ComplexFTensor::from_uniform(&tensor.to_uniform()).unwrap();
         assert_eq!(roundtrip, tensor);
+    }
+
+    #[test]
+    fn constructor_rejects_overflowing_shape() {
+        assert!(ComplexFTensor::new(vec![usize::MAX, 2], Vec::new()).is_none());
     }
 
     #[test]

@@ -41,8 +41,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_i64_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_i64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A tensor whose cells are native `i64` values in a contiguous buffer.
@@ -76,7 +76,8 @@ impl I64Tensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<i64>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then_some(Self { shape, data })
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then_some(Self { shape, data })
     }
 
     /// Adds a scalar to every cell, widening to bigint on overflow.
@@ -239,6 +240,11 @@ mod tests {
             }
             I64AddResult::Specialized(_) => panic!("expected bigint widening"),
         }
+    }
+
+    #[test]
+    fn constructor_rejects_overflowing_shape() {
+        assert!(I64Tensor::new(vec![usize::MAX, 2], Vec::new()).is_none());
     }
 
     #[test]
