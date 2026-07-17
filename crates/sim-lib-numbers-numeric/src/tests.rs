@@ -44,6 +44,10 @@ fn quoted(name: &str) -> Expr {
     }
 }
 
+fn keyword(key: &str) -> Expr {
+    Expr::Symbol(Symbol::new(format!(":{key}")))
+}
+
 fn f64_value(cx: &mut Cx, canonical: &str) -> Value {
     cx.factory()
         .number_literal(Symbol::qualified("numbers", "f64"), canonical.to_owned())
@@ -205,6 +209,23 @@ fn native_identity_func(cx: &mut Cx) -> sim_kernel::Value {
         .unwrap()
 }
 
+fn duplicate_option_table(cx: &mut Cx, key: &str, first: Expr, second: Expr) -> Value {
+    cx.factory()
+        .expr(Expr::Map(vec![
+            (keyword(key), first),
+            (keyword(key), second),
+        ]))
+        .unwrap()
+}
+
+fn assert_duplicate_option(err: Error, key: &str) {
+    assert!(
+        err.to_string()
+            .contains(format!("duplicate option :{key}").as_str()),
+        "{err}"
+    );
+}
+
 #[test]
 fn composed_pipeline_table_value_round_trips() {
     let mut cx = test_cx();
@@ -283,6 +304,158 @@ fn numeric_compose_returns_composed_pipeline_value() {
     assert_eq!(pipeline.method, Symbol::new("rk4"));
     assert_eq!(pipeline.state, StateKind::F64);
     assert!(matches!(pipeline.func_ref, sim_kernel::Ref::Handle(_)));
+}
+
+#[test]
+fn duplicate_expr_options_fail_closed() {
+    let mut cx = test_cx();
+    let cases = vec![
+        (
+            "numeric-diff",
+            vec![
+                quoted("f"),
+                quoted("x"),
+                f64_number("1.0"),
+                keyword("method"),
+                quoted("central-5"),
+                keyword("method"),
+                quoted("auto"),
+            ],
+            "method",
+        ),
+        (
+            "numeric-diff",
+            vec![
+                quoted("f"),
+                quoted("x"),
+                f64_number("1.0"),
+                keyword("h"),
+                f64_number("0.1"),
+                keyword("h"),
+                f64_number("0.2"),
+            ],
+            "h",
+        ),
+        (
+            "integrate",
+            vec![
+                quoted("f"),
+                quoted("x"),
+                f64_number("0.0"),
+                f64_number("1.0"),
+                keyword("n"),
+                f64_number("4"),
+                keyword("n"),
+                f64_number("8"),
+            ],
+            "n",
+        ),
+        (
+            "integrate-adapt",
+            vec![
+                quoted("f"),
+                quoted("x"),
+                f64_number("0.0"),
+                f64_number("1.0"),
+                keyword("tol"),
+                f64_number("0.1"),
+                keyword("tol"),
+                f64_number("0.2"),
+            ],
+            "tol",
+        ),
+        (
+            "ode-solve",
+            vec![
+                quoted("f"),
+                quoted("x"),
+                quoted("y"),
+                f64_number("0.0"),
+                f64_number("1.0"),
+                f64_number("2.0"),
+                keyword("max-steps"),
+                f64_number("4"),
+                keyword("max-steps"),
+                f64_number("8"),
+            ],
+            "max-steps",
+        ),
+    ];
+
+    for (operator, args, key) in cases {
+        let err = cx
+            .eval_expr(Expr::Call {
+                operator: Box::new(Expr::Symbol(Symbol::new(operator))),
+                args,
+            })
+            .unwrap_err();
+        assert_duplicate_option(err, key);
+    }
+}
+
+#[test]
+fn duplicate_table_options_fail_closed() {
+    let mut cx = test_cx();
+    let func = plain_unary(&mut cx, "duplicate-options", |x| x);
+    let x = cx.factory().symbol(Symbol::new("x")).unwrap();
+    let y = cx.factory().symbol(Symbol::new("y")).unwrap();
+
+    let diff_method_options =
+        duplicate_option_table(&mut cx, "method", quoted("central-5"), quoted("auto"));
+    let point = f64_value(&mut cx, "1.0");
+    let err = cx
+        .call_function(
+            &Symbol::new("numeric-diff"),
+            Args::new(vec![func.clone(), x.clone(), point, diff_method_options]),
+        )
+        .unwrap_err();
+    assert_duplicate_option(err, "method");
+
+    let diff_h_options = duplicate_option_table(&mut cx, "h", f64_number("0.1"), f64_number("0.2"));
+    let point = f64_value(&mut cx, "1.0");
+    let err = cx
+        .call_function(
+            &Symbol::new("numeric-diff"),
+            Args::new(vec![func.clone(), x.clone(), point, diff_h_options]),
+        )
+        .unwrap_err();
+    assert_duplicate_option(err, "h");
+
+    let quad_n_options = duplicate_option_table(&mut cx, "n", f64_number("4"), f64_number("8"));
+    let lo = f64_value(&mut cx, "0.0");
+    let hi = f64_value(&mut cx, "1.0");
+    let err = cx
+        .call_function(
+            &Symbol::new("integrate"),
+            Args::new(vec![func.clone(), x.clone(), lo, hi, quad_n_options]),
+        )
+        .unwrap_err();
+    assert_duplicate_option(err, "n");
+
+    let quad_tol_options =
+        duplicate_option_table(&mut cx, "tol", f64_number("0.1"), f64_number("0.2"));
+    let lo = f64_value(&mut cx, "0.0");
+    let hi = f64_value(&mut cx, "1.0");
+    let err = cx
+        .call_function(
+            &Symbol::new("integrate-adapt"),
+            Args::new(vec![func.clone(), x.clone(), lo, hi, quad_tol_options]),
+        )
+        .unwrap_err();
+    assert_duplicate_option(err, "tol");
+
+    let ode_max_steps_options =
+        duplicate_option_table(&mut cx, "max-steps", f64_number("4"), f64_number("8"));
+    let x0 = f64_value(&mut cx, "0.0");
+    let y0 = f64_value(&mut cx, "1.0");
+    let x_end = f64_value(&mut cx, "2.0");
+    let err = cx
+        .call_function(
+            &Symbol::new("ode-solve"),
+            Args::new(vec![func, x, y, x0, y0, x_end, ode_max_steps_options]),
+        )
+        .unwrap_err();
+    assert_duplicate_option(err, "max-steps");
 }
 
 #[test]

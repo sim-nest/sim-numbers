@@ -1,11 +1,11 @@
 //! The quadrature library and its integration backends, registering fixed and
 //! adaptive quadrature rules and the finite-difference differentiators.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use sim_kernel::{
-    AbiVersion, Cx, Dependency, Export, Lib, LibManifest, LibTarget, Linker, Result, Symbol, Value,
-    Version,
+    AbiVersion, Cx, Dependency, Error, Export, Lib, LibManifest, LibTarget, Linker, Result, Symbol,
+    Value, Version,
 };
 use sim_lib_numbers_codec::{numeric_plugin_descriptor_symbol, numeric_plugin_descriptor_value};
 use sim_lib_numbers_core::domains;
@@ -74,15 +74,29 @@ impl Lib for QuadNumbersLib {
     }
 
     fn load(&self, cx: &mut sim_kernel::LoadCx, linker: &mut Linker<'_>) -> Result<()> {
-        for plugin in differentiators() {
-            register_differentiator(plugin)?;
-        }
-        for plugin in quadratures() {
-            register_quadrature(plugin)?;
-        }
+        register_plugins_once()?;
         install_descriptors(cx, linker)?;
         Ok(())
     }
+}
+
+static PLUGINS_REGISTERED: OnceLock<std::result::Result<(), String>> = OnceLock::new();
+
+fn register_plugins_once() -> Result<()> {
+    match PLUGINS_REGISTERED.get_or_init(|| register_plugins().map_err(|err| err.to_string())) {
+        Ok(()) => Ok(()),
+        Err(message) => Err(Error::Eval(message.clone())),
+    }
+}
+
+fn register_plugins() -> Result<()> {
+    for plugin in differentiators() {
+        register_differentiator(plugin)?;
+    }
+    for plugin in quadratures() {
+        register_quadrature(plugin)?;
+    }
+    Ok(())
 }
 
 fn descriptor_exports() -> Vec<Export> {

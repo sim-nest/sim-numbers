@@ -1,7 +1,7 @@
 //! The Runge-Kutta library and its ODE-solver backends, registering the
 //! fixed-step and adaptive integrators as numeric plugins.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use sim_kernel::{
     AbiVersion, Cx, Dependency, Error, Export, Lib, LibManifest, LibTarget, Linker, Result, Symbol,
@@ -66,12 +66,26 @@ impl Lib for RkNumbersLib {
     }
 
     fn load(&self, cx: &mut sim_kernel::LoadCx, linker: &mut Linker<'_>) -> Result<()> {
-        for plugin in solvers() {
-            register_ode_solver(plugin)?;
-        }
+        register_plugins_once()?;
         install_descriptors(cx, linker)?;
         Ok(())
     }
+}
+
+static PLUGINS_REGISTERED: OnceLock<std::result::Result<(), String>> = OnceLock::new();
+
+fn register_plugins_once() -> Result<()> {
+    match PLUGINS_REGISTERED.get_or_init(|| register_plugins().map_err(|err| err.to_string())) {
+        Ok(()) => Ok(()),
+        Err(message) => Err(Error::Eval(message.clone())),
+    }
+}
+
+fn register_plugins() -> Result<()> {
+    for plugin in solvers() {
+        register_ode_solver(plugin)?;
+    }
+    Ok(())
 }
 
 fn descriptor_exports() -> Vec<Export> {

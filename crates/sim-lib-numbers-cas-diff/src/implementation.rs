@@ -12,4 +12,6 @@ mod registry;
 pub use diff::{diff_cas, diff_symbol};
 pub use function::CasDiffLib;
 pub use integrate::{integrate_cas, integrate_sym_symbol};
-pub use registry::{CasDiffRegistry, DiffRule, global_diff_registry, register_diff_rule};
+pub use registry::{
+    CasDiffRegistry, DiffRule, global_diff_registry, override_diff_rule, register_diff_rule,
+};

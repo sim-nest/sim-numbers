@@ -1,11 +1,14 @@
 //! Argument and option parsing for the numeric operations, turning expression
 //! and table inputs into typed `DiffOpts`, `QuadOpts`, and `OdeOpts`.
 
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::BTreeMap, sync::Arc};
 
 use sim_kernel::{Cx, DefaultFactory, EagerPolicy, Error, Expr, QuoteMode, Result, Symbol, Value};
 
 use super::traits::{DiffOpts, OdeOpts, QuadOpts};
+
+/// Parsed numeric option values keyed by keyword name without the leading `:`.
+pub type ParsedOptions = BTreeMap<String, Value>;
 
 pub fn parse_diff_exprs(cx: &mut Cx, args: Vec<Expr>) -> Result<(Value, Symbol, Value, DiffOpts)> {
     let [func_expr, var_expr, point_expr, rest @ ..] = args.as_slice() else {
@@ -102,18 +105,16 @@ pub fn parse_ode_exprs(
     ))
 }
 
-pub fn parse_table_options(
-    cx: &mut Cx,
-    name: &str,
-    value: &Value,
-) -> Result<HashMap<String, Value>> {
+pub fn parse_table_options(cx: &mut Cx, name: &str, value: &Value) -> Result<ParsedOptions> {
     let expr = value.object().as_expr(cx)?;
     let Expr::Map(entries) = expr else {
         return Err(Error::Eval(format!("{name} options must be a table")));
     };
-    let mut options = HashMap::new();
+    let mut options = ParsedOptions::new();
     for (key_expr, value_expr) in entries {
-        options.insert(keyword(&key_expr)?, cx.eval_expr(value_expr)?);
+        let key = keyword(&key_expr)?;
+        let value = cx.eval_expr(value_expr)?;
+        insert_option(&mut options, name, key, value)?;
     }
     Ok(options)
 }
@@ -122,7 +123,7 @@ pub fn parse_symbolish_value(cx: &mut Cx, value: &Value) -> Result<Option<Symbol
     Ok(parse_symbolish_expr(&value.object().as_expr(cx)?))
 }
 
-pub fn option_symbol(options: &HashMap<String, Value>, key: &str) -> Result<Option<Symbol>> {
+pub fn option_symbol(options: &ParsedOptions, key: &str) -> Result<Option<Symbol>> {
     match options.get(key) {
         Some(value) => {
             let mut cx = dummy_cx();
@@ -134,7 +135,7 @@ pub fn option_symbol(options: &HashMap<String, Value>, key: &str) -> Result<Opti
     }
 }
 
-pub fn option_f64(options: &HashMap<String, Value>, key: &str) -> Result<Option<f64>> {
+pub fn option_f64(options: &ParsedOptions, key: &str) -> Result<Option<f64>> {
     match options.get(key) {
         Some(value) => value
             .object()
@@ -146,7 +147,7 @@ pub fn option_f64(options: &HashMap<String, Value>, key: &str) -> Result<Option<
     }
 }
 
-pub fn option_usize(options: &HashMap<String, Value>, key: &str) -> Result<Option<usize>> {
+pub fn option_usize(options: &ParsedOptions, key: &str) -> Result<Option<usize>> {
     match options.get(key) {
         Some(value) => value
             .object()
@@ -158,11 +159,7 @@ pub fn option_usize(options: &HashMap<String, Value>, key: &str) -> Result<Optio
     }
 }
 
-pub fn reject_unknown(
-    name: &str,
-    options: &HashMap<String, Value>,
-    allowed: &[&str],
-) -> Result<()> {
+pub fn reject_unknown(name: &str, options: &ParsedOptions, allowed: &[&str]) -> Result<()> {
     for key in options.keys() {
         if !allowed.iter().any(|allowed_key| key == allowed_key) {
             return Err(Error::Eval(format!("{name}: unknown option :{key}")));
@@ -171,17 +168,27 @@ pub fn reject_unknown(
     Ok(())
 }
 
-fn parse_expr_options(cx: &mut Cx, name: &str, exprs: &[Expr]) -> Result<HashMap<String, Value>> {
+fn parse_expr_options(cx: &mut Cx, name: &str, exprs: &[Expr]) -> Result<ParsedOptions> {
     if !exprs.len().is_multiple_of(2) {
         return Err(Error::Eval(format!(
             "{name} options must be key/value pairs"
         )));
     }
-    let mut options = HashMap::new();
+    let mut options = ParsedOptions::new();
     for pair in exprs.chunks(2) {
-        options.insert(keyword(&pair[0])?, cx.eval_expr(pair[1].clone())?);
+        let key = keyword(&pair[0])?;
+        let value = cx.eval_expr(pair[1].clone())?;
+        insert_option(&mut options, name, key, value)?;
     }
     Ok(options)
+}
+
+fn insert_option(options: &mut ParsedOptions, name: &str, key: String, value: Value) -> Result<()> {
+    if options.contains_key(&key) {
+        return Err(Error::Eval(format!("{name}: duplicate option :{key}")));
+    }
+    options.insert(key, value);
+    Ok(())
 }
 
 fn parse_symbolish_expr(expr: &Expr) -> Option<Symbol> {
