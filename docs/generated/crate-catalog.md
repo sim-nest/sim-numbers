@@ -36,4 +36,4 @@ Generated from Cargo metadata by `xtask crate-catalog v1`.
 | `sim-lib-numbers-tensor-linalg` | `true` | `custom-build, lib` | Linear algebra operations for SIM tensors: dot, matrix multiply, inversion, norms, and constructors. |
 | `sim-lib-numbers-tensor-rat64` | `true` | `custom-build, lib` | Rational i64-pair tensor specialization for the SIM tensor domain. |
 | `sim-lib-numbers-tensor` | `true` | `custom-build, lib` | Uniform n-dimensional tensor value, constructors, and specialization hooks for SIM numbers. |
-| `xtask` | `false` | `bin` | Repository automation wrapper for sim-numbers generated documentation. |
+| `xtask` | `false` | `bin` | Repository automation wrapper for sim-numbers generated documentation and policy checks. |

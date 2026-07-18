@@ -394,7 +394,7 @@
       ]
     },
     {
-      "description": "Repository automation wrapper for sim-numbers generated documentation.",
+      "description": "Repository automation wrapper for sim-numbers generated documentation and policy checks.",
       "generated_readme": true,
       "manifest": "xtask/Cargo.toml",
       "name": "xtask",
