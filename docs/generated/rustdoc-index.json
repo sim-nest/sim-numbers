@@ -216,7 +216,7 @@
       "group": "workspace",
       "manifest": "xtask/Cargo.toml",
       "package": "xtask",
-      "summary": "Repository automation wrapper for sim-numbers generated documentation."
+      "summary": "Repository automation wrapper for sim-numbers generated documentation and policy checks."
     }
   ]
 }

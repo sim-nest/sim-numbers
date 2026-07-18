@@ -133,7 +133,7 @@ representation where no specialization applies.
 Run validation from this repository:
 
 ```bash
-cargo fmt --all --check && cargo test --workspace && cargo clippy --workspace --all-targets -- -D warnings && cargo doc --workspace --no-deps
+cargo fmt --all --check && cargo run -p xtask -- check-file-sizes && cargo test --workspace && cargo clippy --workspace --all-targets -- -D warnings && cargo doc --workspace --no-deps
 cargo run -p xtask -- simdoc --check
 ```
 
