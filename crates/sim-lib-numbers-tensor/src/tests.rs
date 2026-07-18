@@ -238,6 +238,34 @@ fn tensor_citizen_read_constructor_round_trips() {
 }
 
 #[test]
+fn tensor_read_constructor_accepts_numeric_shape_dimensions() {
+    let mut cx = test_cx();
+    cx.grant(read_construct_capability());
+    let shape = data_value(vec![number("i64", "2"), number("i64", "2")]);
+    let tensor = cx
+        .read_construct(
+            &tensor_value_class_symbol(),
+            vec![
+                symbol("v1"),
+                shape,
+                data_value(vec![
+                    number("i64", "1"),
+                    number("i64", "2"),
+                    number("i64", "3"),
+                    number("i64", "4"),
+                ]),
+                DefaultFactory
+                    .symbol(Symbol::qualified("numbers", "i64"))
+                    .unwrap(),
+            ],
+        )
+        .unwrap();
+    let tensor = tensor_value_ref(&tensor).unwrap();
+    assert_eq!(tensor.shape(), &[2, 2]);
+    assert_eq!(tensor.dtype(), &Symbol::qualified("numbers", "i64"));
+}
+
+#[test]
 fn tensor_read_constructor_rejects_malformed_shape_and_wrong_domain() {
     let mut cx = test_cx();
     cx.grant(read_construct_capability());
@@ -271,6 +299,25 @@ fn tensor_read_constructor_rejects_malformed_shape_and_wrong_domain() {
         )
         .unwrap_err();
     assert!(wrong_domain.to_string().contains("dtype"));
+
+    let negative_dimension = cx
+        .read_construct(
+            &tensor_value_class_symbol(),
+            vec![
+                symbol("v1"),
+                data_value(vec![number("i64", "-1")]),
+                data_value(Vec::new()),
+                DefaultFactory
+                    .symbol(Symbol::qualified("numbers", "i64"))
+                    .unwrap(),
+            ],
+        )
+        .unwrap_err();
+    assert!(
+        negative_dimension
+            .to_string()
+            .contains("non-negative integer dimensions")
+    );
 }
 
 #[test]

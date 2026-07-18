@@ -8,6 +8,7 @@ use sim_kernel::{
     Symbol, Value, force_list_to_vec,
 };
 
+use super::dimension::{extract_dims, extract_usize};
 use super::value::{
     Tensor, build_scalar_tensor_value, build_tensor_value, tensor_dtype, tensor_value_ref,
 };
@@ -259,33 +260,6 @@ fn extract_optional_symbol(cx: &mut Cx, value: &Value) -> Result<Option<Symbol>>
         _ => Err(Error::Eval(
             "expected a symbol or nil for tensor dtype".to_owned(),
         )),
-    }
-}
-
-fn extract_dims(cx: &mut Cx, value: &Value, context: &str) -> Result<Vec<usize>> {
-    let list = value
-        .object()
-        .as_list()
-        .ok_or_else(|| Error::Eval(format!("{context} must be a list or vector of dimensions")))?;
-    let values = force_list_to_vec(cx, list, context)?;
-    values
-        .iter()
-        .map(|entry| extract_usize(cx, entry, context))
-        .collect()
-}
-
-fn extract_usize(cx: &mut Cx, value: &Value, context: &str) -> Result<usize> {
-    match value.object().as_expr(cx)? {
-        Expr::Number(number) => number
-            .canonical
-            .parse::<usize>()
-            .map_err(|_| Error::Eval(format!("{context} expects non-negative integer dimensions"))),
-        Expr::String(text) => text
-            .parse::<usize>()
-            .map_err(|_| Error::Eval(format!("{context} expects non-negative integer dimensions"))),
-        _ => Err(Error::Eval(format!(
-            "{context} expects non-negative integer dimensions"
-        ))),
     }
 }
 

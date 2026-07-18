@@ -2357,10 +2357,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "535bd0b325ed839ca81b476ecf7a1e21f8639dee",
+    "git_commit": "51a7158a48cfbcfe4e7396192778d848c11689b2",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "535bd0b325ed839ca81b476ecf7a1e21f8639dee",
+    "source_commit": "51a7158a48cfbcfe4e7396192778d848c11689b2",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2373,9 +2373,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "2349199a005e9e5a",
+    "workspace_hash": "67708149e7df9f54",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 279,
+    "workspace_hash_input_count": 280,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2605,6 +2605,7 @@
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/book.toml",
       "crates/sim-lib-numbers-tensor/src/implementation/citizen.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/dimension.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/function.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/value.rs",
