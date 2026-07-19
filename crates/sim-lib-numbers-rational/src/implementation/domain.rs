@@ -102,7 +102,8 @@ impl NumberDomain for RationalNumberDomain {
     }
 
     fn parse_literal(&self, cx: &mut sim_kernel::Cx, text: &str) -> Result<Option<Value>> {
-        let Some((numerator, denominator)) = super::ops::parse_rational_parts(text) else {
+        let Some((numerator, denominator)) = super::parse::parse_rational_parts_checked(text)?
+        else {
             return Ok(None);
         };
         cx.factory()

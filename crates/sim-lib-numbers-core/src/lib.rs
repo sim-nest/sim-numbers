@@ -9,11 +9,15 @@
 
 pub mod domains;
 pub mod literal;
+pub mod magnitude;
 pub mod scalar;
 pub mod value_shape;
 
 pub use literal::{
     NumberLiteralClass, NumberLiteralShape, class_surface_or_symbol, shape_surface_or_symbol,
+};
+pub use magnitude::{
+    DEFAULT_MAX_ARBITRARY_MAGNITUDE_BITS, MagnitudeLimit, decimal_digits_to_bits_ceil,
 };
 pub use scalar::{
     DomainLiteralMatcher, ScalarBinaryOp, ScalarDomainSpec, ScalarLiteralMatcher, ScalarOps,

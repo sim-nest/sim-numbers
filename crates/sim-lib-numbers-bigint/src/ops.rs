@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 
 use num_bigint::BigInt;
 use sim_kernel::{Cx, NumberLiteral, Result, Value};
-use sim_lib_numbers_core::domains;
+use sim_lib_numbers_core::{MagnitudeLimit, domains};
 
 use crate::implementation::{number_domain, rational_domain};
 
@@ -18,7 +18,7 @@ pub(crate) fn bigint_add_rule(
     left: NumberLiteral,
     right: NumberLiteral,
 ) -> Result<Value> {
-    binary_bigint_rule(cx, left, right, |left, right| left + right)
+    binary_bigint_rule(cx, "add result", left, right, |left, right| left + right)
 }
 
 pub(crate) fn bigint_sub_rule(
@@ -26,7 +26,7 @@ pub(crate) fn bigint_sub_rule(
     left: NumberLiteral,
     right: NumberLiteral,
 ) -> Result<Value> {
-    binary_bigint_rule(cx, left, right, |left, right| left - right)
+    binary_bigint_rule(cx, "sub result", left, right, |left, right| left - right)
 }
 
 pub(crate) fn bigint_mul_rule(
@@ -34,7 +34,7 @@ pub(crate) fn bigint_mul_rule(
     left: NumberLiteral,
     right: NumberLiteral,
 ) -> Result<Value> {
-    binary_bigint_rule(cx, left, right, |left, right| left * right)
+    binary_bigint_rule(cx, "mul result", left, right, |left, right| left * right)
 }
 
 pub(crate) fn bigint_div_rule(
@@ -49,8 +49,10 @@ pub(crate) fn bigint_div_rule(
         ));
     }
     let left_value = parse_bigint_literal(left, "left")?;
+    let result = left_value / right_value;
+    check_bigint_magnitude("div result", &result)?;
     cx.factory()
-        .number_literal(number_domain(), (left_value / right_value).to_string())
+        .number_literal(number_domain(), result.to_string())
 }
 
 pub(crate) fn bigint_rem_rule(
@@ -65,8 +67,10 @@ pub(crate) fn bigint_rem_rule(
         ));
     }
     let left_value = parse_bigint_literal(left, "left")?;
+    let result = left_value % right_value;
+    check_bigint_magnitude("rem result", &result)?;
     cx.factory()
-        .number_literal(number_domain(), (left_value % right_value).to_string())
+        .number_literal(number_domain(), result.to_string())
 }
 
 pub(crate) fn bigint_pow_rule(
@@ -79,8 +83,11 @@ pub(crate) fn bigint_pow_rule(
     let exponent_u32: u32 = exponent.try_into().map_err(|_| {
         sim_kernel::Error::Eval("pow exponent must be a nonnegative integer".to_owned())
     })?;
+    magnitude_limit().check_bits("pow result", estimate_pow_bits(&base, exponent_u32))?;
+    let result = base.pow(exponent_u32);
+    check_bigint_magnitude("pow result", &result)?;
     cx.factory()
-        .number_literal(number_domain(), base.pow(exponent_u32).to_string())
+        .number_literal(number_domain(), result.to_string())
 }
 
 pub(crate) fn bigint_cmp_rule(
@@ -94,16 +101,17 @@ pub(crate) fn bigint_cmp_rule(
 }
 
 pub(crate) fn bigint_neg_rule(cx: &mut Cx, operand: NumberLiteral) -> Result<Value> {
-    cx.factory().number_literal(
-        number_domain(),
-        (-parse_bigint_literal(operand, "operand")?).to_string(),
-    )
+    let result = -parse_bigint_literal(operand, "operand")?;
+    check_bigint_magnitude("neg result", &result)?;
+    cx.factory()
+        .number_literal(number_domain(), result.to_string())
 }
 
 pub(crate) fn bigint_sum_rule(cx: &mut Cx, operands: Vec<NumberLiteral>) -> Result<Value> {
     let mut acc = BigInt::from(0_u8);
     for operand in operands {
         acc += parse_bigint_literal(operand, "operand")?;
+        check_bigint_magnitude("sum result", &acc)?;
     }
     cx.factory()
         .number_literal(number_domain(), acc.to_string())
@@ -113,6 +121,7 @@ pub(crate) fn bigint_product_rule(cx: &mut Cx, operands: Vec<NumberLiteral>) -> 
     let mut acc = BigInt::from(1_u8);
     for operand in operands {
         acc *= parse_bigint_literal(operand, "operand")?;
+        check_bigint_magnitude("product result", &acc)?;
     }
     cx.factory()
         .number_literal(number_domain(), acc.to_string())
@@ -197,18 +206,18 @@ pub(crate) fn promote_bigint_to_rational(
 
 fn binary_bigint_rule(
     cx: &mut Cx,
+    context: &str,
     left: NumberLiteral,
     right: NumberLiteral,
     apply: impl FnOnce(BigInt, BigInt) -> BigInt,
 ) -> Result<Value> {
-    cx.factory().number_literal(
-        number_domain(),
-        apply(
-            parse_bigint_literal(left, "left")?,
-            parse_bigint_literal(right, "right")?,
-        )
-        .to_string(),
-    )
+    let result = apply(
+        parse_bigint_literal(left, "left")?,
+        parse_bigint_literal(right, "right")?,
+    );
+    check_bigint_magnitude(context, &result)?;
+    cx.factory()
+        .number_literal(number_domain(), result.to_string())
 }
 
 fn parse_bigint_literal(number: NumberLiteral, side: &str) -> Result<BigInt> {
@@ -219,12 +228,15 @@ fn parse_bigint_literal(number: NumberLiteral, side: &str) -> Result<BigInt> {
             number.domain
         )));
     }
-    number.canonical.parse::<BigInt>().map_err(|err| {
+    precheck_bigint_decimal_text(&format!("{side} operand"), &number.canonical)?;
+    let value = number.canonical.parse::<BigInt>().map_err(|err| {
         sim_kernel::Error::Eval(format!(
             "{side} operand was not a valid bigint literal: {}",
             err
         ))
-    })
+    })?;
+    check_bigint_magnitude(&format!("{side} operand"), &value)?;
+    Ok(value)
 }
 
 fn comparison_value(cx: &mut Cx, ordering: Ordering) -> Result<Value> {
@@ -238,9 +250,43 @@ fn comparison_value(cx: &mut Cx, ordering: Ordering) -> Result<Value> {
 }
 
 pub(crate) fn canonical_bigint(text: &str) -> Result<String> {
-    text.parse::<BigInt>()
-        .map(|value| value.to_string())
-        .map_err(|err| sim_kernel::Error::Eval(format!("invalid bigint literal: {}", err)))
+    precheck_bigint_decimal_text("bigint literal", text)?;
+    let value = text
+        .parse::<BigInt>()
+        .map_err(|err| sim_kernel::Error::Eval(format!("invalid bigint literal: {}", err)))?;
+    check_bigint_magnitude("bigint literal", &value)?;
+    Ok(value.to_string())
+}
+
+fn magnitude_limit() -> MagnitudeLimit {
+    MagnitudeLimit::default_arbitrary_precision()
+}
+
+pub(crate) fn precheck_bigint_decimal_text(context: &str, text: &str) -> Result<()> {
+    magnitude_limit()
+        .check_decimal_digits(context, decimal_digit_count(text))
+        .map(|_| ())
+}
+
+fn check_bigint_magnitude(context: &str, value: &BigInt) -> Result<()> {
+    magnitude_limit().check_bits(context, value.bits())
+}
+
+fn estimate_pow_bits(base: &BigInt, exponent: u32) -> u64 {
+    if exponent == 0 {
+        return 1;
+    }
+    let zero = BigInt::from(0_u8);
+    let one = BigInt::from(1_u8);
+    let negative_one = -one.clone();
+    if base == &zero || base == &one || base == &negative_one {
+        return 1;
+    }
+    base.bits().max(1).saturating_mul(u64::from(exponent))
+}
+
+fn decimal_digit_count(text: &str) -> usize {
+    text.bytes().filter(|byte| byte.is_ascii_digit()).count()
 }
 
 fn expect_domain_literal(cx: &mut Cx, value: Value, side: &str) -> Result<NumberLiteral> {
