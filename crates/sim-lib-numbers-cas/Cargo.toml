@@ -3,13 +3,14 @@ name = "sim-lib-numbers-cas"
 version = "0.1.2"
 edition = "2024"
 license = "MPL-2.0"
-description = "SIM workspace package for sim lib numbers cas."
+description = "Computer-algebra expression domain, simplification, and value conversion for SIM numbers."
 readme = "README.md"
 publish = true
 repository = "https://github.com/sim-nest/sim-numbers"
 homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
+sim-codec = { version = "0.1.0" }
 sim-cookbook = { version = "0.1.0" }
 sim-citizen = { version = "0.1.0" }
 sim-citizen-derive = { version = "0.1.0" }
@@ -18,7 +19,6 @@ sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 sim-shape = { version = "0.1.0" }
 
 [dev-dependencies]
-sim-codec = { version = "0.1.0" }
 sim-codec-lisp = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0", features = ["test-support"] }
 sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }

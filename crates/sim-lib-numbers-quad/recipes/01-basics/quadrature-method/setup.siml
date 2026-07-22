@@ -1,1 +1,1 @@
-(quote (numbers/quad simpson adaptive integral))
+(integrate #(numbers/Func (x) x) x 0.0 1.0 :method simpson :n 8)

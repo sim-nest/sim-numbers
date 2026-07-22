@@ -5,16 +5,18 @@ use std::{any::Any, sync::Arc};
 
 use sim_kernel::{
     Args, Callable, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NumberValue, Object,
-    ObjectEncode, Result, ShapeRef, Symbol, Value, ValueNumberBinaryOp, ValueNumberUnaryOp,
+    ObjectEncode, Result, ShapeRef, Symbol, Value,
 };
-use sim_lib_numbers_cas::{
-    CasExpr, cas_expr_to_surface_expr, free_vars, simplify_expr, value_to_cas_expr,
-};
+use sim_lib_numbers_cas::{CasExpr, cas_expr_to_surface_expr, free_vars, value_to_cas_expr};
 use sim_lib_numbers_cas_eval::eval_cas;
 use sim_shape::{AnyShape, ListShape, Shape, shape_value};
 
 use super::domain::{func_class_symbol, func_domain_symbol};
 use super::function::{child_env_with_args, vars_expr};
+
+mod ops;
+
+pub(crate) use ops::register_value_ops;
 
 /// A native (Rust-backed) function body: a closure invoked with the runtime
 /// context and the evaluated argument values, used when a `Func` has no CAS body.
@@ -36,8 +38,62 @@ pub struct FuncMetadata {
 #[derive(Clone)]
 enum FuncBody {
     Symbolic(CasExpr),
-    Native(NativeFn),
-    Dual { cas: CasExpr, native: NativeFn },
+    Native {
+        native: NativeFn,
+        symbolic_status: SymbolicStatus,
+    },
+    Dual {
+        cas: CasExpr,
+        native: NativeFn,
+    },
+}
+
+/// Whether a [`Func`] exposes an exact symbolic body, is differentiable through
+/// a named hint, or has lost its symbolic body for a named reason.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum SymbolicStatus {
+    /// A CAS body is available and can be inspected by symbolic tools.
+    Available,
+    /// The function is native-only, but metadata names a differentiator that
+    /// can handle it numerically or exactly outside the CAS path.
+    ProvidedByHint,
+    /// The function is native-only because symbolic information was lost.
+    Lost {
+        /// The machine-readable reason for the loss.
+        reason: Symbol,
+    },
+}
+
+impl SymbolicStatus {
+    /// Reason used for ordinary native functions with no symbolic body.
+    pub fn native_only() -> Self {
+        Self::Lost {
+            reason: Symbol::qualified("numbers/func", "native-only"),
+        }
+    }
+
+    /// Reason used when arithmetic combines a symbolic body with a native-only
+    /// body and must keep only the executable native result.
+    pub fn mixed_native() -> Self {
+        Self::Lost {
+            reason: Symbol::qualified("numbers/func", "mixed-native"),
+        }
+    }
+
+    fn status_symbol(&self) -> Symbol {
+        match self {
+            Self::Available => Symbol::qualified("numbers/func", "available"),
+            Self::ProvidedByHint => Symbol::qualified("numbers/func", "provided-by-hint"),
+            Self::Lost { .. } => Symbol::qualified("numbers/func", "lost"),
+        }
+    }
+
+    fn reason(&self) -> Option<&Symbol> {
+        match self {
+            Self::Lost { reason } => Some(reason),
+            _ => None,
+        }
+    }
 }
 
 /// A callable function value in the `Func` number domain: its bound variables
@@ -93,7 +149,28 @@ impl Func {
 
     /// Builds a function with a native body and caller-supplied metadata.
     pub fn native_with(vars: Vec<Symbol>, body_native: NativeFn, metadata: FuncMetadata) -> Self {
-        Self::new(vars, FuncBody::Native(body_native), metadata)
+        let status = if metadata.differentiator_hint.is_some() {
+            SymbolicStatus::ProvidedByHint
+        } else {
+            SymbolicStatus::native_only()
+        };
+        Self::native_with_status(vars, body_native, metadata, status)
+    }
+
+    fn native_with_status(
+        vars: Vec<Symbol>,
+        body_native: NativeFn,
+        metadata: FuncMetadata,
+        symbolic_status: SymbolicStatus,
+    ) -> Self {
+        Self::new(
+            vars,
+            FuncBody::Native {
+                native: body_native,
+                symbolic_status,
+            },
+            metadata,
+        )
     }
 
     /// Builds an internal dual-body function whose native body is derived from
@@ -118,13 +195,15 @@ impl Func {
     pub fn body_cas(&self) -> Option<&CasExpr> {
         match &self.body {
             FuncBody::Symbolic(body) | FuncBody::Dual { cas: body, .. } => Some(body),
-            FuncBody::Native(_) => None,
+            FuncBody::Native { .. } => None,
         }
     }
 
     fn body_native(&self) -> Option<&NativeFn> {
         match &self.body {
-            FuncBody::Native(body) | FuncBody::Dual { native: body, .. } => Some(body),
+            FuncBody::Native { native: body, .. } | FuncBody::Dual { native: body, .. } => {
+                Some(body)
+            }
             FuncBody::Symbolic(_) => None,
         }
     }
@@ -132,6 +211,37 @@ impl Func {
     /// Returns whether this function carries a native body.
     pub fn is_native(&self) -> bool {
         self.body_native().is_some()
+    }
+
+    /// Returns the symbolic-body status for this function.
+    pub fn symbolic_status(&self) -> SymbolicStatus {
+        match &self.body {
+            FuncBody::Symbolic(_) | FuncBody::Dual { .. } => SymbolicStatus::Available,
+            FuncBody::Native {
+                symbolic_status, ..
+            } => symbolic_status.clone(),
+        }
+    }
+
+    fn native_extension_payload(&self) -> Expr {
+        let status = self.symbolic_status();
+        let mut fields = vec![(
+            Expr::Symbol(Symbol::new("symbolic-status")),
+            Expr::Symbol(status.status_symbol()),
+        )];
+        if let Some(reason) = status.reason() {
+            fields.push((
+                Expr::Symbol(Symbol::new("symbolic-loss-reason")),
+                Expr::Symbol(reason.clone()),
+            ));
+        }
+        if let Some(hint) = &self.metadata.differentiator_hint {
+            fields.push((
+                Expr::Symbol(Symbol::new("differentiator-hint")),
+                Expr::Symbol(hint.clone()),
+            ));
+        }
+        Expr::Map(fields)
     }
 
     fn invoke(&self, cx: &mut Cx, args: &[Value]) -> Result<Value> {
@@ -184,7 +294,7 @@ impl sim_kernel::ObjectCompat for Func {
         let Some(body_cas) = self.body_cas() else {
             return Ok(Expr::Extension {
                 tag: func_class_symbol(),
-                payload: Box::new(Expr::String("#<native-func>".to_owned())),
+                payload: Box::new(self.native_extension_payload()),
             });
         };
         Ok(Expr::Call {
@@ -214,12 +324,24 @@ impl sim_kernel::ObjectCompat for Func {
             None => cx.factory().nil()?,
         };
         let native = cx.factory().bool(self.is_native())?;
-        cx.factory().table(vec![
+        let symbolic_status = self.symbolic_status();
+        let mut fields = vec![
             (Symbol::new("kind"), cx.factory().string("func".to_owned())?),
             (Symbol::new("vars"), vars),
             (Symbol::new("body"), body),
             (Symbol::new("native"), native),
-        ])
+            (
+                Symbol::new("symbolic-status"),
+                cx.factory().symbol(symbolic_status.status_symbol())?,
+            ),
+        ];
+        if let Some(reason) = symbolic_status.reason() {
+            fields.push((
+                Symbol::new("symbolic-loss-reason"),
+                cx.factory().symbol(reason.clone())?,
+            ));
+        }
+        cx.factory().table(fields)
     }
     fn as_callable(&self) -> Option<&dyn Callable> {
         Some(self)
@@ -283,172 +405,4 @@ pub(crate) fn build_constant_func_value(cx: &mut Cx, value: Value) -> Result<Val
     let body = value_to_cas_expr(cx, value)?;
     let vars = free_vars(&body);
     build_func_value(cx, Func::symbolic(vars, body))
-}
-
-pub(crate) fn register_value_ops(linker: &mut sim_kernel::Linker<'_>) {
-    linker.value_number_binary_op(binary_op(
-        Symbol::qualified("math", "add"),
-        apply_add_func_op,
-    ));
-    linker.value_number_binary_op(binary_op(
-        Symbol::qualified("math", "sub"),
-        apply_sub_func_op,
-    ));
-    linker.value_number_binary_op(binary_op(
-        Symbol::qualified("math", "mul"),
-        apply_mul_func_op,
-    ));
-    linker.value_number_binary_op(binary_op(
-        Symbol::qualified("math", "div"),
-        apply_div_func_op,
-    ));
-    linker.value_number_binary_op(binary_op(
-        Symbol::qualified("math", "pow"),
-        apply_pow_func_op,
-    ));
-    linker.value_number_binary_op(binary_op(
-        Symbol::qualified("math", "rem"),
-        apply_rem_func_op,
-    ));
-    linker.value_number_unary_op(ValueNumberUnaryOp {
-        operator: Symbol::qualified("math", "neg"),
-        operand_domain: func_domain_symbol(),
-        cost: 1,
-        apply: apply_unary_func_op,
-    });
-}
-
-fn binary_op(
-    operator: Symbol,
-    apply: fn(&mut Cx, Value, Value) -> Result<Value>,
-) -> ValueNumberBinaryOp {
-    ValueNumberBinaryOp {
-        operator,
-        left_domain: func_domain_symbol(),
-        right_domain: func_domain_symbol(),
-        cost: 1,
-        apply,
-    }
-}
-
-fn apply_add_func_op(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
-    apply_binary_func_op(cx, Symbol::qualified("math", "add"), left, right)
-}
-
-fn apply_sub_func_op(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
-    apply_binary_func_op(cx, Symbol::qualified("math", "sub"), left, right)
-}
-
-fn apply_mul_func_op(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
-    apply_binary_func_op(cx, Symbol::qualified("math", "mul"), left, right)
-}
-
-fn apply_div_func_op(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
-    apply_binary_func_op(cx, Symbol::qualified("math", "div"), left, right)
-}
-
-fn apply_pow_func_op(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
-    apply_binary_func_op(cx, Symbol::qualified("math", "pow"), left, right)
-}
-
-fn apply_rem_func_op(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
-    apply_binary_func_op(cx, Symbol::qualified("math", "rem"), left, right)
-}
-
-fn apply_binary_func_op(cx: &mut Cx, operator: Symbol, left: Value, right: Value) -> Result<Value> {
-    let left_func = left
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| Error::Eval("left operand was not a function value".to_owned()))?
-        .clone();
-    let right_func = right
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| Error::Eval("right operand was not a function value".to_owned()))?
-        .clone();
-    let vars = union_vars(&left_func.vars, &right_func.vars);
-    let closure_vars = vars.clone();
-    let body_cas = match (left_func.body_cas(), right_func.body_cas()) {
-        (Some(left_body), Some(right_body)) => Some(simplify_expr(
-            cx,
-            CasExpr::Op(
-                operator.clone(),
-                vec![left_body.clone(), right_body.clone()],
-            ),
-        )?),
-        _ => None,
-    };
-    let native: NativeFn = Arc::new(move |cx: &mut Cx, args: &[Value]| {
-        let left_args = project_args(&closure_vars, &left_func.vars, args)?;
-        let right_args = project_args(&closure_vars, &right_func.vars, args)?;
-        let left_value = left_func.invoke(cx, &left_args)?;
-        let right_value = right_func.invoke(cx, &right_args)?;
-        cx.apply_value_number_binary_op(&operator, left_value, right_value)
-    });
-    let func = match body_cas {
-        Some(body_cas) => Func::dual_with(vars, body_cas, native, FuncMetadata::default()),
-        None => Func::native(vars, native),
-    };
-    build_func_value(cx, func)
-}
-
-fn apply_unary_func_op(cx: &mut Cx, value: Value) -> Result<Value> {
-    let func = value
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| Error::Eval("operand was not a function value".to_owned()))?
-        .clone();
-    let body_cas = func
-        .body_cas()
-        .cloned()
-        .map(|body| {
-            simplify_expr(
-                cx,
-                CasExpr::Op(Symbol::qualified("math", "neg"), vec![body]),
-            )
-        })
-        .transpose()?;
-    let native_func = func.clone();
-    let native: NativeFn = Arc::new(move |cx: &mut Cx, args: &[Value]| {
-        let out = native_func.invoke(cx, args)?;
-        cx.apply_value_number_unary_op(&Symbol::qualified("math", "neg"), out)
-    });
-    let func = match body_cas {
-        Some(body_cas) => {
-            Func::dual_with(func.vars.clone(), body_cas, native, FuncMetadata::default())
-        }
-        None => Func::native(func.vars.clone(), native),
-    };
-    build_func_value(cx, func)
-}
-
-fn union_vars(left: &[Symbol], right: &[Symbol]) -> Vec<Symbol> {
-    let mut vars = left.to_vec();
-    for var in right {
-        if !vars.contains(var) {
-            vars.push(var.clone());
-        }
-    }
-    vars
-}
-
-fn project_args(union: &[Symbol], target: &[Symbol], args: &[Value]) -> Result<Vec<Value>> {
-    target
-        .iter()
-        .map(|var| {
-            let index = union
-                .iter()
-                .position(|candidate| candidate == var)
-                .ok_or_else(|| {
-                    Error::Eval(format!(
-                        "function variable {var} missing from projected call"
-                    ))
-                })?;
-            args.get(index).cloned().ok_or_else(|| {
-                Error::Eval(format!(
-                    "function variable {var} missing from call arguments"
-                ))
-            })
-        })
-        .collect()
 }

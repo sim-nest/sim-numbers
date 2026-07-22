@@ -6,34 +6,34 @@ Generated from Cargo metadata by `xtask crate-catalog v1`.
 
 | Package | Publish | Targets | Description |
 | --- | --- | --- | --- |
-| `sim-lib-numbers-ad` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers ad. |
-| `sim-lib-numbers-arith` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers arith. |
-| `sim-lib-numbers-bigint` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers bigint. |
-| `sim-lib-numbers-bool` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers bool. |
-| `sim-lib-numbers-cas-diff` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers cas diff. |
-| `sim-lib-numbers-cas-eval` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers cas eval. |
-| `sim-lib-numbers-cas` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers cas. |
-| `sim-lib-numbers-codec` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers codec. |
-| `sim-lib-numbers-complex` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers complex. |
-| `sim-lib-numbers-core` | `true` | `custom-build, lib` | Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spe. |
-| `sim-lib-numbers-exotic` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers exotic. |
-| `sim-lib-numbers-f64` | `true` | `cdylib, custom-build, rlib` | SIM workspace package for sim lib numbers f64. |
-| `sim-lib-numbers-fixed` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers fixed. |
-| `sim-lib-numbers-float` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers float. |
-| `sim-lib-numbers-func` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers func. |
-| `sim-lib-numbers-i64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers i64. |
-| `sim-lib-numbers-numeric` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers numeric. |
-| `sim-lib-numbers-prelude` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers prelude. |
-| `sim-lib-numbers-quad` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers quad. |
-| `sim-lib-numbers-rational` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers rational. |
-| `sim-lib-numbers-rk` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers rk. |
+| `sim-lib-numbers-ad` | `true` | `custom-build, lib` | Forward and reverse automatic-differentiation primitives for SIM numeric code. |
+| `sim-lib-numbers-arith` | `true` | `custom-build, lib` | Cross-domain arithmetic dispatch over the SIM number promotion lattice. |
+| `sim-lib-numbers-bigint` | `true` | `custom-build, lib` | Arbitrary-precision integer number domain with exact arithmetic and rational promotion. |
+| `sim-lib-numbers-bool` | `true` | `custom-build, lib` | Boolean number domain with literal parsing and promotion into scalar numeric domains. |
+| `sim-lib-numbers-cas-diff` | `true` | `custom-build, lib` | Symbolic differentiation and integration rules for SIM CAS expressions. |
+| `sim-lib-numbers-cas-eval` | `true` | `custom-build, lib` | Evaluation support for SIM CAS expressions against runtime values and environments. |
+| `sim-lib-numbers-cas` | `true` | `custom-build, lib` | Computer-algebra expression domain, simplification, and value conversion for SIM numbers. |
+| `sim-lib-numbers-codec` | `true` | `custom-build, lib` | Numeric plugin descriptor helpers for advertising SIM number methods and codecs. |
+| `sim-lib-numbers-complex` | `true` | `custom-build, lib` | Complex number domain with arithmetic and scalar promotion edges. |
+| `sim-lib-numbers-core` | `true` | `custom-build, lib` | Shared scalar-domain substrate: number-value shapes, literal classes, op installers, and promotion metadata. |
+| `sim-lib-numbers-exotic` | `true` | `custom-build, lib` | Continued-fraction and exact-real helpers for the SIM number stack. |
+| `sim-lib-numbers-f64` | `true` | `cdylib, custom-build, rlib` | Double-precision float number domain with arithmetic and complex promotion. |
+| `sim-lib-numbers-fixed` | `true` | `custom-build, lib` | Fixed-width signed and unsigned integer number domains from 8 to 128 bits. |
+| `sim-lib-numbers-float` | `true` | `custom-build, lib` | Single-precision float number domain and promotion into f64. |
+| `sim-lib-numbers-func` | `true` | `custom-build, lib` | Callable numeric function values over symbolic or native bodies. |
+| `sim-lib-numbers-i64` | `true` | `custom-build, lib` | Signed 64-bit integer number domain with arithmetic and promotion edges. |
+| `sim-lib-numbers-numeric` | `true` | `custom-build, lib` | Numeric differentiation, quadrature, and ODE dispatch over pluggable SIM number backends. |
+| `sim-lib-numbers-prelude` | `true` | `custom-build, lib` | One-call installer for the standard SIM number domains and tensor backends. |
+| `sim-lib-numbers-quad` | `true` | `custom-build, lib` | Quadrature and finite-difference plugins for the SIM numeric surface. |
+| `sim-lib-numbers-rational` | `true` | `custom-build, lib` | Exact rational number domain over arbitrary-precision integer numerators and denominators. |
+| `sim-lib-numbers-rk` | `true` | `custom-build, lib` | Runge-Kutta ODE solver plugins for the SIM numeric surface. |
 | `sim-lib-numbers-stats` | `true` | `custom-build, lib` | Statistical and probability helpers for the SIM number stack. |
-| `sim-lib-numbers-tensor-bcast` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor bcast. |
-| `sim-lib-numbers-tensor-bit` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor bit. |
-| `sim-lib-numbers-tensor-cmplxf` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor cmplxf. |
-| `sim-lib-numbers-tensor-f64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor f64. |
-| `sim-lib-numbers-tensor-i64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor i64. |
-| `sim-lib-numbers-tensor-linalg` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor linalg. |
-| `sim-lib-numbers-tensor-rat64` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor rat64. |
-| `sim-lib-numbers-tensor` | `true` | `custom-build, lib` | SIM workspace package for sim lib numbers tensor. |
-| `xtask` | `false` | `bin` | SIM workspace package for xtask. |
+| `sim-lib-numbers-tensor-bcast` | `true` | `custom-build, lib` | NumPy-style tensor broadcasting and promoted element-wise operations for SIM tensors. |
+| `sim-lib-numbers-tensor-bit` | `true` | `custom-build, lib` | Packed boolean tensor specialization with bitwise tensor operations. |
+| `sim-lib-numbers-tensor-cmplxf` | `true` | `custom-build, lib` | Complex f64-pair tensor specialization for SIM tensor values. |
+| `sim-lib-numbers-tensor-f64` | `true` | `custom-build, lib` | Contiguous f64 tensor specialization with native element-wise math. |
+| `sim-lib-numbers-tensor-i64` | `true` | `custom-build, lib` | Contiguous i64 tensor specialization with overflow-aware arithmetic. |
+| `sim-lib-numbers-tensor-linalg` | `true` | `custom-build, lib` | Linear algebra operations for SIM tensors: dot, matrix multiply, inversion, norms, and constructors. |
+| `sim-lib-numbers-tensor-rat64` | `true` | `custom-build, lib` | Rational i64-pair tensor specialization for the SIM tensor domain. |
+| `sim-lib-numbers-tensor` | `true` | `custom-build, lib` | Uniform n-dimensional tensor value, constructors, and specialization hooks for SIM numbers. |
+| `xtask` | `false` | `bin` | Repository automation wrapper for sim-numbers generated documentation and policy checks. |

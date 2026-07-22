@@ -1,11 +1,9 @@
 //! Shared value-arithmetic helpers used by the quadrature and differentiation
-//! backends to evaluate functions and combine number-domain values.
+//! backends to evaluate callables and combine number-domain values.
 
-use std::sync::Arc;
-
-use sim_kernel::{Args, Cx, Error, Result, Symbol, Value};
+use sim_kernel::{Cx, Error, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
-use sim_lib_numbers_func::Func;
+use sim_lib_numbers_numeric::NumericCallable;
 
 pub fn f64_value(cx: &mut Cx, value: f64) -> Result<Value> {
     cx.factory()
@@ -50,9 +48,8 @@ pub fn zero_like(cx: &mut Cx, seed: Value) -> Result<Value> {
     scale(cx, seed, 0.0)
 }
 
-pub fn call_unary_func(cx: &mut Cx, func: &Func, point: Value) -> Result<Value> {
-    let value = cx.factory().opaque(Arc::new(func.clone()))?;
-    cx.call_value(value, Args::new(vec![point]))
+pub fn call_unary_callable(cx: &mut Cx, func: &NumericCallable, point: Value) -> Result<Value> {
+    func.call(cx, vec![point])
 }
 
 pub fn abs_error(cx: &mut Cx, left: Value, right: Value) -> Result<f64> {

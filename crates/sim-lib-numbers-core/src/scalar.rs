@@ -11,9 +11,10 @@ use sim_kernel::{
 };
 
 /// The `ObjectCompat::class` stub every number-domain object returns: the
-/// registered `core/NumberDomain` class, or a fresh stub for it. This body was
-/// byte-identical across all ~12 numeric-domain crates before OVERLAP6.09; each
-/// domain's `fn class` now delegates here.
+/// registered `core/NumberDomain` class, or a fresh stub for it.
+///
+/// Scalar domain implementations delegate here so the runtime sees one shared
+/// number-domain class shape across every concrete scalar domain.
 pub fn number_domain_class_stub(cx: &mut Cx) -> sim_kernel::Result<sim_kernel::ClassRef> {
     if let Some(value) = cx
         .registry()

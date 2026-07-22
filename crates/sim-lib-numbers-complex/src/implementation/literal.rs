@@ -1,6 +1,6 @@
 //! The `numbers/complex` domain object and `ComplexNumbersLib`: the domain and
 //! operator symbols and the `Lib` that registers the domain, its shapes, value
-//! class, ops, and incoming promotion edges.
+//! class, ops, and inbound promotion edges.
 
 use std::sync::Arc;
 
@@ -100,7 +100,8 @@ pub fn product_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/complex number-domain marker; reconstruct by loading the complex number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/complex"
 )]
 /// The complex number domain at the sink of the scalar promotion lattice:
 /// parses `a+bi` literals and accepts the widening edges from `f64`, `i64`, and
@@ -188,7 +189,7 @@ impl sim_kernel::ObjectCompat for ComplexNumberDomain {
 }
 
 /// The library that installs the `numbers/complex` domain: its literal class
-/// and shapes, the `ComplexValue` class, the complex ops, and the incoming
+/// and shapes, the `ComplexValue` class, the complex ops, and the inbound
 /// promotion rules from `f64`, `i64`, and `rational`.
 ///
 /// # Examples

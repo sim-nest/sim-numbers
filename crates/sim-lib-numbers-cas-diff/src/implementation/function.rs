@@ -7,10 +7,13 @@ use sim_kernel::{
     AbiVersion, Args, Callable, ClassRef, Cx, DefaultFactory, Dependency, Error, Export, Expr,
     Factory, Lib, LibManifest, LibTarget, Linker, Object, Result, Symbol, Value, Version,
 };
-use sim_lib_numbers_cas::{cas_expr_to_value, value_to_cas_expr};
+use sim_lib_numbers_cas::{
+    cas_expr_to_surface_expr, cas_expr_to_value, extract_symbolish, value_to_cas_expr,
+};
 use sim_lib_numbers_core::domains;
 
 use super::diff::{diff_cas, diff_symbol};
+use super::func_surface::func_surface_body;
 use super::integrate::integrate_sym_symbol;
 use super::integrate_function::IntegrateSymFunction;
 
@@ -133,35 +136,12 @@ impl Callable for DiffFunction {
     }
 }
 
-use sim_lib_numbers_cas::extract_symbolish;
-
 fn diff_func_value(cx: &mut Cx, value: Value, var: &Symbol) -> Result<Value> {
-    let expr = value.object().as_expr(cx)?;
-    let Expr::Call { operator, args } = expr else {
-        return Err(Error::Eval(
-            "NotDifferentiable: function value does not expose a symbolic body".to_owned(),
-        ));
-    };
-    let Expr::Symbol(operator) = operator.as_ref() else {
-        return Err(Error::Eval(
-            "NotDifferentiable: function value does not expose a symbolic body".to_owned(),
-        ));
-    };
-    if *operator != Symbol::new("fn") {
-        return Err(Error::Eval(
-            "NotDifferentiable: function value does not expose a symbolic body".to_owned(),
-        ));
-    }
-    let [vars_expr, body_expr] = args.as_slice() else {
-        return Err(Error::Eval(
-            "NotDifferentiable: function value had an invalid fn surface".to_owned(),
-        ));
-    };
-    let body = value_to_cas_expr(cx, cx.factory().expr(body_expr.clone())?)?;
+    let (vars_expr, body) = func_surface_body(cx, &value)?;
     let derivative = diff_cas(cx, &body, var)?;
-    let derivative_expr = sim_lib_numbers_cas::cas_expr_to_surface_expr(cx, &derivative)?;
+    let derivative_expr = cas_expr_to_surface_expr(cx, &derivative)?;
     cx.eval_expr(Expr::Call {
         operator: Box::new(Expr::Symbol(Symbol::new("fn"))),
-        args: vec![vars_expr.clone(), derivative_expr],
+        args: vec![vars_expr, derivative_expr],
     })
 }

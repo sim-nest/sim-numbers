@@ -1,5 +1,175 @@
 {
-  "schema": "sim.feature-map.v1",
-  "repo": "sim-numbers",
-  "packages": []
+  "generator": "xtask repo-contract v1",
+  "packages": [
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-ad"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-arith"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-bigint"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-bool"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-cas"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-cas-diff"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-cas-eval"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-codec"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-complex"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-core"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-exotic"
+    },
+    {
+      "features": [
+        {
+          "edges": [
+            "dep:sim-codec-binary",
+            "dep:sim-macros"
+          ],
+          "name": "native-export",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "package": "sim-lib-numbers-f64"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-fixed"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-float"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-func"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-i64"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-numeric"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-prelude"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-quad"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-rational"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-rk"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-stats"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-bcast"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-bit"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-cmplxf"
+    },
+    {
+      "features": [
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-f64"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-i64"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-linalg"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-rat64"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "xtask"
+    }
+  ]
 }

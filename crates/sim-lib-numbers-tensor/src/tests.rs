@@ -6,7 +6,7 @@ use sim_kernel::{
 };
 
 use crate::{
-    TensorNumbersLib, build_tensor_value, number_domain, tensor_value_class_symbol,
+    Tensor, TensorNumbersLib, build_tensor_value, number_domain, tensor_value_class_symbol,
     tensor_value_ref,
 };
 
@@ -142,6 +142,70 @@ fn tensor_constructor_infers_join_dtype_for_mixed_cells() {
 }
 
 #[test]
+fn tensor_constructor_rejects_inferred_impossible_join() {
+    let mut cx = test_cx();
+    let result = build_tensor_value(
+        &mut cx,
+        vec![2],
+        None,
+        vec![
+            DefaultFactory
+                .number_literal(Symbol::qualified("test", "left"), "1".to_owned())
+                .unwrap(),
+            DefaultFactory
+                .number_literal(Symbol::qualified("test", "right"), "2".to_owned())
+                .unwrap(),
+        ],
+    );
+    let err = match result {
+        Ok(_) => panic!("unregistered, unrelated domains must not infer a dtype"),
+        Err(err) => err,
+    };
+    assert!(err.to_string().contains("no join domain exists"));
+}
+
+#[test]
+fn tensor_constructor_rejects_explicit_impossible_dtype() {
+    let mut cx = test_cx();
+    let result = build_tensor_value(
+        &mut cx,
+        vec![2],
+        Some(Symbol::qualified("numbers", "bool")),
+        vec![number("i64", "1"), number("f64", "2.0")],
+    );
+    let err = match result {
+        Ok(_) => panic!("explicit dtype must accept every cell"),
+        Err(err) => err,
+    };
+    assert!(err.to_string().contains("not a valid join"));
+}
+
+#[test]
+fn checked_tensor_constructor_rejects_invalid_direct_construction() {
+    let mut cx = test_cx();
+    let missing_scalar_cell = match Tensor::new_checked(
+        &mut cx,
+        Vec::new(),
+        Symbol::qualified("numbers", "i64"),
+        Vec::new(),
+    ) {
+        Ok(_) => panic!("rank-0 tensor without a cell must fail"),
+        Err(err) => err,
+    };
+    assert!(missing_scalar_cell.to_string().contains("expects 1 cells"));
+
+    let mismatched_cell_dtype = match Tensor::new_exact(
+        vec![1],
+        Symbol::qualified("numbers", "i64"),
+        vec![number("f64", "1.0")],
+    ) {
+        Ok(_) => panic!("exact constructor must reject mismatched cell dtype"),
+        Err(err) => err,
+    };
+    assert!(mismatched_cell_dtype.to_string().contains("does not match"));
+}
+
+#[test]
 fn tensor_citizen_read_constructor_round_trips() {
     let mut cx = test_cx();
     let tensor = build_tensor_value(
@@ -171,6 +235,34 @@ fn tensor_citizen_read_constructor_round_trips() {
         ]),
     )
     .unwrap();
+}
+
+#[test]
+fn tensor_read_constructor_accepts_numeric_shape_dimensions() {
+    let mut cx = test_cx();
+    cx.grant(read_construct_capability());
+    let shape = data_value(vec![number("i64", "2"), number("i64", "2")]);
+    let tensor = cx
+        .read_construct(
+            &tensor_value_class_symbol(),
+            vec![
+                symbol("v1"),
+                shape,
+                data_value(vec![
+                    number("i64", "1"),
+                    number("i64", "2"),
+                    number("i64", "3"),
+                    number("i64", "4"),
+                ]),
+                DefaultFactory
+                    .symbol(Symbol::qualified("numbers", "i64"))
+                    .unwrap(),
+            ],
+        )
+        .unwrap();
+    let tensor = tensor_value_ref(&tensor).unwrap();
+    assert_eq!(tensor.shape(), &[2, 2]);
+    assert_eq!(tensor.dtype(), &Symbol::qualified("numbers", "i64"));
 }
 
 #[test]
@@ -207,6 +299,25 @@ fn tensor_read_constructor_rejects_malformed_shape_and_wrong_domain() {
         )
         .unwrap_err();
     assert!(wrong_domain.to_string().contains("dtype"));
+
+    let negative_dimension = cx
+        .read_construct(
+            &tensor_value_class_symbol(),
+            vec![
+                symbol("v1"),
+                data_value(vec![number("i64", "-1")]),
+                data_value(Vec::new()),
+                DefaultFactory
+                    .symbol(Symbol::qualified("numbers", "i64"))
+                    .unwrap(),
+            ],
+        )
+        .unwrap_err();
+    assert!(
+        negative_dimension
+            .to_string()
+            .contains("non-negative integer dimensions")
+    );
 }
 
 #[test]
@@ -280,7 +391,7 @@ fn tensor_citizen_fixtures_cover_typed_cell_domains() {
                 .collect(),
         )
         .unwrap();
-        assert_eq!(tensor_value_ref(&tensor).unwrap().dtype, domain);
+        assert_eq!(tensor_value_ref(&tensor).unwrap().dtype(), &domain);
         sim_citizen::check_value_fixture(&mut cx, tensor).unwrap();
     }
 }

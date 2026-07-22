@@ -45,7 +45,8 @@ pub(crate) fn value_shape_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/f64 number-domain marker; reconstruct by loading the f64 number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/f64"
 )]
 /// The double-precision 64-bit floating-point number domain: parses decimal
 /// literals and declares the promotion edge into [`complex`](domains::complex).

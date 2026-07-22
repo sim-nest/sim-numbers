@@ -20,7 +20,7 @@
 //!
 //! let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
 //! let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
-//! assert_eq!(roundtrip.to_uniform().data.len(), 2);
+//! assert_eq!(roundtrip.to_uniform().data().len(), 2);
 //! ```
 //!
 //! A mismatched element count fails closed:
@@ -36,8 +36,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_rational_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_rational_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A rational tensor whose cells are `(numerator, denominator)` `i64` pairs.
@@ -59,7 +59,8 @@ impl Rat64Tensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<(i64, i64)>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then(|| Self {
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then(|| Self {
             shape,
             data: data.into_iter().map(normalize).collect(),
         })
@@ -76,11 +77,10 @@ impl SpecTensor for Rat64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|(num, den)| {
                     DefaultFactory
@@ -88,14 +88,15 @@ impl SpecTensor for Rat64Tensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("rational tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_rational_literal_cell)
                 .collect::<Option<Vec<_>>>()?
@@ -202,9 +203,14 @@ mod tests {
     #[test]
     fn rationals_are_normalized() {
         let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
-        assert_eq!(tensor.to_uniform().data.len(), 2);
+        assert_eq!(tensor.to_uniform().data().len(), 2);
         let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
         assert_eq!(roundtrip.data, vec![(1, 2), (3, 4)]);
+    }
+
+    #[test]
+    fn constructor_rejects_overflowing_shape() {
+        assert!(Rat64Tensor::new(vec![usize::MAX, 2], Vec::new()).is_none());
     }
 
     #[test]

@@ -4,7 +4,7 @@
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
 
-use sim_citizen::{CitizenField, arity_error, decode_version};
+use sim_citizen::{arity_error, decode_version};
 use sim_kernel::{
     Args, Callable, Class, ClassId, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, Linker,
     Object, ReadConstructor, ReadConstructorRef, Result, ShapeRef, Symbol, TableRef, Value,
@@ -12,7 +12,7 @@ use sim_kernel::{
 };
 use sim_lib_numbers_core::domains;
 
-use super::{domain::number_domain, value::build_tensor_value};
+use super::{dimension::extract_dims, domain::number_domain, value::build_tensor_value};
 
 /// The symbol naming the tensor value class (`numbers/Tensor`) under which
 /// tensor values register and reconstruct.
@@ -88,7 +88,7 @@ impl Callable for TensorValueClass {
             return Err(arity_error(tensor_value_class_symbol(), 4, values.len()));
         };
         decode_version(cx, version.clone(), 1, tensor_value_class_symbol())?;
-        let shape = Vec::<usize>::decode_field_value(cx, shape.clone(), "shape")?;
+        let shape = extract_dims(cx, shape, "numbers/Tensor shape")?;
         let data = decode_data(cx, data)?;
         let domain = decode_domain(cx, domain)?;
         if domain == number_domain() {

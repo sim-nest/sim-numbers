@@ -2,6 +2,7 @@
 //! registration, constructor operations, and the `Tensor` value type.
 
 mod citizen;
+mod dimension;
 mod domain;
 mod function;
 mod value;

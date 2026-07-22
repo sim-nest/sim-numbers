@@ -48,17 +48,17 @@ fn dot(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
     };
     let left = expect_vector(left_value)?;
     let right = expect_vector(right_value)?;
-    if left.shape != right.shape {
+    if left.shape() != right.shape() {
         return Err(Error::Eval(
             "dot expects vectors with matching lengths".to_owned(),
         ));
     }
     sum_products(
         cx,
-        left.data
+        left.data()
             .iter()
             .cloned()
-            .zip(right.data.iter().cloned())
+            .zip(right.data().iter().cloned())
             .collect(),
     )
 }
@@ -71,7 +71,7 @@ fn matmul(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
     };
     let left = expect_tensor(left_value)?;
     let right = expect_tensor(right_value)?;
-    match (left.shape.as_slice(), right.shape.as_slice()) {
+    match (left.shape(), right.shape()) {
         ([m], [n]) => {
             if m != n {
                 return Err(Error::Eval("matmul vector lengths must match".to_owned()));
@@ -87,8 +87,8 @@ fn matmul(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
                 for col in 0..*cols {
                     let mut terms = Vec::with_capacity(*inner_left);
                     for inner in 0..*inner_left {
-                        let left_cell = left.data[row * inner_left + inner].clone();
-                        let right_cell = right.data[inner * cols + col].clone();
+                        let left_cell = left.data()[row * inner_left + inner].clone();
+                        let right_cell = right.data()[inner * cols + col].clone();
                         terms.push((left_cell, right_cell));
                     }
                     out.push(sum_products(cx, terms)?);
@@ -104,8 +104,8 @@ fn matmul(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
             for row in 0..*rows {
                 let mut terms = Vec::with_capacity(*inner_left);
                 for inner in 0..*inner_left {
-                    let left_cell = left.data[row * inner_left + inner].clone();
-                    let right_cell = right.data[inner].clone();
+                    let left_cell = left.data()[row * inner_left + inner].clone();
+                    let right_cell = right.data()[inner].clone();
                     terms.push((left_cell, right_cell));
                 }
                 out.push(sum_products(cx, terms)?);
@@ -120,8 +120,8 @@ fn matmul(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
             for col in 0..*cols {
                 let mut terms = Vec::with_capacity(*inner_left);
                 for inner in 0..*inner_left {
-                    let left_cell = left.data[inner].clone();
-                    let right_cell = right.data[inner * cols + col].clone();
+                    let left_cell = left.data()[inner].clone();
+                    let right_cell = right.data()[inner * cols + col].clone();
                     terms.push((left_cell, right_cell));
                 }
                 out.push(sum_products(cx, terms)?);
@@ -142,11 +142,11 @@ fn cross(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
     };
     let left = expect_vector(left_value)?;
     let right = expect_vector(right_value)?;
-    if left.data.len() != 3 || right.data.len() != 3 {
+    if left.data().len() != 3 || right.data().len() != 3 {
         return Err(Error::Eval("cross expects 3-vectors".to_owned()));
     }
-    let a = &left.data;
-    let b = &right.data;
+    let a = left.data();
+    let b = right.data();
     let c0_left = mul(cx, a[1].clone(), b[2].clone())?;
     let c0_right = mul(cx, a[2].clone(), b[1].clone())?;
     let c1_left = mul(cx, a[2].clone(), b[0].clone())?;
@@ -168,12 +168,12 @@ fn transpose(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         ));
     };
     let tensor = expect_matrix(value)?;
-    let rows = tensor.shape[0];
-    let cols = tensor.shape[1];
-    let mut out = Vec::with_capacity(tensor.data.len());
+    let rows = tensor.shape()[0];
+    let cols = tensor.shape()[1];
+    let mut out = Vec::with_capacity(tensor.data().len());
     for col in 0..cols {
         for row in 0..rows {
-            out.push(tensor.data[row * cols + col].clone());
+            out.push(tensor.data()[row * cols + col].clone());
         }
     }
     build_tensor_value(
@@ -191,7 +191,7 @@ fn det(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         ));
     };
     let tensor = expect_matrix(value)?;
-    if tensor.shape[0] != tensor.shape[1] {
+    if tensor.shape()[0] != tensor.shape()[1] {
         return Err(Error::Eval("det expects a square matrix".to_owned()));
     }
     determinant(cx, tensor)
@@ -204,9 +204,9 @@ fn inv(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         ));
     };
     let tensor = expect_matrix(value)?;
-    match tensor.shape.as_slice() {
+    match tensor.shape() {
         [1, 1] => {
-            let denom = tensor.data[0].clone();
+            let denom = tensor.data()[0].clone();
             let one = i64_number(1)?;
             let value = div(cx, one, denom)?;
             build_tensor_value(
@@ -219,10 +219,10 @@ fn inv(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         [2, 2] => {
             let det_value = determinant(cx, tensor)?;
             let one_over_det = div(cx, i64_number(1)?, det_value)?;
-            let a = tensor.data[0].clone();
-            let b = tensor.data[1].clone();
-            let c = tensor.data[2].clone();
-            let d = tensor.data[3].clone();
+            let a = tensor.data()[0].clone();
+            let b = tensor.data()[1].clone();
+            let c = tensor.data()[2].clone();
+            let d = tensor.data()[3].clone();
             let minus_b = neg(cx, b)?;
             let minus_c = neg(cx, c)?;
             let cells = vec![
@@ -246,16 +246,16 @@ fn trace(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         ));
     };
     let tensor = expect_matrix(value)?;
-    if tensor.shape[0] != tensor.shape[1] {
+    if tensor.shape()[0] != tensor.shape()[1] {
         return Err(Error::Eval("trace expects a square matrix".to_owned()));
     }
-    let cols = tensor.shape[1];
-    if tensor.shape[0] == 0 {
+    let cols = tensor.shape()[1];
+    if tensor.shape()[0] == 0 {
         return i64_number(0);
     }
-    let mut acc = tensor.data[0].clone();
-    for row in 1..tensor.shape[0] {
-        acc = add(cx, acc, tensor.data[row * cols + row].clone())?;
+    let mut acc = tensor.data()[0].clone();
+    for row in 1..tensor.shape()[0] {
+        acc = add(cx, acc, tensor.data()[row * cols + row].clone())?;
     }
     Ok(acc)
 }
@@ -277,7 +277,7 @@ fn norm(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
     }
     let tensor = expect_tensor(tensor_value)?;
     let mut acc = i64_number(0)?;
-    for cell in &tensor.data {
+    for cell in tensor.data() {
         let square = mul(cx, cell.clone(), cell.clone())?;
         acc = add(cx, acc, square)?;
     }
@@ -342,13 +342,13 @@ fn fill_tensor(cx: &mut sim_kernel::Cx, values: &[Value], ones: bool) -> Result<
 const DET_COFACTOR_MAX: usize = 6;
 
 fn determinant(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
-    let n = tensor.shape[0];
+    let n = tensor.shape()[0];
     match n {
         0 => i64_number(1),
-        1 => Ok(tensor.data[0].clone()),
+        1 => Ok(tensor.data()[0].clone()),
         2 => {
-            let ad = mul(cx, tensor.data[0].clone(), tensor.data[3].clone())?;
-            let bc = mul(cx, tensor.data[1].clone(), tensor.data[2].clone())?;
+            let ad = mul(cx, tensor.data()[0].clone(), tensor.data()[3].clone())?;
+            let bc = mul(cx, tensor.data()[1].clone(), tensor.data()[2].clone())?;
             sub(cx, ad, bc)
         }
         _ if n <= DET_COFACTOR_MAX => determinant_cofactor(cx, tensor),
@@ -357,7 +357,7 @@ fn determinant(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
 }
 
 fn determinant_cofactor(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
-    let n = tensor.shape[0];
+    let n = tensor.shape()[0];
     let mut acc = None;
     for col in 0..n {
         let sign = if col % 2 == 0 {
@@ -365,7 +365,7 @@ fn determinant_cofactor(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Valu
         } else {
             i64_number(-1)?
         };
-        let factor = mul(cx, sign, tensor.data[col].clone())?;
+        let factor = mul(cx, sign, tensor.data()[col].clone())?;
         let minor = minor_tensor(cx, tensor, 0, col)?;
         let subdet = determinant(cx, &minor)?;
         let term = mul(cx, factor, subdet)?;
@@ -389,8 +389,8 @@ fn determinant_cofactor(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Valu
 /// flip the sign; an all-zero pivot column means the matrix is singular
 /// (determinant 0).
 fn determinant_bareiss(cx: &mut sim_kernel::Cx, tensor: &Tensor) -> Result<Value> {
-    let n = tensor.shape[0];
-    let mut m = tensor.data.clone();
+    let n = tensor.shape()[0];
+    let mut m = tensor.data().to_vec();
     let at = |row: usize, col: usize| row * n + col;
     let mut prev = i64_number(1)?;
     let mut negate = false;
@@ -463,12 +463,12 @@ fn sum_products(cx: &mut sim_kernel::Cx, terms: Vec<(Value, Value)>) -> Result<V
 }
 
 fn minor_tensor(
-    _cx: &mut sim_kernel::Cx,
+    cx: &mut sim_kernel::Cx,
     tensor: &Tensor,
     skip_row: usize,
     skip_col: usize,
 ) -> Result<Tensor> {
-    let n = tensor.shape[0];
+    let n = tensor.shape()[0];
     let mut data = Vec::with_capacity((n - 1) * (n - 1));
     for row in 0..n {
         if row == skip_row {
@@ -478,12 +478,8 @@ fn minor_tensor(
             if col == skip_col {
                 continue;
             }
-            data.push(tensor.data[row * n + col].clone());
+            data.push(tensor.data()[row * n + col].clone());
         }
     }
-    Ok(Tensor {
-        shape: vec![n - 1, n - 1],
-        dtype: tensor.dtype.clone(),
-        data,
-    })
+    Tensor::new_checked(cx, vec![n - 1, n - 1], tensor.dtype().clone(), data)
 }

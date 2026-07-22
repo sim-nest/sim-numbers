@@ -38,8 +38,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_f64_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_f64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A tensor whose cells are native `f64` values in a contiguous buffer.
@@ -59,7 +59,8 @@ impl F64Tensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<f64>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then_some(Self { shape, data })
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then_some(Self { shape, data })
     }
 
     /// Adds a scalar to every cell, operating directly on the native buffer.
@@ -77,20 +78,21 @@ impl F64Tensor {
     /// and exists mainly for comparison.
     pub fn add_uniform_scalar_slow(&self, scalar: f64) -> Tensor {
         let uniform = self.to_uniform();
-        Tensor {
-            shape: uniform.shape,
-            dtype: uniform.dtype,
-            data: uniform
-                .data
-                .into_iter()
+        Tensor::new_exact(
+            uniform.shape().to_vec(),
+            uniform.dtype().clone(),
+            uniform
+                .data()
+                .iter()
                 .map(|value| {
-                    let literal = parse_f64_literal_cell(&value).unwrap();
+                    let literal = parse_f64_literal_cell(value).unwrap();
                     DefaultFactory
                         .number_literal(domains::f64(), (literal + scalar).to_string())
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("uniform f64 tensor conversion should stay valid")
     }
 
     /// Times both add-scalar paths once and returns `(fast_ns, slow_ns)`.
@@ -121,11 +123,10 @@ impl SpecTensor for F64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|value| {
                     DefaultFactory
@@ -133,14 +134,15 @@ impl SpecTensor for F64Tensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("f64 tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_f64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,
@@ -217,31 +219,4 @@ pub static RECIPES: sim_cookbook::EmbeddedDir =
     include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));
 
 #[cfg(test)]
-mod tests {
-    use sim_kernel::Lib;
-
-    use super::{F64Tensor, F64TensorLib, SpecTensor, tensor_spec_symbol};
-
-    #[test]
-    fn specialized_add_scalar_beats_uniform_smoke() {
-        let len = 512;
-        let tensor = F64Tensor::new(vec![len], vec![1.0; len]).unwrap();
-        let added = tensor.add_scalar(2.0);
-        assert_eq!(added.data[0], 3.0);
-        let (fast, slow) = tensor.smoke_speed_ratio(2.0);
-        assert!(
-            slow > fast,
-            "expected specialized path to beat slow uniform path"
-        );
-        let roundtrip = F64Tensor::from_uniform(&added.to_uniform()).unwrap();
-        assert_eq!(roundtrip, added);
-    }
-
-    #[test]
-    fn lib_exports_spec_tensor_descriptor() {
-        assert_eq!(
-            F64TensorLib::new().manifest().exports[0].symbol(),
-            &tensor_spec_symbol()
-        );
-    }
-}
+mod tests;

@@ -3,6 +3,8 @@
 
 use std::{error::Error, fmt};
 
+#[path = "agent_fixtures.rs"]
+mod agent_fixtures;
 #[path = "claim.rs"]
 mod claim;
 #[path = "function.rs"]

@@ -1,1 +1,1 @@
-(quote (numbers/fixed fixed-point scale checked-arith))
+numbers/i32

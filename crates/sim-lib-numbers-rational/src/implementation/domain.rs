@@ -89,7 +89,8 @@ pub fn pow_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/rational number-domain marker; reconstruct by loading the rational number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/rational"
 )]
 /// The exact rational number domain: parses `num/den` literals and declares the
 /// promotion edges to and from the integer and `f64` domains.
@@ -101,7 +102,8 @@ impl NumberDomain for RationalNumberDomain {
     }
 
     fn parse_literal(&self, cx: &mut sim_kernel::Cx, text: &str) -> Result<Option<Value>> {
-        let Some((numerator, denominator)) = super::ops::parse_rational_parts(text) else {
+        let Some((numerator, denominator)) = super::parse::parse_rational_parts_checked(text)?
+        else {
             return Ok(None);
         };
         cx.factory()

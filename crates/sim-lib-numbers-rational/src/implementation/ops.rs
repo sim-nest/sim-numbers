@@ -1,86 +1,16 @@
-//! Reduced rational arithmetic rules, literal/decimal parsing into
-//! numerator/denominator pairs, and the promotions to and from the integer and
-//! `f64` domains, in both literal and value form.
+//! Reduced rational arithmetic rules and the promotions to and from the integer
+//! and `f64` domains, in both literal and value form.
 
 use num_bigint::{BigInt, Sign};
 use sim_kernel::{Cx, Error, NumberLiteral, Result, Value};
 
 use super::domain::{f64_domain, number_domain};
 use super::integer::{parse_integer_literal, parse_integer_value};
+use super::parse::{f64_decimal_to_rational_checked, parse_rational_parts_checked};
 use super::value::{Rational, expect_rational_parts, make_reduced_rational};
 
 pub(crate) type RationalRuleFn = fn(&mut Cx, NumberLiteral, NumberLiteral) -> Result<Value>;
 pub(crate) type ValueRuleFn = fn(&mut Cx, Value, Value) -> Result<Value>;
-
-/// Parses a `num/den` rational literal into a reduced numerator/denominator
-/// `BigInt` pair, returning `None` on malformed text or a zero denominator.
-///
-/// The result is normalized: the sign is carried by the numerator and the parts
-/// share no common factor.
-///
-/// # Examples
-///
-/// ```
-/// use num_bigint::BigInt;
-/// use sim_lib_numbers_rational::parse_rational_parts;
-///
-/// assert_eq!(
-///     parse_rational_parts("6/8"),
-///     Some((BigInt::from(3), BigInt::from(4)))
-/// );
-/// assert_eq!(parse_rational_parts("1/0"), None);
-/// ```
-pub fn parse_rational_parts(text: &str) -> Option<(BigInt, BigInt)> {
-    let (num_text, den_text) = text.split_once('/')?;
-    let num = num_text.parse::<BigInt>().ok()?;
-    let den = den_text.parse::<BigInt>().ok()?;
-    normalize_bigint_rational(num, den)
-}
-
-/// Converts a finite decimal string (no exponent) into an exact reduced
-/// numerator/denominator `BigInt` pair, the basis of the f64 -> rational
-/// promotion. Returns `None` on empty, exponential, or malformed input.
-///
-/// # Examples
-///
-/// ```
-/// use num_bigint::BigInt;
-/// use sim_lib_numbers_rational::f64_decimal_to_rational;
-///
-/// assert_eq!(
-///     f64_decimal_to_rational("0.25"),
-///     Some((BigInt::from(1), BigInt::from(4)))
-/// );
-/// assert_eq!(f64_decimal_to_rational("1e3"), None);
-/// ```
-pub fn f64_decimal_to_rational(text: &str) -> Option<(BigInt, BigInt)> {
-    let trimmed = text.trim();
-    if trimmed.is_empty() || trimmed.contains(['e', 'E']) {
-        return None;
-    }
-    let negative = trimmed.starts_with('-');
-    let unsigned = trimmed.strip_prefix(['-', '+']).unwrap_or(trimmed);
-    let (whole_text, fractional_text) = unsigned.split_once('.').unwrap_or((unsigned, ""));
-    if whole_text.is_empty() && fractional_text.is_empty() {
-        return None;
-    }
-    let whole = if whole_text.is_empty() {
-        BigInt::from(0_u8)
-    } else {
-        whole_text.parse::<BigInt>().ok()?
-    };
-    let scale = BigInt::from(10_u8).pow(fractional_text.len() as u32);
-    let fractional = if fractional_text.is_empty() {
-        BigInt::from(0_u8)
-    } else {
-        fractional_text.parse::<BigInt>().ok()?
-    };
-    let mut numerator = whole * scale.clone() + fractional;
-    if negative {
-        numerator = -numerator;
-    }
-    normalize_bigint_rational(numerator, scale)
-}
 
 pub(crate) fn rational_add_rule(
     cx: &mut Cx,
@@ -261,7 +191,7 @@ pub(crate) fn promote_f64_literal_to_rational(
             number.domain
         )));
     }
-    let (num, den) = f64_decimal_to_rational(&number.canonical).ok_or_else(|| {
+    let (num, den) = f64_decimal_to_rational_checked(&number.canonical)?.ok_or_else(|| {
         Error::Eval(format!(
             "could not promote f64 literal to rational: {}",
             number.canonical
@@ -291,7 +221,7 @@ pub(crate) fn promote_rational_literal_to_f64(
             number.domain
         )));
     }
-    let (num, den) = parse_rational_parts(&number.canonical).ok_or_else(|| {
+    let (num, den) = parse_rational_parts_checked(&number.canonical)?.ok_or_else(|| {
         Error::Eval(format!(
             "invalid rational literal for f64 promotion: {}",
             number.canonical
@@ -409,36 +339,6 @@ fn mul(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
 
 fn pow(cx: &mut Cx, left: Value, right: Value) -> Result<Value> {
     cx.apply_value_number_binary_op(&sim_kernel::Symbol::qualified("math", "pow"), left, right)
-}
-
-fn normalize_bigint_rational(num: BigInt, den: BigInt) -> Option<(BigInt, BigInt)> {
-    if den == BigInt::from(0_u8) {
-        return None;
-    }
-    let sign = if den.sign() == Sign::Minus {
-        -BigInt::from(1_u8)
-    } else {
-        BigInt::from(1_u8)
-    };
-    let num = num * sign.clone();
-    let den = den * sign;
-    let gcd = gcd_bigint(num.clone(), den.clone());
-    Some((num / gcd.clone(), den / gcd))
-}
-
-fn gcd_bigint(mut left: BigInt, mut right: BigInt) -> BigInt {
-    left = bigint_abs(left);
-    right = bigint_abs(right);
-    while right != BigInt::from(0_u8) {
-        let next = left % right.clone();
-        left = right;
-        right = next;
-    }
-    if left == BigInt::from(0_u8) {
-        BigInt::from(1_u8)
-    } else {
-        left
-    }
 }
 
 fn bigint_abs(value: BigInt) -> BigInt {

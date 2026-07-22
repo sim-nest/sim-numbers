@@ -1,0 +1,115 @@
+schema = "sim.features"
+
+[enforcement.audience]
+code = "strict"
+framework = "strict"
+
+[enforcement.specimen]
+user = "strict"
+framework = "strict"
+code = "advisory"
+
+[enforcement.route]
+major_entrypoints = "advisory"
+frameworks = "advisory"
+
+[[feature]]
+id = "feature/sim-numbers/generated-docs"
+title = "Repository documentation surface"
+summary = "Publish generated package, card, rustdoc, and index facts for the number-domain crates."
+owner = "crate/xtask"
+audiences = ["code"]
+guidance = "Use this row when checking the generated documentation and index lane for number domains."
+claims_anchors = [
+  "anchor/cli/xtask",
+  "anchor/crate/xtask",
+  "anchor/doc/generated/card-index",
+  "anchor/doc/generated/feature-map",
+  "anchor/doc/generated/provenance",
+  "anchor/doc/generated/repo-contract",
+  "anchor/doc/generated/rustdoc-index",
+  "anchor/doc/generated/sim-index-fragment",
+  "anchor/repo/sim-numbers",
+]
+claims_surfaces = [
+  "cli/xtask",
+  "docs/sim-numbers/generated",
+]
+
+[[feature]]
+id = "feature/sim-numbers/numbers"
+title = "Number framework"
+summary = "Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries."
+owner = "crate/sim-lib-numbers-core"
+audiences = ["code", "framework"]
+guidance = "Use this row when adding or selecting a number domain outside the kernel."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-ad",
+  "anchor/crate/sim-lib-numbers-arith",
+  "anchor/crate/sim-lib-numbers-bigint",
+  "anchor/crate/sim-lib-numbers-bool",
+  "anchor/crate/sim-lib-numbers-cas",
+  "anchor/crate/sim-lib-numbers-cas-diff",
+  "anchor/crate/sim-lib-numbers-cas-eval",
+  "anchor/crate/sim-lib-numbers-codec",
+  "anchor/crate/sim-lib-numbers-complex",
+  "anchor/crate/sim-lib-numbers-core",
+  "anchor/crate/sim-lib-numbers-exotic",
+  "anchor/crate/sim-lib-numbers-f64",
+  "anchor/crate/sim-lib-numbers-fixed",
+  "anchor/crate/sim-lib-numbers-float",
+  "anchor/crate/sim-lib-numbers-func",
+  "anchor/crate/sim-lib-numbers-i64",
+  "anchor/crate/sim-lib-numbers-numeric",
+  "anchor/crate/sim-lib-numbers-prelude",
+  "anchor/crate/sim-lib-numbers-quad",
+  "anchor/crate/sim-lib-numbers-rational",
+  "anchor/crate/sim-lib-numbers-rk",
+  "anchor/crate/sim-lib-numbers-stats",
+  "anchor/crate/sim-lib-numbers-tensor",
+  "anchor/crate/sim-lib-numbers-tensor-bcast",
+  "anchor/crate/sim-lib-numbers-tensor-bit",
+  "anchor/crate/sim-lib-numbers-tensor-cmplxf",
+  "anchor/crate/sim-lib-numbers-tensor-f64",
+  "anchor/crate/sim-lib-numbers-tensor-i64",
+  "anchor/crate/sim-lib-numbers-tensor-linalg",
+  "anchor/crate/sim-lib-numbers-tensor-rat64",
+  "anchor/runtime-lib/sim-lib-numbers-arith/numbers-arithmetic-lib",
+  "anchor/runtime-lib/sim-lib-numbers-bigint/big-int-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-bool/bool-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-cas-diff/cas-diff-lib",
+  "anchor/runtime-lib/sim-lib-numbers-cas-eval/cas-eval-lib",
+  "anchor/runtime-lib/sim-lib-numbers-cas/cas-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-complex/complex-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-exotic/exotic-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-f64/f64-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-fixed/fixed-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-float/f32-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-func/func-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-i64/i64-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-numeric/numeric-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-quad/quad-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-rational/rational-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-rk/rk-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-bit/bit-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-cmplxf/complex-ftensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-f64/f64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-i64/i64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-rat64/rat64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
+]
+
+[[route]]
+id = "route/add-number-domain"
+task = "Add a number domain"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/numbers", why = "The number row owns reusable number domains and their runtime libraries." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen", why = "The tensor citizen test checks runtime projection for a number domain." },
+]

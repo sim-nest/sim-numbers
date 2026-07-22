@@ -1,1 +1,1 @@
-(quote (numbers/stats bayesian-update bayesian-update-binary entropy mean variance sample-variance four-fifths-ratio disparate-impact))
+(stats/mean-claim [1.0 2.0 3.0 4.0 5.0])

@@ -28,7 +28,8 @@
 //!             vec![CasExpr::Var(Symbol::new("1")), arg.clone()],
 //!         ))
 //!     }),
-//! );
+//! )
+//! .unwrap();
 //!
 //! let registry = global_diff_registry().read().unwrap();
 //! let derivative = registry.apply(
@@ -43,7 +44,7 @@ mod implementation;
 
 pub use implementation::{
     CasDiffLib, CasDiffRegistry, DiffRule, diff_cas, diff_symbol, global_diff_registry,
-    integrate_cas, integrate_sym_symbol, register_diff_rule,
+    integrate_cas, integrate_sym_symbol, override_diff_rule, register_diff_rule,
 };
 
 /// Cookbook recipes for this lib, embedded at build time.

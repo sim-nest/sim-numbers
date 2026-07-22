@@ -3,7 +3,7 @@
   "package_count": 31,
   "packages": [
     {
-      "description": "SIM workspace package for sim lib numbers ad.",
+      "description": "Forward and reverse automatic-differentiation primitives for SIM numeric code.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-ad/Cargo.toml",
       "name": "sim-lib-numbers-ad",
@@ -16,7 +16,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers arith.",
+      "description": "Cross-domain arithmetic dispatch over the SIM number promotion lattice.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-arith/Cargo.toml",
       "name": "sim-lib-numbers-arith",
@@ -29,7 +29,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers bigint.",
+      "description": "Arbitrary-precision integer number domain with exact arithmetic and rational promotion.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-bigint/Cargo.toml",
       "name": "sim-lib-numbers-bigint",
@@ -42,7 +42,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers bool.",
+      "description": "Boolean number domain with literal parsing and promotion into scalar numeric domains.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-bool/Cargo.toml",
       "name": "sim-lib-numbers-bool",
@@ -55,7 +55,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers cas diff.",
+      "description": "Symbolic differentiation and integration rules for SIM CAS expressions.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-cas-diff/Cargo.toml",
       "name": "sim-lib-numbers-cas-diff",
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers cas eval.",
+      "description": "Evaluation support for SIM CAS expressions against runtime values and environments.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-cas-eval/Cargo.toml",
       "name": "sim-lib-numbers-cas-eval",
@@ -81,7 +81,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers cas.",
+      "description": "Computer-algebra expression domain, simplification, and value conversion for SIM numbers.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-cas/Cargo.toml",
       "name": "sim-lib-numbers-cas",
@@ -94,7 +94,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers codec.",
+      "description": "Numeric plugin descriptor helpers for advertising SIM number methods and codecs.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-codec/Cargo.toml",
       "name": "sim-lib-numbers-codec",
@@ -107,7 +107,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers complex.",
+      "description": "Complex number domain with arithmetic and scalar promotion edges.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-complex/Cargo.toml",
       "name": "sim-lib-numbers-complex",
@@ -120,7 +120,7 @@
       ]
     },
     {
-      "description": "Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spe.",
+      "description": "Shared scalar-domain substrate: number-value shapes, literal classes, op installers, and promotion metadata.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-core/Cargo.toml",
       "name": "sim-lib-numbers-core",
@@ -133,7 +133,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers exotic.",
+      "description": "Continued-fraction and exact-real helpers for the SIM number stack.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-exotic/Cargo.toml",
       "name": "sim-lib-numbers-exotic",
@@ -146,7 +146,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers f64.",
+      "description": "Double-precision float number domain with arithmetic and complex promotion.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-f64/Cargo.toml",
       "name": "sim-lib-numbers-f64",
@@ -160,7 +160,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers fixed.",
+      "description": "Fixed-width signed and unsigned integer number domains from 8 to 128 bits.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-fixed/Cargo.toml",
       "name": "sim-lib-numbers-fixed",
@@ -173,7 +173,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers float.",
+      "description": "Single-precision float number domain and promotion into f64.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-float/Cargo.toml",
       "name": "sim-lib-numbers-float",
@@ -186,7 +186,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers func.",
+      "description": "Callable numeric function values over symbolic or native bodies.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-func/Cargo.toml",
       "name": "sim-lib-numbers-func",
@@ -199,7 +199,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers i64.",
+      "description": "Signed 64-bit integer number domain with arithmetic and promotion edges.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-i64/Cargo.toml",
       "name": "sim-lib-numbers-i64",
@@ -212,7 +212,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers numeric.",
+      "description": "Numeric differentiation, quadrature, and ODE dispatch over pluggable SIM number backends.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-numeric/Cargo.toml",
       "name": "sim-lib-numbers-numeric",
@@ -225,7 +225,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers prelude.",
+      "description": "One-call installer for the standard SIM number domains and tensor backends.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-prelude/Cargo.toml",
       "name": "sim-lib-numbers-prelude",
@@ -238,7 +238,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers quad.",
+      "description": "Quadrature and finite-difference plugins for the SIM numeric surface.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-quad/Cargo.toml",
       "name": "sim-lib-numbers-quad",
@@ -251,7 +251,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers rational.",
+      "description": "Exact rational number domain over arbitrary-precision integer numerators and denominators.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-rational/Cargo.toml",
       "name": "sim-lib-numbers-rational",
@@ -264,7 +264,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers rk.",
+      "description": "Runge-Kutta ODE solver plugins for the SIM numeric surface.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-rk/Cargo.toml",
       "name": "sim-lib-numbers-rk",
@@ -290,7 +290,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor bcast.",
+      "description": "NumPy-style tensor broadcasting and promoted element-wise operations for SIM tensors.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-bcast/Cargo.toml",
       "name": "sim-lib-numbers-tensor-bcast",
@@ -303,7 +303,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor bit.",
+      "description": "Packed boolean tensor specialization with bitwise tensor operations.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-bit/Cargo.toml",
       "name": "sim-lib-numbers-tensor-bit",
@@ -316,7 +316,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor cmplxf.",
+      "description": "Complex f64-pair tensor specialization for SIM tensor values.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-cmplxf/Cargo.toml",
       "name": "sim-lib-numbers-tensor-cmplxf",
@@ -329,7 +329,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor f64.",
+      "description": "Contiguous f64 tensor specialization with native element-wise math.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
       "name": "sim-lib-numbers-tensor-f64",
@@ -342,7 +342,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor i64.",
+      "description": "Contiguous i64 tensor specialization with overflow-aware arithmetic.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-i64/Cargo.toml",
       "name": "sim-lib-numbers-tensor-i64",
@@ -355,7 +355,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor linalg.",
+      "description": "Linear algebra operations for SIM tensors: dot, matrix multiply, inversion, norms, and constructors.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-linalg/Cargo.toml",
       "name": "sim-lib-numbers-tensor-linalg",
@@ -368,7 +368,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor rat64.",
+      "description": "Rational i64-pair tensor specialization for the SIM tensor domain.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-rat64/Cargo.toml",
       "name": "sim-lib-numbers-tensor-rat64",
@@ -381,7 +381,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for sim lib numbers tensor.",
+      "description": "Uniform n-dimensional tensor value, constructors, and specialization hooks for SIM numbers.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor/Cargo.toml",
       "name": "sim-lib-numbers-tensor",
@@ -394,7 +394,7 @@
       ]
     },
     {
-      "description": "SIM workspace package for xtask.",
+      "description": "Repository automation wrapper for sim-numbers generated documentation and policy checks.",
       "generated_readme": true,
       "manifest": "xtask/Cargo.toml",
       "name": "xtask",

@@ -41,8 +41,8 @@ use sim_kernel::{
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, domains, element_count, parse_i64_literal_cell,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    parse_i64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A tensor whose cells are native `i64` values in a contiguous buffer.
@@ -76,7 +76,8 @@ impl I64Tensor {
     /// Returns `None` when `data.len()` does not match the element count
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<i64>) -> Option<Self> {
-        (element_count(&shape) == data.len()).then_some(Self { shape, data })
+        let expected = checked_element_count(&shape).ok()?;
+        (expected == data.len()).then_some(Self { shape, data })
     }
 
     /// Adds a scalar to every cell, widening to bigint on overflow.
@@ -90,11 +91,10 @@ impl I64Tensor {
             match value.checked_add(scalar) {
                 Some(sum) => out.push(sum),
                 None => {
-                    return I64AddResult::Uniform(Tensor {
-                        shape: self.shape.clone(),
-                        dtype: domains::bigint(),
-                        data: self
-                            .data
+                    let tensor = Tensor::new_exact(
+                        self.shape.clone(),
+                        domains::bigint(),
+                        self.data
                             .iter()
                             .map(|cell| {
                                 DefaultFactory
@@ -105,7 +105,9 @@ impl I64Tensor {
                                     .unwrap()
                             })
                             .collect(),
-                    });
+                    )
+                    .expect("bigint overflow fallback should build a valid uniform tensor");
+                    return I64AddResult::Uniform(tensor);
                 }
             }
         }
@@ -126,11 +128,10 @@ impl SpecTensor for I64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor {
-            shape: self.shape.clone(),
-            dtype: self.dtype(),
-            data: self
-                .data
+        Tensor::new_exact(
+            self.shape.clone(),
+            self.dtype(),
+            self.data
                 .iter()
                 .map(|value| {
                     DefaultFactory
@@ -138,14 +139,15 @@ impl SpecTensor for I64Tensor {
                         .unwrap()
                 })
                 .collect(),
-        }
+        )
+        .expect("i64 tensor storage should convert to a valid uniform tensor")
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         Some(Self {
-            shape: tensor.shape.clone(),
+            shape: tensor.shape().to_vec(),
             data: tensor
-                .data
+                .data()
                 .iter()
                 .map(parse_i64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,
@@ -220,31 +222,6 @@ pub fn tensor_spec_symbol() -> Symbol {
 /// Cookbook recipes for this lib, embedded at build time.
 pub static RECIPES: sim_cookbook::EmbeddedDir =
     include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));
+
 #[cfg(test)]
-mod tests {
-    use sim_kernel::Lib;
-    use sim_lib_numbers_tensor::domains;
-
-    use super::{I64AddResult, I64Tensor, I64TensorLib, tensor_spec_symbol};
-
-    #[test]
-    fn overflow_widens_to_bigint_uniform_tensor() {
-        let tensor = I64Tensor::new(vec![2], vec![i64::MAX, 3]).unwrap();
-        let out = tensor.checked_add_scalar(1);
-        match out {
-            I64AddResult::Uniform(tensor) => {
-                assert_eq!(tensor.dtype, domains::bigint());
-                assert_eq!(tensor.shape, vec![2]);
-            }
-            I64AddResult::Specialized(_) => panic!("expected bigint widening"),
-        }
-    }
-
-    #[test]
-    fn lib_exports_spec_tensor_descriptor() {
-        assert_eq!(
-            I64TensorLib::new().manifest().exports[0].symbol(),
-            &tensor_spec_symbol()
-        );
-    }
-}
+mod tests;

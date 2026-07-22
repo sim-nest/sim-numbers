@@ -4,8 +4,10 @@ use sim_kernel::{
     Args, Callable, Cx, DefaultFactory, EagerPolicy, Error, Expr, LengthResult, NumberLiteral,
     QuoteMode, Symbol,
 };
+use sim_lib_numbers_cas::{CasExpr, canonical_eq, expr_to_cas_expr};
+use sim_lib_numbers_cas_diff::{diff_symbol, integrate_sym_symbol};
 
-use crate::{Func, FuncMetadata, FuncNumbersLib, grad_symbol};
+use crate::{Func, FuncMetadata, FuncNumbersLib, SymbolicStatus, fn_symbol, grad_symbol};
 
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -30,6 +32,13 @@ fn number(text: &str) -> Expr {
     })
 }
 
+fn quoted(name: &str) -> Expr {
+    Expr::Quote {
+        mode: QuoteMode::Quote,
+        expr: Box::new(Expr::Symbol(Symbol::new(name))),
+    }
+}
+
 fn number_value(cx: &mut Cx, text: &str) -> sim_kernel::Value {
     cx.factory()
         .number_literal(Symbol::qualified("numbers", "i64"), text.to_owned())
@@ -38,10 +47,53 @@ fn number_value(cx: &mut Cx, text: &str) -> sim_kernel::Value {
 
 fn zero_func_value(cx: &mut Cx) -> sim_kernel::Value {
     let zero = number_value(cx, "0");
-    let zero = sim_lib_numbers_cas::CasExpr::num(cx, zero).unwrap();
+    let zero = CasExpr::num(cx, zero).unwrap();
     cx.factory()
         .opaque(Arc::new(Func::symbolic(Vec::new(), zero)))
         .unwrap()
+}
+
+fn cas_number(cx: &mut Cx, text: &str) -> CasExpr {
+    let value = number_value(cx, text);
+    CasExpr::num(cx, value).unwrap()
+}
+
+fn symbolic_func_value(cx: &mut Cx, vars: Vec<Symbol>, body: CasExpr) -> sim_kernel::Value {
+    cx.factory()
+        .opaque(Arc::new(Func::symbolic(vars, body)))
+        .unwrap()
+}
+
+fn native_increment_func_value(cx: &mut Cx) -> sim_kernel::Value {
+    cx.factory()
+        .opaque(Arc::new(Func::native(
+            vec![Symbol::new("x")],
+            Arc::new(|cx, args| {
+                let [value] = args else {
+                    return Err(Error::Eval("expected one arg".to_owned()));
+                };
+                cx.apply_value_number_binary_op(
+                    &Symbol::qualified("math", "add"),
+                    value.clone(),
+                    cx.factory()
+                        .number_literal(Symbol::qualified("numbers", "i64"), "1".to_owned())?,
+                )
+            }),
+        )))
+        .unwrap()
+}
+
+fn returned_func_body(cx: &mut Cx, value: &sim_kernel::Value) -> CasExpr {
+    let Expr::Call { operator, args } = value.object().as_expr(cx).unwrap() else {
+        panic!("expected returned function surface");
+    };
+    assert_eq!(operator.as_ref(), &Expr::Symbol(fn_symbol()));
+    let [_, body_expr] = args.as_slice() else {
+        panic!("expected fn surface to carry vars and a body");
+    };
+    expr_to_cas_expr(cx, body_expr)
+        .unwrap()
+        .expect("returned function body should be CAS-compatible")
 }
 
 fn promote_to_func_via_add(cx: &mut Cx, value: sim_kernel::Value) -> sim_kernel::Value {
@@ -112,6 +164,61 @@ fn function_plus_constant_remains_callable() {
 }
 
 #[test]
+fn symbolic_plus_symbolic_stays_symbolic() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let left = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x.clone()));
+    let right = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x.clone()));
+
+    let sum = cx
+        .apply_value_number_binary_op(&Symbol::qualified("math", "add"), left, right)
+        .unwrap();
+    let func = sum.object().downcast_ref::<Func>().unwrap();
+
+    assert!(func.body_cas().is_some());
+    assert_eq!(func.symbolic_status(), SymbolicStatus::Available);
+}
+
+#[test]
+fn symbolic_plus_native_reports_mixed_native_loss() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let symbolic = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x));
+    let native = native_increment_func_value(&mut cx);
+
+    let mixed = cx
+        .apply_value_number_binary_op(&Symbol::qualified("math", "add"), symbolic, native)
+        .unwrap();
+    let func = mixed.object().downcast_ref::<Func>().unwrap();
+
+    assert!(func.body_cas().is_none());
+    assert_eq!(func.symbolic_status(), SymbolicStatus::mixed_native());
+    let err = cx
+        .call_function(
+            &diff_symbol(),
+            Args::new(vec![mixed, cx.factory().expr(quoted("x")).unwrap()]),
+        )
+        .unwrap_err();
+    assert!(matches!(err, Error::Eval(message) if message.contains("numbers/func/mixed-native")));
+}
+
+#[test]
+fn mixed_native_eval_unchanged() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let symbolic = symbolic_func_value(&mut cx, vec![x.clone()], CasExpr::Var(x));
+    let native = native_increment_func_value(&mut cx);
+
+    let mixed = cx
+        .apply_value_number_binary_op(&Symbol::qualified("math", "add"), symbolic, native)
+        .unwrap();
+    let arg = number_value(&mut cx, "4");
+    let out = cx.call_value(mixed, Args::new(vec![arg])).unwrap();
+
+    assert_eq!(out.object().as_expr(&mut cx).unwrap(), number("9"));
+}
+
+#[test]
 fn native_only_functions_report_not_differentiable() {
     let mut cx = test_cx();
     let native = cx
@@ -145,7 +252,68 @@ fn native_only_functions_report_not_differentiable() {
             ]),
         )
         .unwrap_err();
-    assert!(matches!(err, Error::Eval(message) if message.contains("NotDifferentiable")));
+    assert!(matches!(err, Error::Eval(message) if message.contains("numbers/func/native-only")));
+}
+
+#[test]
+fn diff_func_with_sin_body_survives_surface_bridge() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let func = symbolic_func_value(
+        &mut cx,
+        vec![x.clone()],
+        CasExpr::Op(Symbol::new("sin"), vec![CasExpr::Var(x.clone())]),
+    );
+    let var = cx.factory().expr(quoted("x")).unwrap();
+
+    let derivative = cx
+        .call_function(&diff_symbol(), Args::new(vec![func, var]))
+        .unwrap();
+    let body = returned_func_body(&mut cx, &derivative);
+    let expected = CasExpr::Op(Symbol::new("cos"), vec![CasExpr::Var(x)]);
+
+    assert!(canonical_eq(&mut cx, &body, &expected).unwrap());
+}
+
+#[test]
+fn integrate_func_with_pow_body_survives_surface_bridge() {
+    let mut cx = test_cx();
+    let x = Symbol::new("x");
+    let exponent = cas_number(&mut cx, "2");
+    let func = symbolic_func_value(
+        &mut cx,
+        vec![x.clone()],
+        CasExpr::Op(
+            Symbol::qualified("math", "pow"),
+            vec![CasExpr::Var(x.clone()), exponent],
+        ),
+    );
+    let var = cx.factory().expr(quoted("x")).unwrap();
+
+    let integral = cx
+        .call_function(&integrate_sym_symbol(), Args::new(vec![func, var]))
+        .unwrap();
+    let body = returned_func_body(&mut cx, &integral);
+    let coefficient = cx
+        .factory()
+        .number_literal(
+            Symbol::qualified("numbers", "f64"),
+            "0.3333333333333333".to_owned(),
+        )
+        .unwrap();
+    let cubed_exponent = cas_number(&mut cx, "3");
+    let expected = CasExpr::Op(
+        Symbol::qualified("math", "mul"),
+        vec![
+            CasExpr::num(&mut cx, coefficient).unwrap(),
+            CasExpr::Op(
+                Symbol::qualified("math", "pow"),
+                vec![CasExpr::Var(x), cubed_exponent],
+            ),
+        ],
+    );
+
+    assert!(canonical_eq(&mut cx, &body, &expected).unwrap());
 }
 
 #[test]
@@ -224,6 +392,7 @@ fn native_with_preserves_metadata() {
         func.metadata.differentiator_hint,
         Some(Symbol::qualified("test", "diff"))
     );
+    assert_eq!(func.symbolic_status(), SymbolicStatus::ProvidedByHint);
     let payload = func.metadata.payload.as_ref().expect("payload");
     assert_eq!(
         payload.object().as_expr(&mut cx).unwrap(),
@@ -240,10 +409,7 @@ fn body_mismatch_unrepresentable() {
     assert!(native.is_native());
     assert!(native.body_cas().is_none());
 
-    let symbolic = Func::symbolic(
-        vec![Symbol::new("x")],
-        sim_lib_numbers_cas::CasExpr::Var(Symbol::new("x")),
-    );
+    let symbolic = Func::symbolic(vec![Symbol::new("x")], CasExpr::Var(Symbol::new("x")));
     assert!(!symbolic.is_native());
     assert!(symbolic.body_cas().is_some());
 }
@@ -252,11 +418,7 @@ fn body_mismatch_unrepresentable() {
 fn promote_symbolic_cas_lifts_free_var() {
     let mut cx = test_cx();
     let x = Symbol::new("x");
-    let cas = sim_lib_numbers_cas::cas_expr_to_value(
-        &mut cx,
-        sim_lib_numbers_cas::CasExpr::Var(x.clone()),
-    )
-    .unwrap();
+    let cas = sim_lib_numbers_cas::cas_expr_to_value(&mut cx, CasExpr::Var(x.clone())).unwrap();
 
     let promoted = promote_to_func_via_add(&mut cx, cas);
     let func = promoted.object().downcast_ref::<Func>().unwrap();

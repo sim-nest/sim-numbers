@@ -5,7 +5,6 @@ use std::sync::Arc;
 
 use sim_kernel::{Args, Cx, Error, Expr, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
-use sim_lib_numbers_func::Func;
 
 use super::{
     options::{
@@ -13,7 +12,9 @@ use super::{
         parse_ode_exprs, parse_symbolish_value, parse_table_options, reject_unknown,
     },
     registry::global_numeric_registry,
-    traits::{DiffOpts, Differentiator, NumericKind, OdeOpts, OdeProblem, QuadOpts},
+    traits::{
+        DiffOpts, Differentiator, NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts,
+    },
 };
 
 pub fn call_numeric_diff(cx: &mut Cx, args: Args) -> Result<Value> {
@@ -199,28 +200,31 @@ fn diff_dispatch(
     point: Value,
     opts: DiffOpts,
 ) -> Result<Value> {
-    let func = expect_unary_func(&func_value, &var)?;
+    let func = NumericCallable::unary(func_value, var.clone())?;
     let auto = Symbol::new("auto");
     let is_auto = opts.method == auto;
     if is_auto && func.body_cas().is_some() {
         let derivative = cx.call_function(
             &Symbol::new("diff"),
-            Args::new(vec![func_value.clone(), cx.factory().symbol(var.clone())?]),
+            Args::new(vec![
+                func.value().clone(),
+                cx.factory().symbol(var.clone())?,
+            ]),
         )?;
         let out = cx.call_value(derivative, Args::new(vec![point]))?;
         cx.push_info("numeric-diff method=auto steps=1");
         return Ok(out);
     }
     if is_auto
-        && let Some(hint) = &func.metadata.differentiator_hint
+        && let Some(hint) = func.differentiator_hint()
         && let Some(plugin) = registered_differentiator(hint)?
     {
-        let out = plugin.diff_at(cx, &func, &var, &point, opts.clone())?;
+        let out = plugin.diff_callable_at(cx, &func, &var, &point, opts.clone())?;
         cx.push_info(format!("numeric-diff method=auto->{} steps=exact", hint));
         return Ok(out);
     }
     if let Some(plugin) = registered_differentiator(&opts.method)? {
-        let out = plugin.diff_at(cx, &func, &var, &point, opts.clone())?;
+        let out = plugin.diff_callable_at(cx, &func, &var, &point, opts.clone())?;
         cx.push_info(format!(
             "numeric-diff method={} steps=2 h={}",
             opts.method, opts.h
@@ -228,7 +232,7 @@ fn diff_dispatch(
         return Ok(out);
     }
     if is_auto {
-        let out = finite_diff_central(cx, func_value, point, opts.h)?;
+        let out = finite_diff_central(cx, &func, point, opts.h)?;
         cx.push_info(format!("numeric-diff method=auto steps=2 h={}", opts.h));
         return Ok(out);
     }
@@ -251,7 +255,7 @@ fn integrate_dispatch(
     opts: QuadOpts,
     kind: NumericKind,
 ) -> Result<Value> {
-    let func = expect_unary_func(&func_value, &var)?;
+    let func = NumericCallable::unary(func_value, var.clone())?;
     let registry = global_numeric_registry()
         .read()
         .map_err(|_| Error::PoisonedLock("numeric registry"))?;
@@ -293,7 +297,11 @@ struct OdeDispatch {
 }
 
 fn ode_dispatch(cx: &mut Cx, dispatch: OdeDispatch) -> Result<Value> {
-    let dy = expect_ode_func(&dispatch.dy_value, &dispatch.var, &dispatch.y_var)?;
+    let dy = NumericCallable::binary(
+        dispatch.dy_value,
+        dispatch.var.clone(),
+        dispatch.y_var.clone(),
+    )?;
     let registry = global_numeric_registry()
         .read()
         .map_err(|_| Error::PoisonedLock("numeric registry"))?;
@@ -384,37 +392,7 @@ fn extract_var(cx: &mut Cx, value: &Value) -> Result<Symbol> {
         .ok_or_else(|| Error::Eval("expected symbol or quoted symbol variable".to_owned()))
 }
 
-fn expect_unary_func(value: &Value, var: &Symbol) -> Result<Func> {
-    let func = value
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| Error::Eval("numeric methods currently expect a Func value".to_owned()))?
-        .clone();
-    if func.vars.len() != 1 || func.vars[0] != *var {
-        return Err(Error::Eval(
-            "numeric methods currently require a unary function whose parameter matches the requested variable"
-                .to_owned(),
-        ));
-    }
-    Ok(func)
-}
-
-fn expect_ode_func(value: &Value, x_var: &Symbol, y_var: &Symbol) -> Result<Func> {
-    let func = value
-        .object()
-        .downcast_ref::<Func>()
-        .ok_or_else(|| Error::Eval("ode-solve currently expects a Func value".to_owned()))?
-        .clone();
-    if func.vars.len() != 2 || func.vars[0] != *x_var || func.vars[1] != *y_var {
-        return Err(Error::Eval(
-            "ode-solve currently requires a binary function whose parameters match the requested x and y variables"
-                .to_owned(),
-        ));
-    }
-    Ok(func)
-}
-
-fn finite_diff_central(cx: &mut Cx, func: Value, point: Value, h: f64) -> Result<Value> {
+fn finite_diff_central(cx: &mut Cx, func: &NumericCallable, point: Value, h: f64) -> Result<Value> {
     let h_value = cx.factory().number_literal(domains::f64(), h.to_string())?;
     let neg_h_value = cx
         .factory()
@@ -426,8 +404,8 @@ fn finite_diff_central(cx: &mut Cx, func: Value, point: Value, h: f64) -> Result
         cx.apply_value_number_binary_op(&Symbol::qualified("math", "add"), point.clone(), h_value)?;
     let x_minus =
         cx.apply_value_number_binary_op(&Symbol::qualified("math", "add"), point, neg_h_value)?;
-    let f_plus = cx.call_value(func.clone(), Args::new(vec![x_plus]))?;
-    let f_minus = cx.call_value(func, Args::new(vec![x_minus]))?;
+    let f_plus = func.call(cx, vec![x_plus])?;
+    let f_minus = func.call(cx, vec![x_minus])?;
     let numerator =
         cx.apply_value_number_binary_op(&Symbol::qualified("math", "sub"), f_plus, f_minus)?;
     cx.apply_value_number_binary_op(&Symbol::qualified("math", "div"), numerator, denom)

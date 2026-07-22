@@ -8,6 +8,7 @@ use sim_kernel::{
     Symbol, Value, force_list_to_vec,
 };
 
+use super::dimension::{extract_dims, extract_usize};
 use super::value::{
     Tensor, build_scalar_tensor_value, build_tensor_value, tensor_dtype, tensor_value_ref,
 };
@@ -159,7 +160,7 @@ fn index_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
     };
     let tensor = tensor_value_ref(tensor_value)
         .ok_or_else(|| Error::Eval("index expects a tensor as its first argument".to_owned()))?;
-    let shape = &tensor.shape;
+    let shape = tensor.shape();
     if indices.len() != shape.len() {
         return Err(Error::Eval(format!(
             "index expected {} indices, found {}",
@@ -173,7 +174,7 @@ fn index_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
         .collect::<Result<Vec<_>>>()?;
     let flat = Tensor::flat_offset(shape, &offsets)?;
     tensor
-        .data
+        .data()
         .get(flat)
         .cloned()
         .ok_or_else(|| Error::Eval("tensor index was out of bounds".to_owned()))
@@ -192,7 +193,7 @@ fn reshape_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
         cx,
         shape,
         Some(tensor_dtype(tensor).clone()),
-        tensor.data.clone(),
+        tensor.data().to_vec(),
     )
 }
 
@@ -206,7 +207,7 @@ fn slice_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
         .ok_or_else(|| Error::Eval("slice expects a tensor value".to_owned()))?;
     let starts = extract_dims(cx, starts_value, "slice starts")?;
     let lens = extract_dims(cx, lens_value, "slice lengths")?;
-    if starts.len() != tensor.shape.len() || lens.len() != tensor.shape.len() {
+    if starts.len() != tensor.shape().len() || lens.len() != tensor.shape().len() {
         return Err(Error::Eval(
             "slice starts and lengths must match tensor rank".to_owned(),
         ));
@@ -218,10 +219,10 @@ fn slice_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
             .zip(starts.iter())
             .map(|(offset, start)| offset + start)
             .collect::<Vec<_>>();
-        let flat = Tensor::flat_offset(&tensor.shape, &absolute)?;
+        let flat = Tensor::flat_offset(tensor.shape(), &absolute)?;
         cells.push(
             tensor
-                .data
+                .data()
                 .get(flat)
                 .cloned()
                 .ok_or_else(|| Error::Eval("slice index was out of bounds".to_owned()))?,
@@ -238,11 +239,11 @@ fn map_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
     };
     let tensor = tensor_value_ref(tensor_value)
         .ok_or_else(|| Error::Eval("map expects a tensor value".to_owned()))?;
-    let mut cells = Vec::with_capacity(tensor.data.len());
-    for cell in &tensor.data {
+    let mut cells = Vec::with_capacity(tensor.data().len());
+    for cell in tensor.data() {
         cells.push(cx.call_value(function.clone(), Args::new(vec![cell.clone()]))?);
     }
-    build_tensor_value(cx, tensor.shape.clone(), None, cells)
+    build_tensor_value(cx, tensor.shape().to_vec(), None, cells)
 }
 
 fn extract_optional_symbol(cx: &mut Cx, value: &Value) -> Result<Option<Symbol>> {
@@ -259,33 +260,6 @@ fn extract_optional_symbol(cx: &mut Cx, value: &Value) -> Result<Option<Symbol>>
         _ => Err(Error::Eval(
             "expected a symbol or nil for tensor dtype".to_owned(),
         )),
-    }
-}
-
-fn extract_dims(cx: &mut Cx, value: &Value, context: &str) -> Result<Vec<usize>> {
-    let list = value
-        .object()
-        .as_list()
-        .ok_or_else(|| Error::Eval(format!("{context} must be a list or vector of dimensions")))?;
-    let values = force_list_to_vec(cx, list, context)?;
-    values
-        .iter()
-        .map(|entry| extract_usize(cx, entry, context))
-        .collect()
-}
-
-fn extract_usize(cx: &mut Cx, value: &Value, context: &str) -> Result<usize> {
-    match value.object().as_expr(cx)? {
-        Expr::Number(number) => number
-            .canonical
-            .parse::<usize>()
-            .map_err(|_| Error::Eval(format!("{context} expects non-negative integer dimensions"))),
-        Expr::String(text) => text
-            .parse::<usize>()
-            .map_err(|_| Error::Eval(format!("{context} expects non-negative integer dimensions"))),
-        _ => Err(Error::Eval(format!(
-            "{context} expects non-negative integer dimensions"
-        ))),
     }
 }
 

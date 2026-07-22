@@ -1,23 +1,24 @@
 //! The quadrature library and its integration backends, registering fixed and
 //! adaptive quadrature rules and the finite-difference differentiators.
 
-use std::sync::Arc;
+use std::sync::{Arc, OnceLock};
 
 use sim_kernel::{
-    AbiVersion, Cx, Dependency, Export, Lib, LibManifest, LibTarget, Linker, Result, Symbol, Value,
-    Version,
+    AbiVersion, Cx, Dependency, Error, Export, Lib, LibManifest, LibTarget, Linker, Result, Symbol,
+    Value, Version,
 };
 use sim_lib_numbers_codec::{numeric_plugin_descriptor_symbol, numeric_plugin_descriptor_value};
 use sim_lib_numbers_core::domains;
-use sim_lib_numbers_func::Func;
 use sim_lib_numbers_numeric::{
-    NumericKind, NumericPlugin, QuadOpts, Quadrature, register_differentiator, register_quadrature,
+    NumericCallable, NumericKind, NumericPlugin, QuadOpts, Quadrature, register_differentiator,
+    register_quadrature,
 };
 
 use super::{
     diff::differentiators,
     support::{
-        abs_error, add, add_scaled, call_unary_func, f64_value, scale, sub, value_to_f64, zero_like,
+        abs_error, add, add_scaled, call_unary_callable, f64_value, scale, sub, value_to_f64,
+        zero_like,
     },
 };
 
@@ -73,15 +74,29 @@ impl Lib for QuadNumbersLib {
     }
 
     fn load(&self, cx: &mut sim_kernel::LoadCx, linker: &mut Linker<'_>) -> Result<()> {
-        for plugin in differentiators() {
-            register_differentiator(plugin)?;
-        }
-        for plugin in quadratures() {
-            register_quadrature(plugin)?;
-        }
+        register_plugins_once()?;
         install_descriptors(cx, linker)?;
         Ok(())
     }
+}
+
+static PLUGINS_REGISTERED: OnceLock<std::result::Result<(), String>> = OnceLock::new();
+
+fn register_plugins_once() -> Result<()> {
+    match PLUGINS_REGISTERED.get_or_init(|| register_plugins().map_err(|err| err.to_string())) {
+        Ok(()) => Ok(()),
+        Err(message) => Err(Error::Eval(message.clone())),
+    }
+}
+
+fn register_plugins() -> Result<()> {
+    for plugin in differentiators() {
+        register_differentiator(plugin)?;
+    }
+    for plugin in quadratures() {
+        register_quadrature(plugin)?;
+    }
+    Ok(())
 }
 
 fn descriptor_exports() -> Vec<Export> {
@@ -210,7 +225,7 @@ impl Quadrature for QuadPlugin {
     fn integrate(
         &self,
         cx: &mut Cx,
-        f: &Func,
+        f: &NumericCallable,
         _var: &Symbol,
         lo: &Value,
         hi: &Value,
@@ -230,7 +245,7 @@ impl Quadrature for QuadPlugin {
     }
 }
 
-fn trapezoid(cx: &mut Cx, f: &Func, a: f64, b: f64, n: usize) -> Result<Value> {
+fn trapezoid(cx: &mut Cx, f: &NumericCallable, a: f64, b: f64, n: usize) -> Result<Value> {
     let n = n.max(1);
     let h = (b - a) / n as f64;
     let fa = sample_at(cx, f, a)?;
@@ -246,7 +261,7 @@ fn trapezoid(cx: &mut Cx, f: &Func, a: f64, b: f64, n: usize) -> Result<Value> {
     scale(cx, acc, h)
 }
 
-fn simpson(cx: &mut Cx, f: &Func, a: f64, b: f64, n: usize) -> Result<Value> {
+fn simpson(cx: &mut Cx, f: &NumericCallable, a: f64, b: f64, n: usize) -> Result<Value> {
     let n = if n < 2 {
         2
     } else if n.is_multiple_of(2) {
@@ -267,7 +282,14 @@ fn simpson(cx: &mut Cx, f: &Func, a: f64, b: f64, n: usize) -> Result<Value> {
     scale(cx, acc, h / 3.0)
 }
 
-fn romberg(cx: &mut Cx, f: &Func, a: f64, b: f64, levels: usize, tol: f64) -> Result<Value> {
+fn romberg(
+    cx: &mut Cx,
+    f: &NumericCallable,
+    a: f64,
+    b: f64,
+    levels: usize,
+    tol: f64,
+) -> Result<Value> {
     let levels = levels.max(1);
     let mut table: Vec<Vec<Value>> = Vec::with_capacity(levels);
     for k in 0..levels {
@@ -297,7 +319,7 @@ fn romberg(cx: &mut Cx, f: &Func, a: f64, b: f64, levels: usize, tol: f64) -> Re
         .expect("romberg table should contain at least one result"))
 }
 
-fn gauss_legendre(cx: &mut Cx, f: &Func, a: f64, b: f64, n: usize) -> Result<Value> {
+fn gauss_legendre(cx: &mut Cx, f: &NumericCallable, a: f64, b: f64, n: usize) -> Result<Value> {
     let nodes = gauss_legendre_nodes(n);
     let mid = 0.5 * (a + b);
     let half = 0.5 * (b - a);
@@ -312,7 +334,7 @@ fn gauss_legendre(cx: &mut Cx, f: &Func, a: f64, b: f64, n: usize) -> Result<Val
 
 fn adaptive_gauss_kronrod(
     cx: &mut Cx,
-    f: &Func,
+    f: &NumericCallable,
     a: f64,
     b: f64,
     tol: f64,
@@ -328,7 +350,7 @@ fn adaptive_gauss_kronrod(
     add(cx, left, right)
 }
 
-fn gauss_kronrod_15(cx: &mut Cx, f: &Func, a: f64, b: f64) -> Result<(Value, Value)> {
+fn gauss_kronrod_15(cx: &mut Cx, f: &NumericCallable, a: f64, b: f64) -> Result<(Value, Value)> {
     const XGK: [f64; 8] = [
         0.991_455_371_120_812_6,
         0.949_107_912_342_758_5,
@@ -382,9 +404,9 @@ fn gauss_kronrod_15(cx: &mut Cx, f: &Func, a: f64, b: f64) -> Result<(Value, Val
     Ok((scale(cx, kronrod, half)?, scale(cx, gauss, half)?))
 }
 
-fn sample_at(cx: &mut Cx, f: &Func, x: f64) -> Result<Value> {
+fn sample_at(cx: &mut Cx, f: &NumericCallable, x: f64) -> Result<Value> {
     let x = f64_value(cx, x)?;
-    call_unary_func(cx, f, x)
+    call_unary_callable(cx, f, x)
 }
 
 fn gauss_legendre_nodes(n: usize) -> Vec<(f64, f64)> {

@@ -130,10 +130,10 @@ representation where no specialization applies.
 
 ## Validation
 
-These commands run in the constellation workspace; only `sim-kernel` builds from a lone clone today (see `DEVELOPING.md` in `sim-sdk`). A single-repo build lands with the first crates.io publish.
+Run validation from this repository:
 
 ```bash
-cargo fmt --check && cargo test --workspace && cargo clippy --workspace -- -D warnings && cargo doc --workspace --no-deps
+cargo fmt --all --check && cargo run -p xtask -- check-file-sizes && cargo test --workspace && cargo clippy --workspace --all-targets -- -D warnings && cargo doc --workspace --no-deps
 cargo run -p xtask -- simdoc --check
 ```
 

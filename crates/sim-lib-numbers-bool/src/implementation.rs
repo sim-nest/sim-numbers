@@ -66,7 +66,8 @@ fn mul_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/bool number-domain marker; reconstruct by loading the bool number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/bool"
 )]
 /// The boolean number domain at the base of the promotion lattice: parses
 /// `true`/`false` literals and declares the widening edges into the integer

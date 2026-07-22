@@ -47,7 +47,8 @@ pub fn builtin_symbol(name: &str) -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/cf number-domain marker; reconstruct by loading the exotic number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/cf"
 )]
 pub struct ExoticNumberDomain;
 

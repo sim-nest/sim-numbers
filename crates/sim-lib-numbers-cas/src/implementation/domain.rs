@@ -43,7 +43,8 @@ fn value_shape_symbol() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/cas number-domain marker; reconstruct by loading the CAS number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/cas"
 )]
 pub struct CasNumberDomain;
 

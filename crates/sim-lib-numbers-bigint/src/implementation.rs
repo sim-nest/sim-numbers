@@ -23,7 +23,8 @@ use crate::literal::value_instance_shape_symbol;
 use crate::ops::{
     BigIntRuleFn, ValueRuleFn, bigint_add_rule, bigint_cmp_rule, bigint_div_rule, bigint_mul_rule,
     bigint_neg_rule, bigint_pow_rule, bigint_product_rule, bigint_rem_rule, bigint_sub_rule,
-    bigint_sum_rule, canonical_bigint, promote_bigint_to_rational, promote_integer_to_bigint,
+    bigint_sum_rule, canonical_bigint, precheck_bigint_decimal_text, promote_bigint_to_rational,
+    promote_integer_to_bigint,
 };
 
 /// The `numbers/bigint` domain symbol shared by this crate's literals, values,
@@ -66,11 +67,12 @@ pub(crate) fn rational_domain() -> Symbol {
 
 #[sim_citizen_derive::non_citizen(
     reason = "numbers/bigint number-domain marker; reconstruct by loading the bigint number lib",
-    kind = "marker"
+    kind = "marker",
+    descriptor = "numbers/bigint"
 )]
-/// The arbitrary-precision signed-integer number domain: parses unbounded
-/// integer literals, performs exact arithmetic, and declares the promotion
-/// edge into [`rational`](domains::rational).
+/// The arbitrary-precision signed-integer number domain: parses budgeted
+/// integer literals, performs exact arithmetic, and declares the promotion edge
+/// into [`rational`](domains::rational).
 pub struct BigIntNumberDomain;
 
 impl NumberDomain for BigIntNumberDomain {
@@ -86,6 +88,7 @@ impl NumberDomain for BigIntNumberDomain {
         if text.contains(['.', '/']) || text.is_empty() {
             return Ok(None);
         }
+        precheck_bigint_decimal_text("bigint literal", text)?;
         let Some(_) = text.parse::<BigInt>().ok() else {
             return Ok(None);
         };

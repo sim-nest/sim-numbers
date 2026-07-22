@@ -10,7 +10,7 @@ A function, the rule that turns inputs into an output, becomes a thing you can h
 
 - Functions become reusable values you can store and pass along like any data.
 - The same handle serves whether the rule is a formula or a built-in operation.
-- Asking a function for its rate of change is built right in.
+- The same value can be sampled by numeric methods when you need its rate of change.
 
 ## Where it fits
 

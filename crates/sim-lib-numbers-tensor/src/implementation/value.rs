@@ -6,8 +6,8 @@ use std::collections::{BTreeMap, BinaryHeap};
 use std::sync::Arc;
 
 use sim_kernel::{
-    ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NumberValue, Object, ObjectCompat,
-    ObjectEncode, ObjectEncoding, Result, Symbol, Value,
+    ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NoopEvalPolicy, NumberValue, Object,
+    ObjectCompat, ObjectEncode, ObjectEncoding, Result, Symbol, Value,
 };
 
 use super::citizen::tensor_value_class_symbol;
@@ -23,16 +23,56 @@ use super::domain::number_domain;
 #[derive(Clone)]
 pub struct Tensor {
     /// Length of each axis, outermost first. Empty for a rank-0 scalar.
-    pub shape: Vec<usize>,
+    shape: Vec<usize>,
     /// The shared scalar number domain of every cell (for example
     /// `numbers/i64` or `numbers/f64`).
-    pub dtype: Symbol,
+    dtype: Symbol,
     /// Row-major cell storage; its length equals the product of `shape`
     /// (one for a scalar).
-    pub data: Vec<Value>,
+    data: Vec<Value>,
 }
 
 impl Tensor {
+    /// Builds a tensor after checking shape, scalar-cell, and promotion
+    /// invariants against the loaded number-domain registry.
+    pub fn new_checked(
+        cx: &mut Cx,
+        shape: Vec<usize>,
+        dtype: Symbol,
+        data: Vec<Value>,
+    ) -> Result<Self> {
+        validate_shape_and_data_len(&shape, data.len())?;
+        validate_cells(cx, &data)?;
+        validate_dtype_accepts_cells(cx, &dtype, &data)?;
+        Ok(Self { shape, dtype, data })
+    }
+
+    /// Builds a tensor whose cells already exactly match `dtype`.
+    ///
+    /// Specialized tensor backends use this when converting packed storage into
+    /// uniform tensor cells without needing a loaded registry. It is stricter
+    /// than [`Tensor::new_checked`]: every cell must report exactly `dtype`.
+    pub fn new_exact(shape: Vec<usize>, dtype: Symbol, data: Vec<Value>) -> Result<Self> {
+        validate_shape_and_data_len(&shape, data.len())?;
+        validate_exact_cell_dtype(&dtype, &data)?;
+        Ok(Self { shape, dtype, data })
+    }
+
+    /// The tensor shape, outermost axis first. Empty means a rank-0 scalar.
+    pub fn shape(&self) -> &[usize] {
+        &self.shape
+    }
+
+    /// The shared scalar number domain accepted by every tensor cell.
+    pub fn dtype(&self) -> &Symbol {
+        &self.dtype
+    }
+
+    /// Row-major scalar cell storage.
+    pub fn data(&self) -> &[Value] {
+        &self.data
+    }
+
     /// The number of axes, i.e. the length of [`shape`](Tensor::shape). Zero
     /// for a scalar.
     pub fn rank(&self) -> usize {
@@ -132,7 +172,13 @@ impl sim_kernel::ObjectCompat for Tensor {
         match self.rank() {
             0 => Ok(Expr::Call {
                 operator: Box::new(Expr::Symbol(Symbol::new("scalar"))),
-                args: vec![self.data[0].object().as_expr(cx)?],
+                args: vec![
+                    self.data
+                        .first()
+                        .ok_or_else(|| Error::Eval("scalar tensor is missing its cell".to_owned()))?
+                        .object()
+                        .as_expr(cx)?,
+                ],
             }),
             1 => Ok(Expr::Vector(exprs(cx, &self.data)?)),
             2 => {
@@ -250,17 +296,10 @@ pub fn build_tensor_value(
     dtype_hint: Option<Symbol>,
     data: Vec<Value>,
 ) -> Result<Value> {
-    let expected = checked_element_count(&shape)?;
-    if data.len() != expected {
-        return Err(Error::Eval(format!(
-            "tensor shape {:?} expects {expected} cells, found {}",
-            shape,
-            data.len()
-        )));
-    }
-    validate_cells(cx, &data)?;
+    validate_shape_and_data_len(&shape, data.len())?;
     let dtype = choose_dtype(cx, dtype_hint, &data)?;
-    cx.factory().opaque(Arc::new(Tensor { shape, dtype, data }))
+    let tensor = Tensor::new_checked(cx, shape, dtype, data)?;
+    cx.factory().opaque(Arc::new(tensor))
 }
 
 /// Builds a rank-0 scalar tensor wrapping a single scalar number `value`.
@@ -275,12 +314,12 @@ pub fn tensor_value_ref(value: &Value) -> Option<&Tensor> {
 
 /// The shared element number domain (dtype) of a tensor's cells.
 pub fn tensor_dtype(tensor: &Tensor) -> &Symbol {
-    &tensor.dtype
+    tensor.dtype()
 }
 
 /// Clones a tensor's row-major cell values as a flat vector.
 pub fn flatten_tensor_scalar_cells(tensor: &Tensor) -> Vec<Value> {
-    tensor.data.clone()
+    tensor.data().to_vec()
 }
 
 pub fn tensor_display_name() -> &'static str {
@@ -294,6 +333,20 @@ fn exprs(cx: &mut Cx, data: &[Value]) -> Result<Vec<Expr>> {
 }
 
 use crate::spec::checked_element_count;
+
+fn validate_shape_and_data_len(shape: &[usize], data_len: usize) -> Result<()> {
+    let expected = checked_element_count(shape)?;
+    if data_len != expected {
+        return Err(Error::Eval(format!(
+            "tensor shape {:?} expects {expected} cells, found {data_len}",
+            shape
+        )));
+    }
+    if data_len == 0 {
+        return Err(Error::Eval("tensor requires at least one cell".to_owned()));
+    }
+    Ok(())
+}
 
 fn validate_cells(cx: &mut Cx, data: &[Value]) -> Result<()> {
     for cell in data {
@@ -311,20 +364,50 @@ fn validate_cells(cx: &mut Cx, data: &[Value]) -> Result<()> {
     Ok(())
 }
 
-fn choose_dtype(cx: &mut Cx, dtype_hint: Option<Symbol>, data: &[Value]) -> Result<Symbol> {
-    let domains = data
+fn validate_dtype_accepts_cells(cx: &mut Cx, dtype: &Symbol, data: &[Value]) -> Result<()> {
+    let domains = cell_domains(cx, data)?;
+    if domains
         .iter()
-        .map(|value| {
-            cx.number_value_ref(value.clone())?
-                .map(|number| number.domain)
-                .ok_or_else(|| {
-                    Error::Eval("tensor cells must all be scalar number values".to_owned())
-                })
-        })
-        .collect::<Result<Vec<_>>>()?;
-    let Some(first) = domains.first() else {
+        .all(|domain| promotion_cost(cx, domain, dtype).is_some())
+    {
+        return Ok(());
+    }
+    Err(Error::Eval(format!(
+        "tensor dtype {dtype} is not a valid join for cell domains {domains:?}"
+    )))
+}
+
+fn validate_exact_cell_dtype(dtype: &Symbol, data: &[Value]) -> Result<()> {
+    let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    for cell in data {
+        let Some(number) = cell.object().as_number_value() else {
+            return Err(Error::Eval(
+                "tensor cells must all be scalar number values".to_owned(),
+            ));
+        };
+        let domain = number.number_domain(&mut cx)?;
+        if domain == number_domain() {
+            return Err(Error::Eval(
+                "tensor cells must be scalar numbers, not nested tensors".to_owned(),
+            ));
+        }
+        if &domain != dtype {
+            return Err(Error::Eval(format!(
+                "tensor dtype {dtype} does not match cell domain {domain}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn choose_dtype(cx: &mut Cx, dtype_hint: Option<Symbol>, data: &[Value]) -> Result<Symbol> {
+    if data.is_empty() {
         return Err(Error::Eval("tensor requires at least one cell".to_owned()));
-    };
+    }
+    let domains = cell_domains(cx, data)?;
+    if domains.is_empty() {
+        return Err(Error::Eval("tensor requires at least one cell".to_owned()));
+    }
     if let Some(dtype) = dtype_hint {
         if domains
             .iter()
@@ -363,13 +446,23 @@ fn choose_dtype(cx: &mut Cx, dtype_hint: Option<Symbol>, data: &[Value]) -> Resu
             _ => best = Some((total, candidate)),
         }
     }
-    best.map(|(_, symbol)| symbol)
-        .ok_or_else(|| {
-            Error::Eval(format!(
-                "no join domain exists for tensor cells {domains:?}"
-            ))
+    best.map(|(_, symbol)| symbol).ok_or_else(|| {
+        Error::Eval(format!(
+            "no join domain exists for tensor cells {domains:?}"
+        ))
+    })
+}
+
+fn cell_domains(cx: &mut Cx, data: &[Value]) -> Result<Vec<Symbol>> {
+    data.iter()
+        .map(|value| {
+            cx.number_value_ref(value.clone())?
+                .map(|number| number.domain)
+                .ok_or_else(|| {
+                    Error::Eval("tensor cells must all be scalar number values".to_owned())
+                })
         })
-        .or_else(|_| Ok(first.clone()))
+        .collect()
 }
 
 fn promotion_cost(cx: &Cx, from: &Symbol, to: &Symbol) -> Option<u32> {

@@ -1,12 +1,1 @@
-(quote
-  (numbers/numeric
-   numbers/func
-   numeric/compose
-   numeric/run-composed
-   domain ode-solve
-   domain quadrature
-   method rk4
-   method simpson
-   state f64
-   result table
-   result value))
+(numeric/compose #(numbers/Func (x) (* x x)) :domain quadrature :method simpson :state f64)
