@@ -3,6 +3,7 @@
 //! policy checks.
 
 mod file_sizes;
+mod index_check;
 mod simdoc;
 
 fn main() {
@@ -10,9 +11,10 @@ fn main() {
     let program = args.first().map(String::as_str).unwrap_or("xtask");
     let result = match args.get(1).map(String::as_str) {
         Some("simdoc") => simdoc::run(args),
+        Some("index-check") => index_check::run(args),
         Some("check-file-sizes") => file_sizes::run(),
         _ => Err(format!(
-            "usage: {program} simdoc [--check] | check-file-sizes"
+            "usage: {program} simdoc [--check] | index-check [--repo PATH] [--strict SPEC] | check-file-sizes"
         )),
     };
 

@@ -17,6 +17,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 
 | Feature | Subject | Specimens | Summary |
 | --- | --- | ---: | --- |
+| `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries. |
 
 ## Surfaces
