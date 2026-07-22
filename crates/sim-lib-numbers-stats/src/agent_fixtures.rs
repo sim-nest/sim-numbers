@@ -2,6 +2,7 @@
 
 use sim_kernel::{Args, Cx, Error, Expr, NumberLiteral, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
+use sim_value::build::sym;
 
 /// Returns the symbols installed for 30-agent descriptor fixtures.
 pub(crate) fn fixture_symbols() -> [Symbol; 4] {
@@ -372,10 +373,27 @@ fn atom(domain: &Symbol, value: &str) -> Expr {
     sym(value)
 }
 
-fn sym(name: &str) -> Expr {
-    Expr::Symbol(Symbol::new(name))
-}
-
 fn list(items: Vec<Expr>) -> Expr {
     Expr::List(items)
+}
+
+#[cfg(test)]
+mod tests {
+    use sim_kernel::{Expr, NumberLiteral};
+    use sim_lib_numbers_core::domains;
+
+    use super::atom;
+
+    #[test]
+    fn atom_preserves_number_and_symbol_shapes() {
+        let domain = domains::i64();
+        assert_eq!(atom(&domain, "ready"), sim_value::build::sym("ready"));
+        assert_eq!(
+            atom(&domain, "42"),
+            Expr::Number(NumberLiteral {
+                domain,
+                canonical: "42".to_owned(),
+            })
+        );
+    }
 }

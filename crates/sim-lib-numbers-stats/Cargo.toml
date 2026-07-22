@@ -13,6 +13,7 @@ homepage = "https://github.com/sim-nest/sim-numbers"
 sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-value = { version = "0.1.0" }
 
 [lints]
 workspace = true
