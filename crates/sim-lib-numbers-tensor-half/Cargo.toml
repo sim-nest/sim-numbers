@@ -1,0 +1,22 @@
+[package]
+name = "sim-lib-numbers-tensor-half"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Contiguous f16 and bf16 tensor specializations with f32-widened CPU math."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+half = { version = "2" }
+sim-cookbook = { version = "0.1.0" }
+sim-kernel = { version = "0.1.0" }
+sim-lib-numbers-tensor = { version = "0.1.4", path = "../sim-lib-numbers-tensor" }
+
+[features]
+default = []
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }

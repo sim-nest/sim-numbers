@@ -8,6 +8,7 @@ use sim_kernel::{
     Symbol, Value, force_list_to_vec,
 };
 
+use super::cast::{cast_function_impl, cast_symbol};
 use super::dimension::{extract_dims, extract_usize};
 use super::value::{
     Tensor, build_scalar_tensor_value, build_tensor_value, tensor_dtype, tensor_value_ref,
@@ -92,6 +93,7 @@ impl Callable for TensorFunction {
             symbol if symbol == reshape_symbol() => reshape_impl(cx, args.into_vec()),
             symbol if symbol == slice_symbol() => slice_impl(cx, args.into_vec()),
             symbol if symbol == map_symbol() => map_impl(cx, args.into_vec()),
+            symbol if symbol == cast_symbol() => cast_function_impl(cx, args.into_vec()),
             _ => Err(Error::Eval(format!(
                 "unsupported tensor helper function {}",
                 self.symbol

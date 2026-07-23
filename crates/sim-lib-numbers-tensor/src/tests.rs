@@ -10,6 +10,7 @@ use crate::{
     tensor_value_ref,
 };
 
+mod cast;
 mod storage;
 
 fn test_cx() -> Cx {
@@ -17,6 +18,8 @@ fn test_cx() -> Cx {
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_float::F32NumbersLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())
         .unwrap();

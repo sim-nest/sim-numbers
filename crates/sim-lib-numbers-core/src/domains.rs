@@ -112,6 +112,16 @@ pub fn f32() -> Symbol {
     domain("f32")
 }
 
+/// The `numbers/f16` domain symbol.
+pub fn f16() -> Symbol {
+    domain("f16")
+}
+
+/// The `numbers/bf16` domain symbol.
+pub fn bf16() -> Symbol {
+    domain("bf16")
+}
+
 /// The `numbers/f64` domain symbol.
 pub fn f64() -> Symbol {
     domain("f64")

@@ -1,5 +1,5 @@
 {
-  "card_count": 32,
+  "card_count": 34,
   "cards": [
     {
       "id": "browse/catalog",
@@ -164,10 +164,22 @@
       "summary": "Complex-cell tensor helpers."
     },
     {
+      "id": "cookbook/numbers/tensor-f32",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-tensor-f32",
+      "summary": "F32-specialized tensor helpers."
+    },
+    {
       "id": "cookbook/numbers/tensor-f64",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-tensor-f64",
       "summary": "F64-specialized tensor helpers."
+    },
+    {
+      "id": "cookbook/numbers/tensor-half",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-tensor-half",
+      "summary": "F16 and bf16 tensor descriptors with f32-widened host helpers."
     },
     {
       "id": "cookbook/numbers/tensor-i64",
@@ -229,7 +241,9 @@
       "sim-lib-numbers-tensor-bcast",
       "sim-lib-numbers-tensor-bit",
       "sim-lib-numbers-tensor-cmplxf",
+      "sim-lib-numbers-tensor-f32",
       "sim-lib-numbers-tensor-f64",
+      "sim-lib-numbers-tensor-half",
       "sim-lib-numbers-tensor-i64",
       "sim-lib-numbers-tensor-linalg",
       "sim-lib-numbers-tensor-rat64",
@@ -347,7 +361,7 @@
       "descriptor": "numbers/tensor",
       "file": "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "kind": "marker",
-      "line": 40,
+      "line": 41,
       "reason": "numbers/tensor number-domain marker; reconstruct by loading the tensor number lib"
     },
     {
@@ -355,11 +369,11 @@
       "descriptor": "numbers/Tensor",
       "file": "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "kind": "marker",
-      "line": 146,
+      "line": 147,
       "reason": "numbers/tensor literal class marker; tensor values use the numbers/Tensor citizen descriptor"
     }
   ],
-  "package_count": 31,
+  "package_count": 33,
   "packages": [
     {
       "crate_name": "sim_lib_numbers_ad",
@@ -1509,7 +1523,21 @@
         {
           "kind": "normal",
           "optional": false,
+          "package": "sim-lib-numbers-tensor-f32",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
           "package": "sim-lib-numbers-tensor-f64",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-half",
           "rename": null,
           "target": null
         },
@@ -1872,6 +1900,13 @@
         {
           "kind": "dev",
           "optional": false,
+          "package": "sim-lib-numbers-float",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "dev",
+          "optional": false,
           "package": "sim-lib-numbers-i64",
           "rename": null,
           "target": null
@@ -2100,6 +2135,58 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_tensor_f32",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Contiguous f32 tensor specialization with native element-wise math.",
+      "features": [
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-f32/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-f32",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-tensor-f32",
+      "rustdoc_summary": "f32 tensor specialization: a contiguous f32 tensor element type and its SpecTensor backend for the f32 tensor domain.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_tensor_f32",
+          "src": "crates/sim-lib-numbers-tensor-f32/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-tensor-f32/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_tensor_f64",
       "dependencies": [
         {
@@ -2148,6 +2235,58 @@
           ],
           "name": "build-script-build",
           "src": "crates/sim-lib-numbers-tensor-f64/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_half",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Contiguous f16 and bf16 tensor specializations with f32-widened CPU math.",
+      "features": [
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-half/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-half",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-tensor-half",
+      "rustdoc_summary": "Half-precision tensor specialization: contiguous f16 and bf16 element types with CPU arithmetic widened to f32.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_tensor_half",
+          "src": "crates/sim-lib-numbers-tensor-half/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-tensor-half/build.rs"
         }
       ]
     },
@@ -2357,10 +2496,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "bd4540a6ca9678cac00f44176b7e1c1482e336d4",
+    "git_commit": "99f1ca05875527b53fd5e694e0765b825f5b17ea",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "bd4540a6ca9678cac00f44176b7e1c1482e336d4",
+    "source_commit": "99f1ca05875527b53fd5e694e0765b825f5b17ea",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2373,9 +2512,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "3c491b328434c47b",
+    "workspace_hash": "6a4b3a9be5096148",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 294,
+    "workspace_hash_input_count": 312,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2608,9 +2747,11 @@
       "crates/sim-lib-numbers-stats/src/tests.rs",
       "crates/sim-lib-numbers-tensor/Cargo.toml",
       "crates/sim-lib-numbers-tensor/build.rs",
+      "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/book.toml",
+      "crates/sim-lib-numbers-tensor/src/implementation/cast.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/citizen.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/dimension.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
@@ -2621,6 +2762,7 @@
       "crates/sim-lib-numbers-tensor/src/implementation.rs",
       "crates/sim-lib-numbers-tensor/src/lib.rs",
       "crates/sim-lib-numbers-tensor/src/spec.rs",
+      "crates/sim-lib-numbers-tensor/src/tests/cast.rs",
       "crates/sim-lib-numbers-tensor/src/tests/storage.rs",
       "crates/sim-lib-numbers-tensor/src/tests.rs",
       "crates/sim-lib-numbers-tensor-bcast/Cargo.toml",
@@ -2641,12 +2783,27 @@
       "crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/recipe.toml",
       "crates/sim-lib-numbers-tensor-cmplxf/recipes/book.toml",
       "crates/sim-lib-numbers-tensor-cmplxf/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-f32/Cargo.toml",
+      "crates/sim-lib-numbers-tensor-f32/build.rs",
+      "crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/recipe.toml",
+      "crates/sim-lib-numbers-tensor-f32/recipes/book.toml",
+      "crates/sim-lib-numbers-tensor-f32/src/f32_tensor.rs",
+      "crates/sim-lib-numbers-tensor-f32/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-f32/src/tests.rs",
       "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
       "crates/sim-lib-numbers-tensor-f64/build.rs",
       "crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/recipe.toml",
       "crates/sim-lib-numbers-tensor-f64/recipes/book.toml",
       "crates/sim-lib-numbers-tensor-f64/src/lib.rs",
       "crates/sim-lib-numbers-tensor-f64/src/tests.rs",
+      "crates/sim-lib-numbers-tensor-half/Cargo.toml",
+      "crates/sim-lib-numbers-tensor-half/build.rs",
+      "crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/recipe.toml",
+      "crates/sim-lib-numbers-tensor-half/recipes/book.toml",
+      "crates/sim-lib-numbers-tensor-half/src/descriptor.rs",
+      "crates/sim-lib-numbers-tensor-half/src/half_tensor.rs",
+      "crates/sim-lib-numbers-tensor-half/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-half/src/tests.rs",
       "crates/sim-lib-numbers-tensor-i64/Cargo.toml",
       "crates/sim-lib-numbers-tensor-i64/build.rs",
       "crates/sim-lib-numbers-tensor-i64/recipes/01-basics/i64-tensor/recipe.toml",
@@ -2673,7 +2830,7 @@
       "xtask/Cargo.toml"
     ]
   },
-  "recipe_book_count": 30,
+  "recipe_book_count": 32,
   "recipes": [
     {
       "book": "numbers/ad",
@@ -3177,8 +3334,16 @@
       "card_id": "cookbook/numbers/tensor",
       "group": "workspace",
       "package": "sim-lib-numbers-tensor",
-      "recipe_count": 2,
+      "recipe_count": 3,
       "recipes": [
+        {
+          "card_id": "numbers/tensor/01-basics/tensor-cast",
+          "codec": "lisp",
+          "id": "tensor-cast",
+          "package": "sim-lib-numbers-tensor",
+          "recipe_toml": "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml",
+          "title": "Cast a tensor explicitly"
+        },
         {
           "card_id": "numbers/tensor/01-basics/tensor-constructor",
           "codec": "lisp",
@@ -3260,6 +3425,26 @@
       "title": "Numbers Tensor Cmplxf"
     },
     {
+      "book": "numbers/tensor-f32",
+      "book_toml": "crates/sim-lib-numbers-tensor-f32/recipes/book.toml",
+      "card_id": "cookbook/numbers/tensor-f32",
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-f32",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/tensor-f32/01-basics/f32-tensor",
+          "codec": "lisp",
+          "id": "f32-tensor",
+          "package": "sim-lib-numbers-tensor-f32",
+          "recipe_toml": "crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/recipe.toml",
+          "title": "F32 tensor descriptor"
+        }
+      ],
+      "summary": "F32-specialized tensor helpers.",
+      "title": "Numbers Tensor F32"
+    },
+    {
       "book": "numbers/tensor-f64",
       "book_toml": "crates/sim-lib-numbers-tensor-f64/recipes/book.toml",
       "card_id": "cookbook/numbers/tensor-f64",
@@ -3278,6 +3463,26 @@
       ],
       "summary": "F64-specialized tensor helpers.",
       "title": "Numbers Tensor F64"
+    },
+    {
+      "book": "numbers/tensor-half",
+      "book_toml": "crates/sim-lib-numbers-tensor-half/recipes/book.toml",
+      "card_id": "cookbook/numbers/tensor-half",
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-half",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/tensor-half/01-basics/half-tensor",
+          "codec": "lisp",
+          "id": "half-tensor",
+          "package": "sim-lib-numbers-tensor-half",
+          "recipe_toml": "crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/recipe.toml",
+          "title": "Half tensor descriptors"
+        }
+      ],
+      "summary": "F16 and bf16 tensor descriptors with f32-widened host helpers.",
+      "title": "Numbers Tensor Half"
     },
     {
       "book": "numbers/tensor-i64",

@@ -3,6 +3,7 @@
 use std::any::Any;
 use std::sync::Arc;
 
+use half::{bf16, f16};
 use sim_kernel::{DefaultFactory, Error, Factory, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
 
@@ -197,6 +198,36 @@ impl TensorCell for f64 {
 
     fn to_value(&self) -> Result<Value> {
         DefaultFactory.number_literal(domains::f64(), self.to_string())
+    }
+}
+
+impl TensorCell for f32 {
+    fn dtype() -> Symbol {
+        domains::f32()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::f32(), self.to_string())
+    }
+}
+
+impl TensorCell for f16 {
+    fn dtype() -> Symbol {
+        domains::f16()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::f16(), self.to_f32().to_string())
+    }
+}
+
+impl TensorCell for bf16 {
+    fn dtype() -> Symbol {
+        domains::bf16()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::bf16(), self.to_f32().to_string())
     }
 }
 

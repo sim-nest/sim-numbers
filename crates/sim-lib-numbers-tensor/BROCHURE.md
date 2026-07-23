@@ -4,7 +4,7 @@ In one line: It gives you grids of numbers, from simple lists to multi-dimension
 
 ## What it gives you
 
-Lots of real data comes in arrangements: a row of readings, a table of figures, an image made of pixels, a stack of layers. This gives you a single, uniform way to hold any such arrangement of numbers, from a plain list up to a many-dimensioned block, and to build them with simple constructors for vectors, matrices, and beyond. Because the shape is part of the value, everything that works on grids works the same regardless of how many dimensions you use. It is the common container that turns scattered numbers into structured data you can operate on as a whole.
+Lots of real data comes in arrangements: a row of readings, a table of figures, an image made of pixels, a stack of layers. This gives you a single, uniform way to hold any such arrangement of numbers, from a plain list up to a many-dimensioned block, and to build them with simple constructors for vectors, matrices, and beyond. Because the shape is part of the value, everything that works on grids works the same regardless of how many dimensions you use. It is the common container that turns scattered numbers into structured data you can operate on as a whole, and `tensor/cast` makes dtype conversion explicit when storage precision changes.
 
 ## Why you will be glad
 

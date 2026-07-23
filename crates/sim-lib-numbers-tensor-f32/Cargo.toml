@@ -1,0 +1,21 @@
+[package]
+name = "sim-lib-numbers-tensor-f32"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Contiguous f32 tensor specialization with native element-wise math."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-cookbook = { version = "0.1.0" }
+sim-kernel = { version = "0.1.0" }
+sim-lib-numbers-tensor = { version = "0.1.4", path = "../sim-lib-numbers-tensor" }
+
+[features]
+default = []
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }

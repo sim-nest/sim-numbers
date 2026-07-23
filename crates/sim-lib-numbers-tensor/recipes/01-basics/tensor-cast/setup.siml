@@ -1,0 +1,1 @@
+(tensor/cast #(numbers/Tensor v1 ((expr:number citizen/int "2")) ((expr:number numbers/f64 "1.5") (expr:number numbers/f64 "2.5")) numbers/f64) numbers/f32)

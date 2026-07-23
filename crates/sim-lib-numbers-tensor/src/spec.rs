@@ -4,6 +4,7 @@
 
 use std::sync::Arc;
 
+use half::{bf16, f16};
 use sim_kernel::{
     Cx, DefaultFactory, Factory, NoopEvalPolicy, NumberLiteral, Result, Symbol, Value,
 };
@@ -195,6 +196,35 @@ pub fn parse_f64_literal_cell(value: &Value) -> Option<f64> {
     let literal = number_literal_for_tensor_cell(value)?;
     (literal.domain == domains::f64())
         .then(|| literal.canonical.parse::<f64>().ok())
+        .flatten()
+}
+
+/// Parses a tensor cell as an `f32`, returning `None` unless it is a number in
+/// the `numbers/f32` domain whose canonical form parses cleanly.
+pub fn parse_f32_literal_cell(value: &Value) -> Option<f32> {
+    let literal = number_literal_for_tensor_cell(value)?;
+    (literal.domain == domains::f32())
+        .then(|| literal.canonical.parse::<f32>().ok())
+        .flatten()
+}
+
+/// Parses a tensor cell as an IEEE half-precision value, returning `None`
+/// unless it is a number in the `numbers/f16` domain whose canonical f32-form
+/// text parses cleanly.
+pub fn parse_f16_literal_cell(value: &Value) -> Option<f16> {
+    let literal = number_literal_for_tensor_cell(value)?;
+    (literal.domain == domains::f16())
+        .then(|| literal.canonical.parse::<f32>().ok().map(f16::from_f32))
+        .flatten()
+}
+
+/// Parses a tensor cell as a bfloat16 value, returning `None` unless it is a
+/// number in the `numbers/bf16` domain whose canonical f32-form text parses
+/// cleanly.
+pub fn parse_bf16_literal_cell(value: &Value) -> Option<bf16> {
+    let literal = number_literal_for_tensor_cell(value)?;
+    (literal.domain == domains::bf16())
+        .then(|| literal.canonical.parse::<f32>().ok().map(bf16::from_f32))
         .flatten()
 }
 

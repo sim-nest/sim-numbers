@@ -1,6 +1,7 @@
 //! Implementation of the tensor domain: its value class citizen, domain
 //! registration, constructor operations, and the `Tensor` value type.
 
+mod cast;
 mod citizen;
 mod dimension;
 mod domain;
@@ -9,6 +10,7 @@ mod storage;
 mod validation;
 mod value;
 
+pub use cast::{cast_symbol, cast_tensor, cast_tensor_value};
 pub use citizen::tensor_value_class_symbol;
 pub use domain::{TensorNumbersLib, number_domain};
 pub use storage::{

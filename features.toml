@@ -70,7 +70,9 @@ claims_anchors = [
   "anchor/crate/sim-lib-numbers-tensor-bcast",
   "anchor/crate/sim-lib-numbers-tensor-bit",
   "anchor/crate/sim-lib-numbers-tensor-cmplxf",
+  "anchor/crate/sim-lib-numbers-tensor-f32",
   "anchor/crate/sim-lib-numbers-tensor-f64",
+  "anchor/crate/sim-lib-numbers-tensor-half",
   "anchor/crate/sim-lib-numbers-tensor-i64",
   "anchor/crate/sim-lib-numbers-tensor-linalg",
   "anchor/crate/sim-lib-numbers-tensor-rat64",
@@ -95,7 +97,9 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-bit/bit-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-cmplxf/complex-ftensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-f32/f32-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-f64/f64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-half/half-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-i64/i64-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-rat64/rat64-tensor-lib",
@@ -108,16 +112,18 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/tensors"
 title = "Tensor operations"
-summary = "Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, broadcasting, and matrix operations."
+summary = "Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations."
 owner = "crate/sim-lib-numbers-tensor"
 audiences = ["code", "framework"]
-guidance = "Use this row when constructing, storing, projecting, broadcasting, or applying matrix operations to tensors. Implement TensorStorage for a new host or resident layout, preserve the canonical Tensor identity, and use its checked cell, cells, and materialize observations."
+guidance = "Use this row when constructing, storing, projecting, casting, broadcasting, or applying matrix operations to tensors. Implement TensorStorage for a new host or resident layout, preserve the canonical Tensor identity, and use its checked cell, cells, and materialize observations."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-tensor",
   "anchor/crate/sim-lib-numbers-tensor-bcast",
   "anchor/crate/sim-lib-numbers-tensor-bit",
   "anchor/crate/sim-lib-numbers-tensor-cmplxf",
+  "anchor/crate/sim-lib-numbers-tensor-f32",
   "anchor/crate/sim-lib-numbers-tensor-f64",
+  "anchor/crate/sim-lib-numbers-tensor-half",
   "anchor/crate/sim-lib-numbers-tensor-i64",
   "anchor/crate/sim-lib-numbers-tensor-linalg",
   "anchor/crate/sim-lib-numbers-tensor-rat64",
@@ -125,7 +131,9 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-bit/bit-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-cmplxf/complex-ftensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-f32/f32-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-f64/f64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-half/half-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-i64/i64-tensor-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-rat64/rat64-tensor-lib",
@@ -136,6 +144,7 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-tensor/spec-tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-function",
   "anchor/rustdoc/sim-lib-numbers-tensor/build_tensor_value",
+  "anchor/rustdoc/sim-lib-numbers-tensor/cast_tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/checked_element_count",
   "anchor/rustdoc/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
   "anchor/rustdoc/sim-lib-numbers-tensor-linalg/dispatch",

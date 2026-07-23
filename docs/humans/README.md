@@ -19,7 +19,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries. |
-| `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, broadcasting, and matrix operations. |
+| `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
 
 ## Surfaces
@@ -183,11 +183,21 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/recipe.toml`
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/book.toml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/purpose.md`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/recipe.toml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/setup.siml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/purpose.md`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/recipe.toml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/book.toml`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/purpose.md`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/recipe.toml`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/setup.siml`
+- `crates/sim-lib-numbers-tensor-half/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor-i64/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-tensor-i64/recipes/01-basics/i64-tensor/purpose.md`
 - `crates/sim-lib-numbers-tensor-i64/recipes/01-basics/i64-tensor/recipe.toml`
@@ -204,6 +214,9 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor-rat64/recipes/01-basics/rat64-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-rat64/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/purpose.md`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/setup.siml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/purpose.md`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/setup.siml`

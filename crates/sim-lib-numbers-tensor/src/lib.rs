@@ -15,15 +15,17 @@ mod spec;
 
 pub use implementation::{
     BoxedTensorStorage, Tensor, TensorCell, TensorLocation, TensorNumbersLib, TensorStorage,
-    TypedTensorStorage, build_scalar_tensor_value, build_tensor_value, flatten_tensor_scalar_cells,
-    number_domain, tensor_dtype, tensor_value_class_symbol, tensor_value_ref,
+    TypedTensorStorage, build_scalar_tensor_value, build_tensor_value, cast_symbol, cast_tensor,
+    cast_tensor_value, flatten_tensor_scalar_cells, number_domain, tensor_dtype,
+    tensor_value_class_symbol, tensor_value_ref,
 };
 pub use sim_lib_numbers_core::domains;
 pub use spec::{
     MAX_TENSOR_CELLS, SpecTensor, SpecTensorDescriptor, bounded_element_count,
-    checked_element_count, element_count, number_literal_for_tensor_cell,
-    parse_complex_literal_cell, parse_f64_literal_cell, parse_i64_literal_cell,
-    parse_rational_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
+    checked_element_count, element_count, number_literal_for_tensor_cell, parse_bf16_literal_cell,
+    parse_complex_literal_cell, parse_f16_literal_cell, parse_f32_literal_cell,
+    parse_f64_literal_cell, parse_i64_literal_cell, parse_rational_literal_cell,
+    spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// Cookbook recipes for this domain, embedded at build time.

@@ -1,5 +1,5 @@
 {
-  "card_count": 32,
+  "card_count": 34,
   "cards": [
     {
       "id": "browse/catalog",
@@ -164,10 +164,22 @@
       "summary": "Complex-cell tensor helpers."
     },
     {
+      "id": "cookbook/numbers/tensor-f32",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-tensor-f32",
+      "summary": "F32-specialized tensor helpers."
+    },
+    {
       "id": "cookbook/numbers/tensor-f64",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-tensor-f64",
       "summary": "F64-specialized tensor helpers."
+    },
+    {
+      "id": "cookbook/numbers/tensor-half",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-tensor-half",
+      "summary": "F16 and bf16 tensor descriptors with f32-widened host helpers."
     },
     {
       "id": "cookbook/numbers/tensor-i64",

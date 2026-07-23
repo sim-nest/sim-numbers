@@ -4,7 +4,7 @@ In one line: a full tower of numbers -- everyday decimals, exact fractions, huge
 
 ## What it gives you
 
-Whole numbers of any size, fractions kept exact, complex and fixed and floating kinds, a computer-algebra system that does calculus on your formulas, numerical solvers for slopes and areas and changing systems, statistics, and multi-dimensional tensors -- every kind announcing itself the same way and combining under one consistent arithmetic.
+Whole numbers of any size, fractions kept exact, complex and fixed and floating kinds, a computer-algebra system that does calculus on your formulas, numerical solvers for slopes and areas and changing systems, statistics, and multi-dimensional tensors -- every kind announcing itself the same way and combining under one consistent arithmetic. Tensor storage covers ordinary f64, compact f32, and half-precision f16/bf16 buffers, with explicit casts where precision changes.
 
 ## Why you will be glad
 

@@ -28,6 +28,7 @@ fn prelude_loads_everyday_numeric_names() {
         Symbol::new("numeric-diff"),
         Symbol::new("integrate"),
         Symbol::new("ode-solve"),
+        Symbol::qualified("tensor", "cast"),
         Symbol::qualified("numeric", "compose"),
         Symbol::qualified("numeric", "run-composed"),
         Symbol::qualified("stats", "claims"),
@@ -121,7 +122,10 @@ fn prelude_registers_typed_tensor_descriptors() {
     let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     for symbol in [
+        sim_lib_numbers_tensor_f32::tensor_spec_symbol(),
         sim_lib_numbers_tensor_f64::tensor_spec_symbol(),
+        sim_lib_numbers_tensor_half::f16_tensor_spec_symbol(),
+        sim_lib_numbers_tensor_half::bf16_tensor_spec_symbol(),
         sim_lib_numbers_tensor_i64::tensor_spec_symbol(),
         sim_lib_numbers_tensor_rat64::tensor_spec_symbol(),
         sim_lib_numbers_tensor_cmplxf::tensor_spec_symbol(),

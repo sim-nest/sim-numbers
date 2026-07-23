@@ -184,11 +184,25 @@
       "summary": "Complex-float tensor specialization: a (real, imag) f64-pair tensor element type and its SpecTensor backend for the complex tensor domain."
     },
     {
+      "crate_name": "sim_lib_numbers_tensor_f32",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-f32/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-f32",
+      "summary": "f32 tensor specialization: a contiguous f32 tensor element type and its SpecTensor backend for the f32 tensor domain."
+    },
+    {
       "crate_name": "sim_lib_numbers_tensor_f64",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
       "package": "sim-lib-numbers-tensor-f64",
       "summary": "f64 tensor specialization: a contiguous f64 tensor element type and its SpecTensor backend for the f64 tensor domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_half",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-half/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-half",
+      "summary": "Half-precision tensor specialization: contiguous f16 and bf16 element types with CPU arithmetic widened to f32."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_i64",
