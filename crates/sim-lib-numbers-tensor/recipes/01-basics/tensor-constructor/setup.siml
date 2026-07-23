@@ -1,1 +1,1 @@
-#(numbers/Tensor v1 (2 2) (1 2 3 4) numbers/i64)
+#(numbers/Tensor v1 ((expr:number citizen/int "2") (expr:number citizen/int "2")) (1 2 3 4) numbers/i64)

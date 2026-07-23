@@ -1,1 +1,1 @@
-#(numbers/Tensor v1 (2) (1/2 2/3) numbers/rational)
+#(numbers/Tensor v1 ((expr:number citizen/int "2")) (1/2 2/3) numbers/rational)
