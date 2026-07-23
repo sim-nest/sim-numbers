@@ -94,7 +94,8 @@ impl SpecTensor for BitTensor {
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
         let bits = tensor
-            .data()
+            .cells()
+            .ok()?
             .iter()
             .map(parse_bool_cell)
             .collect::<Option<Vec<_>>>()?;

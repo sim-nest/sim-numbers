@@ -147,7 +147,8 @@ impl SpecTensor for I64Tensor {
         Some(Self {
             shape: tensor.shape().to_vec(),
             data: tensor
-                .data()
+                .cells()
+                .ok()?
                 .iter()
                 .map(parse_i64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,

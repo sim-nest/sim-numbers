@@ -20,7 +20,7 @@
 //!
 //! let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
 //! let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
-//! assert_eq!(roundtrip.to_uniform().data().len(), 2);
+//! assert_eq!(roundtrip.to_uniform().cells().unwrap().len(), 2);
 //! ```
 //!
 //! A mismatched element count fails closed:
@@ -96,7 +96,8 @@ impl SpecTensor for Rat64Tensor {
         Some(Self {
             shape: tensor.shape().to_vec(),
             data: tensor
-                .data()
+                .cells()
+                .ok()?
                 .iter()
                 .map(parse_rational_literal_cell)
                 .collect::<Option<Vec<_>>>()?
@@ -203,7 +204,7 @@ mod tests {
     #[test]
     fn rationals_are_normalized() {
         let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
-        assert_eq!(tensor.to_uniform().data().len(), 2);
+        assert_eq!(tensor.to_uniform().cells().unwrap().len(), 2);
         let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
         assert_eq!(roundtrip.data, vec![(1, 2), (3, 4)]);
     }

@@ -160,7 +160,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-tensor/Cargo.toml",
       "package": "sim-lib-numbers-tensor",
-      "summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into."
+      "summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into. Tensor shape and dtype stay canonical while the open TensorStorage contract supplies boxed host or loadable resident storage. Observation through Tensor::cell, Tensor::cells, and Tensor::materialize is checked so encoding and projection report resident readback failures."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_bcast",

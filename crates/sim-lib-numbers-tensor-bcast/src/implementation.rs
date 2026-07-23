@@ -160,8 +160,9 @@ fn apply_tensor_binary(cx: &mut Cx, operator: Symbol, left: Value, right: Value)
 fn apply_tensor_neg(cx: &mut Cx, value: Value) -> Result<Value> {
     let tensor = tensor_value_ref(&value)
         .ok_or_else(|| Error::Eval("neg expects a tensor value".to_owned()))?;
-    let mut cells = Vec::with_capacity(tensor.data().len());
-    for cell in flatten_tensor_scalar_cells(tensor) {
+    let source = flatten_tensor_scalar_cells(tensor)?;
+    let mut cells = Vec::with_capacity(source.len());
+    for cell in source.iter().cloned() {
         cells.push(cx.apply_value_number_unary_op(&Symbol::qualified("math", "neg"), cell)?);
     }
     build_tensor_value(
@@ -206,9 +207,5 @@ fn select_cell(tensor: &Tensor, coord: &[usize], result_shape: &[usize]) -> Resu
         local.push(if *dim == 1 { 0 } else { coord_value });
     }
     let flat = Tensor::flat_offset(shape, &local)?;
-    tensor
-        .data()
-        .get(flat)
-        .cloned()
-        .ok_or_else(|| Error::Eval("tensor broadcast selected an invalid cell".to_owned()))
+    tensor.cell(flat)
 }

@@ -5,14 +5,18 @@
 //! The n-dimensional tensor number domain: the uniform `Tensor` value, its
 //! domain registration and constructors (`tensor`, `vec`, `mat`, ...), and the
 //! `SpecTensor` interface that specialized element-type backends plug into.
+//! Tensor shape and dtype stay canonical while the open [`TensorStorage`]
+//! contract supplies boxed host or loadable resident storage. Observation
+//! through [`Tensor::cell`], [`Tensor::cells`], and [`Tensor::materialize`] is
+//! checked so encoding and projection report resident readback failures.
 
 mod implementation;
 mod spec;
 
 pub use implementation::{
-    Tensor, TensorNumbersLib, build_scalar_tensor_value, build_tensor_value,
-    flatten_tensor_scalar_cells, number_domain, tensor_dtype, tensor_value_class_symbol,
-    tensor_value_ref,
+    BoxedTensorStorage, Tensor, TensorLocation, TensorNumbersLib, TensorStorage,
+    build_scalar_tensor_value, build_tensor_value, flatten_tensor_scalar_cells, number_domain,
+    tensor_dtype, tensor_value_class_symbol, tensor_value_ref,
 };
 pub use sim_lib_numbers_core::domains;
 pub use spec::{

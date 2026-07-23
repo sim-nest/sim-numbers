@@ -1898,7 +1898,7 @@
       "name": "sim-lib-numbers-tensor",
       "publish": "true",
       "root": "crates/sim-lib-numbers-tensor",
-      "rustdoc_summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into.",
+      "rustdoc_summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into. Tensor shape and dtype stay canonical while the open TensorStorage contract supplies boxed host or loadable resident storage. Observation through Tensor::cell, Tensor::cells, and Tensor::materialize is checked so encoding and projection report resident readback failures.",
       "target_kinds": [
         "custom-build",
         "lib"
@@ -2357,10 +2357,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "57943e398eacb5bc58433f98b3ff0846eba5abc4",
+    "git_commit": "b29e9215978d79adde538564666114b63c66ba18",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "57943e398eacb5bc58433f98b3ff0846eba5abc4",
+    "source_commit": "b29e9215978d79adde538564666114b63c66ba18",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2373,9 +2373,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "b2ac0931cff85a23",
+    "workspace_hash": "c4aa566abc6ea73d",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 290,
+    "workspace_hash_input_count": 293,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2615,10 +2615,13 @@
       "crates/sim-lib-numbers-tensor/src/implementation/dimension.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/function.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/storage.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/validation.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/value.rs",
       "crates/sim-lib-numbers-tensor/src/implementation.rs",
       "crates/sim-lib-numbers-tensor/src/lib.rs",
       "crates/sim-lib-numbers-tensor/src/spec.rs",
+      "crates/sim-lib-numbers-tensor/src/tests/storage.rs",
       "crates/sim-lib-numbers-tensor/src/tests.rs",
       "crates/sim-lib-numbers-tensor-bcast/Cargo.toml",
       "crates/sim-lib-numbers-tensor-bcast/build.rs",

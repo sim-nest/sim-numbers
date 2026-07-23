@@ -90,7 +90,8 @@ impl SpecTensor for ComplexFTensor {
         Some(Self {
             shape: tensor.shape().to_vec(),
             data: tensor
-                .data()
+                .cells()
+                .ok()?
                 .iter()
                 .map(parse_complex_literal_cell)
                 .collect::<Option<Vec<_>>>()?,

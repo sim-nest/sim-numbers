@@ -82,7 +82,8 @@ impl F64Tensor {
             uniform.shape().to_vec(),
             uniform.dtype().clone(),
             uniform
-                .data()
+                .cells()
+                .expect("uniform f64 tensor storage should be observable")
                 .iter()
                 .map(|value| {
                     let literal = parse_f64_literal_cell(value).unwrap();
@@ -142,7 +143,8 @@ impl SpecTensor for F64Tensor {
         Some(Self {
             shape: tensor.shape().to_vec(),
             data: tensor
-                .data()
+                .cells()
+                .ok()?
                 .iter()
                 .map(parse_f64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,

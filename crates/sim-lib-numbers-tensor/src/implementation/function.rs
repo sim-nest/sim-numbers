@@ -173,11 +173,7 @@ fn index_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
         .map(|value| extract_usize(cx, value, "tensor index"))
         .collect::<Result<Vec<_>>>()?;
     let flat = Tensor::flat_offset(shape, &offsets)?;
-    tensor
-        .data()
-        .get(flat)
-        .cloned()
-        .ok_or_else(|| Error::Eval("tensor index was out of bounds".to_owned()))
+    tensor.cell(flat)
 }
 
 fn reshape_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
@@ -193,7 +189,7 @@ fn reshape_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
         cx,
         shape,
         Some(tensor_dtype(tensor).clone()),
-        tensor.data().to_vec(),
+        tensor.cells()?.to_vec(),
     )
 }
 
@@ -220,13 +216,7 @@ fn slice_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
             .map(|(offset, start)| offset + start)
             .collect::<Vec<_>>();
         let flat = Tensor::flat_offset(tensor.shape(), &absolute)?;
-        cells.push(
-            tensor
-                .data()
-                .get(flat)
-                .cloned()
-                .ok_or_else(|| Error::Eval("slice index was out of bounds".to_owned()))?,
-        );
+        cells.push(tensor.cell(flat)?);
     }
     build_tensor_value(cx, lens, Some(tensor_dtype(tensor).clone()), cells)
 }
@@ -239,8 +229,9 @@ fn map_impl(cx: &mut Cx, values: Vec<Value>) -> Result<Value> {
     };
     let tensor = tensor_value_ref(tensor_value)
         .ok_or_else(|| Error::Eval("map expects a tensor value".to_owned()))?;
-    let mut cells = Vec::with_capacity(tensor.data().len());
-    for cell in tensor.data() {
+    let tensor_cells = tensor.cells()?;
+    let mut cells = Vec::with_capacity(tensor_cells.len());
+    for cell in tensor_cells.iter() {
         cells.push(cx.call_value(function.clone(), Args::new(vec![cell.clone()]))?);
     }
     build_tensor_value(cx, tensor.shape().to_vec(), None, cells)

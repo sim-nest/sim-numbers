@@ -10,6 +10,8 @@ use crate::{
     tensor_value_ref,
 };
 
+mod storage;
+
 fn test_cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
