@@ -4,9 +4,9 @@
 //! Complex-float tensor specialization: a `(real, imag)` f64-pair tensor element
 //! type and its `SpecTensor` backend for the complex tensor domain.
 //!
-//! [`ComplexFTensor`] is the storage type (a flat vector of `(real, imag)`
-//! pairs) and [`ComplexFTensorLib`] registers it as the `complex` element-type
-//! backend for the base tensor domain.
+//! [`ComplexFTensor`] is a typed view over canonical `Tensor` storage for
+//! `(real, imag)` pairs, and [`ComplexFTensorLib`] registers it as the
+//! `complex` element-type backend for the base tensor domain.
 //!
 //! # Examples
 //!
@@ -30,24 +30,27 @@
 //! assert!(ComplexFTensor::new(vec![2, 2], vec![(0.0, 0.0)]).is_none());
 //! ```
 
+use std::{fmt, sync::Arc};
+
 use sim_kernel::{
-    AbiVersion, DefaultFactory, Dependency, Export, Factory, Lib, LibManifest, LibTarget, Linker,
-    Result, Symbol, Version,
+    AbiVersion, DefaultFactory, Dependency, Export, Lib, LibManifest, LibTarget, Linker, Result,
+    Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    SpecTensor, SpecTensorDescriptor, Tensor, TypedTensorStorage, checked_element_count, domains,
     parse_complex_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
-/// A complex tensor whose cells are `(real, imag)` `f64` pairs.
+type ComplexFStorage = TypedTensorStorage<(f64, f64)>;
+
+/// A complex tensor view whose cells are `(real, imag)` `f64` pairs.
 ///
-/// Storage is a flat `Vec<(f64, f64)>` in row-major order over the tensor
+/// Storage is a flat `(f64, f64)` slice in row-major order over the tensor
 /// [`shape`](Self::shape). Conversion to and from the uniform tensor encodes
 /// each cell as a `real+imagi` complex number literal.
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone)]
 pub struct ComplexFTensor {
-    shape: Vec<usize>,
-    data: Vec<(f64, f64)>,
+    tensor: Tensor,
 }
 
 impl ComplexFTensor {
@@ -57,13 +60,47 @@ impl ComplexFTensor {
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<(f64, f64)>) -> Option<Self> {
         let expected = checked_element_count(&shape).ok()?;
-        (expected == data.len()).then_some(Self { shape, data })
+        if expected != data.len() {
+            return None;
+        }
+        let storage = Arc::new(ComplexFStorage::new(data));
+        Tensor::from_storage(shape, domains::complex(), storage)
+            .ok()
+            .map(|tensor| Self { tensor })
+    }
+
+    /// Borrows the native row-major cell slice.
+    pub fn as_slice(&self) -> &[(f64, f64)] {
+        self.storage().cell_slice()
+    }
+
+    fn storage(&self) -> &ComplexFStorage {
+        self.tensor
+            .storage()
+            .as_any()
+            .downcast_ref::<ComplexFStorage>()
+            .expect("ComplexFTensor must hold complex typed storage")
+    }
+}
+
+impl fmt::Debug for ComplexFTensor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ComplexFTensor")
+            .field("shape", &self.shape())
+            .field("data", &self.as_slice())
+            .finish()
+    }
+}
+
+impl PartialEq for ComplexFTensor {
+    fn eq(&self, other: &Self) -> bool {
+        self.shape() == other.shape() && self.as_slice() == other.as_slice()
     }
 }
 
 impl SpecTensor for ComplexFTensor {
     fn shape(&self) -> &[usize] {
-        &self.shape
+        self.tensor.shape()
     }
 
     fn dtype(&self) -> Symbol {
@@ -71,31 +108,25 @@ impl SpecTensor for ComplexFTensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor::new_exact(
-            self.shape.clone(),
-            self.dtype(),
-            self.data
-                .iter()
-                .map(|(real, imag)| {
-                    DefaultFactory
-                        .number_literal(domains::complex(), format!("{real}{imag:+}i"))
-                        .unwrap()
-                })
-                .collect(),
-        )
-        .expect("complex tensor storage should convert to a valid uniform tensor")
+        self.tensor.clone()
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
-        Some(Self {
-            shape: tensor.shape().to_vec(),
-            data: tensor
+        (tensor.dtype() == &domains::complex()).then_some(())?;
+        if tensor.storage().as_any().is::<ComplexFStorage>() {
+            return Some(Self {
+                tensor: tensor.clone(),
+            });
+        }
+        Self::new(
+            tensor.shape().to_vec(),
+            tensor
                 .cells()
                 .ok()?
                 .iter()
                 .map(parse_complex_literal_cell)
                 .collect::<Option<Vec<_>>>()?,
-        })
+        )
     }
 }
 
@@ -145,7 +176,7 @@ impl Lib for ComplexFTensorLib {
                     symbol: tensor_spec_symbol(),
                     dtype: domains::complex(),
                     implementation: "ComplexFTensor",
-                    storage: "Vec<(f64,f64)>",
+                    storage: "canonical Tensor storage over complex f64 cells",
                 },
             )?,
         )
@@ -169,6 +200,8 @@ pub static RECIPES: sim_cookbook::EmbeddedDir =
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
     use sim_kernel::Lib;
 
     use super::{ComplexFTensor, ComplexFTensorLib, SpecTensor, tensor_spec_symbol};
@@ -178,6 +211,17 @@ mod tests {
         let tensor = ComplexFTensor::new(vec![2], vec![(1.0, 2.0), (3.5, -4.0)]).unwrap();
         let roundtrip = ComplexFTensor::from_uniform(&tensor.to_uniform()).unwrap();
         assert_eq!(roundtrip, tensor);
+    }
+
+    #[test]
+    fn uniform_roundtrip_preserves_complex_storage_identity() {
+        let tensor = ComplexFTensor::new(vec![2], vec![(1.0, 2.0), (3.5, -4.0)]).unwrap();
+        let uniform = tensor.to_uniform();
+        assert!(Arc::ptr_eq(tensor.tensor.storage(), uniform.storage()));
+
+        let roundtrip = ComplexFTensor::from_uniform(&uniform).unwrap();
+        assert!(Arc::ptr_eq(roundtrip.tensor.storage(), uniform.storage()));
+        assert_eq!(roundtrip.as_slice(), &[(1.0, 2.0), (3.5, -4.0)]);
     }
 
     #[test]

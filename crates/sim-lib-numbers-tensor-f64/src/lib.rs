@@ -4,7 +4,7 @@
 //! f64 tensor specialization: a contiguous `f64` tensor element type and its
 //! `SpecTensor` backend for the f64 tensor domain.
 //!
-//! [`F64Tensor`] is the storage type (a flat `f64` buffer) with native
+//! [`F64Tensor`] is a typed view over canonical `Tensor` storage with native
 //! element-wise math, and [`F64TensorLib`] registers it as the `f64`
 //! element-type backend for the base tensor domain.
 //!
@@ -31,26 +31,27 @@
 //! assert!(F64Tensor::new(vec![2, 2], vec![0.0]).is_none());
 //! ```
 
-use std::time::Instant;
+use std::{fmt, sync::Arc, time::Instant};
 
 use sim_kernel::{
     AbiVersion, DefaultFactory, Dependency, Export, Factory, Lib, LibManifest, LibTarget, Linker,
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    SpecTensor, SpecTensorDescriptor, Tensor, TypedTensorStorage, checked_element_count, domains,
     parse_f64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
-/// A tensor whose cells are native `f64` values in a contiguous buffer.
+type F64Storage = TypedTensorStorage<f64>;
+
+/// A tensor view whose cells are native `f64` values in canonical storage.
 ///
-/// Storage is a flat `Vec<f64>` in row-major order over the tensor
+/// Storage is a flat `f64` slice in row-major order over the tensor
 /// [`shape`](Self::shape). Working in native `f64` lets element-wise math run
-/// directly on the buffer instead of through boxed number values.
-#[derive(Clone, Debug, PartialEq)]
+/// directly on the typed storage behind the uniform [`Tensor`].
+#[derive(Clone)]
 pub struct F64Tensor {
-    shape: Vec<usize>,
-    data: Vec<f64>,
+    tensor: Tensor,
 }
 
 impl F64Tensor {
@@ -60,22 +61,30 @@ impl F64Tensor {
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<f64>) -> Option<Self> {
         let expected = checked_element_count(&shape).ok()?;
-        (expected == data.len()).then_some(Self { shape, data })
+        if expected != data.len() {
+            return None;
+        }
+        let storage = Arc::new(F64Storage::new(data));
+        Tensor::from_storage(shape, domains::f64(), storage)
+            .ok()
+            .map(|tensor| Self { tensor })
+    }
+
+    /// Borrows the native row-major cell slice.
+    pub fn as_slice(&self) -> &[f64] {
+        self.storage().cell_slice()
     }
 
     /// Adds a scalar to every cell, operating directly on the native buffer.
     pub fn add_scalar(&self, scalar: f64) -> Self {
-        Self {
-            shape: self.shape.clone(),
-            data: self.data.iter().map(|value| value + scalar).collect(),
-        }
+        Self::new(
+            self.shape().to_vec(),
+            self.as_slice().iter().map(|value| value + scalar).collect(),
+        )
+        .expect("f64 add should preserve tensor shape")
     }
 
-    /// Adds a scalar by routing through the boxed uniform tensor representation.
-    ///
-    /// This is the reference path the fast [`add_scalar`](Self::add_scalar)
-    /// specializes away; it parses and re-encodes each cell as a number literal
-    /// and exists mainly for comparison.
+    /// Adds a scalar through uniform cell observation as the reference path.
     pub fn add_uniform_scalar_slow(&self, scalar: f64) -> Tensor {
         let uniform = self.to_uniform();
         Tensor::new_exact(
@@ -112,11 +121,34 @@ impl F64Tensor {
         let slow = slow_start.elapsed().as_nanos();
         (fast.max(1), slow.max(1))
     }
+
+    fn storage(&self) -> &F64Storage {
+        self.tensor
+            .storage()
+            .as_any()
+            .downcast_ref::<F64Storage>()
+            .expect("F64Tensor must hold f64 typed storage")
+    }
+}
+
+impl fmt::Debug for F64Tensor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("F64Tensor")
+            .field(&self.shape())
+            .field(&self.as_slice())
+            .finish()
+    }
+}
+
+impl PartialEq for F64Tensor {
+    fn eq(&self, other: &Self) -> bool {
+        self.shape() == other.shape() && self.as_slice() == other.as_slice()
+    }
 }
 
 impl SpecTensor for F64Tensor {
     fn shape(&self) -> &[usize] {
-        &self.shape
+        self.tensor.shape()
     }
 
     fn dtype(&self) -> Symbol {
@@ -124,31 +156,25 @@ impl SpecTensor for F64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor::new_exact(
-            self.shape.clone(),
-            self.dtype(),
-            self.data
-                .iter()
-                .map(|value| {
-                    DefaultFactory
-                        .number_literal(domains::f64(), value.to_string())
-                        .unwrap()
-                })
-                .collect(),
-        )
-        .expect("f64 tensor storage should convert to a valid uniform tensor")
+        self.tensor.clone()
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
-        Some(Self {
-            shape: tensor.shape().to_vec(),
-            data: tensor
+        (tensor.dtype() == &domains::f64()).then_some(())?;
+        if tensor.storage().as_any().is::<F64Storage>() {
+            return Some(Self {
+                tensor: tensor.clone(),
+            });
+        }
+        Self::new(
+            tensor.shape().to_vec(),
+            tensor
                 .cells()
                 .ok()?
                 .iter()
                 .map(parse_f64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,
-        })
+        )
     }
 }
 
@@ -198,7 +224,7 @@ impl Lib for F64TensorLib {
                     symbol: tensor_spec_symbol(),
                     dtype: domains::f64(),
                     implementation: "F64Tensor",
-                    storage: "Vec<f64>",
+                    storage: "canonical Tensor storage over f64 cells",
                 },
             )?,
         )

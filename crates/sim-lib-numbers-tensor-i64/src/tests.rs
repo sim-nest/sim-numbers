@@ -1,5 +1,7 @@
 use sim_kernel::Lib;
-use sim_lib_numbers_tensor::domains;
+use std::sync::Arc;
+
+use sim_lib_numbers_tensor::{SpecTensor, domains};
 
 use super::{I64AddResult, I64Tensor, I64TensorLib, tensor_spec_symbol};
 
@@ -14,6 +16,17 @@ fn overflow_widens_to_bigint_uniform_tensor() {
         }
         I64AddResult::Specialized(_) => panic!("expected bigint widening"),
     }
+}
+
+#[test]
+fn uniform_roundtrip_preserves_i64_storage_identity() {
+    let tensor = I64Tensor::new(vec![2], vec![4, 9]).unwrap();
+    let uniform = tensor.to_uniform();
+    assert!(Arc::ptr_eq(tensor.tensor.storage(), uniform.storage()));
+
+    let roundtrip = I64Tensor::from_uniform(&uniform).unwrap();
+    assert!(Arc::ptr_eq(roundtrip.tensor.storage(), uniform.storage()));
+    assert_eq!(roundtrip.as_slice(), &[4, 9]);
 }
 
 #[test]

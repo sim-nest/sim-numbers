@@ -1,6 +1,6 @@
 //! The `SpecTensor` interface and descriptor types that let specialized
-//! element-type backends convert to and from the uniform `Tensor` storage, plus
-//! literal-cell parsing helpers shared across those backends.
+//! element-type backends expose typed views over the uniform `Tensor` storage,
+//! plus literal-cell parsing helpers shared across those backends.
 
 use std::sync::Arc;
 
@@ -12,20 +12,22 @@ use crate::Tensor;
 use sim_lib_numbers_core::domains;
 
 /// Interface a specialized element-type tensor backend implements to bridge its
-/// own storage and the uniform [`Tensor`] value.
+/// typed view and the uniform [`Tensor`] value.
 ///
-/// Typed backends (for example dense `f64` or `i64` tensors) keep their own
-/// packed representation and use this trait to convert to and from the shared
-/// uniform storage the `numbers/tensor` domain operates on.
+/// Typed backends (for example dense `f64` or `i64` tensors) wrap the canonical
+/// `Tensor` value and use typed [`TensorStorage`](crate::TensorStorage)
+/// implementations for their native cells. Conversions should clone that
+/// canonical tensor when storage already matches the backend, preserving shared
+/// storage identity for runtime projection and Citizen round-trips.
 pub trait SpecTensor: Send + Sync + 'static {
     /// The length of each axis of the specialized tensor, outermost first.
     fn shape(&self) -> &[usize];
     /// The element number domain (dtype) of the specialized tensor's cells.
     fn dtype(&self) -> Symbol;
-    /// Converts this specialized tensor into the uniform [`Tensor`] storage.
+    /// Returns the canonical uniform [`Tensor`] backing this typed view.
     fn to_uniform(&self) -> Tensor;
-    /// Rebuilds a specialized tensor from uniform storage, or `None` if the
-    /// uniform tensor's dtype or shape does not fit this backend.
+    /// Rebuilds a specialized tensor view from uniform storage, or `None` if
+    /// the uniform tensor's dtype or shape does not fit this backend.
     fn from_uniform(tensor: &Tensor) -> Option<Self>
     where
         Self: Sized;

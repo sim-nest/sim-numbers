@@ -5,7 +5,7 @@
 //! `SpecTensor` backend, with overflow-checked operations that fall back to the
 //! bigint domain.
 //!
-//! [`I64Tensor`] is the storage type (a flat `i64` buffer); its checked
+//! [`I64Tensor`] is a typed view over canonical `Tensor` storage; its checked
 //! operations return an [`I64AddResult`] that widens to bigint on overflow.
 //! [`I64TensorLib`] registers it as the `i64` element-type backend for the base
 //! tensor domain.
@@ -36,32 +36,31 @@
 //! ));
 //! ```
 
+use std::{fmt, sync::Arc};
+
 use sim_kernel::{
     AbiVersion, DefaultFactory, Dependency, Export, Factory, Lib, LibManifest, LibTarget, Linker,
     Result, Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    SpecTensor, SpecTensorDescriptor, Tensor, TypedTensorStorage, checked_element_count, domains,
     parse_i64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
-/// A tensor whose cells are native `i64` values in a contiguous buffer.
+type I64Storage = TypedTensorStorage<i64>;
+
+/// A tensor view whose cells are native `i64` values in canonical storage.
 ///
-/// Storage is a flat `Vec<i64>` in row-major order over the tensor
+/// Storage is a flat `i64` slice in row-major order over the tensor
 /// [`shape`](Self::shape). Native integer math runs directly on the buffer;
 /// operations that would overflow widen into the bigint domain instead of
 /// wrapping.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone)]
 pub struct I64Tensor {
-    shape: Vec<usize>,
-    data: Vec<i64>,
+    tensor: Tensor,
 }
 
 /// Outcome of an overflow-checked `i64` tensor operation.
-///
-/// The fast specialized path is kept when every cell stays in range; on
-/// overflow the whole result widens to a boxed uniform tensor in the bigint
-/// domain.
 #[derive(Clone)]
 pub enum I64AddResult {
     /// Every cell stayed within `i64`; the native [`I64Tensor`] is returned.
@@ -77,24 +76,31 @@ impl I64Tensor {
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<i64>) -> Option<Self> {
         let expected = checked_element_count(&shape).ok()?;
-        (expected == data.len()).then_some(Self { shape, data })
+        if expected != data.len() {
+            return None;
+        }
+        let storage = Arc::new(I64Storage::new(data));
+        Tensor::from_storage(shape, domains::i64(), storage)
+            .ok()
+            .map(|tensor| Self { tensor })
+    }
+
+    /// Borrows the native row-major cell slice.
+    pub fn as_slice(&self) -> &[i64] {
+        self.storage().cell_slice()
     }
 
     /// Adds a scalar to every cell, widening to bigint on overflow.
-    ///
-    /// Returns [`I64AddResult::Specialized`] when every cell fits in `i64`, or
-    /// [`I64AddResult::Uniform`] (a bigint uniform tensor) as soon as any cell
-    /// would overflow.
     pub fn checked_add_scalar(&self, scalar: i64) -> I64AddResult {
-        let mut out = Vec::with_capacity(self.data.len());
-        for value in &self.data {
+        let mut out = Vec::with_capacity(self.as_slice().len());
+        for value in self.as_slice() {
             match value.checked_add(scalar) {
                 Some(sum) => out.push(sum),
                 None => {
                     let tensor = Tensor::new_exact(
-                        self.shape.clone(),
+                        self.shape().to_vec(),
                         domains::bigint(),
-                        self.data
+                        self.as_slice()
                             .iter()
                             .map(|cell| {
                                 DefaultFactory
@@ -111,16 +117,38 @@ impl I64Tensor {
                 }
             }
         }
-        I64AddResult::Specialized(Self {
-            shape: self.shape.clone(),
-            data: out,
-        })
+        I64AddResult::Specialized(Self::new(self.shape().to_vec(), out).unwrap())
+    }
+
+    fn storage(&self) -> &I64Storage {
+        self.tensor
+            .storage()
+            .as_any()
+            .downcast_ref::<I64Storage>()
+            .expect("I64Tensor must hold i64 typed storage")
     }
 }
 
+impl fmt::Debug for I64Tensor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_tuple("I64Tensor")
+            .field(&self.shape())
+            .field(&self.as_slice())
+            .finish()
+    }
+}
+
+impl PartialEq for I64Tensor {
+    fn eq(&self, other: &Self) -> bool {
+        self.shape() == other.shape() && self.as_slice() == other.as_slice()
+    }
+}
+
+impl Eq for I64Tensor {}
+
 impl SpecTensor for I64Tensor {
     fn shape(&self) -> &[usize] {
-        &self.shape
+        self.tensor.shape()
     }
 
     fn dtype(&self) -> Symbol {
@@ -128,31 +156,25 @@ impl SpecTensor for I64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor::new_exact(
-            self.shape.clone(),
-            self.dtype(),
-            self.data
-                .iter()
-                .map(|value| {
-                    DefaultFactory
-                        .number_literal(domains::i64(), value.to_string())
-                        .unwrap()
-                })
-                .collect(),
-        )
-        .expect("i64 tensor storage should convert to a valid uniform tensor")
+        self.tensor.clone()
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
-        Some(Self {
-            shape: tensor.shape().to_vec(),
-            data: tensor
+        (tensor.dtype() == &domains::i64()).then_some(())?;
+        if tensor.storage().as_any().is::<I64Storage>() {
+            return Some(Self {
+                tensor: tensor.clone(),
+            });
+        }
+        Self::new(
+            tensor.shape().to_vec(),
+            tensor
                 .cells()
                 .ok()?
                 .iter()
                 .map(parse_i64_literal_cell)
                 .collect::<Option<Vec<_>>>()?,
-        })
+        )
     }
 }
 
@@ -202,7 +224,7 @@ impl Lib for I64TensorLib {
                     symbol: tensor_spec_symbol(),
                     dtype: domains::i64(),
                     implementation: "I64Tensor",
-                    storage: "Vec<i64>",
+                    storage: "canonical Tensor storage over i64 cells",
                 },
             )?,
         )

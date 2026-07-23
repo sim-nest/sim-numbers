@@ -3,7 +3,8 @@
 use std::any::Any;
 use std::sync::Arc;
 
-use sim_kernel::{Error, Result, Symbol, Value};
+use sim_kernel::{DefaultFactory, Error, Factory, Result, Symbol, Value};
+use sim_lib_numbers_core::domains;
 
 /// The observable placement of tensor storage.
 ///
@@ -108,5 +109,133 @@ impl TensorStorage for BoxedTensorStorage {
 
     fn as_any(&self) -> &dyn Any {
         self
+    }
+}
+
+/// A scalar cell type that can be held in typed host tensor storage.
+pub trait TensorCell: Clone + Send + Sync + 'static {
+    /// The scalar number domain this cell encodes.
+    fn dtype() -> Symbol;
+
+    /// Encodes the typed cell as a scalar runtime value.
+    fn to_value(&self) -> Result<Value>;
+}
+
+/// Host storage for typed scalar cells behind the canonical
+/// [`Tensor`](super::value::Tensor).
+///
+/// Typed tensor adapters use this storage so their public wrapper and the
+/// uniform `Tensor` share one storage lifetime. The adapter still gets a native
+/// cell slice for fast operations, while the runtime observes cells through the
+/// ordinary [`TensorStorage`] contract.
+pub struct TypedTensorStorage<T: TensorCell> {
+    dtype: Symbol,
+    cells: Arc<[T]>,
+}
+
+impl<T: TensorCell> TypedTensorStorage<T> {
+    /// Builds typed host storage from a flat row-major cell buffer.
+    pub fn new(cells: Vec<T>) -> Self {
+        Self::from_shared(cells.into())
+    }
+
+    /// Builds typed host storage from an already shared cell buffer.
+    pub fn from_shared(cells: Arc<[T]>) -> Self {
+        Self {
+            dtype: T::dtype(),
+            cells,
+        }
+    }
+
+    /// Borrows the typed row-major cells.
+    pub fn cell_slice(&self) -> &[T] {
+        &self.cells
+    }
+
+    /// Clones the shared typed row-major cells.
+    pub fn cells(&self) -> Arc<[T]> {
+        self.cells.clone()
+    }
+}
+
+impl<T: TensorCell> TensorStorage for TypedTensorStorage<T> {
+    fn dtype(&self) -> &Symbol {
+        &self.dtype
+    }
+
+    fn len(&self) -> usize {
+        self.cells.len()
+    }
+
+    fn location(&self) -> TensorLocation {
+        TensorLocation::Host
+    }
+
+    fn cell(&self, index: usize) -> Result<Value> {
+        self.cells
+            .get(index)
+            .ok_or_else(|| Error::Eval("tensor cell index was out of bounds".to_owned()))?
+            .to_value()
+    }
+
+    fn materialize(&self) -> Result<Arc<dyn TensorStorage>> {
+        Ok(Arc::new(Self {
+            dtype: self.dtype.clone(),
+            cells: self.cells.clone(),
+        }))
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl TensorCell for f64 {
+    fn dtype() -> Symbol {
+        domains::f64()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::f64(), self.to_string())
+    }
+}
+
+impl TensorCell for i64 {
+    fn dtype() -> Symbol {
+        domains::i64()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::i64(), self.to_string())
+    }
+}
+
+impl TensorCell for bool {
+    fn dtype() -> Symbol {
+        domains::bool()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::bool(), self.to_string())
+    }
+}
+
+impl TensorCell for (f64, f64) {
+    fn dtype() -> Symbol {
+        domains::complex()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::complex(), format!("{}{:+}i", self.0, self.1))
+    }
+}
+
+impl TensorCell for (i64, i64) {
+    fn dtype() -> Symbol {
+        domains::rational()
+    }
+
+    fn to_value(&self) -> Result<Value> {
+        DefaultFactory.number_literal(domains::rational(), format!("{}/{}", self.0, self.1))
     }
 }

@@ -5,9 +5,9 @@
 //! i64-pair tensor element type and its `SpecTensor` backend for the rational
 //! tensor domain.
 //!
-//! [`Rat64Tensor`] is the storage type (a flat vector of reduced `(num, den)`
-//! pairs) and [`Rat64TensorLib`] registers it as the `rational` element-type
-//! backend for the base tensor domain.
+//! [`Rat64Tensor`] is a typed view over canonical `Tensor` storage for reduced
+//! `(num, den)` pairs, and [`Rat64TensorLib`] registers it as the `rational`
+//! element-type backend for the base tensor domain.
 //!
 //! # Examples
 //!
@@ -31,25 +31,28 @@
 //! assert!(Rat64Tensor::new(vec![2, 2], vec![(1, 2)]).is_none());
 //! ```
 
+use std::{fmt, sync::Arc};
+
 use sim_kernel::{
-    AbiVersion, DefaultFactory, Dependency, Export, Factory, Lib, LibManifest, LibTarget, Linker,
-    Result, Symbol, Version,
+    AbiVersion, DefaultFactory, Dependency, Export, Lib, LibManifest, LibTarget, Linker, Result,
+    Symbol, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
+    SpecTensor, SpecTensorDescriptor, Tensor, TypedTensorStorage, checked_element_count, domains,
     parse_rational_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
-/// A rational tensor whose cells are `(numerator, denominator)` `i64` pairs.
+type Rat64Storage = TypedTensorStorage<(i64, i64)>;
+
+/// A rational tensor view whose cells are `(numerator, denominator)` `i64` pairs.
 ///
-/// Storage is a flat `Vec<(i64, i64)>` in row-major order over the tensor
+/// Storage is a flat `(i64, i64)` slice in row-major order over the tensor
 /// [`shape`](Self::shape). Every cell is normalized on construction: the
 /// fraction is reduced by its greatest common divisor and the sign is carried
 /// on the numerator.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone)]
 pub struct Rat64Tensor {
-    shape: Vec<usize>,
-    data: Vec<(i64, i64)>,
+    tensor: Tensor,
 }
 
 impl Rat64Tensor {
@@ -60,16 +63,49 @@ impl Rat64Tensor {
     /// implied by `shape`.
     pub fn new(shape: Vec<usize>, data: Vec<(i64, i64)>) -> Option<Self> {
         let expected = checked_element_count(&shape).ok()?;
-        (expected == data.len()).then(|| Self {
-            shape,
-            data: data.into_iter().map(normalize).collect(),
-        })
+        if expected != data.len() {
+            return None;
+        }
+        let storage = Arc::new(Rat64Storage::new(data.into_iter().map(normalize).collect()));
+        Tensor::from_storage(shape, domains::rational(), storage)
+            .ok()
+            .map(|tensor| Self { tensor })
+    }
+
+    /// Borrows the native row-major cell slice.
+    pub fn as_slice(&self) -> &[(i64, i64)] {
+        self.storage().cell_slice()
+    }
+
+    fn storage(&self) -> &Rat64Storage {
+        self.tensor
+            .storage()
+            .as_any()
+            .downcast_ref::<Rat64Storage>()
+            .expect("Rat64Tensor must hold rational typed storage")
     }
 }
 
+impl fmt::Debug for Rat64Tensor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Rat64Tensor")
+            .field("shape", &self.shape())
+            .field("data", &self.as_slice())
+            .finish()
+    }
+}
+
+impl PartialEq for Rat64Tensor {
+    fn eq(&self, other: &Self) -> bool {
+        self.shape() == other.shape() && self.as_slice() == other.as_slice()
+    }
+}
+
+impl Eq for Rat64Tensor {}
+
 impl SpecTensor for Rat64Tensor {
     fn shape(&self) -> &[usize] {
-        &self.shape
+        self.tensor.shape()
     }
 
     fn dtype(&self) -> Symbol {
@@ -77,34 +113,25 @@ impl SpecTensor for Rat64Tensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor::new_exact(
-            self.shape.clone(),
-            self.dtype(),
-            self.data
-                .iter()
-                .map(|(num, den)| {
-                    DefaultFactory
-                        .number_literal(domains::rational(), format!("{num}/{den}"))
-                        .unwrap()
-                })
-                .collect(),
-        )
-        .expect("rational tensor storage should convert to a valid uniform tensor")
+        self.tensor.clone()
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
-        Some(Self {
-            shape: tensor.shape().to_vec(),
-            data: tensor
+        (tensor.dtype() == &domains::rational()).then_some(())?;
+        if tensor.storage().as_any().is::<Rat64Storage>() {
+            return Some(Self {
+                tensor: tensor.clone(),
+            });
+        }
+        Self::new(
+            tensor.shape().to_vec(),
+            tensor
                 .cells()
                 .ok()?
                 .iter()
                 .map(parse_rational_literal_cell)
-                .collect::<Option<Vec<_>>>()?
-                .into_iter()
-                .map(normalize)
-                .collect(),
-        })
+                .collect::<Option<Vec<_>>>()?,
+        )
     }
 }
 
@@ -154,7 +181,7 @@ impl Lib for Rat64TensorLib {
                     symbol: tensor_spec_symbol(),
                     dtype: domains::rational(),
                     implementation: "Rat64Tensor",
-                    storage: "Vec<(i64,i64)>",
+                    storage: "canonical Tensor storage over rational i64 cells",
                 },
             )?,
         )
@@ -195,30 +222,4 @@ pub static RECIPES: sim_cookbook::EmbeddedDir =
     include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));
 
 #[cfg(test)]
-mod tests {
-    use sim_kernel::Lib;
-    use sim_lib_numbers_tensor::SpecTensor;
-
-    use super::{Rat64Tensor, Rat64TensorLib, tensor_spec_symbol};
-
-    #[test]
-    fn rationals_are_normalized() {
-        let tensor = Rat64Tensor::new(vec![2], vec![(2, 4), (-6, -8)]).unwrap();
-        assert_eq!(tensor.to_uniform().cells().unwrap().len(), 2);
-        let roundtrip = Rat64Tensor::from_uniform(&tensor.to_uniform()).unwrap();
-        assert_eq!(roundtrip.data, vec![(1, 2), (3, 4)]);
-    }
-
-    #[test]
-    fn constructor_rejects_overflowing_shape() {
-        assert!(Rat64Tensor::new(vec![usize::MAX, 2], Vec::new()).is_none());
-    }
-
-    #[test]
-    fn lib_exports_spec_tensor_descriptor() {
-        assert_eq!(
-            Rat64TensorLib::new().manifest().exports[0].symbol(),
-            &tensor_spec_symbol()
-        );
-    }
-}
+mod tests;

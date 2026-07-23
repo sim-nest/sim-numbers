@@ -14,9 +14,9 @@ mod implementation;
 mod spec;
 
 pub use implementation::{
-    BoxedTensorStorage, Tensor, TensorLocation, TensorNumbersLib, TensorStorage,
-    build_scalar_tensor_value, build_tensor_value, flatten_tensor_scalar_cells, number_domain,
-    tensor_dtype, tensor_value_class_symbol, tensor_value_ref,
+    BoxedTensorStorage, Tensor, TensorCell, TensorLocation, TensorNumbersLib, TensorStorage,
+    TypedTensorStorage, build_scalar_tensor_value, build_tensor_value, flatten_tensor_scalar_cells,
+    number_domain, tensor_dtype, tensor_value_class_symbol, tensor_value_ref,
 };
 pub use sim_lib_numbers_core::domains;
 pub use spec::{

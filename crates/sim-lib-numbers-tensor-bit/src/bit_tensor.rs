@@ -1,13 +1,15 @@
 //! Bit-packed boolean tensor storage, its `SpecTensor` backend, and the
 //! library that registers it as the `bool` element-type backend.
 
+use std::{any::Any, fmt, sync::Arc};
+
 use sim_kernel::{
     AbiVersion, DefaultFactory, Dependency, Export, Factory, Lib, LibManifest, LibTarget, Linker,
     Result, Symbol, Value, Version,
 };
 use sim_lib_numbers_tensor::{
-    SpecTensor, SpecTensorDescriptor, Tensor, checked_element_count, domains,
-    spec_tensor_descriptor_value, spec_tensor_symbol,
+    SpecTensor, SpecTensorDescriptor, Tensor, TensorLocation, TensorStorage, checked_element_count,
+    domains, spec_tensor_descriptor_value, spec_tensor_symbol,
 };
 
 /// A boolean tensor stored as bit-packed `u64` words.
@@ -15,11 +17,14 @@ use sim_lib_numbers_tensor::{
 /// Each element occupies a single bit, so an `n`-element tensor is held in
 /// `ceil(n / 64)` words. The logical [`shape`](Self::shape) and element count
 /// drive layout; bitwise operations work directly on the packed words.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone)]
 pub struct BitTensor {
-    shape: Vec<usize>,
+    tensor: Tensor,
+}
+
+struct BitTensorStorage {
     len: usize,
-    words: Vec<u64>,
+    words: Arc<[u64]>,
 }
 
 impl BitTensor {
@@ -38,14 +43,18 @@ impl BitTensor {
                 words[index / 64] |= 1u64 << (index % 64);
             }
         }
-        Some(Self { shape, len, words })
+        let storage = Arc::new(BitTensorStorage {
+            len,
+            words: words.into(),
+        });
+        Tensor::from_storage(shape, domains::bool(), storage)
+            .ok()
+            .map(|tensor| Self { tensor })
     }
 
     /// Unpacks the tensor back into one boolean per element, in flat order.
     pub fn to_bools(&self) -> Vec<bool> {
-        (0..self.len)
-            .map(|index| ((self.words[index / 64] >> (index % 64)) & 1) == 1)
-            .collect()
+        self.storage().to_bools()
     }
 
     /// Element-wise bitwise OR with another bit tensor of the same shape.
@@ -68,11 +77,81 @@ impl BitTensor {
     pub fn bit_and(&self, other: &Self) -> Option<Self> {
         map_words(self, other, |left, right| left & right)
     }
+
+    fn storage(&self) -> &BitTensorStorage {
+        self.tensor
+            .storage()
+            .as_any()
+            .downcast_ref::<BitTensorStorage>()
+            .expect("BitTensor must hold bit-packed storage")
+    }
 }
+
+impl BitTensorStorage {
+    fn to_bools(&self) -> Vec<bool> {
+        (0..self.len)
+            .map(|index| ((self.words[index / 64] >> (index % 64)) & 1) == 1)
+            .collect()
+    }
+}
+
+impl TensorStorage for BitTensorStorage {
+    fn dtype(&self) -> &Symbol {
+        static DTYPE: std::sync::OnceLock<Symbol> = std::sync::OnceLock::new();
+        DTYPE.get_or_init(domains::bool)
+    }
+
+    fn len(&self) -> usize {
+        self.len
+    }
+
+    fn location(&self) -> TensorLocation {
+        TensorLocation::Host
+    }
+
+    fn cell(&self, index: usize) -> Result<Value> {
+        if index >= self.len {
+            return Err(sim_kernel::Error::Eval(
+                "tensor cell index was out of bounds".to_owned(),
+            ));
+        }
+        let bit = ((self.words[index / 64] >> (index % 64)) & 1) == 1;
+        bool_value(bit)
+            .ok_or_else(|| sim_kernel::Error::Eval("bool tensor cell encode failed".to_owned()))
+    }
+
+    fn materialize(&self) -> Result<Arc<dyn TensorStorage>> {
+        Ok(Arc::new(Self {
+            len: self.len,
+            words: self.words.clone(),
+        }))
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl fmt::Debug for BitTensor {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BitTensor")
+            .field("shape", &self.shape())
+            .field("bits", &self.to_bools())
+            .finish()
+    }
+}
+
+impl PartialEq for BitTensor {
+    fn eq(&self, other: &Self) -> bool {
+        self.shape() == other.shape() && self.to_bools() == other.to_bools()
+    }
+}
+
+impl Eq for BitTensor {}
 
 impl SpecTensor for BitTensor {
     fn shape(&self) -> &[usize] {
-        &self.shape
+        self.tensor.shape()
     }
 
     fn dtype(&self) -> Symbol {
@@ -80,19 +159,16 @@ impl SpecTensor for BitTensor {
     }
 
     fn to_uniform(&self) -> Tensor {
-        Tensor::new_exact(
-            self.shape.clone(),
-            self.dtype(),
-            self.to_bools()
-                .into_iter()
-                .map(bool_value)
-                .collect::<Option<Vec<_>>>()
-                .expect("bool tensor values should always encode"),
-        )
-        .expect("bit tensor storage should convert to a valid uniform tensor")
+        self.tensor.clone()
     }
 
     fn from_uniform(tensor: &Tensor) -> Option<Self> {
+        (tensor.dtype() == &domains::bool()).then_some(())?;
+        if tensor.storage().as_any().is::<BitTensorStorage>() {
+            return Some(Self {
+                tensor: tensor.clone(),
+            });
+        }
         let bits = tensor
             .cells()
             .ok()?
@@ -149,7 +225,7 @@ impl Lib for BitTensorLib {
                     symbol: tensor_spec_symbol(),
                     dtype: domains::bool(),
                     implementation: "BitTensor",
-                    storage: "bit-packed u64 words",
+                    storage: "canonical Tensor storage over bit-packed u64 words",
                 },
             )?,
         )
@@ -192,20 +268,29 @@ fn map_words(
     right: &BitTensor,
     f: impl Fn(u64, u64) -> u64,
 ) -> Option<BitTensor> {
-    (left.shape == right.shape).then(|| BitTensor {
-        shape: left.shape.clone(),
-        len: left.len,
+    if left.shape() != right.shape() {
+        return None;
+    }
+    let storage = Arc::new(BitTensorStorage {
+        len: left.storage().len,
         words: left
+            .storage()
             .words
             .iter()
-            .zip(right.words.iter())
+            .zip(right.storage().words.iter())
             .map(|(left, right)| f(*left, *right))
-            .collect(),
-    })
+            .collect::<Vec<_>>()
+            .into(),
+    });
+    Tensor::from_storage(left.shape().to_vec(), domains::bool(), storage)
+        .ok()
+        .map(|tensor| BitTensor { tensor })
 }
 
 #[cfg(test)]
 mod tests {
+    use std::sync::Arc;
+
     use sim_kernel::Lib;
 
     use super::{BitTensor, BitTensorLib, SpecTensor, tensor_spec_symbol};
@@ -218,6 +303,17 @@ mod tests {
         assert_eq!(out.to_bools(), vec![true, false, false, true]);
         let uniform = out.to_uniform();
         assert_eq!(uniform.shape(), &[4]);
+    }
+
+    #[test]
+    fn uniform_roundtrip_preserves_bit_storage_identity() {
+        let tensor = BitTensor::from_bools(vec![4], &[true, false, true, true]).unwrap();
+        let uniform = tensor.to_uniform();
+        assert!(Arc::ptr_eq(tensor.tensor.storage(), uniform.storage()));
+
+        let roundtrip = BitTensor::from_uniform(&uniform).unwrap();
+        assert!(Arc::ptr_eq(roundtrip.tensor.storage(), uniform.storage()));
+        assert_eq!(roundtrip.to_bools(), vec![true, false, true, true]);
     }
 
     #[test]
