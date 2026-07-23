@@ -1,1 +1,1 @@
-#(numbers/Tensor v1 (2) (#(numbers/Complex v1 1.0 2.0) #(numbers/Complex v1 3.0 4.0)) numbers/complex)
+#(numbers/Tensor v1 ((expr:number citizen/int "2")) (#(numbers/Complex v1 1.0 2.0) #(numbers/Complex v1 3.0 4.0)) numbers/complex)
