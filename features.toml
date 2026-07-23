@@ -105,6 +105,68 @@ claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
 ]
 
+[[feature]]
+id = "feature/sim-numbers/tensors"
+title = "Tensor operations"
+summary = "Provide the canonical runtime Tensor value, typed tensor descriptors, broadcasting, and matrix operations."
+owner = "crate/sim-lib-numbers-tensor"
+audiences = ["code", "framework"]
+guidance = "Use this row when constructing, projecting, broadcasting, or applying matrix operations to tensors. Keep runtime tensor semantics in sim-lib-numbers-tensor and its typed tensor libraries."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-tensor",
+  "anchor/crate/sim-lib-numbers-tensor-bcast",
+  "anchor/crate/sim-lib-numbers-tensor-bit",
+  "anchor/crate/sim-lib-numbers-tensor-cmplxf",
+  "anchor/crate/sim-lib-numbers-tensor-f64",
+  "anchor/crate/sim-lib-numbers-tensor-i64",
+  "anchor/crate/sim-lib-numbers-tensor-linalg",
+  "anchor/crate/sim-lib-numbers-tensor-rat64",
+  "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-bit/bit-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-cmplxf/complex-ftensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-f64/f64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-i64/i64-tensor-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-rat64/rat64-tensor-lib",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/spec-tensor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-function",
+  "anchor/rustdoc/sim-lib-numbers-tensor/build_tensor_value",
+  "anchor/rustdoc/sim-lib-numbers-tensor/checked_element_count",
+  "anchor/rustdoc/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
+  "anchor/rustdoc/sim-lib-numbers-tensor-linalg/dispatch",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
+]
+
+[[feature]]
+id = "feature/sim-numbers/numeric-pipelines"
+title = "Numeric pipelines"
+summary = "Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins."
+owner = "crate/sim-lib-numbers-numeric"
+audiences = ["code", "framework"]
+guidance = "Use this row when composing or running numeric jobs through the numeric registry. Executable composed pipelines use f64 state; tensor state descriptors fail closed in this package."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-numeric",
+  "anchor/crate/sim-lib-numbers-rk",
+  "anchor/runtime-lib/sim-lib-numbers-numeric/numeric-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-rk/rk-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-numeric/call_numeric_compose",
+  "anchor/rustdoc/sim-lib-numbers-numeric/call_numeric_run_composed",
+  "anchor/rustdoc/sim-lib-numbers-numeric/composed-pipeline",
+  "anchor/rustdoc/sim-lib-numbers-numeric/numeric-registry",
+  "anchor/rustdoc/sim-lib-numbers-numeric/numeric_run_composed_symbol",
+  "anchor/rustdoc/sim-lib-numbers-numeric/ode-solver",
+  "anchor/rustdoc/sim-lib-numbers-numeric/pipeline-kind",
+  "anchor/rustdoc/sim-lib-numbers-numeric/quadrature",
+  "anchor/rustdoc/sim-lib-numbers-numeric/state-kind",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run",
+]
+
 [[route]]
 id = "route/add-number-domain"
 task = "Add a number domain"
@@ -112,4 +174,22 @@ audiences = ["code", "framework"]
 steps = [
   { feature = "feature/sim-numbers/numbers", why = "The number row owns reusable number domains and their runtime libraries." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen", why = "The tensor citizen test checks runtime projection for a number domain." },
+]
+
+[[route]]
+id = "route/use-tensor-operations"
+task = "Use tensor operations"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/tensors", why = "The tensor row owns the runtime value, typed tensor descriptors, broadcasting, and matrix-operation libraries." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen", why = "The checked tensor citizen specimen proves runtime projection for the canonical Tensor value." },
+]
+
+[[route]]
+id = "route/run-numeric-pipeline"
+task = "Run a numeric pipeline"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/numeric-pipelines", why = "The numeric pipeline row owns composed pipeline values and the numeric registry execution path." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run", why = "The checked pipeline-run specimen proves composed run input parsing and fail-closed tensor-state handling." },
 ]

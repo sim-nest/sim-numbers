@@ -423,3 +423,76 @@ fn keyword_name(symbol: &Symbol) -> String {
 fn unknown_numeric_method(kind: &str, method: &Symbol) -> Error {
     Error::Eval(format!("UnknownNumericMethod: {kind} method {method}"))
 }
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use sim_kernel::{DefaultFactory, EagerPolicy, Ref};
+
+    use super::*;
+
+    fn test_cx() -> Cx {
+        Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+    }
+
+    fn pipeline_value(cx: &mut Cx, kind: PipelineKind, state: StateKind) -> Value {
+        cx.factory()
+            .opaque(Arc::new(ComposedPipeline::new(
+                Ref::Symbol(Symbol::new("test-func")),
+                kind,
+                Symbol::new("auto"),
+                state,
+            )))
+            .expect("pipeline value")
+    }
+
+    fn symbol_value(cx: &mut Cx, name: &str) -> Value {
+        cx.factory()
+            .symbol(Symbol::new(name))
+            .expect("symbol value")
+    }
+
+    fn number_value(cx: &mut Cx, domain: Symbol, canonical: &str) -> Value {
+        cx.factory()
+            .number_literal(domain, canonical.to_owned())
+            .expect("number value")
+    }
+
+    // conformance: numeric pipeline execution parses composed run inputs.
+    #[test]
+    fn numeric_pipeline_run_parses_keyword_arguments() {
+        let mut cx = test_cx();
+        let values = vec![
+            pipeline_value(&mut cx, PipelineKind::Quadrature, StateKind::F64),
+            symbol_value(&mut cx, ":a"),
+            number_value(&mut cx, domains::f64(), "0.0"),
+            symbol_value(&mut cx, ":b"),
+            number_value(&mut cx, domains::f64(), "1.0"),
+            symbol_value(&mut cx, ":n"),
+            number_value(&mut cx, domains::i64(), "4"),
+        ];
+
+        let input = RunComposedInput::from_values(&mut cx, &values).expect("parsed run input");
+        assert_eq!(input.pipeline.kind, PipelineKind::Quadrature);
+        assert_eq!(input.pipeline.state, StateKind::F64);
+        let RunArgs::Quadrature { n, tol, .. } = input.args else {
+            panic!("expected quadrature args");
+        };
+        assert_eq!(n, Some(4));
+        assert_eq!(tol, None);
+    }
+
+    #[test]
+    fn numeric_pipeline_tensor_state_fails_closed() {
+        let pipeline = ComposedPipeline::new(
+            Ref::Symbol(Symbol::new("test-func")),
+            PipelineKind::OdeSolve,
+            Symbol::new("rk4"),
+            StateKind::Tensor,
+        );
+
+        let err = ensure_f64_state(&pipeline).expect_err("tensor state fails closed");
+        assert!(err.to_string().contains("tensor state"), "{err}");
+    }
+}
