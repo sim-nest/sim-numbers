@@ -253,6 +253,49 @@ fn reductions_and_transcendentals_have_checked_cpu_contracts() {
 }
 
 #[test]
+fn tile_local_phase_arguments_use_tensor_math_not_interference_ops() {
+    let mut cx = cx();
+    let phase = cx
+        .call_function(&Symbol::new("vec"), Args::new(vec![i64_num("0")]))
+        .unwrap();
+
+    let sine = cx
+        .call_function(&Symbol::new("sin"), Args::new(vec![phase.clone()]))
+        .unwrap();
+    let cosine = cx
+        .call_function(&Symbol::new("cos"), Args::new(vec![phase]))
+        .unwrap();
+
+    assert_eq!(
+        tensor_value_ref(&sine).unwrap().cells().unwrap()[0]
+            .object()
+            .as_expr(&mut cx)
+            .unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "0".to_owned(),
+        })
+    );
+    assert_eq!(
+        tensor_value_ref(&cosine).unwrap().cells().unwrap()[0]
+            .object()
+            .as_expr(&mut cx)
+            .unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "1".to_owned(),
+        })
+    );
+    assert!(
+        cx.call_function(
+            &Symbol::qualified("interference", "solve"),
+            Args::new(Vec::new())
+        )
+        .is_err()
+    );
+}
+
+#[test]
 fn zeros_with_oversized_shape_errors_instead_of_oom() {
     let mut cx = cx();
     let err = cx
