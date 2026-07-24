@@ -8,4 +8,4 @@ tags = ["numbers", "tensor", "execute"]
 requires = ["numbers/tensor", "numbers/i64", "codec/lisp"]
 [[expect]]
 form = 0
-result = "((1 2) (3 4))"
+result = "[[1 2] [3 4]]"

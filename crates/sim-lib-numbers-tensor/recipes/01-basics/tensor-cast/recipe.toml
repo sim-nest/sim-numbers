@@ -8,4 +8,4 @@ tags = ["numbers", "tensor", "cast", "f32"]
 requires = ["numbers/tensor", "numbers/f64", "numbers/f32", "codec/lisp"]
 [[expect]]
 form = 0
-result = "[1.5 2.5]"
+result = "[(expr:number numbers/f32 \"1.5\") (expr:number numbers/f32 \"2.5\")]"
