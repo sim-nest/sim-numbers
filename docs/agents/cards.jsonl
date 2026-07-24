@@ -186,6 +186,9 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/setup.siml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/recipe.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/setup.siml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/setup.siml"}

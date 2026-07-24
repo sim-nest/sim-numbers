@@ -154,6 +154,33 @@ claims_specimens = [
 ]
 
 [[feature]]
+id = "feature/sim-numbers/tensor-execution"
+title = "Tensor execution"
+summary = "Run canonical Tensor expressions through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
+owner = "crate/sim-lib-numbers-tensor"
+audiences = ["code", "framework"]
+guidance = "Use this row when a tensor expression needs explicit executor placement. Keep tensor semantics in ordinary tensor operations, expose providers through TensorExecutor, and realize through TensorSite so the caller environment is restored after evaluation."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-tensor",
+  "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
+  "anchor/export/sim-lib-numbers-tensor/site/tensor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-meta",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-op",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-request",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-execution",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-exec-error",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-executor-card",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-executor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/cpu-tensor-executor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-site",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor_execute_capability",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor_site_symbol",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/tests/execution",
+]
+
+[[feature]]
 id = "feature/sim-numbers/numeric-pipelines"
 title = "Numeric pipelines"
 summary = "Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins."
@@ -195,6 +222,16 @@ audiences = ["code", "framework"]
 steps = [
   { feature = "feature/sim-numbers/tensors", why = "The tensor row owns the storage-polymorphic runtime value, checked observation, typed tensor descriptors, broadcasting, and matrix-operation libraries." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen", why = "The checked tensor citizen specimen proves runtime projection and semantic reconstruction for the canonical Tensor value." },
+]
+
+[[route]]
+id = "route/execute-tensor-at-site"
+task = "Execute tensor at a site"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/tensors", why = "The tensor row owns the canonical Tensor value and checked host or resident observation." },
+  { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns TensorExecutor and TensorSite for ordinary tensor expressions." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/tests/execution", why = "The checked execution tests prove direct CPU execution, TensorSite realization, capability checks, and environment restoration." },
 ]
 
 [[route]]

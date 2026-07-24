@@ -14,10 +14,14 @@ mod implementation;
 mod spec;
 
 pub use implementation::{
-    BoxedTensorStorage, Tensor, TensorCell, TensorLocation, TensorNumbersLib, TensorStorage,
-    TypedTensorStorage, build_scalar_tensor_value, build_tensor_value, cast_symbol, cast_tensor,
-    cast_tensor_value, flatten_tensor_scalar_cells, number_domain, tensor_dtype,
-    tensor_value_class_symbol, tensor_value_ref,
+    BoxedTensorStorage, CpuTensorExecutor, SubmissionEvidence, Tensor, TensorCell, TensorExecError,
+    TensorExecution, TensorExecutor, TensorExecutorCard, TensorLocation, TensorMeta,
+    TensorNumbersLib, TensorOp, TensorRequest, TensorSite, TensorStorage, TypedTensorStorage,
+    build_scalar_tensor_value, build_tensor_value, cast_op_symbol, cast_symbol, cast_tensor,
+    cast_tensor_value, flatten_tensor_scalar_cells, index_op_symbol, map_op_symbol, mat_op_symbol,
+    number_domain, reshape_op_symbol, scalar_op_symbol, slice_op_symbol, tensor_dtype,
+    tensor_execute_capability, tensor_executor_symbol, tensor_op_symbol, tensor_site_symbol,
+    tensor_value_class_symbol, tensor_value_ref, vec_op_symbol,
 };
 pub use sim_lib_numbers_core::domains;
 pub use spec::{
