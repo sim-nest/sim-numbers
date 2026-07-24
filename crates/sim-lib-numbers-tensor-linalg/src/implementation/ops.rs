@@ -1,17 +1,27 @@
 //! The linear-algebra operation implementations: dispatch plus the concrete
 //! `dot`, `matmul`, `det`, `inv`, and related routines over tensor values.
 
-use sim_kernel::{DefaultFactory, Error, Factory, Result, Symbol, Value};
-use sim_lib_numbers_core::domains;
-use sim_lib_numbers_tensor::{Tensor, build_tensor_value, tensor_dtype};
+use sim_kernel::{Error, Result, Symbol, Value};
+use sim_lib_numbers_tensor::{
+    Tensor, build_tensor_value, cos_op_symbol, execute_tensor_dot, execute_tensor_matmul,
+    execute_tensor_norm, execute_tensor_reduction, execute_tensor_transcendental,
+    execute_tensor_transpose, exp_op_symbol, max_op_symbol, min_op_symbol, sin_op_symbol,
+    sqrt_op_symbol, sum_op_symbol, tensor_dtype,
+};
 
 use super::support::{
     add, bounded_element_count, div, expect_matrix, expect_tensor, expect_vector,
-    extract_optional_symbol, extract_shape, extract_usize, i64_number, mul, neg, pow, sub,
+    extract_optional_symbol, extract_shape, extract_usize, i64_number, mul, neg, sub,
 };
 
 pub fn dispatch(cx: &mut sim_kernel::Cx, symbol: &Symbol, values: Vec<Value>) -> Result<Value> {
-    if *symbol == Symbol::new("dot") {
+    if *symbol == Symbol::new("sum") {
+        reduction(cx, &values, sum_op_symbol())
+    } else if *symbol == Symbol::new("min") {
+        reduction(cx, &values, min_op_symbol())
+    } else if *symbol == Symbol::new("max") {
+        reduction(cx, &values, max_op_symbol())
+    } else if *symbol == Symbol::new("dot") {
         dot(cx, &values)
     } else if *symbol == Symbol::new("matmul") {
         matmul(cx, &values)
@@ -33,11 +43,45 @@ pub fn dispatch(cx: &mut sim_kernel::Cx, symbol: &Symbol, values: Vec<Value>) ->
         zeros(cx, &values)
     } else if *symbol == Symbol::new("ones") {
         ones(cx, &values)
+    } else if *symbol == Symbol::new("sqrt") {
+        transcendental(cx, &values, sqrt_op_symbol())
+    } else if *symbol == Symbol::new("exp") {
+        transcendental(cx, &values, exp_op_symbol())
+    } else if *symbol == Symbol::new("sin") {
+        transcendental(cx, &values, sin_op_symbol())
+    } else if *symbol == Symbol::new("cos") {
+        transcendental(cx, &values, cos_op_symbol())
     } else {
         Err(Error::Eval(format!(
             "unsupported tensor linalg function {symbol}"
         )))
     }
+}
+
+fn reduction(cx: &mut sim_kernel::Cx, values: &[Value], operator: Symbol) -> Result<Value> {
+    let [value] = values else {
+        return Err(Error::Eval(
+            "tensor reduction expects exactly one tensor".to_owned(),
+        ));
+    };
+    let tensor = expect_tensor(value)?;
+    scalar_tensor_cell(&execute_tensor_reduction(cx, operator, tensor)?)
+}
+
+fn transcendental(cx: &mut sim_kernel::Cx, values: &[Value], operator: Symbol) -> Result<Value> {
+    let [value] = values else {
+        return Err(Error::Eval(
+            "tensor transcendental expects exactly one tensor".to_owned(),
+        ));
+    };
+    let tensor = expect_tensor(value)?;
+    let out = execute_tensor_transcendental(cx, operator, tensor)?;
+    build_tensor_value(
+        cx,
+        out.shape().to_vec(),
+        Some(out.dtype().clone()),
+        out.cells()?.to_vec(),
+    )
 }
 
 fn dot(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
@@ -53,16 +97,7 @@ fn dot(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
             "dot expects vectors with matching lengths".to_owned(),
         ));
     }
-    let left_cells = left.cells()?;
-    let right_cells = right.cells()?;
-    sum_products(
-        cx,
-        left_cells
-            .iter()
-            .cloned()
-            .zip(right_cells.iter().cloned())
-            .collect(),
-    )
+    scalar_tensor_cell(&execute_tensor_dot(cx, left, right)?)
 }
 
 fn matmul(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
@@ -78,57 +113,16 @@ fn matmul(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
             if m != n {
                 return Err(Error::Eval("matmul vector lengths must match".to_owned()));
             }
-            dot(cx, values)
+            scalar_tensor_cell(&execute_tensor_matmul(cx, left, right)?)
         }
-        ([rows, inner_left], [inner_right, cols]) => {
-            if inner_left != inner_right {
-                return Err(Error::Eval("matmul inner dimensions must match".to_owned()));
-            }
-            let mut out = Vec::with_capacity(rows * cols);
-            for row in 0..*rows {
-                for col in 0..*cols {
-                    let mut terms = Vec::with_capacity(*inner_left);
-                    for inner in 0..*inner_left {
-                        let left_cell = left.cell(row * inner_left + inner)?;
-                        let right_cell = right.cell(inner * cols + col)?;
-                        terms.push((left_cell, right_cell));
-                    }
-                    out.push(sum_products(cx, terms)?);
-                }
-            }
-            build_tensor_value(cx, vec![*rows, *cols], None, out)
-        }
-        ([rows, inner_left], [inner_right]) => {
-            if inner_left != inner_right {
-                return Err(Error::Eval("matmul inner dimensions must match".to_owned()));
-            }
-            let mut out = Vec::with_capacity(*rows);
-            for row in 0..*rows {
-                let mut terms = Vec::with_capacity(*inner_left);
-                for inner in 0..*inner_left {
-                    let left_cell = left.cell(row * inner_left + inner)?;
-                    let right_cell = right.cell(inner)?;
-                    terms.push((left_cell, right_cell));
-                }
-                out.push(sum_products(cx, terms)?);
-            }
-            build_tensor_value(cx, vec![*rows], None, out)
-        }
-        ([inner_left], [inner_right, cols]) => {
-            if inner_left != inner_right {
-                return Err(Error::Eval("matmul inner dimensions must match".to_owned()));
-            }
-            let mut out = Vec::with_capacity(*cols);
-            for col in 0..*cols {
-                let mut terms = Vec::with_capacity(*inner_left);
-                for inner in 0..*inner_left {
-                    let left_cell = left.cell(inner)?;
-                    let right_cell = right.cell(inner * cols + col)?;
-                    terms.push((left_cell, right_cell));
-                }
-                out.push(sum_products(cx, terms)?);
-            }
-            build_tensor_value(cx, vec![*cols], None, out)
+        ([_, _], [_, _]) | ([_, _], [_]) | ([_], [_, _]) => {
+            let tensor = execute_tensor_matmul(cx, left, right)?;
+            build_tensor_value(
+                cx,
+                tensor.shape().to_vec(),
+                Some(tensor.dtype().clone()),
+                tensor.cells()?.to_vec(),
+            )
         }
         _ => Err(Error::Eval(
             "matmul currently supports rank-1 and rank-2 tensors only".to_owned(),
@@ -172,17 +166,12 @@ fn transpose(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
     let tensor = expect_matrix(value)?;
     let rows = tensor.shape()[0];
     let cols = tensor.shape()[1];
-    let mut out = Vec::with_capacity(tensor.len());
-    for col in 0..cols {
-        for row in 0..rows {
-            out.push(tensor.cell(row * cols + col)?);
-        }
-    }
+    let out = execute_tensor_transpose(cx, tensor)?;
     build_tensor_value(
         cx,
         vec![cols, rows],
-        Some(tensor_dtype(tensor).clone()),
-        out,
+        Some(out.dtype().clone()),
+        out.cells()?.to_vec(),
     )
 }
 
@@ -278,13 +267,7 @@ fn norm(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
         ));
     }
     let tensor = expect_tensor(tensor_value)?;
-    let mut acc = i64_number(0)?;
-    for cell in tensor.cells()?.iter() {
-        let square = mul(cx, cell.clone(), cell.clone())?;
-        acc = add(cx, acc, square)?;
-    }
-    let half = DefaultFactory.number_literal(domains::rational(), "1/2".to_owned())?;
-    pow(cx, acc, half)
+    scalar_tensor_cell(&execute_tensor_norm(cx, tensor)?)
 }
 
 fn eye(cx: &mut sim_kernel::Cx, values: &[Value]) -> Result<Value> {
@@ -451,17 +434,13 @@ fn number_canonical_is_zero(canonical: &str) -> bool {
     false
 }
 
-fn sum_products(cx: &mut sim_kernel::Cx, terms: Vec<(Value, Value)>) -> Result<Value> {
-    let mut terms = terms.into_iter();
-    let Some((first_left, first_right)) = terms.next() else {
-        return i64_number(0);
-    };
-    let mut acc = mul(cx, first_left, first_right)?;
-    for (left, right) in terms {
-        let product = mul(cx, left, right)?;
-        acc = add(cx, acc, product)?;
+fn scalar_tensor_cell(tensor: &Tensor) -> Result<Value> {
+    if tensor.rank() != 0 {
+        return Err(Error::Eval(
+            "executor returned a non-scalar tensor where a scalar result was expected".to_owned(),
+        ));
     }
-    Ok(acc)
+    tensor.cell(0)
 }
 
 fn minor_tensor(

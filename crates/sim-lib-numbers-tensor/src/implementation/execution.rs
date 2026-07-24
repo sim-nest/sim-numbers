@@ -12,6 +12,9 @@ use super::{
         execute_elementwise_binary_request, execute_elementwise_unary_request,
         is_elementwise_binary_op, is_elementwise_unary_op, tensor_elementwise_op_symbols,
     },
+    execution_ops::{
+        execute_tensor_math_request, is_tensor_executor_math_op, tensor_executor_math_op_symbols,
+    },
     value::{Tensor, build_tensor_value, tensor_value_ref},
 };
 
@@ -420,6 +423,7 @@ impl TensorExecutor for CpuTensorExecutor {
             ]
             .into_iter()
             .chain(tensor_elementwise_op_symbols())
+            .chain(tensor_executor_math_op_symbols())
             .collect(),
             None,
         )
@@ -450,6 +454,8 @@ impl TensorExecutor for CpuTensorExecutor {
             execute_elementwise_binary_request(cx, &request)?
         } else if is_elementwise_unary_op(&operation) {
             execute_elementwise_unary_request(cx, &request)?
+        } else if is_tensor_executor_math_op(&operation) {
+            execute_tensor_math_request(cx, &request)?
         } else {
             return Ok(TensorExecution::Unsupported {
                 reason: Arc::from("unknown tensor operation"),

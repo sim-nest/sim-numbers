@@ -2389,7 +2389,7 @@
       "name": "sim-lib-numbers-tensor-linalg",
       "publish": "true",
       "root": "crates/sim-lib-numbers-tensor-linalg",
-      "rustdoc_summary": "Linear-algebra operations over the tensor domain: dot, matmul, cross, transpose, det, inv, trace, norm, and the eye/zeros/ones constructors, registered as a tensor library.",
+      "rustdoc_summary": "Reductions, linear-algebra operations, f32/f64 transcendentals, and constructors over the tensor domain, registered as a tensor library.",
       "target_kinds": [
         "custom-build",
         "lib"
@@ -2496,10 +2496,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "a448d8809822c2a4a362c2fb559a8e3e7393d489",
+    "git_commit": "9ec85862530236dade7ff695af635ebe78506ac2",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "a448d8809822c2a4a362c2fb559a8e3e7393d489",
+    "source_commit": "9ec85862530236dade7ff695af635ebe78506ac2",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2512,9 +2512,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "a1b509b015d71516",
+    "workspace_hash": "a37b53f9b594fc9e",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 317,
+    "workspace_hash_input_count": 319,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2758,6 +2758,8 @@
       "crates/sim-lib-numbers-tensor/src/implementation/domain.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/elementwise.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/execution.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/execution_math_support.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/execution_ops.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/function.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/storage.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/tensor_site.rs",

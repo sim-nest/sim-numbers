@@ -18,13 +18,17 @@ pub use implementation::{
     TensorExecution, TensorExecutor, TensorExecutorCard, TensorLocation, TensorMeta,
     TensorNumbersLib, TensorOp, TensorRequest, TensorSite, TensorStorage, TypedTensorStorage,
     active_tensor_executor, add_op_symbol, build_scalar_tensor_value, build_tensor_value,
-    cast_op_symbol, cast_symbol, cast_tensor, cast_tensor_value, div_op_symbol,
-    execute_tensor_binary_op, execute_tensor_request, execute_tensor_unary_op,
-    flatten_tensor_scalar_cells, index_op_symbol, map_op_symbol, mat_op_symbol, mul_op_symbol,
-    neg_op_symbol, number_domain, pow_op_symbol, rem_op_symbol, reshape_op_symbol,
-    scalar_op_symbol, slice_op_symbol, sub_op_symbol, tensor_dtype, tensor_execute_capability,
+    cast_op_symbol, cast_symbol, cast_tensor, cast_tensor_value, cos_op_symbol, div_op_symbol,
+    dot_op_symbol, execute_tensor_binary_op, execute_tensor_dot, execute_tensor_matmul,
+    execute_tensor_norm, execute_tensor_reduction, execute_tensor_request,
+    execute_tensor_transcendental, execute_tensor_transpose, execute_tensor_unary_op,
+    exp_op_symbol, flatten_tensor_scalar_cells, index_op_symbol, map_op_symbol, mat_op_symbol,
+    matmul_exec_op_symbol, max_op_symbol, min_op_symbol, mul_op_symbol, neg_op_symbol,
+    norm_op_symbol, number_domain, pow_op_symbol, rem_op_symbol, reshape_op_symbol,
+    scalar_op_symbol, sin_op_symbol, slice_op_symbol, sqrt_op_symbol, sub_op_symbol, sum_op_symbol,
+    tensor_dtype, tensor_execute_capability, tensor_executor_math_op_symbols,
     tensor_executor_symbol, tensor_op_symbol, tensor_site_symbol, tensor_value_class_symbol,
-    tensor_value_ref, vec_op_symbol,
+    tensor_value_ref, transpose_exec_op_symbol, vec_op_symbol,
 };
 pub use sim_lib_numbers_core::domains;
 pub use spec::{

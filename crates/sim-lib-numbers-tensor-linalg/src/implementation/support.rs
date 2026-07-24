@@ -41,10 +41,6 @@ pub fn div(cx: &mut sim_kernel::Cx, left: Value, right: Value) -> Result<Value> 
     cx.apply_value_number_binary_op(&Symbol::qualified("math", "div"), left, right)
 }
 
-pub fn pow(cx: &mut sim_kernel::Cx, left: Value, right: Value) -> Result<Value> {
-    cx.apply_value_number_binary_op(&Symbol::qualified("math", "pow"), left, right)
-}
-
 pub fn neg(cx: &mut sim_kernel::Cx, value: Value) -> Result<Value> {
     cx.apply_value_number_unary_op(&Symbol::qualified("math", "neg"), value)
 }

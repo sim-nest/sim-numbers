@@ -156,15 +156,17 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/tensor-execution"
 title = "Tensor execution"
-summary = "Run canonical Tensor expressions and element-wise broadcast operations through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
+summary = "Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
 owner = "crate/sim-lib-numbers-tensor"
 audiences = ["code", "framework"]
-guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib submits element-wise add, sub, mul, div, rem, pow, and neg through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor and realize through TensorSite so the caller environment is restored after evaluation."
+guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib and TensorLinalgLib submit element-wise add, sub, mul, div, rem, pow, neg, whole-tensor sum/min/max/norm, transpose, dot, matmul, sqrt, exp, sin, and cos through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor and realize through TensorSite so the caller environment is restored after evaluation."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-tensor",
   "anchor/crate/sim-lib-numbers-tensor-bcast",
+  "anchor/crate/sim-lib-numbers-tensor-linalg",
   "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
   "anchor/export/sim-lib-numbers-tensor/site/tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/active_tensor_executor",
   "anchor/rustdoc/sim-lib-numbers-tensor/add_op_symbol",
@@ -174,9 +176,27 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-tensor/rem_op_symbol",
   "anchor/rustdoc/sim-lib-numbers-tensor/pow_op_symbol",
   "anchor/rustdoc/sim-lib-numbers-tensor/neg_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/sum_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/min_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/max_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/norm_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/transpose_exec_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/dot_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/matmul_exec_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/sqrt_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/exp_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/sin_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/cos_op_symbol",
   "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_binary_op",
   "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_unary_op",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_reduction",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_norm",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_transpose",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_dot",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_matmul",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_transcendental",
   "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_request",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor_executor_math_op_symbols",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-meta",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-op",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-request",
@@ -192,6 +212,7 @@ claims_anchors = [
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/tests/execution",
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-bcast/src/tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-linalg/src/tests",
 ]
 
 [[feature]]

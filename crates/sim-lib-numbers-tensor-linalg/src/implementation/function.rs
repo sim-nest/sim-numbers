@@ -12,8 +12,11 @@ use sim_lib_numbers_core::domains;
 
 use super::ops;
 
-fn function_symbols() -> [Symbol; 11] {
+fn function_symbols() -> [Symbol; 18] {
     [
+        Symbol::new("sum"),
+        Symbol::new("min"),
+        Symbol::new("max"),
         Symbol::new("dot"),
         Symbol::new("matmul"),
         Symbol::new("cross"),
@@ -25,6 +28,10 @@ fn function_symbols() -> [Symbol; 11] {
         Symbol::new("eye"),
         Symbol::new("zeros"),
         Symbol::new("ones"),
+        Symbol::new("sqrt"),
+        Symbol::new("exp"),
+        Symbol::new("sin"),
+        Symbol::new("cos"),
     ]
 }
 
@@ -72,10 +79,10 @@ impl Callable for LinalgFunction {
 
 /// Registered library that installs linear-algebra functions over tensors.
 ///
-/// Loading this [`Lib`] registers eleven callable functions -- `dot`, `matmul`,
-/// `cross`, `transpose`, `det`, `inv`, `trace`, `norm`, and the `eye`, `zeros`,
-/// and `ones` constructors -- each dispatching into the operation
-/// implementations against the base tensor domain.
+/// Loading this [`Lib`] registers tensor reduction, linear-algebra,
+/// constructor, and f32/f64 transcendental callables. Reducible, linalg, and
+/// transcendental tensor functions submit checked executor requests before the
+/// CPU fallback runs.
 pub struct TensorLinalgLib;
 
 impl TensorLinalgLib {

@@ -216,7 +216,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-tensor-linalg/Cargo.toml",
       "package": "sim-lib-numbers-tensor-linalg",
-      "summary": "Linear-algebra operations over the tensor domain: dot, matmul, cross, transpose, det, inv, trace, norm, and the eye/zeros/ones constructors, registered as a tensor library."
+      "summary": "Reductions, linear-algebra operations, f32/f64 transcendentals, and constructors over the tensor domain, registered as a tensor library."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_rat64",
