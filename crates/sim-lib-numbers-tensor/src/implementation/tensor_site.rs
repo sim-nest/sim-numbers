@@ -9,7 +9,7 @@ use sim_kernel::{
 
 use super::execution::{
     CpuTensorExecutor, TensorExecutor, TensorExecutorCard, tensor_executor_symbol,
-    tensor_site_symbol,
+    tensor_executor_value, tensor_site_symbol,
 };
 
 /// Eval-fabric wrapper that binds one tensor executor for a realization.
@@ -64,9 +64,7 @@ impl EvalFabric for TensorSite {
         cx.require_all(&self.capabilities)?;
         cx.require_all(&request.required_capabilities)?;
 
-        let executor = DefaultFactory.opaque(Arc::new(TensorExecutorValue {
-            executor: self.executor.clone(),
-        }))?;
+        let executor = tensor_executor_value(self.executor.clone())?;
         let mut child = Env::child(Arc::new(cx.env().clone()));
         child.define(tensor_executor_symbol(), executor);
         let value = cx.with_env(child, |cx| cx.eval_expr(request.expr))?;
@@ -135,36 +133,6 @@ impl sim_kernel::ObjectCompat for TensorSite {
             (Symbol::new("operations"), cx.factory().list(operations)?),
             (Symbol::new("device-capability"), device_capability),
         ])
-    }
-}
-
-struct TensorExecutorValue {
-    executor: Arc<dyn TensorExecutor>,
-}
-
-impl Object for TensorExecutorValue {
-    fn display(&self, _cx: &mut Cx) -> Result<String> {
-        let card = self.executor.card();
-        Ok(format!("#<tensor-executor {}>", card.symbol))
-    }
-
-    fn as_any(&self) -> &dyn std::any::Any {
-        self
-    }
-}
-
-impl sim_kernel::ObjectCompat for TensorExecutorValue {
-    fn class(&self, cx: &mut Cx) -> Result<ClassRef> {
-        if let Some(value) = cx
-            .registry()
-            .class_by_symbol(&Symbol::qualified("core", "Function"))
-        {
-            return Ok(value.clone());
-        }
-        DefaultFactory.class_stub(
-            sim_kernel::CORE_FUNCTION_CLASS_ID,
-            Symbol::qualified("core", "Function"),
-        )
     }
 }
 

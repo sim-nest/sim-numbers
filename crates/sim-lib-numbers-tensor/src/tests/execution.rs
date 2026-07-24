@@ -10,8 +10,8 @@ use sim_shape::{ExprKind, ExprKindShape, shape_value};
 
 use crate::{
     CpuTensorExecutor, TensorExecution, TensorExecutor, TensorMeta, TensorOp, TensorRequest,
-    TensorSite, reshape_op_symbol, tensor_execute_capability, tensor_executor_symbol,
-    tensor_site_symbol, tensor_value_ref,
+    TensorSite, add_op_symbol, build_tensor_value, reshape_op_symbol, tensor_execute_capability,
+    tensor_executor_symbol, tensor_site_symbol, tensor_value_ref,
 };
 
 use super::test_cx;
@@ -83,6 +83,15 @@ fn assert_same_tensor(cx: &mut sim_kernel::Cx, left: &Value, right: &Value) {
     assert_eq!(tensor_cells_expr(cx, left), tensor_cells_expr(cx, right));
 }
 
+fn tensor_cell_exprs(cx: &mut sim_kernel::Cx, tensor: &crate::Tensor) -> Vec<Expr> {
+    tensor
+        .cells()
+        .unwrap()
+        .iter()
+        .map(|cell| cell.object().as_expr(cx).unwrap())
+        .collect()
+}
+
 #[test]
 fn cpu_executor_reshapes_using_current_tensor_semantics() {
     let mut cx = test_cx();
@@ -104,6 +113,65 @@ fn cpu_executor_reshapes_using_current_tensor_semantics() {
     };
     assert_eq!(tensor.shape(), &[2, 1]);
     assert_eq!(tensor.dtype(), &Symbol::qualified("numbers", "i64"));
+}
+
+#[test]
+fn cpu_executor_adds_with_broadcast_metadata() {
+    let mut cx = test_cx();
+    let left = tensor_value_ref(
+        &build_tensor_value(
+            &mut cx,
+            vec![2, 1],
+            Some(Symbol::qualified("numbers", "i64")),
+            vec![super::number("i64", "1"), super::number("i64", "2")],
+        )
+        .unwrap(),
+    )
+    .unwrap()
+    .clone();
+    let right = tensor_value_ref(
+        &build_tensor_value(
+            &mut cx,
+            vec![1, 3],
+            Some(Symbol::qualified("numbers", "i64")),
+            vec![
+                super::number("i64", "10"),
+                super::number("i64", "20"),
+                super::number("i64", "30"),
+            ],
+        )
+        .unwrap(),
+    )
+    .unwrap()
+    .clone();
+    let op = TensorOp::without_attributes(&mut cx, add_op_symbol()).unwrap();
+
+    let result = CpuTensorExecutor::new()
+        .execute(
+            &mut cx,
+            TensorRequest::new(
+                op,
+                vec![left, right],
+                TensorMeta::new(vec![2, 3], Symbol::qualified("numbers", "i64")),
+            ),
+        )
+        .unwrap();
+
+    let TensorExecution::Complete(tensor) = result else {
+        panic!("cpu executor must complete element-wise add");
+    };
+    assert_eq!(tensor.shape(), &[2, 3]);
+    assert_eq!(
+        tensor_cell_exprs(&mut cx, &tensor),
+        vec![
+            i64_expr("11"),
+            i64_expr("21"),
+            i64_expr("31"),
+            i64_expr("12"),
+            i64_expr("22"),
+            i64_expr("32"),
+        ]
+    );
 }
 
 #[test]

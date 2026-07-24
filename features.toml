@@ -156,14 +156,27 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/tensor-execution"
 title = "Tensor execution"
-summary = "Run canonical Tensor expressions through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
+summary = "Run canonical Tensor expressions and element-wise broadcast operations through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
 owner = "crate/sim-lib-numbers-tensor"
 audiences = ["code", "framework"]
-guidance = "Use this row when a tensor expression needs explicit executor placement. Keep tensor semantics in ordinary tensor operations, expose providers through TensorExecutor, and realize through TensorSite so the caller environment is restored after evaluation."
+guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib submits element-wise add, sub, mul, div, rem, pow, and neg through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor and realize through TensorSite so the caller environment is restored after evaluation."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-tensor",
+  "anchor/crate/sim-lib-numbers-tensor-bcast",
   "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
   "anchor/export/sim-lib-numbers-tensor/site/tensor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/active_tensor_executor",
+  "anchor/rustdoc/sim-lib-numbers-tensor/add_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/sub_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/mul_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/div_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/rem_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/pow_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/neg_op_symbol",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_binary_op",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_unary_op",
+  "anchor/rustdoc/sim-lib-numbers-tensor/execute_tensor_request",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-meta",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-op",
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-request",
@@ -178,6 +191,7 @@ claims_anchors = [
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/tests/execution",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-bcast/src/tests",
 ]
 
 [[feature]]
@@ -230,8 +244,9 @@ task = "Execute tensor at a site"
 audiences = ["code", "framework"]
 steps = [
   { feature = "feature/sim-numbers/tensors", why = "The tensor row owns the canonical Tensor value and checked host or resident observation." },
-  { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns TensorExecutor and TensorSite for ordinary tensor expressions." },
+  { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns TensorExecutor, TensorSite, and element-wise broadcast request routing." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/tests/execution", why = "The checked execution tests prove direct CPU execution, TensorSite realization, capability checks, and environment restoration." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-bcast/src/tests", why = "The checked broadcast tests prove active executor routing, CPU fallback, zero-extent broadcasting, alias safety, and decline errors." },
 ]
 
 [[route]]

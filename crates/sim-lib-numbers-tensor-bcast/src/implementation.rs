@@ -1,14 +1,16 @@
 //! The broadcasting library: the `TensorBroadcastLib` that registers
 //! element-wise tensor operations and their shape-broadcasting promotion rules.
 
+use std::sync::Arc;
+
 use sim_kernel::{
     AbiVersion, Cx, Dependency, Error, Lib, LibManifest, LibTarget, Linker, Result, Symbol, Value,
     ValueNumberBinaryOp, ValueNumberUnaryOp, ValuePromotionRule, Version,
 };
 use sim_lib_numbers_core::domains;
 use sim_lib_numbers_tensor::{
-    Tensor, bounded_element_count, build_scalar_tensor_value, build_tensor_value,
-    flatten_tensor_scalar_cells, number_domain, tensor_dtype, tensor_value_ref,
+    build_scalar_tensor_value, execute_tensor_binary_op, execute_tensor_unary_op, number_domain,
+    tensor_value_ref,
 };
 
 /// Registered library that installs NumPy-style broadcasting for the
@@ -142,70 +144,13 @@ fn apply_tensor_binary(cx: &mut Cx, operator: Symbol, left: Value, right: Value)
         .ok_or_else(|| Error::Eval("left operand was not a tensor value".to_owned()))?;
     let right = tensor_value_ref(&right)
         .ok_or_else(|| Error::Eval("right operand was not a tensor value".to_owned()))?;
-    let shape = broadcast_shape(left.shape(), right.shape())?;
-    // Size and materialize the result from the checked, ceiling-bounded cell
-    // count: a legal pair like [1_000_000, 1] x [1, 1_000_000] broadcasts to a
-    // 1e12-cell shape that fits in usize but would OOM if allocated. Fail closed
-    // before building the coordinate list or the result vector.
-    let cells_len = bounded_element_count(&shape)?;
-    let mut cells = Vec::with_capacity(cells_len);
-    for coord in Tensor::coordinates(&shape) {
-        let left_cell = select_cell(left, &coord, &shape)?;
-        let right_cell = select_cell(right, &coord, &shape)?;
-        cells.push(cx.apply_value_number_binary_op(&operator, left_cell, right_cell)?);
-    }
-    build_tensor_value(cx, shape, None, cells)
+    let tensor = execute_tensor_binary_op(cx, operator, left, right)?;
+    cx.factory().opaque(Arc::new(tensor))
 }
 
 fn apply_tensor_neg(cx: &mut Cx, value: Value) -> Result<Value> {
     let tensor = tensor_value_ref(&value)
         .ok_or_else(|| Error::Eval("neg expects a tensor value".to_owned()))?;
-    let source = flatten_tensor_scalar_cells(tensor)?;
-    let mut cells = Vec::with_capacity(source.len());
-    for cell in source.iter().cloned() {
-        cells.push(cx.apply_value_number_unary_op(&Symbol::qualified("math", "neg"), cell)?);
-    }
-    build_tensor_value(
-        cx,
-        tensor.shape().to_vec(),
-        Some(tensor_dtype(tensor).clone()),
-        cells,
-    )
-}
-
-fn broadcast_shape(left: &[usize], right: &[usize]) -> Result<Vec<usize>> {
-    let rank = left.len().max(right.len());
-    let mut out = Vec::with_capacity(rank);
-    for axis in 0..rank {
-        let left_dim = *left
-            .get(left.len().wrapping_sub(rank - axis))
-            .unwrap_or(&1usize);
-        let right_dim = *right
-            .get(right.len().wrapping_sub(rank - axis))
-            .unwrap_or(&1usize);
-        if left_dim == right_dim || left_dim == 1 || right_dim == 1 {
-            out.push(left_dim.max(right_dim));
-        } else {
-            return Err(Error::Eval(format!(
-                "cannot broadcast tensor shapes {left:?} and {right:?}"
-            )));
-        }
-    }
-    Ok(out)
-}
-
-fn select_cell(tensor: &Tensor, coord: &[usize], result_shape: &[usize]) -> Result<Value> {
-    let shape = tensor.shape();
-    let rank_gap = result_shape.len().saturating_sub(shape.len());
-    let mut local = Vec::with_capacity(shape.len());
-    for (axis, dim) in shape.iter().enumerate() {
-        let result_axis = axis + rank_gap;
-        let coord_value = coord
-            .get(result_axis)
-            .copied()
-            .ok_or_else(|| Error::Eval("tensor broadcast axis mismatch".to_owned()))?;
-        local.push(if *dim == 1 { 0 } else { coord_value });
-    }
-    let flat = Tensor::flat_offset(shape, &local)?;
-    tensor.cell(flat)
+    let tensor = execute_tensor_unary_op(cx, Symbol::qualified("math", "neg"), tensor)?;
+    cx.factory().opaque(Arc::new(tensor))
 }

@@ -8,6 +8,10 @@ use sim_kernel::{
 
 use super::{
     cast::cast_tensor,
+    elementwise::{
+        execute_elementwise_binary_request, execute_elementwise_unary_request,
+        is_elementwise_binary_op, is_elementwise_unary_op, tensor_elementwise_op_symbols,
+    },
     value::{Tensor, build_tensor_value, tensor_value_ref},
 };
 
@@ -25,6 +29,16 @@ pub fn tensor_site_symbol() -> Symbol {
 /// execution authority.
 pub fn tensor_execute_capability() -> CapabilityName {
     CapabilityName::new("tensor.execute")
+}
+
+/// Returns the tensor executor currently bound in the active environment.
+pub fn active_tensor_executor(cx: &Cx) -> Option<Arc<dyn TensorExecutor>> {
+    cx.env().get(&tensor_executor_symbol()).and_then(|value| {
+        value
+            .object()
+            .downcast_ref::<TensorExecutorBinding>()
+            .map(TensorExecutorBinding::executor)
+    })
 }
 
 /// Open operation symbol for constructing a tensor from shape, dtype, and cells.
@@ -242,19 +256,19 @@ pub enum TensorExecError {
 }
 
 impl TensorExecError {
-    fn invalid(message: impl Into<Arc<str>>) -> Self {
+    pub(crate) fn invalid(message: impl Into<Arc<str>>) -> Self {
         Self::InvalidRequest {
             message: message.into(),
         }
     }
 
-    fn shape(message: impl Into<Arc<str>>) -> Self {
+    pub(crate) fn shape(message: impl Into<Arc<str>>) -> Self {
         Self::Shape {
             message: message.into(),
         }
     }
 
-    fn unsupported(operation: Symbol, reason: impl Into<Arc<str>>) -> Self {
+    pub(crate) fn unsupported(operation: Symbol, reason: impl Into<Arc<str>>) -> Self {
         Self::Unsupported {
             operation,
             reason: reason.into(),
@@ -327,6 +341,58 @@ pub trait TensorExecutor: Send + Sync + 'static {
     fn flush(&self) -> std::result::Result<SubmissionEvidence, TensorExecError>;
 }
 
+/// Executes one tensor request through the active executor, defaulting to CPU.
+pub fn execute_tensor_request(cx: &mut Cx, request: TensorRequest) -> Result<Tensor> {
+    let operation = request.operation.symbol.clone();
+    let executor = active_tensor_executor(cx).unwrap_or_else(|| Arc::new(CpuTensorExecutor::new()));
+    match executor.execute(cx, request).map_err(Error::from)? {
+        TensorExecution::Complete(tensor) => Ok(tensor),
+        TensorExecution::Unsupported { reason } => {
+            Err(Error::from(TensorExecError::unsupported(operation, reason)))
+        }
+    }
+}
+
+pub(crate) fn tensor_executor_value(executor: Arc<dyn TensorExecutor>) -> Result<Value> {
+    DefaultFactory.opaque(Arc::new(TensorExecutorBinding { executor }))
+}
+
+struct TensorExecutorBinding {
+    executor: Arc<dyn TensorExecutor>,
+}
+
+impl TensorExecutorBinding {
+    fn executor(&self) -> Arc<dyn TensorExecutor> {
+        self.executor.clone()
+    }
+}
+
+impl Object for TensorExecutorBinding {
+    fn display(&self, _cx: &mut Cx) -> Result<String> {
+        let card = self.executor.card();
+        Ok(format!("#<tensor-executor {}>", card.symbol))
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl sim_kernel::ObjectCompat for TensorExecutorBinding {
+    fn class(&self, cx: &mut Cx) -> Result<ClassRef> {
+        if let Some(value) = cx
+            .registry()
+            .class_by_symbol(&Symbol::qualified("core", "Function"))
+        {
+            return Ok(value.clone());
+        }
+        DefaultFactory.class_stub(
+            sim_kernel::CORE_FUNCTION_CLASS_ID,
+            Symbol::qualified("core", "Function"),
+        )
+    }
+}
+
 /// Default host executor that delegates to the registered tensor functions.
 #[derive(Clone, Debug, Default)]
 pub struct CpuTensorExecutor;
@@ -351,7 +417,10 @@ impl TensorExecutor for CpuTensorExecutor {
                 mat_op_symbol(),
                 reshape_op_symbol(),
                 cast_op_symbol(),
-            ],
+            ]
+            .into_iter()
+            .chain(tensor_elementwise_op_symbols())
+            .collect(),
             None,
         )
     }
@@ -377,6 +446,10 @@ impl TensorExecutor for CpuTensorExecutor {
                 operation,
                 "index returns a scalar value, not a tensor",
             ));
+        } else if is_elementwise_binary_op(&operation) {
+            execute_elementwise_binary_request(cx, &request)?
+        } else if is_elementwise_unary_op(&operation) {
+            execute_elementwise_unary_request(cx, &request)?
         } else {
             return Ok(TensorExecution::Unsupported {
                 reason: Arc::from("unknown tensor operation"),
