@@ -2,13 +2,11 @@
 #![allow(deprecated)]
 #![deny(missing_docs)]
 
-//! Linear-algebra operations over the tensor domain: `dot`, `matmul`, `cross`,
-//! `transpose`, `det`, `inv`, `trace`, `norm`, and the `eye`/`zeros`/`ones`
-//! constructors, registered as a tensor library.
+//! Reductions, linear-algebra operations, f32/f64 transcendentals, and
+//! constructors over the tensor domain, registered as a tensor library.
 //!
 //! The single export is [`TensorLinalgLib`], a stateless [`Lib`] that, when
-//! loaded, registers the eleven linear-algebra functions as callable values
-//! over the base tensor domain.
+//! loaded, registers tensor operation callables over the base tensor domain.
 //!
 //! [`Lib`]: sim_kernel::Lib
 //!
@@ -24,7 +22,7 @@
 //!
 //! let manifest = TensorLinalgLib::new().manifest();
 //! assert_eq!(manifest.id, domains::tensor_linalg());
-//! assert_eq!(manifest.exports.len(), 11);
+//! assert_eq!(manifest.exports.len(), 18);
 //! ```
 
 mod implementation;

@@ -13,11 +13,14 @@ use sim_lib_numbers_core::{
 use sim_shape::shape_value;
 
 use super::{
+    cast::cast_symbol,
     citizen::{register_tensor_value_class, tensor_value_class_symbol},
+    execution::tensor_site_symbol,
     function::{
         TensorFunction, index_symbol, map_symbol, mat_symbol, reshape_symbol, scalar_symbol,
         slice_symbol, tensor_symbol, vec_symbol,
     },
+    tensor_site::TensorSite,
 };
 
 /// The symbol naming the tensor number domain (`numbers/tensor`).
@@ -240,6 +243,11 @@ impl Lib for TensorNumbersLib {
                 export_function(reshape_symbol()),
                 export_function(slice_symbol()),
                 export_function(map_symbol()),
+                export_function(cast_symbol()),
+                Export::Site {
+                    symbol: tensor_site_symbol(),
+                    runtime_id: None,
+                },
             ],
         }
     }
@@ -289,6 +297,7 @@ impl Lib for TensorNumbersLib {
             reshape_symbol(),
             slice_symbol(),
             map_symbol(),
+            cast_symbol(),
         ] {
             linker.function_value(
                 symbol.clone(),
@@ -297,6 +306,12 @@ impl Lib for TensorNumbersLib {
                     .expect("tensor function should be boxable"),
             )?;
         }
+        linker.site_value(
+            tensor_site_symbol(),
+            DefaultFactory
+                .opaque(Arc::new(TensorSite::local_cpu()))
+                .expect("tensor site should be boxable"),
+        )?;
         Ok(())
     }
 }

@@ -103,7 +103,9 @@ prelude installs the standard set in one call.
 | Crate | Role |
 | --- | --- |
 | `sim-lib-numbers-tensor` | The n-dimensional tensor number domain: the uniform `Tensor` value, its domain registration and constructors (`tensor`, `vec`, `mat`, ...), and the `SpecTensor` interface that specialized element-type backends plug into. |
+| `sim-lib-numbers-tensor-f32` | f32 tensor specialization: a contiguous `f32` element type and its `SpecTensor` backend with native single-precision element-wise math. |
 | `sim-lib-numbers-tensor-f64` | f64 tensor specialization: a contiguous `f64` element type and its `SpecTensor` backend with native element-wise math. |
+| `sim-lib-numbers-tensor-half` | Half-precision tensor specializations: contiguous `f16` and `bf16` element types, with CPU helper math widened to `f32`. |
 | `sim-lib-numbers-tensor-i64` | i64 tensor specialization: a contiguous `i64` element type and its `SpecTensor` backend, with overflow-checked operations that fall back to the bigint domain. |
 | `sim-lib-numbers-tensor-rat64` | Rational-i64 tensor specialization: a normalized `(numerator, denominator)` i64-pair element type and its `SpecTensor` backend for the rational tensor domain. |
 | `sim-lib-numbers-tensor-cmplxf` | Complex-float tensor specialization: a `(real, imag)` f64-pair element type and its `SpecTensor` backend for the complex tensor domain. |
@@ -124,9 +126,11 @@ domain when it is loaded.
 
 The tensor domain follows the same shape one level up: `sim-lib-numbers-tensor`
 defines the uniform `Tensor` value and the `SpecTensor` interface, and each
-specialization crate registers a fast element-type backend (`f64`, `i64`,
-`rational`, `complex`, `bool`) for it, falling back to the uniform
-representation where no specialization applies.
+specialization crate registers a fast element-type backend (`f32`, `f64`,
+`f16`, `bf16`, `i64`, `rational`, `complex`, `bool`) for it, falling back to
+the uniform representation where no specialization applies. `tensor/cast`
+converts between supported tensor dtypes explicitly, so narrowing, rounding,
+special values, and unsupported domains are handled at the conversion boundary.
 
 ## Validation
 

@@ -1,0 +1,5 @@
+book = "numbers/tensor-half"
+title = "Numbers Tensor Half"
+summary = "F16 and bf16 tensor descriptors with f32-widened host helpers."
+order = 42
+chapters = ["01-basics"]

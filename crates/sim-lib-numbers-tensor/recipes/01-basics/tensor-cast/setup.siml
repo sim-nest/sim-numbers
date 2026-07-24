@@ -1,0 +1,1 @@
+(tensor/cast (tensor [2] numbers/f64 [1.5 2.5]) numbers/f32)

@@ -12,4 +12,4 @@ Linear algebra operations for SIM tensors: dot, matrix multiply, inversion, norm
 
 ## Crate Documentation
 
-Linear-algebra operations over the tensor domain: dot, matmul, cross, transpose, det, inv, trace, norm, and the eye/zeros/ones constructors, registered as a tensor library.
+Reductions, linear-algebra operations, f32/f64 transcendentals, and constructors over the tensor domain, registered as a tensor library.

@@ -1,17 +1,20 @@
 //! The uniform `Tensor` value type: its shape, dtype, and cell storage, with
 //! indexing, construction, and number-value behavior backing the tensor domain.
 
-use std::cmp::Ordering;
-use std::collections::{BTreeMap, BinaryHeap};
 use std::sync::Arc;
 
 use sim_kernel::{
-    ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NoopEvalPolicy, NumberValue, Object,
-    ObjectCompat, ObjectEncode, ObjectEncoding, Result, Symbol, Value,
+    ClassRef, Cx, DefaultFactory, Error, Expr, Factory, NumberValue, Object, ObjectCompat,
+    ObjectEncode, ObjectEncoding, Result, Symbol, Value,
 };
 
 use super::citizen::tensor_value_class_symbol;
 use super::domain::number_domain;
+use super::storage::{BoxedTensorStorage, TensorLocation, TensorStorage};
+use super::validation::{
+    choose_dtype, validate_cells, validate_dtype_accepts_cells, validate_exact_cell_dtype,
+    validate_shape_and_data_len,
+};
 
 /// The uniform tensor value: an n-dimensional array of scalar number cells.
 ///
@@ -23,13 +26,12 @@ use super::domain::number_domain;
 #[derive(Clone)]
 pub struct Tensor {
     /// Length of each axis, outermost first. Empty for a rank-0 scalar.
-    shape: Vec<usize>,
+    shape: Arc<[usize]>,
     /// The shared scalar number domain of every cell (for example
     /// `numbers/i64` or `numbers/f64`).
     dtype: Symbol,
-    /// Row-major cell storage; its length equals the product of `shape`
-    /// (one for a scalar).
-    data: Vec<Value>,
+    /// Row-major host or resident storage.
+    storage: Arc<dyn TensorStorage>,
 }
 
 impl Tensor {
@@ -44,7 +46,11 @@ impl Tensor {
         validate_shape_and_data_len(&shape, data.len())?;
         validate_cells(cx, &data)?;
         validate_dtype_accepts_cells(cx, &dtype, &data)?;
-        Ok(Self { shape, dtype, data })
+        Self::from_storage(
+            shape,
+            dtype.clone(),
+            Arc::new(BoxedTensorStorage::new(dtype, data)),
+        )
     }
 
     /// Builds a tensor whose cells already exactly match `dtype`.
@@ -55,7 +61,35 @@ impl Tensor {
     pub fn new_exact(shape: Vec<usize>, dtype: Symbol, data: Vec<Value>) -> Result<Self> {
         validate_shape_and_data_len(&shape, data.len())?;
         validate_exact_cell_dtype(&dtype, &data)?;
-        Ok(Self { shape, dtype, data })
+        Self::from_storage(
+            shape,
+            dtype.clone(),
+            Arc::new(BoxedTensorStorage::new(dtype, data)),
+        )
+    }
+
+    /// Builds a canonical tensor around externally supplied storage.
+    ///
+    /// This validates shape, dtype, and logical length without materializing
+    /// resident storage. The storage implementation is responsible for
+    /// returning scalar values consistent with its declared dtype.
+    pub fn from_storage(
+        shape: Vec<usize>,
+        dtype: Symbol,
+        storage: Arc<dyn TensorStorage>,
+    ) -> Result<Self> {
+        validate_shape_and_data_len(&shape, storage.len())?;
+        if storage.dtype() != &dtype {
+            return Err(Error::Eval(format!(
+                "tensor dtype {dtype} does not match storage dtype {}",
+                storage.dtype()
+            )));
+        }
+        Ok(Self {
+            shape: shape.into(),
+            dtype,
+            storage,
+        })
     }
 
     /// The tensor shape, outermost axis first. Empty means a rank-0 scalar.
@@ -68,9 +102,83 @@ impl Tensor {
         &self.dtype
     }
 
-    /// Row-major scalar cell storage.
-    pub fn data(&self) -> &[Value] {
-        &self.data
+    /// The current host or resident storage location.
+    pub fn location(&self) -> TensorLocation {
+        self.storage.location()
+    }
+
+    /// Borrows the open storage implementation.
+    ///
+    /// Typed adapters can safely downcast through
+    /// [`TensorStorage::as_any`], while execution providers can preserve
+    /// storage identity by cloning this `Arc`.
+    pub fn storage(&self) -> &Arc<dyn TensorStorage> {
+        &self.storage
+    }
+
+    /// The logical row-major cell count.
+    pub fn len(&self) -> usize {
+        self.storage.len()
+    }
+
+    /// Whether this tensor has no logical cells.
+    pub fn is_empty(&self) -> bool {
+        self.storage.is_empty()
+    }
+
+    /// Observes one row-major scalar cell.
+    pub fn cell(&self, index: usize) -> Result<Value> {
+        if index >= self.len() {
+            return Err(Error::Eval(
+                "tensor cell index was out of bounds".to_owned(),
+            ));
+        }
+        self.storage.cell(index)
+    }
+
+    /// Materializes storage into a checked host-observable form.
+    pub fn materialize(&self) -> Result<Arc<dyn TensorStorage>> {
+        let storage = if self.storage.location() == TensorLocation::Host {
+            self.storage.clone()
+        } else {
+            self.storage.materialize()?
+        };
+        if storage.location() != TensorLocation::Host {
+            return Err(Error::Eval(
+                "tensor materialization did not produce host storage".to_owned(),
+            ));
+        }
+        if storage.dtype() != &self.dtype {
+            return Err(Error::Eval(format!(
+                "materialized tensor dtype {} does not match {}",
+                storage.dtype(),
+                self.dtype
+            )));
+        }
+        if storage.len() != self.len() {
+            return Err(Error::Eval(format!(
+                "materialized tensor length {} does not match {}",
+                storage.len(),
+                self.len()
+            )));
+        }
+        Ok(storage)
+    }
+
+    /// Observes all row-major scalar cells.
+    ///
+    /// Boxed host storage returns its shared cell slice directly. Other host
+    /// layouts are read through the open storage contract after one checked
+    /// materialization.
+    pub fn cells(&self) -> Result<Arc<[Value]>> {
+        let storage = self.materialize()?;
+        if let Some(boxed) = storage.as_any().downcast_ref::<BoxedTensorStorage>() {
+            return Ok(boxed.cells());
+        }
+        (0..storage.len())
+            .map(|index| storage.cell(index))
+            .collect::<Result<Vec<_>>>()
+            .map(Arc::from)
     }
 
     /// The number of axes, i.e. the length of [`shape`](Tensor::shape). Zero
@@ -79,7 +187,7 @@ impl Tensor {
         self.shape.len()
     }
 
-    /// Computes the row-major flat offset into [`data`](Tensor::data) for a
+    /// Computes the row-major flat offset into storage for a
     /// multi-dimensional `indices` coordinate against `shape`.
     ///
     /// Returns an error if the index rank does not match `shape` or any
@@ -118,6 +226,9 @@ impl Tensor {
     pub fn coordinates(shape: &[usize]) -> Vec<Vec<usize>> {
         if shape.is_empty() {
             return vec![Vec::new()];
+        }
+        if shape.contains(&0) {
+            return Vec::new();
         }
         let mut out = Vec::new();
         let mut coord = vec![0usize; shape.len()];
@@ -169,25 +280,29 @@ impl sim_kernel::ObjectCompat for Tensor {
         )
     }
     fn as_expr(&self, cx: &mut Cx) -> Result<Expr> {
+        let cells = self.cells()?;
         match self.rank() {
             0 => Ok(Expr::Call {
                 operator: Box::new(Expr::Symbol(Symbol::new("scalar"))),
                 args: vec![
-                    self.data
+                    cells
                         .first()
                         .ok_or_else(|| Error::Eval("scalar tensor is missing its cell".to_owned()))?
                         .object()
                         .as_expr(cx)?,
                 ],
             }),
-            1 => Ok(Expr::Vector(exprs(cx, &self.data)?)),
+            1 => Ok(Expr::Vector(exprs(cx, &cells)?)),
             2 => {
                 let width = self.shape[1];
-                let rows = self
-                    .data
-                    .chunks(width)
-                    .map(|row| exprs(cx, row).map(Expr::Vector))
-                    .collect::<Result<Vec<_>>>()?;
+                let rows = if width == 0 {
+                    vec![Expr::Vector(Vec::new()); self.shape[0]]
+                } else {
+                    cells
+                        .chunks(width)
+                        .map(|row| exprs(cx, row).map(Expr::Vector))
+                        .collect::<Result<Vec<_>>>()?
+                };
                 Ok(Expr::Vector(rows))
             }
             _ => Ok(Expr::Call {
@@ -200,7 +315,7 @@ impl sim_kernel::ObjectCompat for Tensor {
                             .collect(),
                     ),
                     Expr::Symbol(self.dtype.clone()),
-                    Expr::Vector(exprs(cx, &self.data)?),
+                    Expr::Vector(exprs(cx, &cells)?),
                 ],
             }),
         }
@@ -212,7 +327,7 @@ impl sim_kernel::ObjectCompat for Tensor {
                 .map(|dim| cx.factory().string(dim.to_string()))
                 .collect::<Result<Vec<_>>>()?,
         )?;
-        let data = cx.factory().list(self.data.clone())?;
+        let data = cx.factory().list(self.cells()?.to_vec())?;
         cx.factory().table(vec![
             (
                 Symbol::new("kind"),
@@ -243,6 +358,7 @@ impl NumberValue for Tensor {
 
 impl ObjectEncode for Tensor {
     fn object_encoding(&self, cx: &mut Cx) -> Result<ObjectEncoding> {
+        let cells = self.cells()?;
         Ok(ObjectEncoding::Constructor {
             class: tensor_value_class_symbol(),
             args: vec![
@@ -258,7 +374,7 @@ impl ObjectEncode for Tensor {
                         })
                         .collect(),
                 ),
-                Expr::List(exprs(cx, &self.data)?),
+                Expr::List(exprs(cx, &cells)?),
                 Expr::Symbol(self.dtype.clone()),
             ],
         })
@@ -317,9 +433,9 @@ pub fn tensor_dtype(tensor: &Tensor) -> &Symbol {
     tensor.dtype()
 }
 
-/// Clones a tensor's row-major cell values as a flat vector.
-pub fn flatten_tensor_scalar_cells(tensor: &Tensor) -> Vec<Value> {
-    tensor.data().to_vec()
+/// Observes a tensor's row-major scalar cells as a shared flat slice.
+pub fn flatten_tensor_scalar_cells(tensor: &Tensor) -> Result<Arc<[Value]>> {
+    tensor.cells()
 }
 
 pub fn tensor_display_name() -> &'static str {
@@ -330,198 +446,4 @@ fn exprs(cx: &mut Cx, data: &[Value]) -> Result<Vec<Expr>> {
     data.iter()
         .map(|value| value.object().as_expr(cx))
         .collect()
-}
-
-use crate::spec::checked_element_count;
-
-fn validate_shape_and_data_len(shape: &[usize], data_len: usize) -> Result<()> {
-    let expected = checked_element_count(shape)?;
-    if data_len != expected {
-        return Err(Error::Eval(format!(
-            "tensor shape {:?} expects {expected} cells, found {data_len}",
-            shape
-        )));
-    }
-    if data_len == 0 {
-        return Err(Error::Eval("tensor requires at least one cell".to_owned()));
-    }
-    Ok(())
-}
-
-fn validate_cells(cx: &mut Cx, data: &[Value]) -> Result<()> {
-    for cell in data {
-        let Some(number) = cx.number_value_ref(cell.clone())? else {
-            return Err(Error::Eval(
-                "tensor cells must all be scalar number values".to_owned(),
-            ));
-        };
-        if number.domain == number_domain() {
-            return Err(Error::Eval(
-                "tensor cells must be scalar numbers, not nested tensors".to_owned(),
-            ));
-        }
-    }
-    Ok(())
-}
-
-fn validate_dtype_accepts_cells(cx: &mut Cx, dtype: &Symbol, data: &[Value]) -> Result<()> {
-    let domains = cell_domains(cx, data)?;
-    if domains
-        .iter()
-        .all(|domain| promotion_cost(cx, domain, dtype).is_some())
-    {
-        return Ok(());
-    }
-    Err(Error::Eval(format!(
-        "tensor dtype {dtype} is not a valid join for cell domains {domains:?}"
-    )))
-}
-
-fn validate_exact_cell_dtype(dtype: &Symbol, data: &[Value]) -> Result<()> {
-    let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
-    for cell in data {
-        let Some(number) = cell.object().as_number_value() else {
-            return Err(Error::Eval(
-                "tensor cells must all be scalar number values".to_owned(),
-            ));
-        };
-        let domain = number.number_domain(&mut cx)?;
-        if domain == number_domain() {
-            return Err(Error::Eval(
-                "tensor cells must be scalar numbers, not nested tensors".to_owned(),
-            ));
-        }
-        if &domain != dtype {
-            return Err(Error::Eval(format!(
-                "tensor dtype {dtype} does not match cell domain {domain}"
-            )));
-        }
-    }
-    Ok(())
-}
-
-fn choose_dtype(cx: &mut Cx, dtype_hint: Option<Symbol>, data: &[Value]) -> Result<Symbol> {
-    if data.is_empty() {
-        return Err(Error::Eval("tensor requires at least one cell".to_owned()));
-    }
-    let domains = cell_domains(cx, data)?;
-    if domains.is_empty() {
-        return Err(Error::Eval("tensor requires at least one cell".to_owned()));
-    }
-    if let Some(dtype) = dtype_hint {
-        if domains
-            .iter()
-            .all(|domain| promotion_cost(cx, domain, &dtype).is_some())
-        {
-            return Ok(dtype);
-        }
-        return Err(Error::Eval(format!(
-            "tensor dtype {dtype} is not a valid join for cell domains {domains:?}"
-        )));
-    }
-    let candidates = cx
-        .registry()
-        .number_domains()
-        .keys()
-        .filter(|symbol| **symbol != number_domain())
-        .cloned()
-        .collect::<Vec<_>>();
-    let mut best = None::<(u32, Symbol)>;
-    for candidate in candidates {
-        let mut total = 0u32;
-        let mut valid = true;
-        for domain in &domains {
-            let Some(cost) = promotion_cost(cx, domain, &candidate) else {
-                valid = false;
-                break;
-            };
-            total += cost;
-        }
-        if !valid {
-            continue;
-        }
-        match &best {
-            Some((best_cost, best_symbol))
-                if total > *best_cost || (total == *best_cost && candidate >= *best_symbol) => {}
-            _ => best = Some((total, candidate)),
-        }
-    }
-    best.map(|(_, symbol)| symbol).ok_or_else(|| {
-        Error::Eval(format!(
-            "no join domain exists for tensor cells {domains:?}"
-        ))
-    })
-}
-
-fn cell_domains(cx: &mut Cx, data: &[Value]) -> Result<Vec<Symbol>> {
-    data.iter()
-        .map(|value| {
-            cx.number_value_ref(value.clone())?
-                .map(|number| number.domain)
-                .ok_or_else(|| {
-                    Error::Eval("tensor cells must all be scalar number values".to_owned())
-                })
-        })
-        .collect()
-}
-
-fn promotion_cost(cx: &Cx, from: &Symbol, to: &Symbol) -> Option<u32> {
-    if from == to {
-        return Some(0);
-    }
-
-    #[derive(Clone, Eq, PartialEq)]
-    struct State {
-        cost: u32,
-        symbol: Symbol,
-    }
-
-    impl Ord for State {
-        fn cmp(&self, other: &Self) -> Ordering {
-            other
-                .cost
-                .cmp(&self.cost)
-                .then_with(|| other.symbol.cmp(&self.symbol))
-        }
-    }
-
-    impl PartialOrd for State {
-        fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-            Some(self.cmp(other))
-        }
-    }
-
-    let mut best = BTreeMap::<Symbol, u32>::new();
-    let mut heap = BinaryHeap::new();
-    best.insert(from.clone(), 0);
-    heap.push(State {
-        cost: 0,
-        symbol: from.clone(),
-    });
-
-    while let Some(State { cost, symbol }) = heap.pop() {
-        if &symbol == to {
-            return Some(cost);
-        }
-        if best.get(&symbol).copied().unwrap_or(u32::MAX) < cost {
-            continue;
-        }
-        for rule in cx
-            .registry()
-            .value_promotion_rules()
-            .iter()
-            .filter(|rule| rule.from_domain == symbol)
-        {
-            let next = cost + rule.cost as u32;
-            let entry = best.entry(rule.to_domain.clone()).or_insert(u32::MAX);
-            if next < *entry {
-                *entry = next;
-                heap.push(State {
-                    cost: next,
-                    symbol: rule.to_domain.clone(),
-                });
-            }
-        }
-    }
-    None
 }

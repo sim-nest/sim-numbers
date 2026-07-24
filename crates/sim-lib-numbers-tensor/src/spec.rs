@@ -1,9 +1,10 @@
 //! The `SpecTensor` interface and descriptor types that let specialized
-//! element-type backends convert to and from the uniform `Tensor` storage, plus
-//! literal-cell parsing helpers shared across those backends.
+//! element-type backends expose typed views over the uniform `Tensor` storage,
+//! plus literal-cell parsing helpers shared across those backends.
 
 use std::sync::Arc;
 
+use half::{bf16, f16};
 use sim_kernel::{
     Cx, DefaultFactory, Factory, NoopEvalPolicy, NumberLiteral, Result, Symbol, Value,
 };
@@ -12,20 +13,22 @@ use crate::Tensor;
 use sim_lib_numbers_core::domains;
 
 /// Interface a specialized element-type tensor backend implements to bridge its
-/// own storage and the uniform [`Tensor`] value.
+/// typed view and the uniform [`Tensor`] value.
 ///
-/// Typed backends (for example dense `f64` or `i64` tensors) keep their own
-/// packed representation and use this trait to convert to and from the shared
-/// uniform storage the `numbers/tensor` domain operates on.
+/// Typed backends (for example dense `f64` or `i64` tensors) wrap the canonical
+/// `Tensor` value and use typed [`TensorStorage`](crate::TensorStorage)
+/// implementations for their native cells. Conversions should clone that
+/// canonical tensor when storage already matches the backend, preserving shared
+/// storage identity for runtime projection and Citizen round-trips.
 pub trait SpecTensor: Send + Sync + 'static {
     /// The length of each axis of the specialized tensor, outermost first.
     fn shape(&self) -> &[usize];
     /// The element number domain (dtype) of the specialized tensor's cells.
     fn dtype(&self) -> Symbol;
-    /// Converts this specialized tensor into the uniform [`Tensor`] storage.
+    /// Returns the canonical uniform [`Tensor`] backing this typed view.
     fn to_uniform(&self) -> Tensor;
-    /// Rebuilds a specialized tensor from uniform storage, or `None` if the
-    /// uniform tensor's dtype or shape does not fit this backend.
+    /// Rebuilds a specialized tensor view from uniform storage, or `None` if
+    /// the uniform tensor's dtype or shape does not fit this backend.
     fn from_uniform(tensor: &Tensor) -> Option<Self>
     where
         Self: Sized;
@@ -193,6 +196,35 @@ pub fn parse_f64_literal_cell(value: &Value) -> Option<f64> {
     let literal = number_literal_for_tensor_cell(value)?;
     (literal.domain == domains::f64())
         .then(|| literal.canonical.parse::<f64>().ok())
+        .flatten()
+}
+
+/// Parses a tensor cell as an `f32`, returning `None` unless it is a number in
+/// the `numbers/f32` domain whose canonical form parses cleanly.
+pub fn parse_f32_literal_cell(value: &Value) -> Option<f32> {
+    let literal = number_literal_for_tensor_cell(value)?;
+    (literal.domain == domains::f32())
+        .then(|| literal.canonical.parse::<f32>().ok())
+        .flatten()
+}
+
+/// Parses a tensor cell as an IEEE half-precision value, returning `None`
+/// unless it is a number in the `numbers/f16` domain whose canonical f32-form
+/// text parses cleanly.
+pub fn parse_f16_literal_cell(value: &Value) -> Option<f16> {
+    let literal = number_literal_for_tensor_cell(value)?;
+    (literal.domain == domains::f16())
+        .then(|| literal.canonical.parse::<f32>().ok().map(f16::from_f32))
+        .flatten()
+}
+
+/// Parses a tensor cell as a bfloat16 value, returning `None` unless it is a
+/// number in the `numbers/bf16` domain whose canonical f32-form text parses
+/// cleanly.
+pub fn parse_bf16_literal_cell(value: &Value) -> Option<bf16> {
+    let literal = number_literal_for_tensor_cell(value)?;
+    (literal.domain == domains::bf16())
+        .then(|| literal.canonical.parse::<f32>().ok().map(bf16::from_f32))
         .flatten()
 }
 

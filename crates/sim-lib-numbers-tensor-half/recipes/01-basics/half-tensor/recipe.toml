@@ -1,0 +1,8 @@
+id = "half-tensor"
+title = "Half tensor descriptors"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "tensor", "f16", "bf16", "sandbox-descriptor"]
+requires = ["numbers/tensor-half", "codec/lisp"]

@@ -1,0 +1,8 @@
+id = "f32-tensor"
+title = "F32 tensor descriptor"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "tensor", "f32", "sandbox-descriptor"]
+requires = ["numbers/tensor-f32", "codec/lisp"]

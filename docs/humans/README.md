@@ -19,6 +19,9 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries. |
+| `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
+| `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
+| `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
 
 ## Surfaces
 
@@ -27,6 +30,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | `cli/xtask` | `cli` | `crate/xtask` |
 | `docs/sim-numbers/generated` | `docs` | `doc-set/sim-numbers/generated` |
 | `site/sim-lib-numbers-f64` | `site` | `crate/sim-lib-numbers-f64` |
+| `site/sim-lib-numbers-tensor` | `site` | `crate/sim-lib-numbers-tensor` |
 
 ## Recipes
 
@@ -181,11 +185,21 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/recipe.toml`
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/book.toml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/purpose.md`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/recipe.toml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/setup.siml`
+- `crates/sim-lib-numbers-tensor-f32/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/purpose.md`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/recipe.toml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/01-basics/f64-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-f64/recipes/book.toml`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/purpose.md`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/recipe.toml`
+- `crates/sim-lib-numbers-tensor-half/recipes/01-basics/half-tensor/setup.siml`
+- `crates/sim-lib-numbers-tensor-half/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor-i64/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-tensor-i64/recipes/01-basics/i64-tensor/purpose.md`
 - `crates/sim-lib-numbers-tensor-i64/recipes/01-basics/i64-tensor/recipe.toml`
@@ -202,9 +216,15 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor-rat64/recipes/01-basics/rat64-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-rat64/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/purpose.md`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/setup.siml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/purpose.md`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/setup.siml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/purpose.md`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/recipe.toml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/setup.siml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/purpose.md`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/recipe.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/setup.siml`
@@ -466,6 +486,1982 @@ sim_citizen::inventory::submit! {
         arity: 3,
         install: install_tensor_value_citizen,
         conformance: conformance_tensor_value_citizen,
+    }
+}
+```
+
+### `feature/sim-numbers/tensors`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-tensor/src/implementation/citizen.rs`:
+
+```rust
+//! The tensor value class as a runtime citizen: its class registration and the
+//! read-constructor that reconstructs tensor values from encoded form.
+
+use std::sync::Arc;
+use std::sync::atomic::{AtomicU32, Ordering};
+
+use sim_citizen::{arity_error, decode_version};
+use sim_kernel::{
+    Args, Callable, Class, ClassId, ClassRef, Cx, DefaultFactory, Error, Expr, Factory, Linker,
+    Object, ReadConstructor, ReadConstructorRef, Result, ShapeRef, Symbol, TableRef, Value,
+    force_list_to_vec,
+};
+use sim_lib_numbers_core::domains;
+
+use super::{dimension::extract_dims, domain::number_domain, value::build_tensor_value};
+
+/// The symbol naming the tensor value class (`numbers/Tensor`) under which
+/// tensor values register and reconstruct.
+pub fn tensor_value_class_symbol() -> Symbol {
+    domains::tensor_value_class()
+}
+
+fn value_shape_symbol() -> Symbol {
+    sim_lib_numbers_core::value_shape_symbol(&number_domain())
+}
+
+struct TensorValueClass {
+    id: AtomicU32,
+}
+
+impl TensorValueClass {
+    fn new() -> Self {
+        Self {
+            id: AtomicU32::new(0),
+        }
+    }
+
+    fn set_id(&self, id: ClassId) {
+        self.id.store(id.0, Ordering::Relaxed);
+    }
+}
+
+impl Object for TensorValueClass {
+    fn display(&self, _cx: &mut Cx) -> Result<String> {
+        Ok(format!("#<class {}>", tensor_value_class_symbol()))
+    }
+
+    fn as_any(&self) -> &dyn std::any::Any {
+        self
+    }
+}
+
+impl sim_kernel::ObjectCompat for TensorValueClass {
+    fn class(&self, cx: &mut Cx) -> Result<ClassRef> {
+        if let Some(value) = cx
+            .registry()
+            .class_by_symbol(&Symbol::qualified("core", "Class"))
+        {
+            return Ok(value.clone());
+        }
+        DefaultFactory.class_stub(
+            sim_kernel::CORE_CLASS_CLASS_ID,
+            Symbol::qualified("core", "Class"),
+        )
+    }
+
+    fn as_expr(&self, _cx: &mut Cx) -> Result<Expr> {
+        Ok(Expr::Symbol(tensor_value_class_symbol()))
+    }
+
+    fn as_callable(&self) -> Option<&dyn Callable> {
+        Some(self)
+    }
+
+    fn as_class(&self) -> Option<&dyn Class> {
+        Some(self)
+    }
+
+    fn as_read_constructor(&self) -> Option<&dyn ReadConstructor> {
+        Some(self)
+    }
+}
+
+impl Callable for TensorValueClass {
+    fn call(&self, cx: &mut Cx, args: Args) -> Result<Value> {
+        let values = args.into_vec();
+        let [version, shape, data, domain] = values.as_slice() else {
+            return Err(arity_error(tensor_value_class_symbol(), 4, values.len()));
+        };
+        decode_version(cx, version.clone(), 1, tensor_value_class_symbol())?;
+        let shape = extract_dims(cx, shape, "numbers/Tensor shape")?;
+        let data = decode_data(cx, data)?;
+        let domain = decode_domain(cx, domain)?;
+        if domain == number_domain() {
+            return Err(Error::Eval(
+                "numbers/Tensor domain field must name a scalar number domain".to_owned(),
+            ));
+        }
+        build_tensor_value(cx, shape, Some(domain), data)
+    }
+}
+
+impl Class for TensorValueClass {
+    fn id(&self) -> ClassId {
+        ClassId(self.id.load(Ordering::Relaxed))
+    }
+
+    fn symbol(&self) -> Symbol {
+        tensor_value_class_symbol()
+    }
+
+    fn constructor_shape(&self, cx: &mut Cx) -> Result<ShapeRef> {
+        cx.factory().nil()
+    }
+
+    fn instance_shape(&self, cx: &mut Cx) -> Result<ShapeRef> {
+        Ok(cx
+            .registry()
+            .shape_by_symbol(&value_shape_symbol())
+            .cloned()
+            .unwrap_or(cx.factory().symbol(value_shape_symbol())?))
+    }
+
+    fn read_constructor(&self, cx: &mut Cx) -> Result<Option<ReadConstructorRef>> {
+        Ok(cx
+            .registry()
+            .class_by_symbol(&tensor_value_class_symbol())
+            .cloned())
+    }
+
+    fn members(&self, cx: &mut Cx) -> Result<TableRef> {
+        cx.factory().table(vec![
+            (
+                Symbol::new("version"),
+                cx.factory()
+                    .number_literal(Symbol::qualified("citizen", "int"), "1".to_owned())?,
+            ),
+            (
+                Symbol::new("fields"),
+                cx.factory().list(vec![
+                    cx.factory().symbol(Symbol::new("shape"))?,
+                    cx.factory().symbol(Symbol::new("data"))?,
+                    cx.factory().symbol(Symbol::new("domain"))?,
+                ])?,
+            ),
+        ])
+    }
+}
+
+impl ReadConstructor for TensorValueClass {
+    fn symbol(&self) -> Symbol {
+        tensor_value_class_symbol()
+    }
+
+    fn args_shape(&self, cx: &mut Cx) -> Result<ShapeRef> {
+        cx.factory().nil()
+    }
+
+    fn construct_read(&self, cx: &mut Cx, args: Vec<Value>) -> Result<Value> {
+        if args.len() != 4 {
+            return Err(arity_error(tensor_value_class_symbol(), 4, args.len()));
+        }
+        self.call(cx, Args::new(args))
+    }
+}
+
+fn decode_data(cx: &mut Cx, value: &Value) -> Result<Vec<Value>> {
+    let list = value
+        .object()
+        .as_list()
+        .ok_or_else(|| Error::Eval("numbers/Tensor data field must be a list".to_owned()))?;
+    force_list_to_vec(cx, list, "numbers/Tensor data")
+}
+
+fn decode_domain(cx: &mut Cx, value: &Value) -> Result<Symbol> {
+    match value.object().as_expr(cx)? {
+        Expr::Symbol(symbol) => Ok(symbol),
+        _ => Err(Error::Eval(
+            "numbers/Tensor domain field must be a symbol".to_owned(),
+        )),
+    }
+}
+
+pub(crate) fn register_tensor_value_class(linker: &mut Linker<'_>) -> Result<()> {
+    let class = Arc::new(TensorValueClass::new());
+    let id = linker.class_value(
+        tensor_value_class_symbol(),
+        DefaultFactory
+            .opaque(class.clone())
+            .expect("tensor value class should be boxable"),
+    )?;
+    class.set_id(id);
+    Ok(())
+}
+
+fn install_tensor_value_citizen(linker: &mut Linker<'_>) -> Result<()> {
+    register_tensor_value_class(linker)
+}
+
+fn conformance_tensor_value_citizen(cx: &mut Cx) -> Result<()> {
+    let dtype = domains::i64();
+    let value = build_tensor_value(
+        cx,
+        vec![2],
+        Some(dtype.clone()),
+        vec![i64_cell("1")?, i64_cell("2")?],
+    )?;
+    sim_citizen::check_value_fixture_with_wrong_version(
+        cx,
+        value,
+        Some(vec![
+            Expr::Symbol(Symbol::new("v999")),
+            Expr::List(vec![int_expr("2")]),
+            Expr::List(vec![
+                Expr::Number(sim_kernel::NumberLiteral {
+                    domain: dtype.clone(),
+                    canonical: "1".to_owned(),
+                }),
+                Expr::Number(sim_kernel::NumberLiteral {
+                    domain: dtype.clone(),
+                    canonical: "2".to_owned(),
+                }),
+            ]),
+            Expr::Symbol(dtype),
+        ]),
+    )
+}
+
+fn i64_cell(canonical: &str) -> Result<Value> {
+    DefaultFactory.number_literal(domains::i64(), canonical.to_owned())
+}
+
+fn int_expr(canonical: &str) -> Expr {
+    Expr::Number(sim_kernel::NumberLiteral {
+        domain: Symbol::qualified("citizen", "int"),
+        canonical: canonical.to_owned(),
+    })
+}
+
+sim_citizen::inventory::submit! {
+    sim_citizen::CitizenInfo {
+        symbol: "numbers/Tensor",
+        version: 1,
+        crate_name: env!("CARGO_PKG_NAME"),
+        arity: 3,
+        install: install_tensor_value_citizen,
+        conformance: conformance_tensor_value_citizen,
+    }
+}
+```
+
+### `feature/sim-numbers/tensor-execution`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/tests/execution` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-tensor/src/tests/execution.rs`:
+
+```rust
+use std::sync::Arc;
+
+use sim_kernel::{
+    CapabilityName, Consistency, Error, EvalFabric, EvalMode, EvalRequest, Expr, NumberLiteral,
+    Symbol, Value, realize_final,
+};
+use sim_shape::{ExprKind, ExprKindShape, shape_value};
+
+// conformance: tensor execution site
+
+use crate::{
+    CpuTensorExecutor, TensorExecution, TensorExecutor, TensorMeta, TensorOp, TensorRequest,
+    TensorSite, add_op_symbol, build_tensor_value, reshape_op_symbol, tensor_execute_capability,
+    tensor_executor_symbol, tensor_site_symbol, tensor_value_ref,
+};
+
+use super::test_cx;
+
+fn int_expr(canonical: &str) -> Expr {
+    Expr::Number(NumberLiteral {
+        domain: Symbol::qualified("citizen", "int"),
+        canonical: canonical.to_owned(),
+    })
+}
+
+fn i64_expr(canonical: &str) -> Expr {
+    Expr::Number(NumberLiteral {
+        domain: Symbol::qualified("numbers", "i64"),
+        canonical: canonical.to_owned(),
+    })
+}
+
+fn call(symbol: &str, args: Vec<Expr>) -> Expr {
+    Expr::Call {
+        operator: Box::new(Expr::Symbol(Symbol::new(symbol))),
+        args,
+    }
+}
+
+fn reshape_expr() -> Expr {
+    call(
+        "reshape",
+        vec![
+            call(
+                "vec",
+                vec![i64_expr("1"), i64_expr("2"), i64_expr("3"), i64_expr("4")],
+            ),
+            Expr::Vector(vec![int_expr("2"), int_expr("2")]),
+        ],
+    )
+}
+
+fn request(expr: Expr, required_capabilities: Vec<CapabilityName>) -> EvalRequest {
+    EvalRequest {
+        expr,
+        result_shape: None,
+        required_capabilities,
+        deadline: None,
+        consistency: Consistency::LocalFirst,
+        mode: EvalMode::Eval,
+        answer_limit: None,
+        stream_buffer: None,
+        stream: false,
+        trace: false,
+    }
+}
+
+fn tensor_cells_expr(cx: &mut sim_kernel::Cx, value: &Value) -> Vec<Expr> {
+    let tensor = tensor_value_ref(value).expect("tensor value");
+    tensor
+        .cells()
+        .unwrap()
+        .iter()
+        .map(|cell| cell.object().as_expr(cx).unwrap())
+        .collect()
+}
+
+fn assert_same_tensor(cx: &mut sim_kernel::Cx, left: &Value, right: &Value) {
+    let left_tensor = tensor_value_ref(left).expect("left tensor");
+    let right_tensor = tensor_value_ref(right).expect("right tensor");
+    assert_eq!(left_tensor.shape(), right_tensor.shape());
+    assert_eq!(left_tensor.dtype(), right_tensor.dtype());
+    assert_eq!(tensor_cells_expr(cx, left), tensor_cells_expr(cx, right));
+}
+
+fn tensor_cell_exprs(cx: &mut sim_kernel::Cx, tensor: &crate::Tensor) -> Vec<Expr> {
+    tensor
+        .cells()
+        .unwrap()
+        .iter()
+        .map(|cell| cell.object().as_expr(cx).unwrap())
+        .collect()
+}
+
+#[test]
+fn cpu_executor_reshapes_using_current_tensor_semantics() {
+    let mut cx = test_cx();
+    let source_value = cx
+        .eval_expr(call("vec", vec![i64_expr("1"), i64_expr("2")]))
+        .unwrap();
+    let source_tensor = tensor_value_ref(&source_value).unwrap().clone();
+    let op = TensorOp::without_attributes(&mut cx, reshape_op_symbol()).unwrap();
+    let request = TensorRequest::new(
+        op,
+        vec![source_tensor],
+        TensorMeta::new(vec![2, 1], Symbol::qualified("numbers", "i64")),
+    );
+
+    let result = CpuTensorExecutor::new().execute(&mut cx, request).unwrap();
+
+    let TensorExecution::Complete(tensor) = result else {
+        panic!("cpu executor must complete reshape");
+    };
+    assert_eq!(tensor.shape(), &[2, 1]);
+    assert_eq!(tensor.dtype(), &Symbol::qualified("numbers", "i64"));
+}
+
+#[test]
+fn cpu_executor_adds_with_broadcast_metadata() {
+    let mut cx = test_cx();
+    let left = tensor_value_ref(
+        &build_tensor_value(
+            &mut cx,
+            vec![2, 1],
+            Some(Symbol::qualified("numbers", "i64")),
+            vec![super::number("i64", "1"), super::number("i64", "2")],
+        )
+        .unwrap(),
+    )
+    .unwrap()
+    .clone();
+    let right = tensor_value_ref(
+        &build_tensor_value(
+            &mut cx,
+            vec![1, 3],
+            Some(Symbol::qualified("numbers", "i64")),
+            vec![
+                super::number("i64", "10"),
+                super::number("i64", "20"),
+                super::number("i64", "30"),
+            ],
+        )
+        .unwrap(),
+    )
+    .unwrap()
+    .clone();
+    let op = TensorOp::without_attributes(&mut cx, add_op_symbol()).unwrap();
+
+    let result = CpuTensorExecutor::new()
+        .execute(
+            &mut cx,
+            TensorRequest::new(
+                op,
+                vec![left, right],
+                TensorMeta::new(vec![2, 3], Symbol::qualified("numbers", "i64")),
+            ),
+        )
+        .unwrap();
+
+    let TensorExecution::Complete(tensor) = result else {
+        panic!("cpu executor must complete element-wise add");
+    };
+    assert_eq!(tensor.shape(), &[2, 3]);
+    assert_eq!(
+        tensor_cell_exprs(&mut cx, &tensor),
+        vec![
+            i64_expr("11"),
+            i64_expr("21"),
+            i64_expr("31"),
+            i64_expr("12"),
+            i64_expr("22"),
+            i64_expr("32"),
+        ]
+    );
+}
+
+#[test]
+fn tensor_site_realized_cpu_matches_direct_cpu_executor() {
+    let mut cx = test_cx();
+    let source_value = cx
+        .eval_expr(call(
+            "vec",
+            vec![i64_expr("1"), i64_expr("2"), i64_expr("3"), i64_expr("4")],
+        ))
+        .unwrap();
+    let source_tensor = tensor_value_ref(&source_value).unwrap().clone();
+    let op = TensorOp::without_attributes(&mut cx, reshape_op_symbol()).unwrap();
+    let direct = match CpuTensorExecutor::new()
+        .execute(
+            &mut cx,
+            TensorRequest::new(
+                op,
+                vec![source_tensor],
+                TensorMeta::new(vec![2, 2], Symbol::qualified("numbers", "i64")),
+            ),
+        )
+        .unwrap()
+    {
+        TensorExecution::Complete(tensor) => {
+            cx.factory().opaque(std::sync::Arc::new(tensor)).unwrap()
+        }
+        TensorExecution::Unsupported { reason } => panic!("unexpected unsupported: {reason}"),
+    };
+
+    let site = TensorSite::local_cpu();
+    let realized = realize_final(&mut cx, &site, request(reshape_expr(), Vec::new()))
+        .unwrap()
+        .value;
+
+    assert_same_tensor(&mut cx, &direct, &realized);
+}
+
+#[test]
+fn tensor_site_checks_capabilities_and_restores_parent_env() {
+    let mut cx = test_cx();
+    assert!(cx.env().get(&tensor_executor_symbol()).is_none());
+    let site = TensorSite::local_cpu();
+    let denied = match site.realize(
+        &mut cx,
+        request(reshape_expr(), vec![tensor_execute_capability()]),
+    ) {
+        Ok(_) => panic!("tensor site must deny missing tensor execution capability"),
+        Err(error) => error,
+    };
+    assert!(matches!(
+        denied,
+        Error::CapabilityDenied { capability } if capability == tensor_execute_capability()
+    ));
+    assert!(cx.env().get(&tensor_executor_symbol()).is_none());
+
+    cx.grant(tensor_execute_capability());
+    let reply = site
+        .realize(
+            &mut cx,
+            request(
+                Expr::Symbol(tensor_executor_symbol()),
+                vec![tensor_execute_capability()],
+            ),
+        )
+        .unwrap();
+    assert!(
+        reply
+            .value
+            .object()
+            .display(&mut cx)
+            .unwrap()
+            .contains("tensor-executor")
+    );
+    assert!(cx.env().get(&tensor_executor_symbol()).is_none());
+}
+
+#[test]
+fn tensor_site_checks_result_shape_and_restores_parent_env() {
+    let mut cx = test_cx();
+    let site = TensorSite::local_cpu();
+    let mut request = request(reshape_expr(), Vec::new());
+    request.result_shape = Some(shape_value(
+        Symbol::qualified("test", "bool-result"),
+        Arc::new(ExprKindShape::new(ExprKind::Bool)),
+    ));
+
+    let error = match site.realize(&mut cx, request) {
+        Ok(_) => panic!("tensor site must reject a mismatched result shape"),
+        Err(error) => error,
+    };
+
+    assert!(matches!(error, Error::WrongShape { .. }));
+    assert!(cx.env().get(&tensor_executor_symbol()).is_none());
+}
+
+#[test]
+fn tensor_numbers_lib_exports_tensor_site() {
+    let cx = test_cx();
+    let site = cx
+        .registry()
+        .site_by_symbol(&tensor_site_symbol())
+        .expect("tensor site export");
+    assert!(site.object().as_eval_fabric().is_some());
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor-bcast/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-tensor-bcast/src/tests.rs`:
+
+```rust
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
+};
+
+use sim_kernel::{
+    Args, CapabilityName, Consistency, Cx, DefaultFactory, EagerPolicy, Error, EvalFabric,
+    EvalMode, EvalRequest, Expr, Factory, NumberLiteral, Symbol, read_construct_capability,
+};
+use sim_lib_numbers_tensor::{
+    CpuTensorExecutor, SubmissionEvidence, TensorExecError, TensorExecution, TensorExecutor,
+    TensorExecutorCard, TensorRequest, TensorSite, add_op_symbol, build_tensor_value,
+    tensor_value_class_symbol, tensor_value_ref,
+};
+
+use crate::TensorBroadcastLib;
+
+fn test_cx() -> Cx {
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_rational::RationalNumbersLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_tensor::TensorNumbersLib::new())
+        .unwrap();
+    cx.load_lib(&TensorBroadcastLib::new()).unwrap();
+    cx
+}
+
+fn number(canonical: &str) -> sim_kernel::Value {
+    DefaultFactory
+        .number_literal(Symbol::qualified("numbers", "i64"), canonical.to_owned())
+        .unwrap()
+}
+
+fn i64_expr(canonical: &str) -> Expr {
+    Expr::Number(NumberLiteral {
+        domain: Symbol::qualified("numbers", "i64"),
+        canonical: canonical.to_owned(),
+    })
+}
+
+fn call(symbol: &str, args: Vec<Expr>) -> Expr {
+    Expr::Call {
+        operator: Box::new(Expr::Symbol(Symbol::new(symbol))),
+        args,
+    }
+}
+
+fn symbol(value: Symbol) -> sim_kernel::Value {
+    DefaultFactory.symbol(value).unwrap()
+}
+
+fn shape_value(dims: &[&str]) -> sim_kernel::Value {
+    DefaultFactory
+        .list(
+            dims.iter()
+                .map(|dim| {
+                    DefaultFactory
+                        .number_literal(Symbol::qualified("citizen", "int"), (*dim).to_owned())
+                        .unwrap()
+                })
+                .collect(),
+        )
+        .unwrap()
+}
+
+fn data_value(cells: Vec<sim_kernel::Value>) -> sim_kernel::Value {
+    DefaultFactory.list(cells).unwrap()
+}
+
+// conformance: tensor broadcast element-wise execution routes through TensorExecutor.
+
+fn tensor_cells(cx: &mut Cx, value: &sim_kernel::Value) -> Vec<String> {
+    tensor_value_ref(value)
+        .expect("tensor value")
+        .cells()
+        .unwrap()
+        .iter()
+        .map(|cell| match cell.object().as_expr(cx).unwrap() {
+            Expr::Number(NumberLiteral { canonical, .. }) => canonical,
+            other => panic!("expected number cell, found {other:?}"),
+        })
+        .collect()
+}
+
+fn eval_request(expr: Expr) -> EvalRequest {
+    EvalRequest {
+        expr,
+        result_shape: None,
+        required_capabilities: Vec::new(),
+        deadline: None,
+        consistency: Consistency::LocalFirst,
+        mode: EvalMode::Eval,
+        answer_limit: None,
+        stream_buffer: None,
+        stream: false,
+        trace: false,
+    }
+}
+
+#[derive(Clone)]
+struct CountingExecutor {
+    calls: Arc<AtomicUsize>,
+}
+
+impl CountingExecutor {
+    fn new(calls: Arc<AtomicUsize>) -> Self {
+        Self { calls }
+    }
+}
+
+impl TensorExecutor for CountingExecutor {
+    fn card(&self) -> TensorExecutorCard {
+        TensorExecutorCard::new(
+            Symbol::qualified("test", "counting-executor"),
+            "counting",
+            Symbol::qualified("core", "local-fabric"),
+            vec![add_op_symbol()],
+            None,
+        )
+    }
+
+    fn execute(
+        &self,
+        cx: &mut Cx,
+        request: TensorRequest,
+    ) -> std::result::Result<TensorExecution, TensorExecError> {
+        self.calls.fetch_add(1, Ordering::SeqCst);
+        assert_eq!(request.operation.symbol, add_op_symbol());
+        CpuTensorExecutor::new().execute(cx, request)
+    }
+
+    fn flush(&self) -> std::result::Result<SubmissionEvidence, TensorExecError> {
+        CpuTensorExecutor::new().flush()
+    }
+}
+
+#[derive(Clone)]
+struct DecliningExecutor;
+
+impl TensorExecutor for DecliningExecutor {
+    fn card(&self) -> TensorExecutorCard {
+        TensorExecutorCard::new(
+            Symbol::qualified("test", "declining-executor"),
+            "declining",
+            Symbol::qualified("test", "device"),
+            vec![add_op_symbol()],
+            Some(CapabilityName::new("test.device")),
+        )
+    }
+
+    fn execute(
+        &self,
+        _cx: &mut Cx,
+        _request: TensorRequest,
+    ) -> std::result::Result<TensorExecution, TensorExecError> {
+        Ok(TensorExecution::Unsupported {
+            reason: Arc::from("device declines boxed mixed-number tensors"),
+        })
+    }
+
+    fn flush(&self) -> std::result::Result<SubmissionEvidence, TensorExecError> {
+        Ok(SubmissionEvidence::new(self.card().symbol, 0))
+    }
+}
+
+#[test]
+fn scalar_plus_vector_broadcasts() {
+    let mut cx = test_cx();
+    let vector = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![number("1"), number("2"), number("3")]),
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![number("1"), vector]))
+        .unwrap();
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Vector(vec![
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "2".to_owned(),
+            }),
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "3".to_owned(),
+            }),
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "4".to_owned(),
+            }),
+        ])
+    );
+}
+
+#[test]
+fn matrix_plus_vector_broadcasts_trailing_axis() {
+    let mut cx = test_cx();
+    let rows = cx
+        .factory()
+        .list(vec![
+            cx.factory().list(vec![number("1"), number("2")]).unwrap(),
+            cx.factory().list(vec![number("3"), number("4")]).unwrap(),
+        ])
+        .unwrap();
+    let matrix = cx
+        .call_function(&Symbol::new("mat"), Args::new(vec![rows]))
+        .unwrap();
+    let vector = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![number("10"), number("20")]),
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![matrix, vector]))
+        .unwrap();
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Vector(vec![
+            Expr::Vector(vec![
+                Expr::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "i64"),
+                    canonical: "11".to_owned(),
+                }),
+                Expr::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "i64"),
+                    canonical: "22".to_owned(),
+                }),
+            ]),
+            Expr::Vector(vec![
+                Expr::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "i64"),
+                    canonical: "13".to_owned(),
+                }),
+                Expr::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "i64"),
+                    canonical: "24".to_owned(),
+                }),
+            ]),
+        ])
+    );
+}
+
+#[test]
+fn rank_three_broadcast_matches_manual_cells() {
+    let mut cx = test_cx();
+    let left = build_tensor_value(
+        &mut cx,
+        vec![2, 1, 3],
+        Some(Symbol::qualified("numbers", "i64")),
+        ["1", "2", "3", "4", "5", "6"]
+            .into_iter()
+            .map(number)
+            .collect(),
+    )
+    .unwrap();
+    let right = build_tensor_value(
+        &mut cx,
+        vec![1, 4, 1],
+        Some(Symbol::qualified("numbers", "i64")),
+        ["10", "20", "30", "40"].into_iter().map(number).collect(),
+    )
+    .unwrap();
+
+    let out = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![left, right]))
+        .unwrap();
+    let tensor = tensor_value_ref(&out).unwrap();
+
+    assert_eq!(tensor.shape(), &[2, 4, 3]);
+    assert_eq!(
+        tensor_cells(&mut cx, &out),
+        vec![
+            "11", "12", "13", "21", "22", "23", "31", "32", "33", "41", "42", "43", "14", "15",
+            "16", "24", "25", "26", "34", "35", "36", "44", "45", "46",
+        ]
+    );
+}
+
+#[test]
+fn zero_extent_broadcast_preserves_empty_result() {
+    let mut cx = test_cx();
+    let empty = build_tensor_value(
+        &mut cx,
+        vec![0],
+        Some(Symbol::qualified("numbers", "i64")),
+        Vec::new(),
+    )
+    .unwrap();
+    let unit = build_tensor_value(
+        &mut cx,
+        vec![1],
+        Some(Symbol::qualified("numbers", "i64")),
+        vec![number("9")],
+    )
+    .unwrap();
+
+    let out = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![empty, unit]))
+        .unwrap();
+    let tensor = tensor_value_ref(&out).unwrap();
+
+    assert_eq!(tensor.shape(), &[0]);
+    assert!(tensor.cells().unwrap().is_empty());
+}
+
+#[test]
+fn repeated_operand_alias_uses_stable_source_cells() {
+    let mut cx = test_cx();
+    let vector = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![number("2"), number("3"), number("4")]),
+        )
+        .unwrap();
+
+    let out = cx
+        .call_function(&Symbol::new("*"), Args::new(vec![vector.clone(), vector]))
+        .unwrap();
+
+    assert_eq!(tensor_cells(&mut cx, &out), vec!["4", "9", "16"]);
+}
+
+#[test]
+fn incompatible_broadcast_shapes_error_before_execution() {
+    let mut cx = test_cx();
+    let left = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![number("1"), number("2")]),
+        )
+        .unwrap();
+    let right = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![number("3"), number("4"), number("5")]),
+        )
+        .unwrap();
+
+    let err = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![left, right]))
+        .unwrap_err();
+
+    assert!(err.to_string().contains("cannot broadcast"));
+}
+
+#[test]
+fn active_env_executor_receives_elementwise_request() {
+    let mut cx = test_cx();
+    let calls = Arc::new(AtomicUsize::new(0));
+    let site = TensorSite::new(
+        Symbol::qualified("test", "tensor-counting-site"),
+        Arc::new(CountingExecutor::new(calls.clone())),
+        Vec::new(),
+    );
+    let reply = site
+        .realize(
+            &mut cx,
+            eval_request(call(
+                "+",
+                vec![
+                    i64_expr("1"),
+                    call("vec", vec![i64_expr("2"), i64_expr("3")]),
+                ],
+            )),
+        )
+        .unwrap();
+
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    assert_eq!(tensor_cells(&mut cx, &reply.value), vec!["3", "4"]);
+}
+
+#[test]
+fn active_device_decline_returns_unsupported_error() {
+    let mut cx = test_cx();
+    cx.grant(CapabilityName::new("test.device"));
+    let site = TensorSite::new(
+        Symbol::qualified("test", "tensor-declining-site"),
+        Arc::new(DecliningExecutor),
+        vec![CapabilityName::new("test.device")],
+    );
+
+    let err = match site.realize(
+        &mut cx,
+        eval_request(call(
+            "+",
+            vec![
+                call("vec", vec![i64_expr("1"), i64_expr("2")]),
+                call("vec", vec![i64_expr("3"), i64_expr("4")]),
+            ],
+        )),
+    ) {
+        Ok(_) => panic!("declining executor must fail the realized expression"),
+        Err(error) => error,
+    };
+
+    assert!(matches!(err, Error::Eval(_)));
+    assert!(err.to_string().contains("device declines"));
+}
+
+#[test]
+fn broadcast_ops_accept_tensor_citizen_values() {
+    let mut cx = test_cx();
+    cx.grant(read_construct_capability());
+    let vector = cx
+        .read_construct(
+            &tensor_value_class_symbol(),
+            vec![
+                symbol(Symbol::new("v1")),
+                shape_value(&["3"]),
+                data_value(vec![number("1"), number("2"), number("3")]),
+                symbol(Symbol::qualified("numbers", "i64")),
+            ],
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![number("1"), vector]))
+        .unwrap();
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Vector(vec![
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "2".to_owned(),
+            }),
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "3".to_owned(),
+            }),
+            Expr::Number(NumberLiteral {
+                domain: Symbol::qualified("numbers", "i64"),
+                canonical: "4".to_owned(),
+            }),
+        ])
+    );
+}
+
+#[test]
+fn broadcast_result_over_cell_ceiling_errors_instead_of_oom() {
+    let mut cx = test_cx();
+    let i64_domain = Symbol::qualified("numbers", "i64");
+    // Two individually-legal operands (~1M cells each) whose broadcast is a
+    // 1e12-cell shape: it fits in usize but must be rejected before the result
+    // is materialized rather than driven into an out-of-memory abort.
+    let cell = number("1");
+    let column = build_tensor_value(
+        &mut cx,
+        vec![1_000_000, 1],
+        Some(i64_domain.clone()),
+        vec![cell.clone(); 1_000_000],
+    )
+    .unwrap();
+    let row = build_tensor_value(
+        &mut cx,
+        vec![1, 1_000_000],
+        Some(i64_domain),
+        vec![cell; 1_000_000],
+    )
+    .unwrap();
+    let err = cx
+        .call_function(&Symbol::new("+"), Args::new(vec![column, row]))
+        .unwrap_err();
+    let message = err.to_string();
+    assert!(
+        message.contains("cells") && message.contains("exceeding"),
+        "expected a cell-ceiling diagnostic, got: {message}"
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor-linalg/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-tensor-linalg/src/tests.rs`:
+
+```rust
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
+};
+
+use sim_kernel::{
+    Args, Consistency, Cx, DefaultFactory, EagerPolicy, EvalFabric, EvalMode, EvalRequest, Expr,
+    Factory, NumberLiteral, Symbol, read_construct_capability,
+};
+use sim_lib_numbers_arith::NumbersArithmeticLib;
+use sim_lib_numbers_cas::CasNumbersLib;
+use sim_lib_numbers_i64::I64NumbersLib;
+use sim_lib_numbers_tensor::{
+    CpuTensorExecutor, SubmissionEvidence, TensorExecError, TensorExecution, TensorExecutor,
+    TensorExecutorCard, TensorNumbersLib, TensorRequest, TensorSite, matmul_exec_op_symbol,
+    tensor_value_class_symbol, tensor_value_ref,
+};
+use sim_lib_numbers_tensor_bcast::TensorBroadcastLib;
+
+use crate::TensorLinalgLib;
+
+// conformance: tensor linalg executor routing covers reductions and matrix math.
+
+fn cx() -> Cx {
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    cx.load_lib(&TensorNumbersLib::new()).unwrap();
+    cx.load_lib(&TensorBroadcastLib::new()).unwrap();
+    cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
+    cx.load_lib(&I64NumbersLib::new()).unwrap();
+    cx.load_lib(&CasNumbersLib::new()).unwrap();
+    cx.load_lib(&TensorLinalgLib::new()).unwrap();
+    cx
+}
+
+fn i64_num(text: &str) -> sim_kernel::Value {
+    DefaultFactory
+        .number_literal(Symbol::qualified("numbers", "i64"), text.to_owned())
+        .unwrap()
+}
+
+fn symbol(value: Symbol) -> sim_kernel::Value {
+    DefaultFactory.symbol(value).unwrap()
+}
+
+fn shape_value(dims: &[&str]) -> sim_kernel::Value {
+    DefaultFactory
+        .list(
+            dims.iter()
+                .map(|dim| {
+                    DefaultFactory
+                        .number_literal(Symbol::qualified("citizen", "int"), (*dim).to_owned())
+                        .unwrap()
+                })
+                .collect(),
+        )
+        .unwrap()
+}
+
+fn data_value(cells: Vec<sim_kernel::Value>) -> sim_kernel::Value {
+    DefaultFactory.list(cells).unwrap()
+}
+
+fn eval_request(expr: Expr) -> EvalRequest {
+    EvalRequest {
+        expr,
+        result_shape: None,
+        required_capabilities: Vec::new(),
+        deadline: None,
+        consistency: Consistency::LocalFirst,
+        mode: EvalMode::Eval,
+        answer_limit: None,
+        stream_buffer: None,
+        stream: false,
+        trace: false,
+    }
+}
+
+fn cas_var(cx: &mut Cx, symbol: &str) -> sim_kernel::Value {
+    cx.call_function(
+        &Symbol::qualified("cas", "var"),
+        Args::new(vec![DefaultFactory.symbol(Symbol::new(symbol)).unwrap()]),
+    )
+    .unwrap()
+}
+
+#[derive(Clone)]
+struct CountingExecutor {
+    calls: Arc<AtomicUsize>,
+}
+
+impl TensorExecutor for CountingExecutor {
+    fn card(&self) -> TensorExecutorCard {
+        TensorExecutorCard::new(
+            Symbol::qualified("test", "linalg-counting-executor"),
+            "counting",
+            Symbol::qualified("core", "local-fabric"),
+            vec![matmul_exec_op_symbol()],
+            None,
+        )
+    }
+
+    fn execute(
+        &self,
+        cx: &mut Cx,
+        request: TensorRequest,
+    ) -> std::result::Result<TensorExecution, TensorExecError> {
+        if request.operation.symbol == matmul_exec_op_symbol() {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+        }
+        CpuTensorExecutor::new().execute(cx, request)
+    }
+
+    fn flush(&self) -> std::result::Result<SubmissionEvidence, TensorExecError> {
+        CpuTensorExecutor::new().flush()
+    }
+}
+
+#[test]
+fn dot_and_eye_surface_work() {
+    let mut cx = cx();
+    let left = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![i64_num("1"), i64_num("2"), i64_num("3")]),
+        )
+        .unwrap();
+    let right = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![i64_num("4"), i64_num("5"), i64_num("6")]),
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("dot"), Args::new(vec![left, right]))
+        .unwrap();
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "32".to_owned(),
+        })
+    );
+
+    let eye = cx
+        .call_function(&Symbol::new("eye"), Args::new(vec![i64_num("2")]))
+        .unwrap();
+    let matrix = cx
+        .call_function(
+            &Symbol::new("mat"),
+            Args::new(vec![
+                cx.factory()
+                    .list(vec![
+                        cx.factory().list(vec![i64_num("7"), i64_num("8")]).unwrap(),
+                        cx.factory()
+                            .list(vec![i64_num("9"), i64_num("10")])
+                            .unwrap(),
+                    ])
+                    .unwrap(),
+            ]),
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("matmul"), Args::new(vec![eye, matrix.clone()]))
+        .unwrap();
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        matrix.object().as_expr(&mut cx).unwrap()
+    );
+}
+
+#[test]
+fn matmul_routes_through_active_tensor_executor() {
+    let mut cx = cx();
+    let calls = Arc::new(AtomicUsize::new(0));
+    let site = TensorSite::new(
+        Symbol::qualified("test", "linalg-counting-site"),
+        Arc::new(CountingExecutor {
+            calls: calls.clone(),
+        }),
+        Vec::new(),
+    );
+    let expr = Expr::Call {
+        operator: Box::new(Expr::Symbol(Symbol::new("matmul"))),
+        args: vec![
+            Expr::Call {
+                operator: Box::new(Expr::Symbol(Symbol::new("mat"))),
+                args: vec![Expr::Vector(vec![
+                    Expr::Vector(vec![Expr::Number(NumberLiteral {
+                        domain: Symbol::qualified("numbers", "i64"),
+                        canonical: "1".to_owned(),
+                    })]),
+                    Expr::Vector(vec![Expr::Number(NumberLiteral {
+                        domain: Symbol::qualified("numbers", "i64"),
+                        canonical: "2".to_owned(),
+                    })]),
+                ])],
+            },
+            Expr::Call {
+                operator: Box::new(Expr::Symbol(Symbol::new("vec"))),
+                args: vec![Expr::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "i64"),
+                    canonical: "3".to_owned(),
+                })],
+            },
+        ],
+    };
+
+    let reply = site.realize(&mut cx, eval_request(expr)).unwrap();
+
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    let tensor = tensor_value_ref(&reply.value).unwrap();
+    assert_eq!(tensor.shape(), &[2]);
+}
+
+#[test]
+fn reductions_and_transcendentals_have_checked_cpu_contracts() {
+    let mut cx = cx();
+    let vector = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![i64_num("3"), i64_num("4")]),
+        )
+        .unwrap();
+    let sum = cx
+        .call_function(&Symbol::new("sum"), Args::new(vec![vector.clone()]))
+        .unwrap();
+    assert_eq!(
+        sum.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "7".to_owned(),
+        })
+    );
+
+    let norm = cx
+        .call_function(&Symbol::new("norm"), Args::new(vec![vector.clone()]))
+        .unwrap();
+    assert_eq!(
+        norm.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "5".to_owned(),
+        })
+    );
+
+    let roots = cx
+        .call_function(&Symbol::new("sqrt"), Args::new(vec![vector]))
+        .unwrap();
+    assert_eq!(
+        tensor_value_ref(&roots).unwrap().dtype(),
+        &Symbol::qualified("numbers", "f32")
+    );
+}
+
+#[test]
+fn tile_local_phase_arguments_use_tensor_math_not_interference_ops() {
+    let mut cx = cx();
+    let phase = cx
+        .call_function(&Symbol::new("vec"), Args::new(vec![i64_num("0")]))
+        .unwrap();
+
+    let sine = cx
+        .call_function(&Symbol::new("sin"), Args::new(vec![phase.clone()]))
+        .unwrap();
+    let cosine = cx
+        .call_function(&Symbol::new("cos"), Args::new(vec![phase]))
+        .unwrap();
+
+    assert_eq!(
+        tensor_value_ref(&sine).unwrap().cells().unwrap()[0]
+            .object()
+            .as_expr(&mut cx)
+            .unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "0".to_owned(),
+        })
+    );
+    assert_eq!(
+        tensor_value_ref(&cosine).unwrap().cells().unwrap()[0]
+            .object()
+            .as_expr(&mut cx)
+            .unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "1".to_owned(),
+        })
+    );
+    assert!(
+        cx.call_function(
+            &Symbol::qualified("interference", "solve"),
+            Args::new(Vec::new())
+        )
+        .is_err()
+    );
+}
+
+#[test]
+fn zeros_with_oversized_shape_errors_instead_of_oom() {
+    let mut cx = cx();
+    let err = cx
+        .call_function(
+            &Symbol::new("zeros"),
+            Args::new(vec![shape_value(&["1000000000000"])]),
+        )
+        .unwrap_err();
+    let message = err.to_string();
+    assert!(
+        message.contains("cells") && message.contains("exceeding"),
+        "expected a cell-ceiling diagnostic, got: {message}"
+    );
+}
+
+#[test]
+fn det_of_large_matrix_uses_elimination_and_returns_promptly() {
+    let mut cx = cx();
+    // A 20x20 upper-triangular matrix with 2 on the diagonal: determinant is
+    // 2^20 = 1048576. Cofactor expansion would need ~20! operations and hang;
+    // the Bareiss elimination path returns immediately.
+    let n = 20usize;
+    let mut rows = Vec::with_capacity(n);
+    for i in 0..n {
+        let mut row = Vec::with_capacity(n);
+        for j in 0..n {
+            let entry = if i == j {
+                "2"
+            } else if j > i {
+                "1"
+            } else {
+                "0"
+            };
+            row.push(i64_num(entry));
+        }
+        rows.push(cx.factory().list(row).unwrap());
+    }
+    let grid = cx.factory().list(rows).unwrap();
+    let matrix = cx
+        .call_function(&Symbol::new("mat"), Args::new(vec![grid]))
+        .unwrap();
+    let start = std::time::Instant::now();
+    let out = cx
+        .call_function(&Symbol::new("det"), Args::new(vec![matrix]))
+        .unwrap();
+    assert!(
+        start.elapsed() < std::time::Duration::from_secs(5),
+        "det of a 20x20 matrix must return promptly"
+    );
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "1048576".to_owned(),
+        })
+    );
+}
+
+#[test]
+fn symbolic_matmul_yields_symbolic_cells() {
+    let mut cx = cx();
+    let a = cas_var(&mut cx, "a");
+    let b = cas_var(&mut cx, "b");
+    let c = cas_var(&mut cx, "c");
+    let d = cas_var(&mut cx, "d");
+    let left = cx
+        .call_function(
+            &Symbol::new("mat"),
+            Args::new(vec![
+                cx.factory()
+                    .list(vec![
+                        cx.factory().list(vec![a, b]).unwrap(),
+                        cx.factory().list(vec![c, d]).unwrap(),
+                    ])
+                    .unwrap(),
+            ]),
+        )
+        .unwrap();
+    let x = cas_var(&mut cx, "x");
+    let y = cas_var(&mut cx, "y");
+    let right = cx
+        .call_function(
+            &Symbol::new("mat"),
+            Args::new(vec![
+                cx.factory()
+                    .list(vec![
+                        cx.factory().list(vec![x]).unwrap(),
+                        cx.factory().list(vec![y]).unwrap(),
+                    ])
+                    .unwrap(),
+            ]),
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("matmul"), Args::new(vec![left, right]))
+        .unwrap();
+    let expr = out.object().as_expr(&mut cx).unwrap();
+    match expr {
+        Expr::Vector(rows) => assert_eq!(rows.len(), 2),
+        other => panic!("expected symbolic matrix result, got {other:?}"),
+    }
+}
+
+#[test]
+fn linalg_ops_accept_tensor_citizen_values() {
+    let mut cx = cx();
+    cx.grant(read_construct_capability());
+    let left = cx
+        .read_construct(
+            &tensor_value_class_symbol(),
+            vec![
+                symbol(Symbol::new("v1")),
+                shape_value(&["3"]),
+                data_value(vec![i64_num("1"), i64_num("2"), i64_num("3")]),
+                symbol(Symbol::qualified("numbers", "i64")),
+            ],
+        )
+        .unwrap();
+    let right = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![i64_num("4"), i64_num("5"), i64_num("6")]),
+        )
+        .unwrap();
+    let out = cx
+        .call_function(&Symbol::new("dot"), Args::new(vec![left, right]))
+        .unwrap();
+    assert_eq!(
+        out.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "32".to_owned(),
+        })
+    );
+}
+```
+
+### `feature/sim-numbers/numeric-pipelines`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-numeric/src/pipeline_run.rs`:
+
+```rust
+//! Execution for first-class composed numeric pipeline values.
+
+use std::{collections::BTreeMap, sync::Arc};
+
+use sim_kernel::{Args, Cx, Error, Expr, Result, Symbol, Value, value_from_ref};
+use sim_lib_numbers_core::domains;
+
+use super::{
+    options::parse_symbolish_value,
+    pipeline::{ComposedPipeline, PipelineKind, StateKind},
+    registry::global_numeric_registry,
+    traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
+};
+
+pub fn call_numeric_run_composed(cx: &mut Cx, args: Args) -> Result<Value> {
+    let values = args.into_vec();
+    let input = RunComposedInput::from_values(cx, &values)?;
+    match input.pipeline.kind.clone() {
+        PipelineKind::OdeSolve => run_ode_composed(cx, input),
+        PipelineKind::Quadrature => run_quad_composed(cx, input),
+    }
+}
+
+pub fn call_numeric_run_composed_exprs(cx: &mut Cx, args: Vec<Expr>) -> Result<Value> {
+    let values = args
+        .into_iter()
+        .map(|expr| eval_run_arg(cx, expr))
+        .collect::<Result<Vec<_>>>()?;
+    let input = RunComposedInput::from_values(cx, &values)?;
+    match input.pipeline.kind.clone() {
+        PipelineKind::OdeSolve => run_ode_composed(cx, input),
+        PipelineKind::Quadrature => run_quad_composed(cx, input),
+    }
+}
+
+struct RunComposedInput {
+    pipeline: ComposedPipeline,
+    args: RunArgs,
+}
+
+enum RunArgs {
+    Ode {
+        t0: Value,
+        t1: Value,
+        y0: Value,
+        dt: f64,
+    },
+    Quadrature {
+        a: Value,
+        b: Value,
+        n: Option<usize>,
+        tol: Option<f64>,
+    },
+}
+
+impl RunComposedInput {
+    fn from_values(cx: &mut Cx, values: &[Value]) -> Result<Self> {
+        let Some((pipeline_value, rest)) = values.split_first() else {
+            return Err(Error::Eval(
+                "numeric/run-composed expects a pipeline and run arguments".to_owned(),
+            ));
+        };
+        let pipeline = require_composed_pipeline(pipeline_value)?;
+        match pipeline.kind.clone() {
+            PipelineKind::OdeSolve => Self::ode_from_values(cx, pipeline, rest),
+            PipelineKind::Quadrature => Self::quad_from_values(cx, pipeline, rest),
+        }
+    }
+
+    fn ode_from_values(cx: &mut Cx, pipeline: ComposedPipeline, values: &[Value]) -> Result<Self> {
+        let args = match values {
+            [t0, t1, y0, dt] => RunArgs::Ode {
+                t0: t0.clone(),
+                t1: t1.clone(),
+                y0: y0.clone(),
+                dt: value_to_f64(cx, dt, "numeric/run-composed :dt")?,
+            },
+            keyed if keyed.len().is_multiple_of(2) => ode_args_from_keyed(cx, keyed)?,
+            _ => {
+                return Err(Error::Eval(
+                    "numeric/run-composed expects pipeline, t0, t1, y0, dt or keyword pairs"
+                        .to_owned(),
+                ));
+            }
+        };
+        Ok(Self { pipeline, args })
+    }
+
+    fn quad_from_values(cx: &mut Cx, pipeline: ComposedPipeline, values: &[Value]) -> Result<Self> {
+        let args = match values {
+            [a, b, n] => RunArgs::Quadrature {
+                a: a.clone(),
+                b: b.clone(),
+                n: Some(value_to_usize(cx, n, "numeric/run-composed :n")?),
+                tol: None,
+            },
+            keyed if keyed.len().is_multiple_of(2) => quad_args_from_keyed(cx, keyed)?,
+            _ => {
+                return Err(Error::Eval(
+                    "numeric/run-composed quadrature expects a, b, n or keyword pairs".to_owned(),
+                ));
+            }
+        };
+        Ok(Self { pipeline, args })
+    }
+}
+
+fn ode_args_from_keyed(cx: &mut Cx, values: &[Value]) -> Result<RunArgs> {
+    let options = keyed_run_options(cx, values)?;
+    reject_unknown_run_keys(&options, &["t0", "t1", "y0", "dt"])?;
+    Ok(RunArgs::Ode {
+        t0: require_run_value(&options, "t0")?.clone(),
+        t1: require_run_value(&options, "t1")?.clone(),
+        y0: require_run_value(&options, "y0")?.clone(),
+        dt: value_to_f64(
+            cx,
+            require_run_value(&options, "dt")?,
+            "numeric/run-composed :dt",
+        )?,
+    })
+}
+
+fn quad_args_from_keyed(cx: &mut Cx, values: &[Value]) -> Result<RunArgs> {
+    let options = keyed_run_options(cx, values)?;
+    reject_unknown_run_keys(&options, &["a", "b", "n", "tol"])?;
+    let n = options
+        .get("n")
+        .map(|value| value_to_usize(cx, value, "numeric/run-composed :n"))
+        .transpose()?;
+    let tol = options
+        .get("tol")
+        .map(|value| value_to_f64(cx, value, "numeric/run-composed :tol"))
+        .transpose()?;
+    if n.is_some() == tol.is_some() {
+        return Err(Error::Eval(
+            "numeric/run-composed quadrature expects exactly one of :n or :tol".to_owned(),
+        ));
+    }
+    Ok(RunArgs::Quadrature {
+        a: require_run_value(&options, "a")?.clone(),
+        b: require_run_value(&options, "b")?.clone(),
+        n,
+        tol,
+    })
+}
+
+fn keyed_run_options(cx: &mut Cx, values: &[Value]) -> Result<BTreeMap<String, Value>> {
+    let mut options = BTreeMap::<String, Value>::new();
+    for pair in values.chunks(2) {
+        let [key, value] = pair else {
+            unreachable!("chunks over even input yield pairs");
+        };
+        let symbol = parse_symbolish_value(cx, key)?.ok_or_else(|| {
+            Error::Eval("numeric/run-composed expected keyword argument".to_owned())
+        })?;
+        options.insert(keyword_name(&symbol), value.clone());
+    }
+    Ok(options)
+}
+
+fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
+    let RunComposedInput { pipeline, args } = input;
+    ensure_f64_state(&pipeline)?;
+    let RunArgs::Ode { t0, t1, y0, dt } = args else {
+        unreachable!("ODE pipeline parser builds ODE run args");
+    };
+    let func_value = value_from_ref(cx, &pipeline.func_ref)?;
+    let dy = NumericCallable::sampled_binary(func_value, Symbol::new("x"), Symbol::new("y"))?;
+    let method = resolve_ode_method(&pipeline.method);
+    let plugin = {
+        let registry = global_numeric_registry()
+            .read()
+            .map_err(|_| Error::PoisonedLock("numeric registry"))?;
+        registry
+            .ode_fixed(&method)
+            .or_else(|| registry.ode_adaptive(&method))
+    };
+    let Some(plugin) = plugin else {
+        return Err(Error::Eval(format!(
+            "UnknownNumericMethod: ode method {method}"
+        )));
+    };
+    let plugin_kind = plugin.kind();
+    let tol = if plugin_kind == NumericKind::OdeAdaptive {
+        Some(1.0e-8)
+    } else {
+        None
+    };
+    let points = plugin.solve(
+        cx,
+        OdeProblem {
+            dy: &dy,
+            var: &dy.vars()[0],
+            y_var: &dy.vars()[1],
+            x0: &t0,
+            y0: &y0,
+            x_end: &t1,
+        },
+        OdeOpts {
+            method: method.clone(),
+            h: Some(dt),
+            tol,
+            max_steps: None,
+        },
+    )?;
+    let steps = points.len().saturating_sub(1);
+    let steps_value = if plugin_kind == NumericKind::OdeAdaptive {
+        cx.factory()
+            .number_literal(domains::f64(), tol.unwrap_or(1.0e-8).to_string())?
+    } else {
+        cx.factory()
+            .number_literal(domains::i64(), steps.to_string())?
+    };
+    let value = points
+        .last()
+        .map(|(_, y)| y.clone())
+        .ok_or_else(|| Error::Eval("numeric/run-composed solver returned no points".to_owned()))?;
+    cx.factory().table(vec![
+        (Symbol::new("value"), value),
+        (Symbol::new("method"), cx.factory().symbol(method)?),
+        (
+            Symbol::new("domain"),
+            cx.factory().symbol(pipeline.kind.symbol())?,
+        ),
+        (
+            Symbol::new("state-kind"),
+            cx.factory().symbol(pipeline.state.symbol())?,
+        ),
+        (Symbol::new("steps"), steps_value),
+    ])
+}
+
+fn run_quad_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
+    let RunComposedInput { pipeline, args } = input;
+    ensure_f64_state(&pipeline)?;
+    let RunArgs::Quadrature { a, b, n, tol } = args else {
+        unreachable!("quadrature pipeline parser builds quadrature run args");
+    };
+    let func_value = value_from_ref(cx, &pipeline.func_ref)?;
+    let func = NumericCallable::sampled_unary(func_value, Symbol::new("x"))?;
+    let selection = select_quad_plugin(&pipeline.method, n, tol)?;
+    let value = selection.plugin.integrate(
+        cx,
+        &func,
+        &func.vars()[0],
+        &a,
+        &b,
+        QuadOpts {
+            method: selection.method.clone(),
+            n,
+            tol,
+        },
+    )?;
+    let mut entries = vec![
+        (Symbol::new("value"), value),
+        (
+            Symbol::new("method"),
+            cx.factory().symbol(selection.method.clone())?,
+        ),
+        (
+            Symbol::new("domain"),
+            cx.factory().symbol(pipeline.kind.symbol())?,
+        ),
+        (
+            Symbol::new("state-kind"),
+            cx.factory().symbol(pipeline.state.symbol())?,
+        ),
+    ];
+    if let Some(n) = n {
+        entries.push((
+            Symbol::new("n"),
+            cx.factory().number_literal(domains::i64(), n.to_string())?,
+        ));
+    }
+    if let Some(tol) = tol {
+        entries.push((
+            Symbol::new("tol"),
+            cx.factory()
+                .number_literal(domains::f64(), tol.to_string())?,
+        ));
+    }
+    cx.push_info(format!(
+        "numeric/run-composed method={} domain={:?}",
+        selection.method, selection.kind
+    ));
+    cx.factory().table(entries)
+}
+
+fn require_composed_pipeline(value: &Value) -> Result<ComposedPipeline> {
+    value
+        .object()
+        .downcast_ref::<ComposedPipeline>()
+        .cloned()
+        .ok_or_else(|| Error::Eval("numeric/run-composed expects a ComposedPipeline".to_owned()))
+}
+
+fn require_run_value<'a>(options: &'a BTreeMap<String, Value>, key: &str) -> Result<&'a Value> {
+    options
+        .get(key)
+        .ok_or_else(|| Error::Eval(format!("numeric/run-composed missing :{key}")))
+}
+
+fn reject_unknown_run_keys(options: &BTreeMap<String, Value>, allowed: &[&str]) -> Result<()> {
+    for key in options.keys() {
+        if !allowed.contains(&key.as_str()) {
+            return Err(Error::Eval(format!(
+                "numeric/run-composed: unknown option :{key}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn eval_run_arg(cx: &mut Cx, expr: Expr) -> Result<Value> {
+    match &expr {
+        Expr::Symbol(symbol) if symbol.name.starts_with(':') => cx.factory().symbol(symbol.clone()),
+        _ => cx.eval_expr(expr),
+    }
+}
+
+fn value_to_f64(cx: &mut Cx, value: &Value, context: &str) -> Result<f64> {
+    value
+        .object()
+        .display(cx)?
+        .parse::<f64>()
+        .map_err(|_| Error::Eval(format!("{context} expected an f64-compatible value")))
+}
+
+fn value_to_usize(cx: &mut Cx, value: &Value, context: &str) -> Result<usize> {
+    value
+        .object()
+        .display(cx)?
+        .parse::<usize>()
+        .map_err(|_| Error::Eval(format!("{context} expected a non-negative integer")))
+}
+
+fn resolve_ode_method(method: &Symbol) -> Symbol {
+    if *method == Symbol::new("auto") {
+        Symbol::new("rkf45")
+    } else {
+        method.clone()
+    }
+}
+
+fn ensure_f64_state(pipeline: &ComposedPipeline) -> Result<()> {
+    if pipeline.state == StateKind::F64 {
+        Ok(())
+    } else {
+        Err(Error::Eval("NotYetSupported: tensor state".to_owned()))
+    }
+}
+
+struct QuadSelection {
+    method: Symbol,
+    kind: NumericKind,
+    plugin: Arc<dyn Quadrature>,
+}
+
+fn select_quad_plugin(
+    method: &Symbol,
+    n: Option<usize>,
+    tol: Option<f64>,
+) -> Result<QuadSelection> {
+    let method = resolve_quad_method(method, n, tol);
+    let registry = global_numeric_registry()
+        .read()
+        .map_err(|_| Error::PoisonedLock("numeric registry"))?;
+    let fixed = registry.quadrature_fixed(&method);
+    let adaptive = registry.quadrature_adaptive(&method);
+    match (n.is_some(), tol.is_some(), fixed, adaptive) {
+        (true, false, Some(plugin), _) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureFixed,
+            plugin,
+        }),
+        (false, true, _, Some(plugin)) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureAdaptive,
+            plugin,
+        }),
+        (false, false, Some(plugin), _) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureFixed,
+            plugin,
+        }),
+        (false, false, None, Some(plugin)) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureAdaptive,
+            plugin,
+        }),
+        (false, false, None, None) => Err(unknown_numeric_method("quadrature", &method)),
+        (true, true, _, _) => Err(Error::Eval(
+            "numeric/run-composed quadrature expects either :n or :tol, not both".to_owned(),
+        )),
+        (true, false, None, _) => Err(Error::Eval(format!(
+            "quadrature method {method} does not accept :n"
+        ))),
+        (false, true, _, None) => Err(Error::Eval(format!(
+            "quadrature method {method} does not accept :tol"
+        ))),
+    }
+}
+
+fn resolve_quad_method(method: &Symbol, n: Option<usize>, tol: Option<f64>) -> Symbol {
+    if *method != Symbol::new("auto") {
+        return method.clone();
+    }
+    if tol.is_some() && n.is_none() {
+        Symbol::new("adaptive-gauss-kronrod")
+    } else {
+        Symbol::new("simpson")
+    }
+}
+
+fn keyword_name(symbol: &Symbol) -> String {
+    symbol
+        .name
+        .strip_prefix(':')
+        .unwrap_or(&symbol.name)
+        .to_owned()
+}
+
+fn unknown_numeric_method(kind: &str, method: &Symbol) -> Error {
+    Error::Eval(format!("UnknownNumericMethod: {kind} method {method}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use sim_kernel::{DefaultFactory, EagerPolicy, Ref};
+
+    use super::*;
+
+    fn test_cx() -> Cx {
+        Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+    }
+
+    fn pipeline_value(cx: &mut Cx, kind: PipelineKind, state: StateKind) -> Value {
+        cx.factory()
+            .opaque(Arc::new(ComposedPipeline::new(
+                Ref::Symbol(Symbol::new("test-func")),
+                kind,
+                Symbol::new("auto"),
+                state,
+            )))
+            .expect("pipeline value")
+    }
+
+    fn symbol_value(cx: &mut Cx, name: &str) -> Value {
+        cx.factory()
+            .symbol(Symbol::new(name))
+            .expect("symbol value")
+    }
+
+    fn number_value(cx: &mut Cx, domain: Symbol, canonical: &str) -> Value {
+        cx.factory()
+            .number_literal(domain, canonical.to_owned())
+            .expect("number value")
+    }
+
+    // conformance: numeric pipeline execution parses composed run inputs.
+    #[test]
+    fn numeric_pipeline_run_parses_keyword_arguments() {
+        let mut cx = test_cx();
+        let values = vec![
+            pipeline_value(&mut cx, PipelineKind::Quadrature, StateKind::F64),
+            symbol_value(&mut cx, ":a"),
+            number_value(&mut cx, domains::f64(), "0.0"),
+            symbol_value(&mut cx, ":b"),
+            number_value(&mut cx, domains::f64(), "1.0"),
+            symbol_value(&mut cx, ":n"),
+            number_value(&mut cx, domains::i64(), "4"),
+        ];
+
+        let input = RunComposedInput::from_values(&mut cx, &values).expect("parsed run input");
+        assert_eq!(input.pipeline.kind, PipelineKind::Quadrature);
+        assert_eq!(input.pipeline.state, StateKind::F64);
+        let RunArgs::Quadrature { n, tol, .. } = input.args else {
+            panic!("expected quadrature args");
+        };
+        assert_eq!(n, Some(4));
+        assert_eq!(tol, None);
+    }
+
+    #[test]
+    fn numeric_pipeline_tensor_state_fails_closed() {
+        let pipeline = ComposedPipeline::new(
+            Ref::Symbol(Symbol::new("test-func")),
+            PipelineKind::OdeSolve,
+            Symbol::new("rk4"),
+            StateKind::Tensor,
+        );
+
+        let err = ensure_f64_state(&pipeline).expect_err("tensor state fails closed");
+        assert!(err.to_string().contains("tensor state"), "{err}");
     }
 }
 ```

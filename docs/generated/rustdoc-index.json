@@ -160,7 +160,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-tensor/Cargo.toml",
       "package": "sim-lib-numbers-tensor",
-      "summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into."
+      "summary": "The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into. Tensor shape and dtype stay canonical while the open TensorStorage contract supplies boxed host or loadable resident storage. Observation through Tensor::cell, Tensor::cells, and Tensor::materialize is checked so encoding and projection report resident readback failures."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_bcast",
@@ -184,11 +184,25 @@
       "summary": "Complex-float tensor specialization: a (real, imag) f64-pair tensor element type and its SpecTensor backend for the complex tensor domain."
     },
     {
+      "crate_name": "sim_lib_numbers_tensor_f32",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-f32/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-f32",
+      "summary": "f32 tensor specialization: a contiguous f32 tensor element type and its SpecTensor backend for the f32 tensor domain."
+    },
+    {
       "crate_name": "sim_lib_numbers_tensor_f64",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
       "package": "sim-lib-numbers-tensor-f64",
       "summary": "f64 tensor specialization: a contiguous f64 tensor element type and its SpecTensor backend for the f64 tensor domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_half",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-half/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-half",
+      "summary": "Half-precision tensor specialization: contiguous f16 and bf16 element types with CPU arithmetic widened to f32."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_i64",
@@ -202,7 +216,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-tensor-linalg/Cargo.toml",
       "package": "sim-lib-numbers-tensor-linalg",
-      "summary": "Linear-algebra operations over the tensor domain: dot, matmul, cross, transpose, det, inv, trace, norm, and the eye/zeros/ones constructors, registered as a tensor library."
+      "summary": "Reductions, linear-algebra operations, f32/f64 transcendentals, and constructors over the tensor domain, registered as a tensor library."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_rat64",

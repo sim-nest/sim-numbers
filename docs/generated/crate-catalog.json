@@ -1,6 +1,6 @@
 {
   "generator": "xtask crate-catalog v1",
-  "package_count": 31,
+  "package_count": 33,
   "packages": [
     {
       "description": "Forward and reverse automatic-differentiation primitives for SIM numeric code.",
@@ -329,6 +329,19 @@
       ]
     },
     {
+      "description": "Contiguous f32 tensor specialization with native element-wise math.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-f32/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-f32",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-f32/README.md",
+      "root": "crates/sim-lib-numbers-tensor-f32",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
       "description": "Contiguous f64 tensor specialization with native element-wise math.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-tensor-f64/Cargo.toml",
@@ -336,6 +349,19 @@
       "publish": "true",
       "readme": "crates/sim-lib-numbers-tensor-f64/README.md",
       "root": "crates/sim-lib-numbers-tensor-f64",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Contiguous f16 and bf16 tensor specializations with f32-widened CPU math.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-tensor-half/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-half",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-half/README.md",
+      "root": "crates/sim-lib-numbers-tensor-half",
       "target_kinds": [
         "custom-build",
         "lib"

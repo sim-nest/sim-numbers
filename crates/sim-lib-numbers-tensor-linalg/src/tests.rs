@@ -1,16 +1,25 @@
-use std::sync::Arc;
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
+};
 
 use sim_kernel::{
-    Args, Cx, DefaultFactory, EagerPolicy, Expr, Factory, NumberLiteral, Symbol,
-    read_construct_capability,
+    Args, Consistency, Cx, DefaultFactory, EagerPolicy, EvalFabric, EvalMode, EvalRequest, Expr,
+    Factory, NumberLiteral, Symbol, read_construct_capability,
 };
 use sim_lib_numbers_arith::NumbersArithmeticLib;
 use sim_lib_numbers_cas::CasNumbersLib;
 use sim_lib_numbers_i64::I64NumbersLib;
-use sim_lib_numbers_tensor::{TensorNumbersLib, tensor_value_class_symbol};
+use sim_lib_numbers_tensor::{
+    CpuTensorExecutor, SubmissionEvidence, TensorExecError, TensorExecution, TensorExecutor,
+    TensorExecutorCard, TensorNumbersLib, TensorRequest, TensorSite, matmul_exec_op_symbol,
+    tensor_value_class_symbol, tensor_value_ref,
+};
 use sim_lib_numbers_tensor_bcast::TensorBroadcastLib;
 
 use crate::TensorLinalgLib;
+
+// conformance: tensor linalg executor routing covers reductions and matrix math.
 
 fn cx() -> Cx {
     let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
@@ -51,12 +60,59 @@ fn data_value(cells: Vec<sim_kernel::Value>) -> sim_kernel::Value {
     DefaultFactory.list(cells).unwrap()
 }
 
+fn eval_request(expr: Expr) -> EvalRequest {
+    EvalRequest {
+        expr,
+        result_shape: None,
+        required_capabilities: Vec::new(),
+        deadline: None,
+        consistency: Consistency::LocalFirst,
+        mode: EvalMode::Eval,
+        answer_limit: None,
+        stream_buffer: None,
+        stream: false,
+        trace: false,
+    }
+}
+
 fn cas_var(cx: &mut Cx, symbol: &str) -> sim_kernel::Value {
     cx.call_function(
         &Symbol::qualified("cas", "var"),
         Args::new(vec![DefaultFactory.symbol(Symbol::new(symbol)).unwrap()]),
     )
     .unwrap()
+}
+
+#[derive(Clone)]
+struct CountingExecutor {
+    calls: Arc<AtomicUsize>,
+}
+
+impl TensorExecutor for CountingExecutor {
+    fn card(&self) -> TensorExecutorCard {
+        TensorExecutorCard::new(
+            Symbol::qualified("test", "linalg-counting-executor"),
+            "counting",
+            Symbol::qualified("core", "local-fabric"),
+            vec![matmul_exec_op_symbol()],
+            None,
+        )
+    }
+
+    fn execute(
+        &self,
+        cx: &mut Cx,
+        request: TensorRequest,
+    ) -> std::result::Result<TensorExecution, TensorExecError> {
+        if request.operation.symbol == matmul_exec_op_symbol() {
+            self.calls.fetch_add(1, Ordering::SeqCst);
+        }
+        CpuTensorExecutor::new().execute(cx, request)
+    }
+
+    fn flush(&self) -> std::result::Result<SubmissionEvidence, TensorExecError> {
+        CpuTensorExecutor::new().flush()
+    }
 }
 
 #[test]
@@ -109,6 +165,133 @@ fn dot_and_eye_surface_work() {
     assert_eq!(
         out.object().as_expr(&mut cx).unwrap(),
         matrix.object().as_expr(&mut cx).unwrap()
+    );
+}
+
+#[test]
+fn matmul_routes_through_active_tensor_executor() {
+    let mut cx = cx();
+    let calls = Arc::new(AtomicUsize::new(0));
+    let site = TensorSite::new(
+        Symbol::qualified("test", "linalg-counting-site"),
+        Arc::new(CountingExecutor {
+            calls: calls.clone(),
+        }),
+        Vec::new(),
+    );
+    let expr = Expr::Call {
+        operator: Box::new(Expr::Symbol(Symbol::new("matmul"))),
+        args: vec![
+            Expr::Call {
+                operator: Box::new(Expr::Symbol(Symbol::new("mat"))),
+                args: vec![Expr::Vector(vec![
+                    Expr::Vector(vec![Expr::Number(NumberLiteral {
+                        domain: Symbol::qualified("numbers", "i64"),
+                        canonical: "1".to_owned(),
+                    })]),
+                    Expr::Vector(vec![Expr::Number(NumberLiteral {
+                        domain: Symbol::qualified("numbers", "i64"),
+                        canonical: "2".to_owned(),
+                    })]),
+                ])],
+            },
+            Expr::Call {
+                operator: Box::new(Expr::Symbol(Symbol::new("vec"))),
+                args: vec![Expr::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "i64"),
+                    canonical: "3".to_owned(),
+                })],
+            },
+        ],
+    };
+
+    let reply = site.realize(&mut cx, eval_request(expr)).unwrap();
+
+    assert_eq!(calls.load(Ordering::SeqCst), 1);
+    let tensor = tensor_value_ref(&reply.value).unwrap();
+    assert_eq!(tensor.shape(), &[2]);
+}
+
+#[test]
+fn reductions_and_transcendentals_have_checked_cpu_contracts() {
+    let mut cx = cx();
+    let vector = cx
+        .call_function(
+            &Symbol::new("vec"),
+            Args::new(vec![i64_num("3"), i64_num("4")]),
+        )
+        .unwrap();
+    let sum = cx
+        .call_function(&Symbol::new("sum"), Args::new(vec![vector.clone()]))
+        .unwrap();
+    assert_eq!(
+        sum.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "i64"),
+            canonical: "7".to_owned(),
+        })
+    );
+
+    let norm = cx
+        .call_function(&Symbol::new("norm"), Args::new(vec![vector.clone()]))
+        .unwrap();
+    assert_eq!(
+        norm.object().as_expr(&mut cx).unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "5".to_owned(),
+        })
+    );
+
+    let roots = cx
+        .call_function(&Symbol::new("sqrt"), Args::new(vec![vector]))
+        .unwrap();
+    assert_eq!(
+        tensor_value_ref(&roots).unwrap().dtype(),
+        &Symbol::qualified("numbers", "f32")
+    );
+}
+
+#[test]
+fn tile_local_phase_arguments_use_tensor_math_not_interference_ops() {
+    let mut cx = cx();
+    let phase = cx
+        .call_function(&Symbol::new("vec"), Args::new(vec![i64_num("0")]))
+        .unwrap();
+
+    let sine = cx
+        .call_function(&Symbol::new("sin"), Args::new(vec![phase.clone()]))
+        .unwrap();
+    let cosine = cx
+        .call_function(&Symbol::new("cos"), Args::new(vec![phase]))
+        .unwrap();
+
+    assert_eq!(
+        tensor_value_ref(&sine).unwrap().cells().unwrap()[0]
+            .object()
+            .as_expr(&mut cx)
+            .unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "0".to_owned(),
+        })
+    );
+    assert_eq!(
+        tensor_value_ref(&cosine).unwrap().cells().unwrap()[0]
+            .object()
+            .as_expr(&mut cx)
+            .unwrap(),
+        Expr::Number(NumberLiteral {
+            domain: Symbol::qualified("numbers", "f32"),
+            canonical: "1".to_owned(),
+        })
+    );
+    assert!(
+        cx.call_function(
+            &Symbol::qualified("interference", "solve"),
+            Args::new(Vec::new())
+        )
+        .is_err()
     );
 }
 

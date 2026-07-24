@@ -149,7 +149,29 @@
         }
       ],
       "group": "workspace",
+      "package": "sim-lib-numbers-tensor-f32"
+    },
+    {
+      "features": [
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
       "package": "sim-lib-numbers-tensor-f64"
+    },
+    {
+      "features": [
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-half"
     },
     {
       "features": [],

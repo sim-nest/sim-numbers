@@ -31,7 +31,9 @@ Generated from Cargo metadata by `xtask crate-catalog v1`.
 | `sim-lib-numbers-tensor-bcast` | `true` | `custom-build, lib` | NumPy-style tensor broadcasting and promoted element-wise operations for SIM tensors. |
 | `sim-lib-numbers-tensor-bit` | `true` | `custom-build, lib` | Packed boolean tensor specialization with bitwise tensor operations. |
 | `sim-lib-numbers-tensor-cmplxf` | `true` | `custom-build, lib` | Complex f64-pair tensor specialization for SIM tensor values. |
+| `sim-lib-numbers-tensor-f32` | `true` | `custom-build, lib` | Contiguous f32 tensor specialization with native element-wise math. |
 | `sim-lib-numbers-tensor-f64` | `true` | `custom-build, lib` | Contiguous f64 tensor specialization with native element-wise math. |
+| `sim-lib-numbers-tensor-half` | `true` | `custom-build, lib` | Contiguous f16 and bf16 tensor specializations with f32-widened CPU math. |
 | `sim-lib-numbers-tensor-i64` | `true` | `custom-build, lib` | Contiguous i64 tensor specialization with overflow-aware arithmetic. |
 | `sim-lib-numbers-tensor-linalg` | `true` | `custom-build, lib` | Linear algebra operations for SIM tensors: dot, matrix multiply, inversion, norms, and constructors. |
 | `sim-lib-numbers-tensor-rat64` | `true` | `custom-build, lib` | Rational i64-pair tensor specialization for the SIM tensor domain. |
