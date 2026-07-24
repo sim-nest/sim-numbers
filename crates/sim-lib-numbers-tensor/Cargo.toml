@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-tensor"
-version = "0.1.4"
+version = "0.1.5"
 edition = "2024"
 license = "MPL-2.0"
 description = "Uniform n-dimensional tensor value, constructors, and specialization hooks for SIM numbers."
@@ -15,7 +15,7 @@ sim-citizen = { version = "0.1.0" }
 sim-citizen-derive = { version = "0.1.0" }
 sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
-sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-lib-numbers-core = { version = "0.1.2", path = "../sim-lib-numbers-core" }
 sim-shape = { version = "0.1.0" }
 
 [dev-dependencies]
