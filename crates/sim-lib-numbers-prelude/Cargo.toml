@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-prelude"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 license = "MPL-2.0"
 description = "One-call installer for the standard SIM number domains and tensor backends."
@@ -27,10 +27,10 @@ sim-lib-numbers-fixed = { version = "0.1.0", path = "../sim-lib-numbers-fixed" }
 sim-lib-numbers-float = { version = "0.1.0", path = "../sim-lib-numbers-float" }
 sim-lib-numbers-func = { version = "0.1.0", path = "../sim-lib-numbers-func" }
 sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
-sim-lib-numbers-numeric = { version = "0.1.0", path = "../sim-lib-numbers-numeric" }
+sim-lib-numbers-numeric = { version = "0.1.2", path = "../sim-lib-numbers-numeric" }
 sim-lib-numbers-quad = { version = "0.1.0", path = "../sim-lib-numbers-quad" }
 sim-lib-numbers-rational = { version = "0.1.0", path = "../sim-lib-numbers-rational" }
-sim-lib-numbers-rk = { version = "0.1.0", path = "../sim-lib-numbers-rk" }
+sim-lib-numbers-rk = { version = "0.1.2", path = "../sim-lib-numbers-rk" }
 sim-lib-numbers-stats = { version = "0.1.0", path = "../sim-lib-numbers-stats" }
 sim-lib-numbers-tensor = { version = "0.1.0", path = "../sim-lib-numbers-tensor" }
 sim-lib-numbers-tensor-bcast = { version = "0.1.0", path = "../sim-lib-numbers-tensor-bcast" }
