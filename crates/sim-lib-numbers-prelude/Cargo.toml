@@ -25,7 +25,7 @@ sim-lib-numbers-exotic = { version = "0.1.0", path = "../sim-lib-numbers-exotic"
 sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
 sim-lib-numbers-fixed = { version = "0.1.0", path = "../sim-lib-numbers-fixed" }
 sim-lib-numbers-float = { version = "0.1.0", path = "../sim-lib-numbers-float" }
-sim-lib-numbers-func = { version = "0.1.0", path = "../sim-lib-numbers-func" }
+sim-lib-numbers-func = { version = "0.1.2", path = "../sim-lib-numbers-func" }
 sim-lib-numbers-i64 = { version = "0.1.0", path = "../sim-lib-numbers-i64" }
 sim-lib-numbers-numeric = { version = "0.1.2", path = "../sim-lib-numbers-numeric" }
 sim-lib-numbers-quad = { version = "0.1.0", path = "../sim-lib-numbers-quad" }

@@ -15,7 +15,7 @@ sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-cas = { version = "0.1.0", path = "../sim-lib-numbers-cas" }
 sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
-sim-lib-numbers-func = { version = "0.1.0", path = "../sim-lib-numbers-func" }
+sim-lib-numbers-func = { version = "0.1.2", path = "../sim-lib-numbers-func" }
 sim-lib-numbers-tensor = { version = "0.1.0", path = "../sim-lib-numbers-tensor" }
 
 [dev-dependencies]
