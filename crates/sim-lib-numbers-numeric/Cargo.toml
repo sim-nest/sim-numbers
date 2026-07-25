@@ -16,11 +16,13 @@ sim-lib-numbers-cas = { version = "0.1.0", path = "../sim-lib-numbers-cas" }
 sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
 sim-lib-numbers-f64 = { version = "0.1.0", path = "../sim-lib-numbers-f64" }
 sim-lib-numbers-func = { version = "0.1.0", path = "../sim-lib-numbers-func" }
+sim-lib-numbers-tensor = { version = "0.1.0", path = "../sim-lib-numbers-tensor" }
 
 [dev-dependencies]
 sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
 sim-lib-numbers-cas-diff = { version = "0.1.0", path = "../sim-lib-numbers-cas-diff" }
 sim-lib-numbers-cas-eval = { version = "0.1.0", path = "../sim-lib-numbers-cas-eval" }
+sim-lib-numbers-tensor-bcast = { version = "0.1.0", path = "../sim-lib-numbers-tensor-bcast" }
 
 [build-dependencies]
 sim-cookbook = { version = "0.1.0" }

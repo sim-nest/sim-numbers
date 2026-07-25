@@ -221,7 +221,7 @@ title = "Numeric pipelines"
 summary = "Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when composing or running numeric jobs through the numeric registry. Executable composed pipelines use f64 state; tensor state descriptors fail closed in this package."
+guidance = "Use this row when composing or running numeric jobs through the numeric registry. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry; quadrature remains scalar."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-numeric",
   "anchor/crate/sim-lib-numbers-rk",
@@ -238,6 +238,28 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-numeric/state-kind",
 ]
 claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run",
+]
+
+[[feature]]
+id = "feature/sim-numbers/tensor-ode"
+title = "Tensor ODE pipelines"
+summary = "Run tensor-valued ODE state through the existing numeric ODE pipeline and Runge-Kutta solver registry."
+owner = "crate/sim-lib-numbers-numeric"
+audiences = ["code", "framework"]
+guidance = "Use this row when an ODE state is a Tensor. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-numeric",
+  "anchor/crate/sim-lib-numbers-rk",
+  "anchor/crate/sim-lib-numbers-tensor",
+  "anchor/crate/sim-lib-numbers-tensor-bcast",
+  "anchor/rustdoc/sim-lib-numbers-numeric/call_numeric_run_composed",
+  "anchor/rustdoc/sim-lib-numbers-numeric/ode-solver",
+  "anchor/rustdoc/sim-lib-numbers-numeric/state-kind",
+  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-executor",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run",
 ]
 
@@ -276,5 +298,16 @@ task = "Run a numeric pipeline"
 audiences = ["code", "framework"]
 steps = [
   { feature = "feature/sim-numbers/numeric-pipelines", why = "The numeric pipeline row owns composed pipeline values and the numeric registry execution path." },
-  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run", why = "The checked pipeline-run specimen proves composed run input parsing and fail-closed tensor-state handling." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run", why = "The checked pipeline-run specimen proves composed run input parsing and tensor-state admission." },
+]
+
+[[route]]
+id = "route/run-tensor-ode"
+task = "Run a tensor ODE"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/numeric-pipelines", why = "The numeric pipeline row owns composed pipeline values and numeric registry execution." },
+  { feature = "feature/sim-numbers/tensor-ode", why = "The tensor ODE row owns tensor-state admission, CPU fallback, and hardware RHS restrictions." },
+  { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns Env-bound executor routing and CPU fallback for tensor operations." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests", why = "The RK tests prove tensor state across fixed/adaptive methods, hardware refusals, and CPU agreement." },
 ]

@@ -22,6 +22,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
+| `feature/sim-numbers/tensor-ode` | `crate/sim-lib-numbers-numeric` | 2 | Run tensor-valued ODE state through the existing numeric ODE pipeline and Runge-Kutta solver registry. |
 
 ## Surfaces
 
@@ -1975,8 +1976,9 @@ use sim_lib_numbers_core::domains;
 
 use super::{
     options::parse_symbolish_value,
-    pipeline::{ComposedPipeline, PipelineKind, StateKind},
+    pipeline::{ComposedPipeline, PipelineKind},
     registry::global_numeric_registry,
+    state::{ensure_quadrature_state, validate_ode_state},
     traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
 };
 
@@ -2128,12 +2130,12 @@ fn keyed_run_options(cx: &mut Cx, values: &[Value]) -> Result<BTreeMap<String, V
 
 fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     let RunComposedInput { pipeline, args } = input;
-    ensure_f64_state(&pipeline)?;
     let RunArgs::Ode { t0, t1, y0, dt } = args else {
         unreachable!("ODE pipeline parser builds ODE run args");
     };
     let func_value = value_from_ref(cx, &pipeline.func_ref)?;
     let dy = NumericCallable::sampled_binary(func_value, Symbol::new("x"), Symbol::new("y"))?;
+    validate_ode_state(cx, &pipeline, &dy, &t0, &y0)?;
     let method = resolve_ode_method(&pipeline.method);
     let plugin = {
         let registry = global_numeric_registry()
@@ -2200,7 +2202,7 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
 
 fn run_quad_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     let RunComposedInput { pipeline, args } = input;
-    ensure_f64_state(&pipeline)?;
+    ensure_quadrature_state(&pipeline)?;
     let RunArgs::Quadrature { a, b, n, tol } = args else {
         unreachable!("quadrature pipeline parser builds quadrature run args");
     };
@@ -2310,11 +2312,933 @@ fn resolve_ode_method(method: &Symbol) -> Symbol {
     }
 }
 
-fn ensure_f64_state(pipeline: &ComposedPipeline) -> Result<()> {
-    if pipeline.state == StateKind::F64 {
-        Ok(())
+struct QuadSelection {
+    method: Symbol,
+    kind: NumericKind,
+    plugin: Arc<dyn Quadrature>,
+}
+
+fn select_quad_plugin(
+    method: &Symbol,
+    n: Option<usize>,
+    tol: Option<f64>,
+) -> Result<QuadSelection> {
+    let method = resolve_quad_method(method, n, tol);
+    let registry = global_numeric_registry()
+        .read()
+        .map_err(|_| Error::PoisonedLock("numeric registry"))?;
+    let fixed = registry.quadrature_fixed(&method);
+    let adaptive = registry.quadrature_adaptive(&method);
+    match (n.is_some(), tol.is_some(), fixed, adaptive) {
+        (true, false, Some(plugin), _) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureFixed,
+            plugin,
+        }),
+        (false, true, _, Some(plugin)) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureAdaptive,
+            plugin,
+        }),
+        (false, false, Some(plugin), _) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureFixed,
+            plugin,
+        }),
+        (false, false, None, Some(plugin)) => Ok(QuadSelection {
+            method,
+            kind: NumericKind::QuadratureAdaptive,
+            plugin,
+        }),
+        (false, false, None, None) => Err(unknown_numeric_method("quadrature", &method)),
+        (true, true, _, _) => Err(Error::Eval(
+            "numeric/run-composed quadrature expects either :n or :tol, not both".to_owned(),
+        )),
+        (true, false, None, _) => Err(Error::Eval(format!(
+            "quadrature method {method} does not accept :n"
+        ))),
+        (false, true, _, None) => Err(Error::Eval(format!(
+            "quadrature method {method} does not accept :tol"
+        ))),
+    }
+}
+
+fn resolve_quad_method(method: &Symbol, n: Option<usize>, tol: Option<f64>) -> Symbol {
+    if *method != Symbol::new("auto") {
+        return method.clone();
+    }
+    if tol.is_some() && n.is_none() {
+        Symbol::new("adaptive-gauss-kronrod")
     } else {
-        Err(Error::Eval("NotYetSupported: tensor state".to_owned()))
+        Symbol::new("simpson")
+    }
+}
+
+fn keyword_name(symbol: &Symbol) -> String {
+    symbol
+        .name
+        .strip_prefix(':')
+        .unwrap_or(&symbol.name)
+        .to_owned()
+}
+
+fn unknown_numeric_method(kind: &str, method: &Symbol) -> Error {
+    Error::Eval(format!("UnknownNumericMethod: {kind} method {method}"))
+}
+
+#[cfg(test)]
+mod tests {
+    use std::sync::Arc;
+
+    use sim_kernel::{DefaultFactory, EagerPolicy, Ref};
+
+    use super::*;
+    use crate::StateKind;
+
+    fn test_cx() -> Cx {
+        Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+    }
+
+    fn pipeline_value(cx: &mut Cx, kind: PipelineKind, state: StateKind) -> Value {
+        cx.factory()
+            .opaque(Arc::new(ComposedPipeline::new(
+                Ref::Symbol(Symbol::new("test-func")),
+                kind,
+                Symbol::new("auto"),
+                state,
+            )))
+            .expect("pipeline value")
+    }
+
+    fn symbol_value(cx: &mut Cx, name: &str) -> Value {
+        cx.factory()
+            .symbol(Symbol::new(name))
+            .expect("symbol value")
+    }
+
+    fn number_value(cx: &mut Cx, domain: Symbol, canonical: &str) -> Value {
+        cx.factory()
+            .number_literal(domain, canonical.to_owned())
+            .expect("number value")
+    }
+
+    // conformance: numeric pipeline execution parses composed run inputs.
+    #[test]
+    fn numeric_pipeline_run_parses_keyword_arguments() {
+        let mut cx = test_cx();
+        let values = vec![
+            pipeline_value(&mut cx, PipelineKind::Quadrature, StateKind::F64),
+            symbol_value(&mut cx, ":a"),
+            number_value(&mut cx, domains::f64(), "0.0"),
+            symbol_value(&mut cx, ":b"),
+            number_value(&mut cx, domains::f64(), "1.0"),
+            symbol_value(&mut cx, ":n"),
+            number_value(&mut cx, domains::i64(), "4"),
+        ];
+
+        let input = RunComposedInput::from_values(&mut cx, &values).expect("parsed run input");
+        assert_eq!(input.pipeline.kind, PipelineKind::Quadrature);
+        assert_eq!(input.pipeline.state, StateKind::F64);
+        let RunArgs::Quadrature { n, tol, .. } = input.args else {
+            panic!("expected quadrature args");
+        };
+        assert_eq!(n, Some(4));
+        assert_eq!(tol, None);
+    }
+}
+```
+
+### `feature/sim-numbers/tensor-ode`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-rk/src/tests.rs`:
+
+```rust
+use std::{any::Any, sync::Arc};
+
+use sim_kernel::{
+    Args, Callable, CapabilityName, ClassRef, Cx, DefaultFactory, EagerPolicy, Error, EvalFabric,
+    EvalMode, EvalRequest, Expr, Factory, Object, Symbol, Value,
+};
+use sim_lib_numbers_cas::CasExpr;
+use sim_lib_numbers_func::Func;
+use sim_lib_numbers_numeric::NumericNumbersLib;
+use sim_lib_numbers_tensor::{
+    CpuTensorExecutor, SubmissionEvidence, TensorExecError, TensorExecution, TensorExecutor,
+    TensorExecutorCard, TensorRequest, TensorSite, build_tensor_value, tensor_value_ref,
+};
+
+use crate::RkNumbersLib;
+
+fn test_cx() -> Cx {
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_tensor::TensorNumbersLib::new())
+        .unwrap();
+    cx.load_lib(&sim_lib_numbers_tensor_bcast::TensorBroadcastLib::new())
+        .unwrap();
+    cx.load_lib(&NumericNumbersLib::new()).unwrap();
+    cx.load_lib(&RkNumbersLib::new()).unwrap();
+    cx
+}
+
+fn f64_value(cx: &mut Cx, value: f64) -> Value {
+    cx.factory()
+        .number_literal(Symbol::qualified("numbers", "f64"), value.to_string())
+        .unwrap()
+}
+
+fn value_to_f64(cx: &mut Cx, value: &Value) -> f64 {
+    value.object().display(cx).unwrap().parse::<f64>().unwrap()
+}
+
+fn tensor_value(cx: &mut Cx, values: &[f64]) -> Value {
+    let cells = values
+        .iter()
+        .map(|value| f64_value(cx, *value))
+        .collect::<Vec<_>>();
+    build_tensor_value(
+        cx,
+        vec![values.len()],
+        Some(Symbol::qualified("numbers", "f64")),
+        cells,
+    )
+    .unwrap()
+}
+
+fn tensor_f64s(tensor_value: &Value, cx: &mut Cx) -> Vec<f64> {
+    tensor_value_ref(tensor_value)
+        .expect("tensor value")
+        .cells()
+        .unwrap()
+        .iter()
+        .map(|cell| value_to_f64(cx, cell))
+        .collect()
+}
+
+#[derive(Clone)]
+struct PlainBinary {
+    name: &'static str,
+    f: fn(f64, f64) -> f64,
+}
+
+impl Object for PlainBinary {
+    fn display(&self, _cx: &mut Cx) -> sim_kernel::Result<String> {
+        Ok(format!("#<plain-callable {}>", self.name))
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
+    }
+}
+
+impl sim_kernel::ObjectCompat for PlainBinary {
+    fn class(&self, _cx: &mut Cx) -> sim_kernel::Result<ClassRef> {
+        DefaultFactory.class_stub(
+            sim_kernel::CORE_FUNCTION_CLASS_ID,
+            Symbol::qualified("core", "Function"),
+        )
+    }
+
+    fn as_callable(&self) -> Option<&dyn Callable> {
+        Some(self)
+    }
+}
+
+impl Callable for PlainBinary {
+    fn call(&self, cx: &mut Cx, args: Args) -> sim_kernel::Result<Value> {
+        let values = args.into_vec();
+        let [x, y] = values.as_slice() else {
+            return Err(Error::Eval("plain binary expected two args".to_owned()));
+        };
+        let x = value_to_f64(cx, x);
+        let y = value_to_f64(cx, y);
+        Ok(f64_value(cx, (self.f)(x, y)))
+    }
+}
+
+fn plain_binary(cx: &mut Cx, name: &'static str, f: fn(f64, f64) -> f64) -> Value {
+    cx.factory()
+        .opaque(Arc::new(PlainBinary { name, f }))
+        .unwrap()
+}
+
+fn tensor_identity_rhs() -> Func {
+    Func::native(
+        vec![Symbol::new("x"), Symbol::new("y")],
+        Arc::new(|_cx, args| {
+            let [_, y] = args else {
+                return Err(Error::Eval("expected two args".to_owned()));
+            };
+            Ok(y.clone())
+        }),
+    )
+}
+
+fn ode_rhs() -> Func {
+    Func::native(
+        vec![Symbol::new("x"), Symbol::new("y")],
+        Arc::new(|_cx, args| {
+            let [_, y] = args else {
+                return Err(Error::Eval("expected two args".to_owned()));
+            };
+            Ok(y.clone())
+        }),
+    )
+}
+
+#[test]
+fn ode_accepts_plain_binary_callable() {
+    let mut cx = test_cx();
+    let rhs = plain_binary(&mut cx, "plain-exp-rhs", |_x, y| y);
+    let method = cx.factory().symbol(Symbol::new("rk4")).unwrap();
+    let h = f64_value(&mut cx, 0.01);
+    let options = cx
+        .factory()
+        .table(vec![
+            (Symbol::new(":method"), method),
+            (Symbol::new(":h"), h),
+        ])
+        .unwrap();
+    let x0 = f64_value(&mut cx, 0.0);
+    let y0 = f64_value(&mut cx, 1.0);
+    let x_end = f64_value(&mut cx, 1.0);
+
+    let out = cx
+        .call_function(
+            &Symbol::new("ode-solve"),
+            Args::new(vec![
+                rhs,
+                cx.factory().symbol(Symbol::new("x")).unwrap(),
+                cx.factory().symbol(Symbol::new("y")).unwrap(),
+                x0,
+                y0,
+                x_end,
+                options,
+            ]),
+        )
+        .unwrap();
+
+    let expr = out.object().as_expr(&mut cx).unwrap();
+    let last_y = match expr {
+        sim_kernel::Expr::List(points) => match points.last().unwrap() {
+            sim_kernel::Expr::List(pair) => match &pair[1] {
+                sim_kernel::Expr::Number(number) => number.canonical.parse::<f64>().unwrap(),
+                other => cx
+                    .eval_expr(other.clone())
+                    .map(|value| value_to_f64(&mut cx, &value))
+                    .unwrap(),
+            },
+            _ => panic!("expected pair"),
+        },
+        _ => panic!("expected list"),
+    };
+    assert!((last_y - std::f64::consts::E).abs() < 1.0e-8);
+}
+
+#[test]
+fn ode_methods_reach_e_within_tolerance() {
+    let mut cx = test_cx();
+    let rhs = cx.factory().opaque(Arc::new(ode_rhs())).unwrap();
+    for (method, h, tol) in [
+        ("forward-euler", 0.01, 2.0e-2),
+        ("backward-euler", 0.01, 2.0e-2),
+        ("midpoint", 0.01, 3.0e-4),
+        ("rk4", 0.01, 1.0e-8),
+        ("rkf45", 0.1, 1.0e-6),
+    ] {
+        let mut entries = vec![
+            (
+                Symbol::new(":method"),
+                cx.factory().symbol(Symbol::new(method)).unwrap(),
+            ),
+            (Symbol::new(":h"), f64_value(&mut cx, h)),
+        ];
+        if method == "rkf45" {
+            entries.push((Symbol::new(":tol"), f64_value(&mut cx, 1.0e-8)));
+        }
+        let options = cx.factory().table(entries).unwrap();
+        let x0 = f64_value(&mut cx, 0.0);
+        let y0 = f64_value(&mut cx, 1.0);
+        let x_end = f64_value(&mut cx, 1.0);
+        let out = cx
+            .call_function(
+                &Symbol::new("ode-solve"),
+                Args::new(vec![
+                    rhs.clone(),
+                    cx.factory().symbol(Symbol::new("x")).unwrap(),
+                    cx.factory().symbol(Symbol::new("y")).unwrap(),
+                    x0,
+                    y0,
+                    x_end,
+                    options,
+                ]),
+            )
+            .unwrap();
+        let expr = out.object().as_expr(&mut cx).unwrap();
+        let last_y = match expr {
+            sim_kernel::Expr::List(points) => match points.last().unwrap() {
+                sim_kernel::Expr::List(pair) => match &pair[1] {
+                    sim_kernel::Expr::Number(number) => number.canonical.parse::<f64>().unwrap(),
+                    other => cx
+                        .eval_expr(other.clone())
+                        .map(|value| value_to_f64(&mut cx, &value))
+                        .unwrap(),
+                },
+                _ => panic!("expected pair"),
+            },
+            _ => panic!("expected list"),
+        };
+        assert!(
+            (last_y - std::f64::consts::E).abs() < tol,
+            "{method} -> {last_y}"
+        );
+    }
+}
+
+#[test]
+// conformance: tensor ODE pipelines run through every registered RK solver.
+fn tensor_ode_pipeline_runs_all_rk_methods_and_matches_scalar_cpu() {
+    let mut cx = test_cx();
+    let rhs = cx
+        .factory()
+        .opaque(Arc::new(tensor_identity_rhs()))
+        .unwrap();
+    let y0 = tensor_value(&mut cx, &[1.0, 2.0, -0.5]);
+
+    for (method, h, tol) in [
+        ("forward-euler", 0.01, 2.0e-2),
+        ("backward-euler", 0.01, 2.0e-2),
+        ("midpoint", 0.01, 3.0e-4),
+        ("rk4", 0.01, 1.0e-8),
+        ("rkf45", 0.1, 1.0e-6),
+    ] {
+        let pipeline = cx
+            .call_function(
+                &Symbol::qualified("numeric", "compose"),
+                Args::new(vec![
+                    rhs.clone(),
+                    cx.factory().symbol(Symbol::new("ode-solve")).unwrap(),
+                    cx.factory().symbol(Symbol::new(method)).unwrap(),
+                    cx.factory().symbol(Symbol::new("tensor")).unwrap(),
+                ]),
+            )
+            .unwrap();
+        let t0 = f64_value(&mut cx, 0.0);
+        let t1 = f64_value(&mut cx, 1.0);
+        let dt = f64_value(&mut cx, h);
+        let out = cx
+            .call_function(
+                &Symbol::qualified("numeric", "run-composed"),
+                Args::new(vec![pipeline, t0, t1, y0.clone(), dt]),
+            )
+            .unwrap();
+        let value = out
+            .object()
+            .as_table_impl()
+            .unwrap()
+            .get(&mut cx, Symbol::new("value"))
+            .unwrap();
+        for (actual, initial) in tensor_f64s(&value, &mut cx)
+            .into_iter()
+            .zip([1.0, 2.0, -0.5])
+        {
+            let expected = initial * std::f64::consts::E;
+            assert!(
+                (actual - expected).abs() < tol * expected.abs().max(1.0),
+                "{method}"
+            );
+        }
+    }
+}
+
+#[derive(Clone)]
+struct DeviceExecutor;
+
+impl TensorExecutor for DeviceExecutor {
+    fn card(&self) -> TensorExecutorCard {
+        TensorExecutorCard::new(
+            Symbol::qualified("test", "executor/device"),
+            "test-device",
+            Symbol::qualified("test", "device"),
+            CpuTensorExecutor::new().card().operations.to_vec(),
+            Some(CapabilityName::new("test.device")),
+        )
+    }
+
+    fn execute(
+        &self,
+        cx: &mut Cx,
+        request: TensorRequest,
+    ) -> std::result::Result<TensorExecution, TensorExecError> {
+        CpuTensorExecutor::new().execute(cx, request)
+    }
+
+    fn flush(&self) -> std::result::Result<SubmissionEvidence, TensorExecError> {
+        Ok(SubmissionEvidence::new(self.card().symbol, 0))
+    }
+}
+
+fn number_expr(value: &str) -> Expr {
+    Expr::Number(sim_kernel::NumberLiteral {
+        domain: Symbol::qualified("numbers", "f64"),
+        canonical: value.to_owned(),
+    })
+}
+
+fn symbol_expr(symbol: impl Into<Symbol>) -> Expr {
+    Expr::Symbol(symbol.into())
+}
+
+fn call_expr(symbol: impl Into<Symbol>, args: Vec<Expr>) -> Expr {
+    Expr::Call {
+        operator: Box::new(symbol_expr(symbol)),
+        args,
+    }
+}
+
+fn tensor_pipeline_expr(rhs: Expr) -> Expr {
+    call_expr(
+        Symbol::qualified("numeric", "run-composed"),
+        vec![
+            call_expr(
+                Symbol::qualified("numeric", "compose"),
+                vec![
+                    rhs,
+                    symbol_expr(Symbol::new("ode-solve")),
+                    symbol_expr(Symbol::new("rk4")),
+                    symbol_expr(Symbol::new("tensor")),
+                ],
+            ),
+            number_expr("0.0"),
+            number_expr("0.1"),
+            call_expr(
+                Symbol::new("vec"),
+                vec![number_expr("1.0"), number_expr("2.0")],
+            ),
+            number_expr("0.1"),
+        ],
+    )
+}
+
+fn eval_request(expr: Expr) -> EvalRequest {
+    EvalRequest {
+        expr,
+        result_shape: None,
+        required_capabilities: Vec::new(),
+        deadline: None,
+        consistency: sim_kernel::Consistency::LocalFirst,
+        mode: EvalMode::Eval,
+        answer_limit: None,
+        stream_buffer: None,
+        stream: false,
+        trace: false,
+    }
+}
+
+#[test]
+fn tensor_ode_hardware_refuses_arbitrary_callable_rhs() {
+    let mut cx = test_cx();
+    let rhs = plain_binary(&mut cx, "native-tensor-rhs", |_x, y| y);
+    cx.env_mut().define(Symbol::new("native-rhs"), rhs);
+    let site = TensorSite::new(
+        Symbol::qualified("test", "site/device"),
+        Arc::new(DeviceExecutor),
+        Vec::new(),
+    );
+
+    let err = match site.realize(
+        &mut cx,
+        eval_request(tensor_pipeline_expr(symbol_expr(Symbol::new("native-rhs")))),
+    ) {
+        Ok(_) => panic!("device tensor ODE must reject native RHS"),
+        Err(error) => error,
+    };
+    assert!(err.to_string().contains("pure symbolic Func RHS"), "{err}");
+}
+
+#[test]
+fn tensor_ode_hardware_refuses_non_tensor_rhs() {
+    let mut cx = test_cx();
+    let rhs = cx
+        .factory()
+        .opaque(Arc::new(Func::symbolic(
+            vec![Symbol::new("x"), Symbol::new("y")],
+            CasExpr::Var(Symbol::new("x")),
+        )))
+        .unwrap();
+    cx.env_mut().define(Symbol::new("scalar-rhs"), rhs);
+    let site = TensorSite::new(
+        Symbol::qualified("test", "site/device"),
+        Arc::new(DeviceExecutor),
+        Vec::new(),
+    );
+
+    let err = match site.realize(
+        &mut cx,
+        eval_request(tensor_pipeline_expr(symbol_expr(Symbol::new("scalar-rhs")))),
+    ) {
+        Ok(_) => panic!("device tensor ODE must reject scalar RHS"),
+        Err(error) => error,
+    };
+    assert!(
+        err.to_string().contains("RHS must return a tensor"),
+        "{err}"
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-numeric/src/pipeline_run.rs`:
+
+```rust
+//! Execution for first-class composed numeric pipeline values.
+
+use std::{collections::BTreeMap, sync::Arc};
+
+use sim_kernel::{Args, Cx, Error, Expr, Result, Symbol, Value, value_from_ref};
+use sim_lib_numbers_core::domains;
+
+use super::{
+    options::parse_symbolish_value,
+    pipeline::{ComposedPipeline, PipelineKind},
+    registry::global_numeric_registry,
+    state::{ensure_quadrature_state, validate_ode_state},
+    traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
+};
+
+pub fn call_numeric_run_composed(cx: &mut Cx, args: Args) -> Result<Value> {
+    let values = args.into_vec();
+    let input = RunComposedInput::from_values(cx, &values)?;
+    match input.pipeline.kind.clone() {
+        PipelineKind::OdeSolve => run_ode_composed(cx, input),
+        PipelineKind::Quadrature => run_quad_composed(cx, input),
+    }
+}
+
+pub fn call_numeric_run_composed_exprs(cx: &mut Cx, args: Vec<Expr>) -> Result<Value> {
+    let values = args
+        .into_iter()
+        .map(|expr| eval_run_arg(cx, expr))
+        .collect::<Result<Vec<_>>>()?;
+    let input = RunComposedInput::from_values(cx, &values)?;
+    match input.pipeline.kind.clone() {
+        PipelineKind::OdeSolve => run_ode_composed(cx, input),
+        PipelineKind::Quadrature => run_quad_composed(cx, input),
+    }
+}
+
+struct RunComposedInput {
+    pipeline: ComposedPipeline,
+    args: RunArgs,
+}
+
+enum RunArgs {
+    Ode {
+        t0: Value,
+        t1: Value,
+        y0: Value,
+        dt: f64,
+    },
+    Quadrature {
+        a: Value,
+        b: Value,
+        n: Option<usize>,
+        tol: Option<f64>,
+    },
+}
+
+impl RunComposedInput {
+    fn from_values(cx: &mut Cx, values: &[Value]) -> Result<Self> {
+        let Some((pipeline_value, rest)) = values.split_first() else {
+            return Err(Error::Eval(
+                "numeric/run-composed expects a pipeline and run arguments".to_owned(),
+            ));
+        };
+        let pipeline = require_composed_pipeline(pipeline_value)?;
+        match pipeline.kind.clone() {
+            PipelineKind::OdeSolve => Self::ode_from_values(cx, pipeline, rest),
+            PipelineKind::Quadrature => Self::quad_from_values(cx, pipeline, rest),
+        }
+    }
+
+    fn ode_from_values(cx: &mut Cx, pipeline: ComposedPipeline, values: &[Value]) -> Result<Self> {
+        let args = match values {
+            [t0, t1, y0, dt] => RunArgs::Ode {
+                t0: t0.clone(),
+                t1: t1.clone(),
+                y0: y0.clone(),
+                dt: value_to_f64(cx, dt, "numeric/run-composed :dt")?,
+            },
+            keyed if keyed.len().is_multiple_of(2) => ode_args_from_keyed(cx, keyed)?,
+            _ => {
+                return Err(Error::Eval(
+                    "numeric/run-composed expects pipeline, t0, t1, y0, dt or keyword pairs"
+                        .to_owned(),
+                ));
+            }
+        };
+        Ok(Self { pipeline, args })
+    }
+
+    fn quad_from_values(cx: &mut Cx, pipeline: ComposedPipeline, values: &[Value]) -> Result<Self> {
+        let args = match values {
+            [a, b, n] => RunArgs::Quadrature {
+                a: a.clone(),
+                b: b.clone(),
+                n: Some(value_to_usize(cx, n, "numeric/run-composed :n")?),
+                tol: None,
+            },
+            keyed if keyed.len().is_multiple_of(2) => quad_args_from_keyed(cx, keyed)?,
+            _ => {
+                return Err(Error::Eval(
+                    "numeric/run-composed quadrature expects a, b, n or keyword pairs".to_owned(),
+                ));
+            }
+        };
+        Ok(Self { pipeline, args })
+    }
+}
+
+fn ode_args_from_keyed(cx: &mut Cx, values: &[Value]) -> Result<RunArgs> {
+    let options = keyed_run_options(cx, values)?;
+    reject_unknown_run_keys(&options, &["t0", "t1", "y0", "dt"])?;
+    Ok(RunArgs::Ode {
+        t0: require_run_value(&options, "t0")?.clone(),
+        t1: require_run_value(&options, "t1")?.clone(),
+        y0: require_run_value(&options, "y0")?.clone(),
+        dt: value_to_f64(
+            cx,
+            require_run_value(&options, "dt")?,
+            "numeric/run-composed :dt",
+        )?,
+    })
+}
+
+fn quad_args_from_keyed(cx: &mut Cx, values: &[Value]) -> Result<RunArgs> {
+    let options = keyed_run_options(cx, values)?;
+    reject_unknown_run_keys(&options, &["a", "b", "n", "tol"])?;
+    let n = options
+        .get("n")
+        .map(|value| value_to_usize(cx, value, "numeric/run-composed :n"))
+        .transpose()?;
+    let tol = options
+        .get("tol")
+        .map(|value| value_to_f64(cx, value, "numeric/run-composed :tol"))
+        .transpose()?;
+    if n.is_some() == tol.is_some() {
+        return Err(Error::Eval(
+            "numeric/run-composed quadrature expects exactly one of :n or :tol".to_owned(),
+        ));
+    }
+    Ok(RunArgs::Quadrature {
+        a: require_run_value(&options, "a")?.clone(),
+        b: require_run_value(&options, "b")?.clone(),
+        n,
+        tol,
+    })
+}
+
+fn keyed_run_options(cx: &mut Cx, values: &[Value]) -> Result<BTreeMap<String, Value>> {
+    let mut options = BTreeMap::<String, Value>::new();
+    for pair in values.chunks(2) {
+        let [key, value] = pair else {
+            unreachable!("chunks over even input yield pairs");
+        };
+        let symbol = parse_symbolish_value(cx, key)?.ok_or_else(|| {
+            Error::Eval("numeric/run-composed expected keyword argument".to_owned())
+        })?;
+        options.insert(keyword_name(&symbol), value.clone());
+    }
+    Ok(options)
+}
+
+fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
+    let RunComposedInput { pipeline, args } = input;
+    let RunArgs::Ode { t0, t1, y0, dt } = args else {
+        unreachable!("ODE pipeline parser builds ODE run args");
+    };
+    let func_value = value_from_ref(cx, &pipeline.func_ref)?;
+    let dy = NumericCallable::sampled_binary(func_value, Symbol::new("x"), Symbol::new("y"))?;
+    validate_ode_state(cx, &pipeline, &dy, &t0, &y0)?;
+    let method = resolve_ode_method(&pipeline.method);
+    let plugin = {
+        let registry = global_numeric_registry()
+            .read()
+            .map_err(|_| Error::PoisonedLock("numeric registry"))?;
+        registry
+            .ode_fixed(&method)
+            .or_else(|| registry.ode_adaptive(&method))
+    };
+    let Some(plugin) = plugin else {
+        return Err(Error::Eval(format!(
+            "UnknownNumericMethod: ode method {method}"
+        )));
+    };
+    let plugin_kind = plugin.kind();
+    let tol = if plugin_kind == NumericKind::OdeAdaptive {
+        Some(1.0e-8)
+    } else {
+        None
+    };
+    let points = plugin.solve(
+        cx,
+        OdeProblem {
+            dy: &dy,
+            var: &dy.vars()[0],
+            y_var: &dy.vars()[1],
+            x0: &t0,
+            y0: &y0,
+            x_end: &t1,
+        },
+        OdeOpts {
+            method: method.clone(),
+            h: Some(dt),
+            tol,
+            max_steps: None,
+        },
+    )?;
+    let steps = points.len().saturating_sub(1);
+    let steps_value = if plugin_kind == NumericKind::OdeAdaptive {
+        cx.factory()
+            .number_literal(domains::f64(), tol.unwrap_or(1.0e-8).to_string())?
+    } else {
+        cx.factory()
+            .number_literal(domains::i64(), steps.to_string())?
+    };
+    let value = points
+        .last()
+        .map(|(_, y)| y.clone())
+        .ok_or_else(|| Error::Eval("numeric/run-composed solver returned no points".to_owned()))?;
+    cx.factory().table(vec![
+        (Symbol::new("value"), value),
+        (Symbol::new("method"), cx.factory().symbol(method)?),
+        (
+            Symbol::new("domain"),
+            cx.factory().symbol(pipeline.kind.symbol())?,
+        ),
+        (
+            Symbol::new("state-kind"),
+            cx.factory().symbol(pipeline.state.symbol())?,
+        ),
+        (Symbol::new("steps"), steps_value),
+    ])
+}
+
+fn run_quad_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
+    let RunComposedInput { pipeline, args } = input;
+    ensure_quadrature_state(&pipeline)?;
+    let RunArgs::Quadrature { a, b, n, tol } = args else {
+        unreachable!("quadrature pipeline parser builds quadrature run args");
+    };
+    let func_value = value_from_ref(cx, &pipeline.func_ref)?;
+    let func = NumericCallable::sampled_unary(func_value, Symbol::new("x"))?;
+    let selection = select_quad_plugin(&pipeline.method, n, tol)?;
+    let value = selection.plugin.integrate(
+        cx,
+        &func,
+        &func.vars()[0],
+        &a,
+        &b,
+        QuadOpts {
+            method: selection.method.clone(),
+            n,
+            tol,
+        },
+    )?;
+    let mut entries = vec![
+        (Symbol::new("value"), value),
+        (
+            Symbol::new("method"),
+            cx.factory().symbol(selection.method.clone())?,
+        ),
+        (
+            Symbol::new("domain"),
+            cx.factory().symbol(pipeline.kind.symbol())?,
+        ),
+        (
+            Symbol::new("state-kind"),
+            cx.factory().symbol(pipeline.state.symbol())?,
+        ),
+    ];
+    if let Some(n) = n {
+        entries.push((
+            Symbol::new("n"),
+            cx.factory().number_literal(domains::i64(), n.to_string())?,
+        ));
+    }
+    if let Some(tol) = tol {
+        entries.push((
+            Symbol::new("tol"),
+            cx.factory()
+                .number_literal(domains::f64(), tol.to_string())?,
+        ));
+    }
+    cx.push_info(format!(
+        "numeric/run-composed method={} domain={:?}",
+        selection.method, selection.kind
+    ));
+    cx.factory().table(entries)
+}
+
+fn require_composed_pipeline(value: &Value) -> Result<ComposedPipeline> {
+    value
+        .object()
+        .downcast_ref::<ComposedPipeline>()
+        .cloned()
+        .ok_or_else(|| Error::Eval("numeric/run-composed expects a ComposedPipeline".to_owned()))
+}
+
+fn require_run_value<'a>(options: &'a BTreeMap<String, Value>, key: &str) -> Result<&'a Value> {
+    options
+        .get(key)
+        .ok_or_else(|| Error::Eval(format!("numeric/run-composed missing :{key}")))
+}
+
+fn reject_unknown_run_keys(options: &BTreeMap<String, Value>, allowed: &[&str]) -> Result<()> {
+    for key in options.keys() {
+        if !allowed.contains(&key.as_str()) {
+            return Err(Error::Eval(format!(
+                "numeric/run-composed: unknown option :{key}"
+            )));
+        }
+    }
+    Ok(())
+}
+
+fn eval_run_arg(cx: &mut Cx, expr: Expr) -> Result<Value> {
+    match &expr {
+        Expr::Symbol(symbol) if symbol.name.starts_with(':') => cx.factory().symbol(symbol.clone()),
+        _ => cx.eval_expr(expr),
+    }
+}
+
+fn value_to_f64(cx: &mut Cx, value: &Value, context: &str) -> Result<f64> {
+    value
+        .object()
+        .display(cx)?
+        .parse::<f64>()
+        .map_err(|_| Error::Eval(format!("{context} expected an f64-compatible value")))
+}
+
+fn value_to_usize(cx: &mut Cx, value: &Value, context: &str) -> Result<usize> {
+    value
+        .object()
+        .display(cx)?
+        .parse::<usize>()
+        .map_err(|_| Error::Eval(format!("{context} expected a non-negative integer")))
+}
+
+fn resolve_ode_method(method: &Symbol) -> Symbol {
+    if *method == Symbol::new("auto") {
+        Symbol::new("rkf45")
+    } else {
+        method.clone()
     }
 }
 
@@ -2399,6 +3323,7 @@ mod tests {
     use sim_kernel::{DefaultFactory, EagerPolicy, Ref};
 
     use super::*;
+    use crate::StateKind;
 
     fn test_cx() -> Cx {
         Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
@@ -2449,19 +3374,6 @@ mod tests {
         };
         assert_eq!(n, Some(4));
         assert_eq!(tol, None);
-    }
-
-    #[test]
-    fn numeric_pipeline_tensor_state_fails_closed() {
-        let pipeline = ComposedPipeline::new(
-            Ref::Symbol(Symbol::new("test-func")),
-            PipelineKind::OdeSolve,
-            Symbol::new("rk4"),
-            StateKind::Tensor,
-        );
-
-        let err = ensure_f64_state(&pipeline).expect_err("tensor state fails closed");
-        assert!(err.to_string().contains("tensor state"), "{err}");
     }
 }
 ```

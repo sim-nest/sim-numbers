@@ -229,44 +229,57 @@ fn numeric6_quad_over_func_composed_pipeline() {
 }
 
 #[test]
-fn numeric6_tensor_state_guard_errors_cleanly() {
+fn numeric6_tensor_state_runs_through_composed_ode_pipeline() {
     let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
-    let square = square_func(&mut cx);
-    let a = f64_value(&mut cx, 0.0);
-    let b = f64_value(&mut cx, 1.0);
-    let n = i64_value(&mut cx, 1000);
+    let decay = decay_func(&mut cx);
+    let y0_first = f64_value(&mut cx, 1.0);
+    let y0_second = f64_value(&mut cx, 2.0);
+    let y0 = cx
+        .call_function(&Symbol::new("vec"), Args::new(vec![y0_first, y0_second]))
+        .unwrap();
 
     let pipeline = cx
         .call_function(
             &numeric_compose_symbol(),
             Args::new(vec![
-                square,
+                decay,
                 cx.factory().symbol(Symbol::new(":domain")).unwrap(),
-                cx.factory().symbol(Symbol::new("quadrature")).unwrap(),
+                cx.factory().symbol(Symbol::new("ode-solve")).unwrap(),
                 cx.factory().symbol(Symbol::new(":method")).unwrap(),
-                cx.factory().symbol(Symbol::new("simpson")).unwrap(),
+                cx.factory().symbol(Symbol::new("rk4")).unwrap(),
                 cx.factory().symbol(Symbol::new(":state")).unwrap(),
                 cx.factory().symbol(Symbol::new("tensor")).unwrap(),
             ]),
         )
         .unwrap();
 
-    let err = cx
+    let t0 = f64_value(&mut cx, 0.0);
+    let t1 = f64_value(&mut cx, 1.0);
+    let dt = f64_value(&mut cx, 0.01);
+    let result = cx
         .call_function(
             &numeric_run_composed_symbol(),
             Args::new(vec![
                 pipeline,
-                cx.factory().symbol(Symbol::new(":a")).unwrap(),
-                a,
-                cx.factory().symbol(Symbol::new(":b")).unwrap(),
-                b,
-                cx.factory().symbol(Symbol::new(":n")).unwrap(),
-                n,
+                cx.factory().symbol(Symbol::new(":t0")).unwrap(),
+                t0,
+                cx.factory().symbol(Symbol::new(":t1")).unwrap(),
+                t1,
+                cx.factory().symbol(Symbol::new(":y0")).unwrap(),
+                y0,
+                cx.factory().symbol(Symbol::new(":dt")).unwrap(),
+                dt,
             ]),
         )
-        .unwrap_err();
-    assert!(
-        matches!(err, Error::Eval(message) if message.contains("NotYetSupported") && message.contains("tensor state"))
-    );
+        .unwrap();
+
+    let value = table_field(&mut cx, &result, "value");
+    let tensor = sim_lib_numbers_tensor::tensor_value_ref(&value).expect("tensor ODE value");
+    assert_eq!(tensor.shape(), &[2]);
+    assert_eq!(tensor.dtype(), &Symbol::qualified("numbers", "f64"));
+    let cells = tensor.cells().unwrap();
+    assert!((value_to_f64(&mut cx, &cells[0]) - std::f64::consts::E.recip()).abs() < 1.0e-3);
+    assert!((value_to_f64(&mut cx, &cells[1]) - 2.0 * std::f64::consts::E.recip()).abs() < 1.0e-3);
+    assert_eq!(table_field_symbol(&mut cx, &result, "state-kind"), "tensor");
 }

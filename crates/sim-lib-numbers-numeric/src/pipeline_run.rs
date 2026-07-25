@@ -7,8 +7,9 @@ use sim_lib_numbers_core::domains;
 
 use super::{
     options::parse_symbolish_value,
-    pipeline::{ComposedPipeline, PipelineKind, StateKind},
+    pipeline::{ComposedPipeline, PipelineKind},
     registry::global_numeric_registry,
+    state::{ensure_quadrature_state, validate_ode_state},
     traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
 };
 
@@ -160,12 +161,12 @@ fn keyed_run_options(cx: &mut Cx, values: &[Value]) -> Result<BTreeMap<String, V
 
 fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     let RunComposedInput { pipeline, args } = input;
-    ensure_f64_state(&pipeline)?;
     let RunArgs::Ode { t0, t1, y0, dt } = args else {
         unreachable!("ODE pipeline parser builds ODE run args");
     };
     let func_value = value_from_ref(cx, &pipeline.func_ref)?;
     let dy = NumericCallable::sampled_binary(func_value, Symbol::new("x"), Symbol::new("y"))?;
+    validate_ode_state(cx, &pipeline, &dy, &t0, &y0)?;
     let method = resolve_ode_method(&pipeline.method);
     let plugin = {
         let registry = global_numeric_registry()
@@ -232,7 +233,7 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
 
 fn run_quad_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     let RunComposedInput { pipeline, args } = input;
-    ensure_f64_state(&pipeline)?;
+    ensure_quadrature_state(&pipeline)?;
     let RunArgs::Quadrature { a, b, n, tol } = args else {
         unreachable!("quadrature pipeline parser builds quadrature run args");
     };
@@ -342,14 +343,6 @@ fn resolve_ode_method(method: &Symbol) -> Symbol {
     }
 }
 
-fn ensure_f64_state(pipeline: &ComposedPipeline) -> Result<()> {
-    if pipeline.state == StateKind::F64 {
-        Ok(())
-    } else {
-        Err(Error::Eval("NotYetSupported: tensor state".to_owned()))
-    }
-}
-
 struct QuadSelection {
     method: Symbol,
     kind: NumericKind,
@@ -431,6 +424,7 @@ mod tests {
     use sim_kernel::{DefaultFactory, EagerPolicy, Ref};
 
     use super::*;
+    use crate::StateKind;
 
     fn test_cx() -> Cx {
         Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
@@ -481,18 +475,5 @@ mod tests {
         };
         assert_eq!(n, Some(4));
         assert_eq!(tol, None);
-    }
-
-    #[test]
-    fn numeric_pipeline_tensor_state_fails_closed() {
-        let pipeline = ComposedPipeline::new(
-            Ref::Symbol(Symbol::new("test-func")),
-            PipelineKind::OdeSolve,
-            Symbol::new("rk4"),
-            StateKind::Tensor,
-        );
-
-        let err = ensure_f64_state(&pipeline).expect_err("tensor state fails closed");
-        assert!(err.to_string().contains("tensor state"), "{err}");
     }
 }

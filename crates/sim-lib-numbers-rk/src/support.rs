@@ -4,6 +4,7 @@
 use sim_kernel::{Cx, Error, Result, Symbol, Value};
 use sim_lib_numbers_core::domains;
 use sim_lib_numbers_numeric::NumericCallable;
+use sim_lib_numbers_tensor::{execute_tensor_norm, tensor_value_ref};
 
 pub fn f64_value(cx: &mut Cx, value: f64) -> Result<Value> {
     cx.factory()
@@ -42,6 +43,10 @@ pub fn add_scaled(cx: &mut Cx, acc: Value, value: Value, scalar: f64) -> Result<
 
 pub fn abs_error(cx: &mut Cx, left: Value, right: Value) -> Result<f64> {
     let diff = sub(cx, left, right)?;
+    if let Some(tensor) = tensor_value_ref(&diff) {
+        let norm = execute_tensor_norm(cx, tensor)?;
+        return value_to_f64(cx, &norm.cell(0)?, "numeric tensor error");
+    }
     Ok(value_to_f64(cx, &diff, "numeric error")?.abs())
 }
 
