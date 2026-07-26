@@ -181,6 +181,18 @@ impl Tensor {
             .map(Arc::from)
     }
 
+    /// Compatibility view of all row-major scalar cells.
+    ///
+    /// New code should prefer [`Tensor::cells`], which reports resident readback
+    /// failures. This infallible 0.1-series surface is retained so already
+    /// published tensor companion crates keep compiling. It is only sound for
+    /// host-observable tensors; resident readback failures panic with a message
+    /// that names the fallible replacement.
+    pub fn data(&self) -> Arc<[Value]> {
+        self.cells()
+            .expect("Tensor::data requires host-observable cells; use Tensor::cells for fallible observation")
+    }
+
     /// The number of axes, i.e. the length of [`shape`](Tensor::shape). Zero
     /// for a scalar.
     pub fn rank(&self) -> usize {
@@ -433,9 +445,12 @@ pub fn tensor_dtype(tensor: &Tensor) -> &Symbol {
     tensor.dtype()
 }
 
-/// Observes a tensor's row-major scalar cells as a shared flat slice.
-pub fn flatten_tensor_scalar_cells(tensor: &Tensor) -> Result<Arc<[Value]>> {
-    tensor.cells()
+/// Compatibility view of a tensor's row-major scalar cells as a shared flat slice.
+///
+/// New code should prefer [`Tensor::cells`], which reports resident readback
+/// failures.
+pub fn flatten_tensor_scalar_cells(tensor: &Tensor) -> Vec<Value> {
+    tensor.data().iter().cloned().collect()
 }
 
 pub fn tensor_display_name() -> &'static str {

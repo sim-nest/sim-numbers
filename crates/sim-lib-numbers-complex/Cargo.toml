@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-complex"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 license = "MPL-2.0"
 description = "Complex number domain with arithmetic and scalar promotion edges."
@@ -14,7 +14,7 @@ sim-citizen = { version = "0.1.0" }
 sim-citizen-derive = { version = "0.1.0" }
 sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
-sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-lib-numbers-core = { version = "0.2.0", path = "../sim-lib-numbers-core" }
 sim-shape = { version = "0.1.0" }
 
 [build-dependencies]
@@ -22,4 +22,4 @@ sim-cookbook = { version = "0.1.0" }
 
 [dev-dependencies]
 sim-kernel = { version = "0.1.0", features = ["test-support"] }
-sim-lib-numbers-arith = { version = "0.1.0", path = "../sim-lib-numbers-arith" }
+sim-lib-numbers-arith = { version = "0.2.0", path = "../sim-lib-numbers-arith" }

@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-f64"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 license = "MPL-2.0"
 description = "Double-precision float number domain with arithmetic and complex promotion."
@@ -21,7 +21,7 @@ sim-citizen-derive = { version = "0.1.0" }
 sim-codec-binary = { version = "0.1.0", optional = true }
 sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
-sim-lib-numbers-core = { version = "0.1.0", path = "../sim-lib-numbers-core" }
+sim-lib-numbers-core = { version = "0.2.0", path = "../sim-lib-numbers-core" }
 sim-macros = { version = "0.1.0", optional = true }
 sim-shape = { version = "0.1.0" }
 
