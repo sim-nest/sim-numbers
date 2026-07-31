@@ -1,3 +1,3 @@
 title = "Basics"
 order = 10
-summary = "Checked transform, convolution, autoregression, interpolation, spectrum, and guarded inverse conventions."
+summary = "Checked transform, wavelet, smoothing, Toeplitz, interpolation, spectrum, and guarded inverse conventions."

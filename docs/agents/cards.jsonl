@@ -131,6 +131,10 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/main.rs"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/expected.txt"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/main.rs"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/book.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md"}

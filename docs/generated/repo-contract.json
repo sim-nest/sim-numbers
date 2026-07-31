@@ -137,7 +137,7 @@
       "id": "cookbook/numbers/signal",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-signal",
-      "summary": "Deterministic transforms, autoregression, interpolation, spectral estimation, and guarded inverse examples."
+      "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples."
     },
     {
       "id": "cookbook/numbers/stats",
@@ -1906,6 +1906,13 @@
           "package": "sim-lib-numbers-tensor-f64",
           "rename": null,
           "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-linalg",
+          "rename": null,
+          "target": null
         }
       ],
       "description": "Deterministic transforms, autoregression, spectral estimation, and guarded signal operations.",
@@ -1961,6 +1968,16 @@
           ],
           "name": "spectral-estimators",
           "src": "crates/sim-lib-numbers-signal/examples/spectral_estimators.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "wavelet-smoothing",
+          "src": "crates/sim-lib-numbers-signal/examples/wavelet_smoothing.rs"
         },
         {
           "crate_types": [
@@ -2636,10 +2653,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "2c20a94fe5d5ec5098a1dfd12bc19644e102e010",
+    "git_commit": "f98dd6e651261a248a0293a64c1fd6b11a9598dc",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "2c20a94fe5d5ec5098a1dfd12bc19644e102e010",
+    "source_commit": "f98dd6e651261a248a0293a64c1fd6b11a9598dc",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2652,9 +2669,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "96d23c0e44034ad6",
+    "workspace_hash": "0e437e800194dc0e",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 383,
+    "workspace_hash_input_count": 395,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2875,6 +2892,7 @@
       "crates/sim-lib-numbers-signal/examples/autoregressive_spectral.rs",
       "crates/sim-lib-numbers-signal/examples/blocked_transform.rs",
       "crates/sim-lib-numbers-signal/examples/spectral_estimators.rs",
+      "crates/sim-lib-numbers-signal/examples/wavelet_smoothing.rs",
       "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs",
       "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml",
       "crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/main.rs",
@@ -2884,6 +2902,8 @@
       "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
       "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/main.rs",
       "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/main.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml",
       "crates/sim-lib-numbers-signal/recipes/book.toml",
       "crates/sim-lib-numbers-signal/src/algorithm_tests.rs",
       "crates/sim-lib-numbers-signal/src/analytic.rs",
@@ -2905,6 +2925,7 @@
       "crates/sim-lib-numbers-signal/src/interpolation_tests.rs",
       "crates/sim-lib-numbers-signal/src/io_plan.rs",
       "crates/sim-lib-numbers-signal/src/lib.rs",
+      "crates/sim-lib-numbers-signal/src/linalg_support.rs",
       "crates/sim-lib-numbers-signal/src/lomb.rs",
       "crates/sim-lib-numbers-signal/src/mem.rs",
       "crates/sim-lib-numbers-signal/src/multidimensional.rs",
@@ -2924,11 +2945,18 @@
       "crates/sim-lib-numbers-signal/src/runtime_spectral_callable.rs",
       "crates/sim-lib-numbers-signal/src/runtime_spectral_value.rs",
       "crates/sim-lib-numbers-signal/src/runtime_tests.rs",
+      "crates/sim-lib-numbers-signal/src/sample_interpolation.rs",
+      "crates/sim-lib-numbers-signal/src/sample_interpolation_tests.rs",
+      "crates/sim-lib-numbers-signal/src/savitzky_golay.rs",
+      "crates/sim-lib-numbers-signal/src/smoothing_tests.rs",
       "crates/sim-lib-numbers-signal/src/spectral_tests.rs",
       "crates/sim-lib-numbers-signal/src/spectrum_core.rs",
       "crates/sim-lib-numbers-signal/src/spectrum_types.rs",
       "crates/sim-lib-numbers-signal/src/tensor_view.rs",
+      "crates/sim-lib-numbers-signal/src/toeplitz.rs",
       "crates/sim-lib-numbers-signal/src/transform.rs",
+      "crates/sim-lib-numbers-signal/src/wavelet.rs",
+      "crates/sim-lib-numbers-signal/src/wavelet_tests.rs",
       "crates/sim-lib-numbers-signal/src/window.rs",
       "crates/sim-lib-numbers-stats/Cargo.toml",
       "crates/sim-lib-numbers-stats/build.rs",
@@ -3030,6 +3058,7 @@
       "crates/sim-lib-numbers-tensor-linalg/src/implementation/support.rs",
       "crates/sim-lib-numbers-tensor-linalg/src/implementation.rs",
       "crates/sim-lib-numbers-tensor-linalg/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-linalg/src/solve.rs",
       "crates/sim-lib-numbers-tensor-linalg/src/tests.rs",
       "crates/sim-lib-numbers-tensor-rat64/Cargo.toml",
       "crates/sim-lib-numbers-tensor-rat64/build.rs",
@@ -3485,7 +3514,7 @@
       "card_id": "cookbook/numbers/signal",
       "group": "workspace",
       "package": "sim-lib-numbers-signal",
-      "recipe_count": 6,
+      "recipe_count": 7,
       "recipes": [
         {
           "card_id": "numbers/signal/01-basics/blocked-transform",
@@ -3534,9 +3563,17 @@
           "package": "sim-lib-numbers-signal",
           "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml",
           "title": "Reconstructable spectral scaling"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/wavelet-smoothing",
+          "codec": "rust",
+          "id": "wavelet-smoothing",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml",
+          "title": "Wavelet, smoothing, Toeplitz, and interpolation evidence"
         }
       ],
-      "summary": "Deterministic transforms, autoregression, interpolation, spectral estimation, and guarded inverse examples.",
+      "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples.",
       "title": "Numbers Signal Transforms"
     },
     {

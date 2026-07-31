@@ -3,7 +3,7 @@
 use std::{error::Error, fmt};
 
 /// Error returned when a transform plan or signal buffer is invalid.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum SignalError {
     /// A transform length was zero or too short for its definition.
     InvalidLength {
@@ -70,6 +70,35 @@ pub enum SignalError {
     UnstableModel {
         /// One-based autoregressive order at which stability was lost.
         order: usize,
+    },
+    /// A numerical system had no pivot above its declared singularity threshold.
+    SingularSystem {
+        /// Operation whose system was rejected.
+        operation: &'static str,
+        /// Zero-based elimination step.
+        step: usize,
+        /// Largest candidate pivot magnitude at the rejected step.
+        pivot_magnitude: f64,
+        /// Absolute pivot threshold required by the numerical policy.
+        threshold: f64,
+    },
+    /// A sampled-data input repeated an abscissa under reject policy.
+    DuplicateCoordinate {
+        /// Index of the repeated coordinate in the supplied input.
+        index: usize,
+        /// Repeated abscissa.
+        value: f64,
+    },
+    /// A query lies outside a finite sampled-data domain under reject policy.
+    OutOfDomain {
+        /// Query index.
+        index: usize,
+        /// Rejected coordinate.
+        value: f64,
+        /// Smallest admitted coordinate.
+        minimum: f64,
+        /// Largest admitted coordinate.
+        maximum: f64,
     },
     /// Recursive prediction exceeded its declared finite-amplitude bound.
     PredictionLimit {
@@ -147,6 +176,27 @@ impl fmt::Display for SignalError {
             Self::UnstableModel { order } => {
                 write!(f, "autoregressive model is unstable at order {order}")
             }
+            Self::SingularSystem {
+                operation,
+                step,
+                pivot_magnitude,
+                threshold,
+            } => write!(
+                f,
+                "{operation} system is singular at step {step}: pivot {pivot_magnitude} <= {threshold}"
+            ),
+            Self::DuplicateCoordinate { index, value } => {
+                write!(f, "sample coordinate {index} repeats x={value}")
+            }
+            Self::OutOfDomain {
+                index,
+                value,
+                minimum,
+                maximum,
+            } => write!(
+                f,
+                "query coordinate {index} ({value}) is outside [{minimum}, {maximum}]"
+            ),
             Self::PredictionLimit { index } => {
                 write!(
                     f,

@@ -19,7 +19,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 2 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries. |
-| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 8 | Transform, convolve, correlate, fit stable autoregressive models, estimate classical or MEM spectra, interpolate periodic DFT series, derive analytic signals, and guardedly deconvolve with explicit bounded reports. |
+| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 11 | Transform with Fourier or wavelet plans, smooth and differentiate polynomials, solve Toeplitz systems, interpolate periodic or sampled data, estimate spectra, and guardedly deconvolve with explicit policy and diagnostics. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
@@ -169,6 +169,10 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/main.rs`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/expected.txt`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/main.rs`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/book.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md`
@@ -1617,6 +1621,249 @@ fn eval_lisp(cx: &mut sim_kernel::Cx, source: &str) -> String {
 }
 ```
 
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/sample_interpolation_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/sample_interpolation_tests.rs`:
+
+```rust
+use super::*;
+
+// conformance: sampled interpolation shape, duplicate, and extrapolation policy.
+
+fn plan(method: InterpolationMethod) -> InterpolationPlan {
+    InterpolationPlan {
+        method,
+        ..InterpolationPlan::default()
+    }
+}
+
+#[test]
+fn linear_and_cubic_interpolants_preserve_affine_data() {
+    let x = [0.0, 1.0, 2.5, 4.0];
+    let y = x.map(|x| 2.0 * x - 1.0);
+    let at = [0.25, 1.5, 3.75];
+    for method in [InterpolationMethod::Linear, InterpolationMethod::Cubic] {
+        let result = interpolate_samples(&x, &y, &at, plan(method)).unwrap();
+        for (&coordinate, &value) in at.iter().zip(&result.values) {
+            assert!((value - (2.0 * coordinate - 1.0)).abs() < 1e-10);
+        }
+    }
+}
+
+#[test]
+fn monotone_cubic_does_not_overshoot_sample_intervals() {
+    let interpolator = SampleInterpolator::new(
+        &[0.0, 1.0, 2.0, 4.0],
+        &[0.0, 1.0, 1.5, 3.0],
+        plan(InterpolationMethod::Monotone),
+    )
+    .unwrap();
+    let at = (0..=80)
+        .map(|index| index as f64 / 20.0)
+        .collect::<Vec<_>>();
+    let values = interpolator.evaluate(&at).unwrap().values;
+    assert!(values.windows(2).all(|pair| pair[0] <= pair[1]));
+    assert!(values.iter().all(|value| (0.0..=3.0).contains(value)));
+}
+
+#[test]
+fn duplicate_policies_are_explicit_and_reported() {
+    let x = [0.0, 1.0, 1.0, 2.0];
+    let y = [0.0, 1.0, 3.0, 4.0];
+    assert!(matches!(
+        SampleInterpolator::new(&x, &y, InterpolationPlan::default()),
+        Err(SignalError::DuplicateCoordinate { index: 2, .. })
+    ));
+    let interpolator = SampleInterpolator::new(
+        &x,
+        &y,
+        InterpolationPlan {
+            method: InterpolationMethod::Linear,
+            duplicates: DuplicateXPolicy::Average,
+            extrapolation: ExtrapolationPolicy::Reject,
+        },
+    )
+    .unwrap();
+    let result = interpolator.evaluate(&[1.0]).unwrap();
+    assert_eq!(result.values, vec![2.0]);
+    assert_eq!(result.report.duplicates_resolved, 1);
+    assert_eq!(result.report.unique_points, 3);
+}
+
+#[test]
+fn extrapolation_rejects_clamps_or_continues_endpoint_secants() {
+    let x = [0.0, 1.0, 2.0];
+    let y = [0.0, 2.0, 3.0];
+    assert!(matches!(
+        interpolate_samples(&x, &y, &[-1.0], plan(InterpolationMethod::Linear)),
+        Err(SignalError::OutOfDomain { index: 0, .. })
+    ));
+    let clamped = interpolate_samples(
+        &x,
+        &y,
+        &[-1.0, 3.0],
+        InterpolationPlan {
+            method: InterpolationMethod::Monotone,
+            duplicates: DuplicateXPolicy::Reject,
+            extrapolation: ExtrapolationPolicy::Clamp,
+        },
+    )
+    .unwrap();
+    assert_eq!(clamped.values, vec![0.0, 3.0]);
+    assert_eq!(clamped.report.extrapolated_points, 2);
+    let extended = interpolate_samples(
+        &x,
+        &y,
+        &[-1.0, 3.0],
+        InterpolationPlan {
+            method: InterpolationMethod::Cubic,
+            duplicates: DuplicateXPolicy::Reject,
+            extrapolation: ExtrapolationPolicy::Linear,
+        },
+    )
+    .unwrap();
+    assert_eq!(extended.values, vec![-2.0, 4.0]);
+}
+
+#[test]
+fn interpolation_rejects_unsorted_and_non_finite_inputs() {
+    assert!(
+        SampleInterpolator::new(
+            &[0.0, 2.0, 1.0],
+            &[0.0, 1.0, 2.0],
+            InterpolationPlan::default(),
+        )
+        .is_err()
+    );
+    assert!(
+        interpolate_samples(
+            &[0.0, 1.0],
+            &[0.0, f64::NAN],
+            &[0.5],
+            InterpolationPlan::default(),
+        )
+        .is_err()
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/smoothing_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/smoothing_tests.rs`:
+
+```rust
+use super::*;
+
+// conformance: Savitzky-Golay polynomial laws and Toeplitz diagnostics.
+
+#[test]
+fn savitzky_golay_preserves_fitted_polynomials() {
+    let filter = savitzky_golay(SavitzkyGolaySpec {
+        window_length: 7,
+        polynomial_order: 3,
+        ..SavitzkyGolaySpec::default()
+    })
+    .unwrap();
+    let samples = (-10..=10)
+        .map(|x| {
+            let x = f64::from(x);
+            2.0 - 0.5 * x + 0.25 * x * x - 0.125 * x * x * x
+        })
+        .collect::<Vec<_>>();
+    let smoothed = apply_savitzky_golay(&samples, &filter, BoundaryMode::Symmetric).unwrap();
+    for index in 3..samples.len() - 3 {
+        assert!((smoothed[index] - samples[index]).abs() < 1e-9);
+    }
+}
+
+#[test]
+fn derivatives_include_factorial_and_physical_spacing() {
+    let spacing = 0.25;
+    let filter = savitzky_golay(SavitzkyGolaySpec {
+        window_length: 7,
+        polynomial_order: 3,
+        derivative_order: 2,
+        sample_spacing: spacing,
+        ..SavitzkyGolaySpec::default()
+    })
+    .unwrap();
+    let samples = (-10..=10)
+        .map(|index| {
+            let x = f64::from(index) * spacing;
+            3.0 * x * x + 2.0 * x + 1.0
+        })
+        .collect::<Vec<_>>();
+    let derivative = apply_savitzky_golay(&samples, &filter, BoundaryMode::Zero).unwrap();
+    for value in &derivative[3..derivative.len() - 3] {
+        assert!((*value - 6.0).abs() < 1e-9, "{value}");
+    }
+}
+
+#[test]
+fn toeplitz_solver_reports_pivots_and_residual() {
+    let solution = solve_toeplitz(
+        &[4.0, 1.0, 0.5],
+        &[4.0, 2.0, -1.0],
+        &[5.5, 6.0, 3.5],
+        ToeplitzPlan::default(),
+    )
+    .unwrap();
+    assert!((solution.values[0] - 1.0).abs() < 1e-12);
+    assert!((solution.values[1] - 1.0).abs() < 1e-12);
+    assert!((solution.values[2] - 0.5).abs() < 1e-12);
+    assert!(solution.diagnostics.reciprocal_pivot_condition > 0.0);
+    assert!(solution.diagnostics.residual_l2 < 1e-12);
+}
+
+#[test]
+fn toeplitz_singularity_returns_threshold_diagnostics() {
+    let error = solve_toeplitz(
+        &[1.0, 1.0],
+        &[1.0, 1.0],
+        &[2.0, 2.0],
+        ToeplitzPlan::default(),
+    )
+    .unwrap_err();
+    assert!(matches!(
+        error,
+        SignalError::SingularSystem {
+            operation: "Toeplitz",
+            step: 1,
+            pivot_magnitude,
+            threshold,
+        } if pivot_magnitude <= threshold
+    ));
+}
+
+#[test]
+fn smoothing_policies_fail_closed() {
+    assert!(
+        savitzky_golay(SavitzkyGolaySpec {
+            window_length: 4,
+            ..SavitzkyGolaySpec::default()
+        })
+        .is_err()
+    );
+    assert!(
+        savitzky_golay(SavitzkyGolaySpec {
+            derivative_order: 3,
+            polynomial_order: 2,
+            ..SavitzkyGolaySpec::default()
+        })
+        .is_err()
+    );
+    assert!(
+        solve_toeplitz(
+            &[1.0, 0.0],
+            &[2.0, 0.0],
+            &[1.0, 1.0],
+            ToeplitzPlan::default(),
+        )
+        .is_err()
+    );
+}
+```
+
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/spectral_tests` is checked by `cargo test`.
 
 Source `crates/sim-lib-numbers-signal/src/spectral_tests.rs`:
@@ -1911,6 +2158,87 @@ fn segment_taper_grid_and_work_limits_fail_before_execution() {
             ..
         })
     ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/wavelet_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/wavelet_tests.rs`:
+
+```rust
+use super::*;
+
+// conformance: wavelet inverse and polynomial-annihilation laws.
+
+fn assert_close(left: &[f64], right: &[f64], tolerance: f64) {
+    assert_eq!(left.len(), right.len());
+    for (index, (&left, &right)) in left.iter().zip(right).enumerate() {
+        assert!(
+            (left - right).abs() <= tolerance,
+            "sample {index}: {left} != {right}"
+        );
+    }
+}
+
+#[test]
+fn every_wavelet_and_boundary_round_trips_odd_multilevel_signal() {
+    let signal = [0.5, -1.0, 2.5, 4.0, -3.25, 1.5, 0.125, 7.0, -2.0];
+    for wavelet in [Wavelet::Haar, Wavelet::LeGall53] {
+        for boundary in [
+            BoundaryMode::Periodic,
+            BoundaryMode::Symmetric,
+            BoundaryMode::Zero,
+        ] {
+            let plan = WaveletPlan {
+                wavelet,
+                levels: 3,
+                boundary,
+            };
+            let coefficients = dwt(&signal, &plan).unwrap();
+            assert_eq!(coefficients.levels.len(), 3);
+            assert_eq!(coefficients.levels[0].input_len, signal.len());
+            assert_close(&idwt(&coefficients, &plan).unwrap(), &signal, 1e-12);
+        }
+    }
+}
+
+#[test]
+fn legall_detail_annihilates_a_linear_polynomial() {
+    let signal = (0..9)
+        .map(|index| 2.0 * index as f64 - 3.0)
+        .collect::<Vec<_>>();
+    let plan = WaveletPlan {
+        wavelet: Wavelet::LeGall53,
+        levels: 1,
+        boundary: BoundaryMode::Symmetric,
+    };
+    let coefficients = dwt(&signal, &plan).unwrap();
+    assert!(
+        coefficients.levels[0]
+            .detail
+            .iter()
+            .all(|value| value.abs() <= 1e-12)
+    );
+}
+
+#[test]
+fn wavelet_plans_and_coefficients_fail_closed() {
+    let plan = WaveletPlan::new(Wavelet::Haar, 0);
+    assert!(matches!(
+        dwt(&[1.0, 2.0], &plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "wavelet levels",
+            ..
+        })
+    ));
+
+    let plan = WaveletPlan::new(Wavelet::Haar, 2);
+    assert!(dwt(&[1.0, 2.0], &plan).is_err());
+    assert!(dwt(&[1.0, f64::NAN], &WaveletPlan::new(Wavelet::Haar, 1)).is_err());
+
+    let mut coefficients = dwt(&[1.0, 2.0, 3.0, 4.0], &WaveletPlan::new(Wavelet::Haar, 1)).unwrap();
+    coefficients.levels[0].detail.pop();
+    assert!(idwt(&coefficients, &WaveletPlan::new(Wavelet::Haar, 1)).is_err());
 }
 ```
 

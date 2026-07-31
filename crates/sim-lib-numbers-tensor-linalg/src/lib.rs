@@ -26,8 +26,12 @@
 //! ```
 
 mod implementation;
+mod solve;
 
 pub use implementation::TensorLinalgLib;
+pub use solve::{
+    DenseSolution, DenseSolveError, DenseSolveOptions, DenseSolveReport, solve_dense_f64,
+};
 
 /// Cookbook recipes for this lib, embedded at build time.
 pub static RECIPES: sim_cookbook::EmbeddedDir =

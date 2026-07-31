@@ -13,7 +13,9 @@
 //! returns singular-bin and residual evidence instead of dividing blindly.
 //! Burg models retain stability, effective-order, residual, and selection
 //! evidence; periodic DFT and analytic-signal helpers share the same explicit
-//! sign and normalization conventions.
+//! sign and normalization conventions. Wavelets, Savitzky-Golay filters,
+//! Toeplitz solves, and sampled-data interpolation make boundary, derivative,
+//! singularity, duplicate-coordinate, and extrapolation policy reviewable.
 
 mod analytic;
 mod autoregressive;
@@ -28,6 +30,7 @@ mod error;
 mod fft;
 mod interpolate;
 mod io_plan;
+mod linalg_support;
 mod lomb;
 mod mem;
 mod multidimensional;
@@ -44,10 +47,14 @@ mod runtime_convolution_value;
 mod runtime_spectral;
 mod runtime_spectral_callable;
 mod runtime_spectral_value;
+mod sample_interpolation;
+mod savitzky_golay;
 mod spectrum_core;
 mod spectrum_types;
 mod tensor_view;
+mod toeplitz;
 mod transform;
+mod wavelet;
 mod window;
 
 pub use analytic::{
@@ -108,13 +115,24 @@ pub use runtime_spectral_callable::{
     call_signal_burg, call_signal_dft_interpolate, signal_burg_symbol,
     signal_dft_interpolate_symbol,
 };
+pub use sample_interpolation::{
+    DuplicateXPolicy, ExtrapolationPolicy, InterpolationMethod, InterpolationPlan,
+    InterpolationReport, InterpolationResult, SampleInterpolator, interpolate_samples,
+};
+pub use savitzky_golay::{
+    FiniteImpulseResponse, SavitzkyGolaySpec, apply_savitzky_golay, savitzky_golay,
+};
 pub use spectrum_types::{
     CrossSpectrumEstimate, EstimatorEvidence, EstimatorKind, EstimatorLimits, FrequencyGridPolicy,
     LombScarglePlan, MultitaperPlan, PeriodogramPlan, SpectrumEstimate, SpectrumScaling,
     SpectrumScalingKind, SpectrumSide, WelchPlan,
 };
 pub use tensor_view::TensorView;
+pub use toeplitz::{ToeplitzDiagnostics, ToeplitzPlan, ToeplitzSolution, solve_toeplitz};
 pub use transform::{transform, transform_in_place};
+pub use wavelet::{
+    BoundaryMode, Wavelet, WaveletCoefficients, WaveletLevel, WaveletPlan, dwt, idwt,
+};
 pub use window::{
     Window, WindowFunction, WindowMetrics, WindowNormalization, WindowSampling, WindowSpec,
 };
@@ -143,4 +161,10 @@ mod plan_tests;
 #[cfg(test)]
 mod runtime_tests;
 #[cfg(test)]
+mod sample_interpolation_tests;
+#[cfg(test)]
+mod smoothing_tests;
+#[cfg(test)]
 mod spectral_tests;
+#[cfg(test)]
+mod wavelet_tests;

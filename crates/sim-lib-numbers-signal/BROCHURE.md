@@ -32,6 +32,14 @@ explicit origin, period, endpoint, wrapping, Nyquist, sign, and normalization
 contract. Single-bin evaluation, Hilbert analytic signals, phase unwrapping,
 instantaneous frequency, and attack/release envelopes use those conventions too.
 
+Multilevel Haar and Le Gall 5/3 wavelets preserve the chosen periodic,
+symmetric, or zero boundary policy and retain every odd reconstruction length.
+Savitzky-Golay filters expose their polynomial fit and always scale derivatives
+by factorial and physical sample spacing. Structured Toeplitz inputs use shared
+scaled-pivot linear algebra and return pivot conditioning and residual evidence.
+Linear, natural-cubic, and monotone-cubic interpolation make duplicate samples
+and reject, clamp, or linear extrapolation explicit.
+
 The transform side handles ordinary real samples and paired complex samples,
 including awkward prime lengths, with explicit scaling, direction, packing,
 padding, stride, and output placement. Multidimensional views preserve declared
@@ -51,6 +59,10 @@ memory through a caller-selected Table or Dir block store.
 - Burg/MEM results retain stable order, residual, reflection, and criterion evidence.
 - Periodic interpolation and integration state every grid and endpoint assumption.
 - Hilbert phase, instantaneous frequency, and envelopes share one Fourier contract.
+- Odd multilevel wavelets reconstruct under every declared boundary mode.
+- Savitzky-Golay derivatives preserve fitted polynomials in physical units.
+- Toeplitz solves report singular pivots or finite residual evidence.
+- Sample interpolation types duplicate and extrapolation behavior.
 - Segment, taper, frequency-grid, and total-work ceilings fail before execution.
 - Canonical tensor buffers let the result move directly into other number work.
 - Scratch, passes, block I/O, precision, and a content digest make external
