@@ -115,10 +115,10 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/signal-transforms"
 title = "Reference-checked signal transforms"
-summary = "Transform canonical complex and f64 tensor signals with direct DFT definitions, mixed-radix and Bluestein FFTs, real packing, and DCT/DST I-IV."
+summary = "Transform canonical complex and f64 tensor signals with direct definitions, fast paths, strided multidimensional views, and bounded Table/Dir block plans."
 owner = "crate/sim-lib-numbers-signal"
 audiences = ["code", "framework", "user"]
-guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable. Use reference_dft, reference_dct, or reference_dst as the definition-level oracle; use TransformKind::Fft for the mixed-radix and prime-length fast path. Load SignalNumbersLib for signal/transform from Lisp."
+guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable. Use TensorView plus transform_nd for borrowed multidimensional layouts. Use TransformResources and transform_nd_blocked when the complete row-major tensor lives in caller-supplied Table or Dir blocks and one selected axis line fits bounded scratch. Use reference_dft, reference_dct, or reference_dst as definition-level oracles; load SignalNumbersLib for one-dimensional signal/transform calls from Lisp."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-signal",
   "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
@@ -129,12 +129,19 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-signal/signal-buffer",
   "anchor/rustdoc/sim-lib-numbers-signal/signal-numbers-lib",
   "anchor/rustdoc/sim-lib-numbers-signal/spectrum-packing",
+  "anchor/rustdoc/sim-lib-numbers-signal/tensor-view",
   "anchor/rustdoc/sim-lib-numbers-signal/transform",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform_nd",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform_nd_blocked",
   "anchor/rustdoc/sim-lib-numbers-signal/transform-kind",
   "anchor/rustdoc/sim-lib-numbers-signal/transform-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-precision",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-resources",
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests",
 ]
 
 [[feature]]
@@ -297,8 +304,9 @@ task = "Transform a real or complex signal"
 audiences = ["code", "framework", "user"]
 steps = [
   { feature = "feature/sim-numbers/tensors", why = "The tensor row owns canonical complex and f64 storage shared by signal inputs and outputs." },
-  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns explicit transform conventions, direct references, fast Fourier plans, real packing, and cosine/sine definitions." },
-  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance", why = "The checked conformance specimen proves impulse and tone bins, orthonormal Parseval and round trips, prime-length coverage, and fail-closed empty or non-finite inputs." },
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns explicit transform conventions, direct references, fast Fourier plans, strided tensor axes, bounded Table/Dir blocks, and execution reports." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance", why = "The checked one-dimensional specimen proves impulse and tone bins, orthonormal Parseval and round trips, prime-length coverage, and fail-closed inputs." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests", why = "The checked multidimensional specimen proves strided direct-definition agreement, scratch admission, stable plan evidence, and blocked/in-memory equality." },
 ]
 
 [[route]]

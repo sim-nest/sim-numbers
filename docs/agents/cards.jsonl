@@ -109,6 +109,10 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/setup.siml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-rk/recipes/book.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/expected.txt"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/chapter.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml"}

@@ -30,6 +30,37 @@ pub enum SignalError {
         /// Length available through the selected view.
         actual: usize,
     },
+    /// A tensor shape or physical layout is not a valid non-overlapping view.
+    InvalidTensorView {
+        /// View invariant that was not satisfied.
+        reason: &'static str,
+    },
+    /// A requested transform axis does not exist in the tensor rank.
+    AxisOutOfBounds {
+        /// Requested axis.
+        axis: usize,
+        /// Number of tensor dimensions.
+        rank: usize,
+    },
+    /// A transform axis appeared more than once.
+    DuplicateAxis {
+        /// Repeated axis.
+        axis: usize,
+    },
+    /// A bounded transform plan would exceed the caller's scratch limit.
+    ScratchLimit {
+        /// Peak scratch bytes required by the selected plan.
+        required: usize,
+        /// Caller-declared scratch-byte ceiling.
+        maximum: usize,
+    },
+    /// A Table/Dir block-store operation failed or returned invalid data.
+    BlockStore {
+        /// Operation being performed.
+        operation: &'static str,
+        /// Backend or encoding diagnostic.
+        message: String,
+    },
     /// A transform received real data where complex data was required, or the
     /// reverse.
     InputKind {
@@ -63,6 +94,22 @@ impl fmt::Display for SignalError {
                     f,
                     "signal length mismatch: expected {expected}, got {actual}"
                 )
+            }
+            Self::InvalidTensorView { reason } => write!(f, "invalid tensor view: {reason}"),
+            Self::AxisOutOfBounds { axis, rank } => {
+                write!(f, "transform axis {axis} is outside tensor rank {rank}")
+            }
+            Self::DuplicateAxis { axis } => {
+                write!(f, "transform axis {axis} was declared more than once")
+            }
+            Self::ScratchLimit { required, maximum } => {
+                write!(
+                    f,
+                    "transform needs {required} scratch bytes, exceeding limit {maximum}"
+                )
+            }
+            Self::BlockStore { operation, message } => {
+                write!(f, "block store {operation} failed: {message}")
             }
             Self::InputKind { expected, actual } => {
                 write!(f, "transform expects {expected} input, got {actual}")
