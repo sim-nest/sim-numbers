@@ -117,6 +117,8 @@ pub enum EstimatorKind {
     SlepianMultitaper,
     /// Uneven-sample generalized Lomb-Scargle estimate.
     LombScargle,
+    /// Burg autoregressive maximum-entropy estimate.
+    MaximumEntropy,
 }
 
 /// Work, averaging, grid, and window facts retained beside an estimate.

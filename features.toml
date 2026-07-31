@@ -42,7 +42,7 @@ title = "Number framework"
 summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries."
 owner = "crate/sim-lib-numbers-core"
 audiences = ["code", "framework"]
-guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, convolution, correlation, blocked-convolution, guarded-deconvolution, or classical spectral-estimation plans over canonical complex and f64 tensors. Use sim-lib-numbers-stats fit_markov for finite first-order transition estimation when callers need exact counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance rather than opaque weights; domain-owned adapters must keep their state types outside sim-numbers."
+guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, convolution, correlation, blocked-convolution, guarded-deconvolution, classical or Burg/MEM spectral estimation, periodic DFT interpolation, and analytic-signal plans over canonical complex and f64 tensors. Use sim-lib-numbers-stats fit_markov for finite first-order transition estimation when callers need exact counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance rather than opaque weights; domain-owned adapters must keep their state types outside sim-numbers."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-ad",
   "anchor/crate/sim-lib-numbers-arith",
@@ -115,15 +115,26 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/signal-transforms"
 title = "Reference-checked signal algorithms"
-summary = "Transform, convolve, correlate, estimate classical spectra, and guardedly deconvolve signals with reference definitions, explicit scaling, and bounded reports."
+summary = "Transform, convolve, correlate, fit stable autoregressive models, estimate classical or MEM spectra, interpolate periodic DFT series, derive analytic signals, and guardedly deconvolve with explicit bounded reports."
 owner = "crate/sim-lib-numbers-signal"
 audiences = ["code", "framework", "user"]
-guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable. Use ConvolutionPlan or CorrelationPlan when geometry, boundary, normalization, lag order, direct/FFT cost selection, or retained span must be explicit. Use BlockConvolutionPlan for overlap-add/save latency and boundary evidence. Use DeconvolutionPlan only with a positive singular threshold and Tikhonov or truncated regularization. Use WindowSpec plus PeriodogramPlan, WelchPlan, MultitaperPlan, or LombScarglePlan when window gain/energy, frequency grid, output scaling, degrees of freedom, and work admission must remain reconstructable; sound-spectrum consumers should reuse these estimators rather than introduce another Fourier convention. Use TensorView plus transform_nd for borrowed multidimensional layouts and TransformResources plus transform_nd_blocked for caller-supplied Table/Dir blocks. Load SignalNumbersLib for the signal/transform, signal/convolve, signal/correlate, and signal/deconvolve Lisp calls."
+guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable. Use ConvolutionPlan or CorrelationPlan when geometry, boundary, normalization, lag order, direct/FFT cost selection, or retained span must be explicit. Use BlockConvolutionPlan for overlap-add/save latency and boundary evidence. Use DeconvolutionPlan only with a positive singular threshold and Tikhonov or truncated regularization. Use WindowSpec plus PeriodogramPlan, WelchPlan, MultitaperPlan, LombScarglePlan, or BurgPlan plus MemSpectrumPlan when window gain/energy, autoregressive stability/order, frequency grid, output scaling, residuals, degrees of freedom, and work admission must remain reconstructable; sound-spectrum consumers should reuse these estimators rather than introduce another Fourier convention. Use DftSeriesPlan for continuous periodic interpolation/integration and AnalyticSignalPlan for Hilbert, phase, frequency, and envelope workflows under the same Fourier conventions. Use TensorView plus transform_nd for borrowed multidimensional layouts and TransformResources plus transform_nd_blocked for caller-supplied Table/Dir blocks. Load SignalNumbersLib for the signal/transform, signal/convolve, signal/correlate, signal/deconvolve, signal/burg, and signal/dft-interpolate Lisp calls."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-signal",
   "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
   "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic_envelope",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic_signal",
+  "anchor/rustdoc/sim-lib-numbers-signal/ar-model",
+  "anchor/rustdoc/sim-lib-numbers-signal/ar-order-criterion",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg-evidence",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg-stability",
   "anchor/rustdoc/sim-lib-numbers-signal/boundary-policy",
   "anchor/rustdoc/sim-lib-numbers-signal/convolution-algorithm",
   "anchor/rustdoc/sim-lib-numbers-signal/convolution-cost-plan",
@@ -136,6 +147,14 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-signal/deconvolution-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/deconvolution-report",
   "anchor/rustdoc/sim-lib-numbers-signal/deconvolve",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft_bin",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft-integral",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft-interpolation",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft-series-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft_integrate",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft_interpolate",
+  "anchor/rustdoc/sim-lib-numbers-signal/envelope-follower-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/envelope_follow",
   "anchor/rustdoc/sim-lib-numbers-signal/estimator-evidence",
   "anchor/rustdoc/sim-lib-numbers-signal/estimator-limits",
   "anchor/rustdoc/sim-lib-numbers-signal/frequency-grid-policy",
@@ -144,6 +163,11 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-signal/lomb_scargle",
   "anchor/rustdoc/sim-lib-numbers-signal/multitaper",
   "anchor/rustdoc/sim-lib-numbers-signal/multitaper-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/mem-spectrum-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/mem_spectrum",
+  "anchor/rustdoc/sim-lib-numbers-signal/prediction-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/predict_backward",
+  "anchor/rustdoc/sim-lib-numbers-signal/predict_forward",
   "anchor/rustdoc/sim-lib-numbers-signal/regularization",
   "anchor/rustdoc/sim-lib-numbers-signal/normalization",
   "anchor/rustdoc/sim-lib-numbers-signal/periodogram",
@@ -167,6 +191,7 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-signal/transform-precision",
   "anchor/rustdoc/sim-lib-numbers-signal/transform-report",
   "anchor/rustdoc/sim-lib-numbers-signal/transform-resources",
+  "anchor/rustdoc/sim-lib-numbers-signal/unwrap_phase",
   "anchor/rustdoc/sim-lib-numbers-signal/welch",
   "anchor/rustdoc/sim-lib-numbers-signal/welch-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/window",
@@ -180,8 +205,11 @@ claims_anchors = [
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/autoregressive_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/interpolation_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/runtime_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/spectral_tests",
 ]
@@ -354,12 +382,25 @@ steps = [
 
 [[route]]
 id = "route/estimate-classical-spectrum"
-task = "Estimate a classical spectrum with reconstructable scaling"
+task = "Estimate a classical or autoregressive spectrum with reconstructable scaling"
 audiences = ["code", "framework", "user"]
 steps = [
-  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns reference windows, periodogram/Welch/cross/coherence, Slepian multitaper, uneven-sample Lomb-Scargle, explicit grids and scaling, and bounded evidence." },
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns reference windows, periodogram/Welch/cross/coherence, Slepian multitaper, uneven-sample Lomb-Scargle, stable Burg/MEM models, explicit grids and scaling, and bounded evidence." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/spectral_tests", why = "The checked tone/noise specimen proves window invariants, Parseval density, peak recovery, coherence, Slepian concentration, uneven-sample recovery, and fail-closed work limits." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/autoregressive_tests", why = "The generated AR-process specimen proves BIC order recovery, stable reflections, MEM resonance, bounded bidirectional prediction, and singular or unstable fail-closed behavior." },
   { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/spectral-estimators", why = "The runnable periodogram specimen prints coherent gain, equivalent noise bandwidth, peak power, degrees of freedom, and admitted work." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/burg-mem-evidence", why = "The deterministic generated AR(2) recipe prints selected order, residual variance, reflection margin, MEM peak, and admitted work." },
+]
+
+[[route]]
+id = "route/interpolate-periodic-spectrum"
+task = "Interpolate or analyze a periodic signal under explicit Fourier conventions"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns continuous DFT-series evaluation and integration, single-bin evaluation, Hilbert construction, unwrapped phase, instantaneous frequency, and envelope following under one explicit convention." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/interpolation_tests", why = "The generated analytic periodic-function specimen proves off-grid interpolation, exact integration, endpoint refusal, wrapping, and single-bin parity." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests", why = "The generated tone specimen proves Hilbert quadrature under every normalization, phase unwrapping, interval-centered frequency, and finite attack/release envelopes." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/dft-interpolation", why = "The Lisp recipe retains unitary scaling, period, origin, endpoint, wrapping, sign, Nyquist, phase, and work evidence." },
 ]
 
 [[route]]

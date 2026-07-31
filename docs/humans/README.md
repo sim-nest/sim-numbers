@@ -19,7 +19,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 2 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries. |
-| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 5 | Transform, convolve, correlate, estimate classical spectra, and guardedly deconvolve signals with reference definitions, explicit scaling, and bounded reports. |
+| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 8 | Transform, convolve, correlate, fit stable autoregressive models, estimate classical or MEM spectra, interpolate periodic DFT series, derive analytic signals, and guardedly deconvolve with explicit bounded reports. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
@@ -151,10 +151,17 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/expected.txt`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/main.rs`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/setup.siml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/setup.siml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/setup.siml`
@@ -729,6 +736,206 @@ fn empty_and_non_finite_inputs_fail_closed() {
 }
 ```
 
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/analytic_tests.rs`:
+
+```rust
+// conformance: generated analytic tones, phase, instantaneous frequency, and envelopes.
+
+use std::f64::consts::{PI, TAU};
+
+use super::*;
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+#[test]
+fn hilbert_construction_matches_a_generated_periodic_tone_for_every_scaling() {
+    let len = 64;
+    let bin = 5;
+    let samples = (0..len)
+        .map(|index| (TAU * bin as f64 * index as f64 / len as f64).cos())
+        .collect::<Vec<_>>();
+    for normalization in [
+        Normalization::None,
+        Normalization::Forward,
+        Normalization::Inverse,
+        Normalization::Orthonormal,
+    ] {
+        let plan = AnalyticSignalPlan {
+            normalization,
+            ..AnalyticSignalPlan::default()
+        };
+        let analytic = analytic_signal(&samples, &plan).unwrap();
+        for (index, (real, imag)) in analytic.samples.iter().copied().enumerate() {
+            let phase = TAU * bin as f64 * index as f64 / len as f64;
+            assert_close(real, phase.cos(), 1.0e-11);
+            assert_close(imag, phase.sin(), 1.0e-11);
+        }
+        let envelope = analytic_envelope(&analytic.samples).unwrap();
+        assert!(envelope.iter().all(|value| (*value - 1.0).abs() < 1.0e-11));
+    }
+}
+
+#[test]
+fn unwrapped_phase_yields_interval_centered_instantaneous_frequency() {
+    let sample_rate_hz = 64.0;
+    let frequency_hz = 5.0;
+    let analytic = (0..64)
+        .map(|index| {
+            let phase = TAU * frequency_hz * index as f64 / sample_rate_hz;
+            (phase.cos(), phase.sin())
+        })
+        .collect::<Vec<_>>();
+    let result = instantaneous_frequency(&analytic, sample_rate_hz).unwrap();
+    assert_eq!(result.frequency_hz.len(), 63);
+    assert_close(result.time_seconds[0], 0.5 / sample_rate_hz, 1.0e-14);
+    for frequency in result.frequency_hz {
+        assert_close(frequency, frequency_hz, 1.0e-12);
+    }
+
+    let wrapped = [0.75 * PI, -0.75 * PI, -0.5 * PI];
+    let unwrapped = unwrap_phase(&wrapped, PI).unwrap();
+    assert_close(unwrapped[1], 1.25 * PI, 1.0e-14);
+    assert_close(unwrapped[2], 1.5 * PI, 1.0e-14);
+}
+
+#[test]
+fn attack_release_envelope_is_finite_and_directional() {
+    let samples = [0.0, 1.0, 1.0, 0.0, 0.0];
+    let plan = EnvelopeFollowerPlan {
+        sample_rate_hz: 10.0,
+        attack_seconds: 0.1,
+        release_seconds: 1.0,
+        initial_value: 0.0,
+    };
+    let envelope = envelope_follow(&samples, &plan).unwrap();
+    assert_eq!(envelope[0], 0.0);
+    assert!(envelope[1] > 0.5);
+    assert!(envelope[2] > envelope[1]);
+    assert!(envelope[3] < envelope[2]);
+    assert!(envelope[4] < envelope[3]);
+    assert!(envelope[3] > 0.5);
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/autoregressive_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/autoregressive_tests.rs`:
+
+```rust
+// conformance: generated AR processes, stable Burg order evidence, MEM, and bounded prediction.
+
+use std::f64::consts::TAU;
+
+use super::*;
+
+fn generated_ar2(len: usize) -> Vec<f64> {
+    let radius = 0.9;
+    let frequency = 0.125;
+    let first = 2.0 * radius * (TAU * frequency).cos();
+    let second = -(radius * radius);
+    let mut state = 0x5eed_f00d_dead_beef_u64;
+    let mut samples = vec![0.0; len];
+    for index in 2..len {
+        state = state
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1);
+        let uniform = (state >> 11) as f64 / (1_u64 << 53) as f64;
+        let innovation = (uniform - 0.5) * 0.2;
+        samples[index] = first * samples[index - 1] + second * samples[index - 2] + innovation;
+    }
+    samples
+}
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+#[test]
+fn burg_recovers_generated_ar_process_and_bic_order() {
+    let samples = generated_ar2(4096);
+    let fixed = burg(&samples, &BurgPlan::new(2)).unwrap();
+    assert_eq!(fixed.evidence.effective_order, 2);
+    assert_eq!(fixed.evidence.termination, BurgTermination::RequestedOrder);
+    assert_close(fixed.coefficients[0], -1.272792206, 0.04);
+    assert_close(fixed.coefficients[1], 0.81, 0.04);
+    assert!(fixed.evidence.minimum_reflection_margin > 0.05);
+    assert!(fixed.evidence.residual_energy > 0.0);
+
+    let mut selected = BurgPlan::new(8);
+    selected.criterion = ArOrderCriterion::Bayesian;
+    let selected = burg(&samples, &selected).unwrap();
+    assert_eq!(selected.evidence.effective_order, 2);
+    assert_eq!(selected.evidence.candidate_scores.len(), 8);
+    assert_eq!(selected.evidence.criterion, ArOrderCriterion::Bayesian);
+}
+
+#[test]
+fn maximum_entropy_spectrum_finds_the_generated_resonance() {
+    let samples = generated_ar2(4096);
+    let model = burg(&samples, &BurgPlan::new(2)).unwrap();
+    let spectrum = mem_spectrum(&model, &MemSpectrumPlan::new(1.0, 512)).unwrap();
+    let peak = spectrum
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert_close(spectrum.frequency[peak], 0.125, 2.0 / 512.0);
+    assert_eq!(spectrum.evidence.estimator, EstimatorKind::MaximumEntropy);
+    assert_eq!(spectrum.evidence.degrees_of_freedom, 4094.0);
+    assert!(
+        spectrum
+            .power
+            .iter()
+            .all(|value| value.is_finite() && *value >= 0.0)
+    );
+}
+
+#[test]
+fn forward_and_backward_predictions_are_bounded_before_recursion() {
+    let samples = generated_ar2(512);
+    let model = burg(&samples, &BurgPlan::new(2)).unwrap();
+    let mut plan = PredictionPlan::new(64);
+    plan.max_abs_value = 10.0;
+    let forward = predict_forward(&model, &samples, &plan).unwrap();
+    let backward = predict_backward(&model, &samples, &plan).unwrap();
+    assert_eq!(forward.samples.len(), 64);
+    assert_eq!(backward.samples.len(), 64);
+    assert!(forward.samples.iter().all(|value| value.abs() <= 10.0));
+    assert!(backward.samples.iter().all(|value| value.abs() <= 10.0));
+    assert_eq!(forward.work_units, 128);
+
+    plan.max_abs_value = 1.0e-12;
+    assert!(matches!(
+        predict_forward(&model, &samples, &plan),
+        Err(SignalError::PredictionLimit { .. })
+    ));
+}
+
+#[test]
+fn singular_and_unstable_models_fail_closed() {
+    assert_eq!(
+        burg(&[3.0; 16], &BurgPlan::new(2)),
+        Err(SignalError::SingularModel { order: 1 })
+    );
+    assert_eq!(
+        burg(&[1.0, -1.0, 1.0, -1.0], &BurgPlan::new(1)),
+        Err(SignalError::UnstableModel { order: 1 })
+    );
+}
+```
+
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests` is checked by `cargo test`.
 
 Source `crates/sim-lib-numbers-signal/src/convolution_tests.rs`:
@@ -1156,6 +1363,110 @@ fn assert_complex_close(actual: &[(f64, f64)], expected: &[(f64, f64)]) {
 }
 ```
 
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/interpolation_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/interpolation_tests.rs`:
+
+```rust
+// conformance: generated analytic periodic functions under explicit DFT-series conventions.
+
+use std::f64::consts::TAU;
+
+use super::*;
+
+fn periodic_value(time: f64) -> f64 {
+    1.0 + 2.0 * (TAU * time).cos() - 0.5 * (2.0 * TAU * time).sin()
+}
+
+fn unitary_bins(len: usize) -> Vec<(f64, f64)> {
+    let samples = (0..len)
+        .map(|index| (periodic_value(index as f64 / len as f64), 0.0))
+        .collect::<Vec<_>>();
+    let mut plan = TransformPlan::new(TransformKind::Dft, len);
+    plan.normalization = Normalization::Orthonormal;
+    let SignalBuffer::Complex(bins) = transform(&plan, SignalView::Complex(&samples)).unwrap()
+    else {
+        panic!("complex DFT expected")
+    };
+    bins.as_slice().to_vec()
+}
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+#[test]
+fn dft_interpolation_matches_generated_periodic_function_between_samples() {
+    let bins = unitary_bins(16);
+    let plan = DftSeriesPlan {
+        normalization: Normalization::Orthonormal,
+        ..DftSeriesPlan::default()
+    };
+    let coordinates = [0.1375, 0.375, 1.1375];
+    let result = dft_interpolate(&bins, &coordinates, &plan).unwrap();
+    for (actual, coordinate) in result.values.iter().zip(coordinates) {
+        assert_close(actual.0, periodic_value(coordinate), 1.0e-11);
+        assert_close(actual.1, 0.0, 1.0e-11);
+    }
+    assert_eq!(result.report.work_units, 48);
+    assert_eq!(result.report.endpoint, EndpointConvention::Excluded);
+    assert_eq!(result.report.periodicity, Periodicity::Wrap);
+}
+
+#[test]
+fn dft_integration_and_endpoint_policy_are_explicit() {
+    let bins = unitary_bins(16);
+    let mut plan = DftSeriesPlan {
+        normalization: Normalization::Orthonormal,
+        periodicity: Periodicity::PrincipalPeriod,
+        endpoint: EndpointConvention::Included,
+        ..DftSeriesPlan::default()
+    };
+    let integral = dft_integrate(&bins, 0.0, 1.0, &plan).unwrap();
+    assert_close(integral.value.0, 1.0, 1.0e-11);
+    assert_close(integral.value.1, 0.0, 1.0e-11);
+
+    plan.endpoint = EndpointConvention::Excluded;
+    assert!(matches!(
+        dft_interpolate(&bins, &[1.0], &plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "DFT interpolation coordinate",
+            ..
+        })
+    ));
+}
+
+#[test]
+fn single_bin_matches_complete_reference_dft() {
+    let samples = (0..17)
+        .map(|index| {
+            let value = periodic_value(index as f64 / 17.0);
+            (value, 0.25 * value)
+        })
+        .collect::<Vec<_>>();
+    let full = reference_dft(
+        &samples,
+        Direction::Forward,
+        SignConvention::NegativeForward,
+    )
+    .unwrap();
+    for bin in [0, 1, 2, 9, 16] {
+        let single = dft_bin(
+            &samples,
+            bin,
+            Normalization::Inverse,
+            SignConvention::NegativeForward,
+        )
+        .unwrap();
+        assert_close(single.0, full[bin].0, 1.0e-11);
+        assert_close(single.1, full[bin].1, 1.0e-11);
+    }
+}
+```
+
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/runtime_tests` is checked by `cargo test`.
 
 Source `crates/sim-lib-numbers-signal/src/runtime_tests.rs`:
@@ -1244,6 +1555,42 @@ fn lisp_surface_exposes_costed_convolution_and_guarded_deconvolution() {
     );
     assert!(!deconvolution.contains("inf"), "{deconvolution}");
     assert!(!deconvolution.contains("NaN"), "{deconvolution}");
+}
+
+#[test]
+fn lisp_surface_exposes_burg_and_unitary_dft_interpolation_evidence() {
+    let mut cx = cx();
+    let interpolation = eval_lisp(
+        &mut cx,
+        "(signal/dft-interpolate [[2.0 0.0] [0.0 0.0] [0.0 0.0] [0.0 0.0]] :at '(0.125 0.375) :normalization 'unitary)",
+    );
+    assert!(
+        interpolation.contains("values ((1 0) (1 0))"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("normalization unitary"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("periodicity wrap"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("endpoint excluded"),
+        "{interpolation}"
+    );
+
+    let burg = eval_lisp(
+        &mut cx,
+        "(signal/burg [0.0 0.2 0.31 0.28 0.12 -0.08 -0.21 -0.19 -0.05 0.13 0.24 0.2] :order 2 :criterion 'fixed :stability 'reject)",
+    );
+    assert!(burg.contains("effective-order 2"), "{burg}");
+    assert!(burg.contains("criterion fixed"), "{burg}");
+    assert!(burg.contains("termination requested-order"), "{burg}");
+    assert!(burg.contains("residual-energy"), "{burg}");
+    assert!(!burg.contains("NaN"), "{burg}");
+    assert!(!burg.contains("inf"), "{burg}");
 }
 
 fn eval_lisp(cx: &mut sim_kernel::Cx, source: &str) -> String {

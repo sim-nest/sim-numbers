@@ -137,7 +137,7 @@
       "id": "cookbook/numbers/signal",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-signal",
-      "summary": "Deterministic transforms, convolution, spectral estimation, and guarded inverse examples."
+      "summary": "Deterministic transforms, autoregression, interpolation, spectral estimation, and guarded inverse examples."
     },
     {
       "id": "cookbook/numbers/stats",

@@ -113,10 +113,17 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/expected.txt"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/main.rs"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/chapter.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/setup.siml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/recipe.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/setup.siml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/setup.siml"}

@@ -1,5 +1,5 @@
 book = "numbers/signal"
 title = "Numbers Signal Transforms"
-summary = "Deterministic transforms, convolution, spectral estimation, and guarded inverse examples."
+summary = "Deterministic transforms, autoregression, interpolation, spectral estimation, and guarded inverse examples."
 order = 45
 chapters = ["01-basics"]

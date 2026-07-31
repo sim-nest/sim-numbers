@@ -61,6 +61,21 @@ pub enum SignalError {
         /// Caller-declared work-unit ceiling.
         maximum: u64,
     },
+    /// Burg recursion encountered a zero-energy or numerically singular stage.
+    SingularModel {
+        /// One-based autoregressive order at which the recursion became singular.
+        order: usize,
+    },
+    /// An autoregressive reflection coefficient crossed the declared stability margin.
+    UnstableModel {
+        /// One-based autoregressive order at which stability was lost.
+        order: usize,
+    },
+    /// Recursive prediction exceeded its declared finite-amplitude bound.
+    PredictionLimit {
+        /// Zero-based predicted sample that first crossed the bound.
+        index: usize,
+    },
     /// A Table/Dir block-store operation failed or returned invalid data.
     BlockStore {
         /// Operation being performed.
@@ -124,6 +139,18 @@ impl fmt::Display for SignalError {
                 write!(
                     f,
                     "spectral estimator needs {required} work units, exceeding limit {maximum}"
+                )
+            }
+            Self::SingularModel { order } => {
+                write!(f, "autoregressive model is singular at order {order}")
+            }
+            Self::UnstableModel { order } => {
+                write!(f, "autoregressive model is unstable at order {order}")
+            }
+            Self::PredictionLimit { index } => {
+                write!(
+                    f,
+                    "autoregressive prediction crossed its bound at sample {index}"
                 )
             }
             Self::BlockStore { operation, message } => {

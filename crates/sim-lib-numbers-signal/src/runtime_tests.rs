@@ -83,6 +83,42 @@ fn lisp_surface_exposes_costed_convolution_and_guarded_deconvolution() {
     assert!(!deconvolution.contains("NaN"), "{deconvolution}");
 }
 
+#[test]
+fn lisp_surface_exposes_burg_and_unitary_dft_interpolation_evidence() {
+    let mut cx = cx();
+    let interpolation = eval_lisp(
+        &mut cx,
+        "(signal/dft-interpolate [[2.0 0.0] [0.0 0.0] [0.0 0.0] [0.0 0.0]] :at '(0.125 0.375) :normalization 'unitary)",
+    );
+    assert!(
+        interpolation.contains("values ((1 0) (1 0))"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("normalization unitary"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("periodicity wrap"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("endpoint excluded"),
+        "{interpolation}"
+    );
+
+    let burg = eval_lisp(
+        &mut cx,
+        "(signal/burg [0.0 0.2 0.31 0.28 0.12 -0.08 -0.21 -0.19 -0.05 0.13 0.24 0.2] :order 2 :criterion 'fixed :stability 'reject)",
+    );
+    assert!(burg.contains("effective-order 2"), "{burg}");
+    assert!(burg.contains("criterion fixed"), "{burg}");
+    assert!(burg.contains("termination requested-order"), "{burg}");
+    assert!(burg.contains("residual-energy"), "{burg}");
+    assert!(!burg.contains("NaN"), "{burg}");
+    assert!(!burg.contains("inf"), "{burg}");
+}
+
 fn eval_lisp(cx: &mut sim_kernel::Cx, source: &str) -> String {
     let expr = decode_eval_expr_with_codec(
         cx,

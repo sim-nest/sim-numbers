@@ -11,7 +11,11 @@ use sim_kernel::{
 use crate::{
     DctType, Direction, DstType, Normalization, SignalBuffer, SignalError, SignalView,
     SpectrumPacking, TransformKind, TransformPlan,
-    runtime_convolution_callable::{load_operations, operation_symbols},
+    runtime_convolution_callable::{
+        load_operations as load_convolution_operations,
+        operation_symbols as convolution_operation_symbols,
+    },
+    runtime_spectral_callable::{load_spectral_operations, spectral_symbols},
     transform,
 };
 
@@ -153,7 +157,8 @@ impl Lib for SignalNumbersLib {
             requires: Vec::<Dependency>::new(),
             capabilities: Vec::new(),
             exports: std::iter::once(signal_transform_symbol())
-                .chain(operation_symbols())
+                .chain(convolution_operation_symbols())
+                .chain(spectral_symbols())
                 .map(|symbol| Export::Function {
                     symbol,
                     function_id: None,
@@ -167,7 +172,8 @@ impl Lib for SignalNumbersLib {
             signal_transform_symbol(),
             DefaultFactory.opaque(Arc::new(SignalTransformFunction))?,
         )?;
-        load_operations(linker)?;
+        load_convolution_operations(linker)?;
+        load_spectral_operations(linker)?;
         Ok(())
     }
 }
