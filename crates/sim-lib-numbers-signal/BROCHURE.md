@@ -1,6 +1,6 @@
 # sim-lib-numbers-signal
 
-In one line: It transforms, combines, aligns, and safely unmixes sampled patterns with every convention stated.
+In one line: It transforms, combines, estimates, aligns, and safely unmixes sampled patterns with every convention stated.
 
 ## What it gives you
 
@@ -13,6 +13,14 @@ circular geometry; boundary, normalization, and lag-order policies remain
 typed and reviewable. Overlap-add and overlap-save plans state their retained
 span, latency, padding, and discarded boundaries. Deconvolution always carries
 a Tikhonov or truncated spectral guard plus singular-bin and residual evidence.
+
+For classical spectral estimation it supplies rectangular, Hann, Hamming,
+Blackman-family, Kaiser, and caller-defined windows with explicit endpoint and
+normalization policy. Periodogram, Welch, cross-spectrum/coherence, Slepian
+multitaper, and uneven-sample Lomb-Scargle reports retain their frequency grid,
+scaling denominator, degrees of freedom, segment/taper counts, and admitted
+work ceiling. A result can therefore be reconstructed without guessing whether
+power was folded, gain-corrected, density-scaled, or variance-normalized.
 
 The transform side handles ordinary real samples and paired complex samples,
 including awkward prime lengths, with explicit scaling, direction, packing,
@@ -29,6 +37,8 @@ memory through a caller-selected Table or Dir block store.
 - Correlation returns signed lags instead of leaving index meaning implicit.
 - Singular deconvolution returns finite conditioning evidence, never infinity.
 - Blocked convolution reports exactly what it retained, padded, and discarded.
+- Tone and noise estimates retain window, grid, scaling, and averaging evidence.
+- Segment, taper, frequency-grid, and total-work ceilings fail before execution.
 - Canonical tensor buffers let the result move directly into other number work.
 - Scratch, passes, block I/O, precision, and a content digest make external
   plans reviewable before and after execution.

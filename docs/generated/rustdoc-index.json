@@ -153,7 +153,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
       "package": "sim-lib-numbers-signal",
-      "summary": "Deterministic transforms, convolution, correlation, and guarded deconvolution over canonical SIM tensors."
+      "summary": "Deterministic transforms, convolution, classical spectral estimation, and guarded deconvolution over canonical SIM tensors."
     },
     {
       "crate_name": "sim_lib_numbers_stats",

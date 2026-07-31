@@ -3,7 +3,7 @@ name = "sim-lib-numbers-signal"
 version = "0.1.0"
 edition = "2024"
 license = "MPL-2.0"
-description = "Deterministic transforms, convolution, correlation, and guarded deconvolution."
+description = "Deterministic transforms, convolution, spectral estimation, and guarded deconvolution."
 readme = "README.md"
 publish = true
 repository = "https://github.com/sim-nest/sim-numbers"
@@ -27,6 +27,10 @@ sim-cookbook = { version = "0.1.0" }
 [[example]]
 name = "blocked-transform"
 path = "examples/blocked_transform.rs"
+
+[[example]]
+name = "spectral-estimators"
+path = "examples/spectral_estimators.rs"
 
 [lints]
 workspace = true

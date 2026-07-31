@@ -1,0 +1,3 @@
+window coherent-gain=0.500 enbw-bins=1.500
+peak-frequency=8.0 peak-power=0.500
+dof=2 work=4160/100000000

@@ -54,6 +54,13 @@ pub enum SignalError {
         /// Caller-declared scratch-byte ceiling.
         maximum: usize,
     },
+    /// A spectral estimator would exceed its declared deterministic work limit.
+    WorkLimit {
+        /// Conservative work units required by the selected plan.
+        required: u64,
+        /// Caller-declared work-unit ceiling.
+        maximum: u64,
+    },
     /// A Table/Dir block-store operation failed or returned invalid data.
     BlockStore {
         /// Operation being performed.
@@ -111,6 +118,12 @@ impl fmt::Display for SignalError {
                 write!(
                     f,
                     "transform needs {required} scratch bytes, exceeding limit {maximum}"
+                )
+            }
+            Self::WorkLimit { required, maximum } => {
+                write!(
+                    f,
+                    "spectral estimator needs {required} work units, exceeding limit {maximum}"
                 )
             }
             Self::BlockStore { operation, message } => {

@@ -137,7 +137,7 @@
       "id": "cookbook/numbers/signal",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-signal",
-      "summary": "Deterministic transforms, convolution, correlation, and guarded inverse examples."
+      "summary": "Deterministic transforms, convolution, spectral estimation, and guarded inverse examples."
     },
     {
       "id": "cookbook/numbers/stats",
@@ -1908,14 +1908,14 @@
           "target": null
         }
       ],
-      "description": "Deterministic transforms, convolution, correlation, and guarded deconvolution.",
+      "description": "Deterministic transforms, convolution, spectral estimation, and guarded deconvolution.",
       "features": [],
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
       "name": "sim-lib-numbers-signal",
       "publish": "true",
       "root": "crates/sim-lib-numbers-signal",
-      "rustdoc_summary": "Deterministic transforms, convolution, correlation, and guarded deconvolution over canonical SIM tensors.",
+      "rustdoc_summary": "Deterministic transforms, convolution, classical spectral estimation, and guarded deconvolution over canonical SIM tensors.",
       "target_kinds": [
         "custom-build",
         "example",
@@ -1941,6 +1941,16 @@
           ],
           "name": "blocked-transform",
           "src": "crates/sim-lib-numbers-signal/examples/blocked_transform.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "spectral-estimators",
+          "src": "crates/sim-lib-numbers-signal/examples/spectral_estimators.rs"
         },
         {
           "crate_types": [
@@ -2616,10 +2626,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "0093101707c7b0d4d6a44f5b80657d464dc02077",
+    "git_commit": "f8403546462bade6fa7160e5cd6f91cdca817c97",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "0093101707c7b0d4d6a44f5b80657d464dc02077",
+    "source_commit": "f8403546462bade6fa7160e5cd6f91cdca817c97",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2632,9 +2642,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "cd50598a73db6cff",
+    "workspace_hash": "daf97065a5114dbe",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 358,
+    "workspace_hash_input_count": 368,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2853,10 +2863,13 @@
       "crates/sim-lib-numbers-signal/Cargo.toml",
       "crates/sim-lib-numbers-signal/build.rs",
       "crates/sim-lib-numbers-signal/examples/blocked_transform.rs",
+      "crates/sim-lib-numbers-signal/examples/spectral_estimators.rs",
       "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs",
       "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml",
       "crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml",
       "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/main.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml",
       "crates/sim-lib-numbers-signal/recipes/book.toml",
       "crates/sim-lib-numbers-signal/src/algorithm_tests.rs",
       "crates/sim-lib-numbers-signal/src/block_io.rs",
@@ -2872,8 +2885,11 @@
       "crates/sim-lib-numbers-signal/src/fft.rs",
       "crates/sim-lib-numbers-signal/src/io_plan.rs",
       "crates/sim-lib-numbers-signal/src/lib.rs",
+      "crates/sim-lib-numbers-signal/src/lomb.rs",
       "crates/sim-lib-numbers-signal/src/multidimensional.rs",
       "crates/sim-lib-numbers-signal/src/multidimensional_tests.rs",
+      "crates/sim-lib-numbers-signal/src/multitaper.rs",
+      "crates/sim-lib-numbers-signal/src/periodogram.rs",
       "crates/sim-lib-numbers-signal/src/plan.rs",
       "crates/sim-lib-numbers-signal/src/plan_tests.rs",
       "crates/sim-lib-numbers-signal/src/reference.rs",
@@ -2883,8 +2899,12 @@
       "crates/sim-lib-numbers-signal/src/runtime_convolution_render.rs",
       "crates/sim-lib-numbers-signal/src/runtime_convolution_value.rs",
       "crates/sim-lib-numbers-signal/src/runtime_tests.rs",
+      "crates/sim-lib-numbers-signal/src/spectral_tests.rs",
+      "crates/sim-lib-numbers-signal/src/spectrum_core.rs",
+      "crates/sim-lib-numbers-signal/src/spectrum_types.rs",
       "crates/sim-lib-numbers-signal/src/tensor_view.rs",
       "crates/sim-lib-numbers-signal/src/transform.rs",
+      "crates/sim-lib-numbers-signal/src/window.rs",
       "crates/sim-lib-numbers-stats/Cargo.toml",
       "crates/sim-lib-numbers-stats/build.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml",
@@ -3440,7 +3460,7 @@
       "card_id": "cookbook/numbers/signal",
       "group": "workspace",
       "package": "sim-lib-numbers-signal",
-      "recipe_count": 3,
+      "recipe_count": 4,
       "recipes": [
         {
           "card_id": "numbers/signal/01-basics/blocked-transform",
@@ -3465,9 +3485,17 @@
           "package": "sim-lib-numbers-signal",
           "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
           "title": "Impulse FFT"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/spectral-estimators",
+          "codec": "rust",
+          "id": "spectral-estimators",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml",
+          "title": "Reconstructable spectral scaling"
         }
       ],
-      "summary": "Deterministic transforms, convolution, correlation, and guarded inverse examples.",
+      "summary": "Deterministic transforms, convolution, spectral estimation, and guarded inverse examples.",
       "title": "Numbers Signal Transforms"
     },
     {
