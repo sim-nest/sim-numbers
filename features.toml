@@ -39,10 +39,10 @@ claims_surfaces = [
 [[feature]]
 id = "feature/sim-numbers/numbers"
 title = "Number framework"
-summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries."
+summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries."
 owner = "crate/sim-lib-numbers-core"
 audiences = ["code", "framework"]
-guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, wavelet, convolution, correlation, blocked-convolution, guarded-deconvolution, classical or Burg/MEM spectral estimation, periodic DFT interpolation, Savitzky-Golay filtering, stable Toeplitz solving, and sampled-data interpolation over canonical complex and f64 tensors. Use sim-lib-numbers-stats fit_markov for finite first-order transition estimation when callers need exact counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance rather than opaque weights; domain-owned adapters must keep their state types outside sim-numbers."
+guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, wavelet, convolution, correlation, blocked-convolution, guarded-deconvolution, classical or Burg/MEM spectral estimation, periodic DFT interpolation, Savitzky-Golay filtering, stable Toeplitz solving, and sampled-data interpolation over canonical complex and f64 tensors. Use the statistical-inference feature for finite Markov/HMM sequence inference and bounded streaming quantiles; domain-owned adapters must keep their state and symbol types outside sim-numbers."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-ad",
   "anchor/crate/sim-lib-numbers-arith",
@@ -108,8 +108,32 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
 ]
 claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
+]
+
+[[feature]]
+id = "feature/sim-numbers/statistical-inference"
+title = "Bounded streaming and sequence inference"
+summary = "Estimate mergeable streaming quantiles and infer finite hidden-state sequences with explicit numerical, convergence, memory, and termination evidence."
+owner = "crate/sim-lib-numbers-stats"
+audiences = ["code", "framework", "user"]
+guidance = "Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-stats",
+  "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_hmm",
+  "anchor/rustdoc/sim-lib-numbers-stats/forward_backward",
+  "anchor/rustdoc/sim-lib-numbers-stats/hidden-markov-model",
+  "anchor/rustdoc/sim-lib-numbers-stats/quantile-sketch",
+  "anchor/rustdoc/sim-lib-numbers-stats/viterbi",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests",
 ]
 
 [[feature]]
@@ -442,8 +466,18 @@ id = "route/fit-finite-transition-model"
 task = "Fit an inspectable finite transition model"
 audiences = ["code", "framework"]
 steps = [
-  { feature = "feature/sim-numbers/numbers", why = "The number framework owns generic finite Markov counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance without domain-specific state types." },
+  { feature = "feature/sim-numbers/statistical-inference", why = "The statistics framework owns generic finite Markov counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance without domain-specific state types." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests", why = "The checked non-music weather specimen proves smoothing, held-out scoring, fail-closed unknown states, and byte-stable serialization." },
+]
+
+[[route]]
+id = "route/infer-hidden-sequence"
+task = "Summarize a stream or infer a finite hidden-state sequence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/statistical-inference", why = "The statistics row owns hard-bounded mergeable quantiles, shared finite transitions, normalized discrete/Gaussian HMM inference, and seeded bounded fitting evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests", why = "The checked monotone-stream specimen proves exact small data, bounded retained entries, rank accuracy, merge behavior, and transactional refusal." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests", why = "The enumerated tiny fixture proves likelihood, posterior, and Viterbi agreement; long, continuous, seeded-fit, and work-limit fixtures prove numerical and termination behavior." },
 ]
 
 [[route]]

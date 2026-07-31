@@ -1,8 +1,8 @@
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
-//! Probability, descriptive statistics, finite Markov transition estimation,
-//! and fairness metric helpers for number-domain data.
+//! Probability, descriptive statistics, streaming quantiles, finite Markov and
+//! hidden-state sequence inference, and fairness helpers for number-domain data.
 //!
 //! Descriptive statistics and disparate-impact helpers also expose Claim
 //! surfaces. The Claim values carry their subject, predicate, and evidence table
@@ -10,7 +10,9 @@
 //! and the inputs used to justify it. [`fit_markov`] keeps the finite vocabulary,
 //! exact counts, additive smoothing, held-out likelihood, deterministic
 //! serialization, and corpus provenance inspectable instead of hiding learned
-//! weights.
+//! weights. [`QuantileSketch`] makes rank error and retained memory explicit;
+//! [`forward_backward`], [`viterbi`], and [`fit_hmm`] keep normalization,
+//! convergence, bounded work, numerical repair, and termination evidence.
 
 mod implementation;
 

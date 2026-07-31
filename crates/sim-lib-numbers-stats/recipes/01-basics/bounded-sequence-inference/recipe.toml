@@ -1,0 +1,12 @@
+id = "bounded-sequence-inference"
+title = "Bounded sequence inference"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 30
+tags = ["numbers", "stats", "quantile", "hmm", "viterbi", "bounded"]
+requires = []
+harness = "cargo-example"
+package = "sim-lib-numbers-stats"
+example = "bounded-sequence-inference"

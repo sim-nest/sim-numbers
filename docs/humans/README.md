@@ -18,7 +18,8 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | Feature | Subject | Specimens | Summary |
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
-| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 2 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries. |
+| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 4 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries. |
+| `feature/sim-numbers/statistical-inference` | `crate/sim-lib-numbers-stats` | 3 | Estimate mergeable streaming quantiles and infer finite hidden-state sequences with explicit numerical, convergence, memory, and termination evidence. |
 | `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 11 | Transform with Fourier or wavelet plans, smooth and differentiate polynomials, solve Toeplitz systems, interpolate periodic or sampled data, estimate spectra, and guardedly deconvolve with explicit policy and diagnostics. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
@@ -174,6 +175,10 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/book.toml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/expected.txt`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml`
@@ -266,6 +271,231 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 
 ### `feature/sim-numbers/numbers`
 
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/hmm_tests.rs`:
+
+```rust
+use super::{hmm_fit::*, hmm_inference::*, hmm_model::*, markov::*};
+
+// conformance: finite discrete/Gaussian HMM inference and bounded fitting.
+
+fn discrete_model() -> HiddenMarkovModel<&'static str> {
+    HiddenMarkovModel::discrete(
+        vec!["fair", "loaded"],
+        vec![0.6, 0.4],
+        vec![vec![0.7, 0.3], vec![0.4, 0.6]],
+        vec![vec![0.5, 0.5], vec![0.1, 0.9]],
+    )
+    .unwrap()
+}
+
+fn path_probability(
+    model: &HiddenMarkovModel<&str>,
+    path: &[usize],
+    observations: &[usize],
+) -> f64 {
+    let emissions = model.emissions().discrete_probabilities().unwrap();
+    let mut probability =
+        model.initial_probabilities()[path[0]] * emissions[path[0]][observations[0]];
+    for position in 1..path.len() {
+        probability *= model
+            .transitions()
+            .probability_by_index(path[position - 1], path[position])
+            .unwrap();
+        probability *= emissions[path[position]][observations[position]];
+    }
+    probability
+}
+
+fn enumerate_paths(length: usize) -> Vec<Vec<usize>> {
+    (0..(1_usize << length))
+        .map(|bits| (0..length).map(|position| (bits >> position) & 1).collect())
+        .collect()
+}
+
+#[test]
+fn normalized_inference_agrees_with_enumerated_tiny_fixture() {
+    let model = discrete_model();
+    let observations = [0, 1, 1];
+    let paths = enumerate_paths(observations.len());
+    let weighted = paths
+        .iter()
+        .map(|path| (path, path_probability(&model, path, &observations)))
+        .collect::<Vec<_>>();
+    let exact_likelihood = weighted
+        .iter()
+        .map(|(_, probability)| probability)
+        .sum::<f64>();
+    let exact_best = weighted
+        .iter()
+        .max_by(|(_, left), (_, right)| left.total_cmp(right))
+        .unwrap();
+
+    let inference = forward_backward(&model, &observations).unwrap();
+    assert!((inference.evidence.log_likelihood.exp() - exact_likelihood).abs() < 1.0e-14);
+    for row in inference
+        .forward
+        .iter()
+        .chain(&inference.backward)
+        .chain(&inference.posterior)
+    {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    for position in 0..observations.len() {
+        for state in 0..2 {
+            let exact = weighted
+                .iter()
+                .filter(|(path, _)| path[position] == state)
+                .map(|(_, probability)| probability)
+                .sum::<f64>()
+                / exact_likelihood;
+            assert!((inference.posterior[position][state] - exact).abs() < 1.0e-12);
+        }
+    }
+
+    let path = viterbi(&model, &observations).unwrap();
+    assert_eq!(&path.state_indices, exact_best.0);
+    assert!((path.log_probability.exp() - exact_best.1).abs() < 1.0e-14);
+    let posterior = posterior_decode(&model, &observations).unwrap();
+    assert_eq!(posterior.state_indices.len(), observations.len());
+    assert_eq!(posterior.evidence, inference.evidence);
+}
+
+#[test]
+fn long_and_continuous_sequences_remain_finite() {
+    let discrete = discrete_model();
+    let long = vec![1; 10_000];
+    let inference = forward_backward(&discrete, &long).unwrap();
+    assert!(inference.evidence.log_likelihood.is_finite());
+
+    let gaussian = HiddenMarkovModel::gaussian(
+        vec!["cold", "hot"],
+        vec![0.5, 0.5],
+        vec![vec![0.95, 0.05], vec![0.08, 0.92]],
+        vec![-2.0, 3.0],
+        vec![0.5, 0.75],
+        1.0e-6,
+    )
+    .unwrap();
+    let observations = [-2.2, -1.8, 2.7, 3.1];
+    assert!(
+        forward_backward(&gaussian, &observations)
+            .unwrap()
+            .evidence
+            .log_likelihood
+            .is_finite()
+    );
+    assert_eq!(viterbi(&gaussian, &observations).unwrap().states.len(), 4);
+}
+
+#[test]
+fn hmm_accepts_the_observable_markov_transition_representation() {
+    let provenance =
+        CorpusProvenance::from_bytes("weather", "fixture", "CC0-1.0", b"weather").unwrap();
+    let policy = MarkovPolicy::new(1.0, 0, provenance).unwrap();
+    let markov = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "sun"]],
+        policy,
+    )
+    .unwrap()
+    .model;
+    let hmm = HiddenMarkovModel::from_transition_matrix(
+        vec![0.5, 0.5],
+        markov.transition_matrix(),
+        EmissionModel::Discrete {
+            probabilities: vec![vec![0.8, 0.2], vec![0.3, 0.7]],
+        },
+    )
+    .unwrap();
+    assert!(forward_backward(&hmm, &[0, 1, 0]).is_ok());
+}
+
+#[test]
+fn discrete_baum_welch_is_seeded_monotone_and_bounded() {
+    let data = vec![
+        Sequence::Discrete(vec![0, 0, 1, 1, 1, 0]),
+        Sequence::Discrete(vec![0, 1, 1, 1, 0, 0]),
+        Sequence::Discrete(vec![1, 1, 1, 0, 0, 0]),
+    ];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 1.0e-6,
+    };
+    let control = HmmFitControl::new(17, 12, 1.0e-8, 20_000, 1.0e-12).unwrap();
+    let first = fit_hmm(&data, spec.clone(), control).unwrap();
+    let second = fit_hmm(&data, spec, control).unwrap();
+    assert_eq!(first, second);
+    assert_eq!(first.evidence.seed, 17);
+    assert!(first.evidence.iterations <= control.max_iterations);
+    assert!(first.evidence.work <= control.max_work);
+    assert!(first.evidence.log_likelihood.is_finite());
+    assert!(
+        first
+            .evidence
+            .likelihood_history
+            .windows(2)
+            .all(|pair| pair[1] + 1.0e-8 >= pair[0])
+    );
+    assert!(matches!(
+        first.evidence.termination,
+        HmmTermination::Converged
+            | HmmTermination::IterationLimit
+            | HmmTermination::WorkLimit
+            | HmmTermination::LikelihoodDecrease
+    ));
+}
+
+#[test]
+fn continuous_fitting_retains_variance_and_termination_evidence() {
+    let data = vec![
+        Sequence::Continuous(vec![-2.2, -2.0, -1.8, 2.8, 3.0, 3.2]),
+        Sequence::Continuous(vec![3.1, 2.9, -1.9, -2.1]),
+    ];
+    let spec = HmmSpec::Gaussian {
+        states: 2,
+        additive_smoothing: 1.0e-6,
+        variance_floor: 1.0e-4,
+    };
+    let control = HmmFitControl::new(99, 8, 1.0e-7, 10_000, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, control).unwrap();
+    let (_, variances, floor) = report.model.emissions().gaussian_parameters().unwrap();
+    assert!(variances.iter().all(|variance| *variance >= floor));
+    assert!(report.evidence.log_likelihood.is_finite());
+    assert!(report.evidence.work <= control.max_work);
+}
+
+#[test]
+fn work_and_input_failures_are_explicit() {
+    let data = vec![Sequence::Discrete(vec![0, 1, 0])];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 0.1,
+    };
+    let too_small = HmmFitControl::new(1, 4, 1.0e-6, 1, 1.0e-12).unwrap();
+    assert!(matches!(
+        fit_hmm(&data, spec.clone(), too_small),
+        Err(HmmError::InvalidFitControl {
+            field: "max_work",
+            ..
+        })
+    ));
+
+    let one_sweep = HmmFitControl::new(1, 4, 1.0e-6, 12, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, one_sweep).unwrap();
+    assert_eq!(report.evidence.iterations, 0);
+    assert_eq!(report.evidence.termination, HmmTermination::WorkLimit);
+    assert_eq!(report.evidence.work, 12);
+
+    assert!(matches!(
+        forward_backward(&discrete_model(), &[2]),
+        Err(HmmError::UnknownSymbol { .. })
+    ));
+}
+```
+
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests` is checked by `cargo test`.
 
 Source `crates/sim-lib-numbers-stats/src/markov_tests.rs`:
@@ -329,6 +559,25 @@ fn stable_serialization_retains_policy_provenance_and_counts() {
 }
 
 #[test]
+fn fitted_counts_project_to_the_shared_stochastic_matrix() {
+    let model = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(0),
+    )
+    .unwrap()
+    .model;
+    let transitions = model.transition_matrix();
+    assert_eq!(transitions.states(), model.states());
+    for row in transitions.rows() {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    assert_eq!(
+        transitions.probability(&"sun", &"rain"),
+        Some(model.transition_probability(&"sun", &"rain").unwrap())
+    );
+}
+
+#[test]
 fn invalid_holdout_and_unknown_states_fail_closed() {
     let sequences = vec![vec!["sun", "rain"]];
     assert!(matches!(
@@ -351,6 +600,98 @@ fn invalid_holdout_and_unknown_states_fail_closed() {
             position: 1
         })
     ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/quantile_tests.rs`:
+
+```rust
+use super::quantile::*;
+
+// conformance: exact and hard-bounded mergeable streaming quantiles.
+
+fn policy() -> QuantilePolicy {
+    QuantilePolicy::new(0.02, 32, 512).unwrap()
+}
+
+#[test]
+fn small_data_uses_the_exact_interpolated_reference() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in [9.0, 1.0, 5.0, 3.0] {
+        sketch.insert(value).unwrap();
+    }
+    let estimate = sketch.estimate(0.5).unwrap();
+    assert_eq!(
+        estimate.value,
+        exact_quantile(&[9.0, 1.0, 5.0, 3.0], 0.5).unwrap()
+    );
+    assert!(estimate.exact);
+    assert_eq!(estimate.retained_entries, 4);
+}
+
+#[test]
+fn large_stream_is_bounded_and_tracks_requested_ranks() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in 0..10_000 {
+        sketch.insert(value as f64).unwrap();
+    }
+    assert!(sketch.retained_entries() <= policy().max_summary_entries);
+    assert!(sketch.retained_entry_bytes() > 0);
+    for quantile in [0.0, 0.1, 0.5, 0.9, 1.0] {
+        let estimate = sketch.estimate(quantile).unwrap();
+        let actual_rank = estimate.value / 9_999.0;
+        assert!((actual_rank - quantile).abs() <= policy().rank_error + 0.001);
+        assert!(estimate.rank_lower <= actual_rank);
+        assert!(actual_rank <= estimate.rank_upper);
+        assert!(!estimate.exact);
+    }
+}
+
+#[test]
+fn independently_built_summaries_merge_without_source_replay() {
+    let mut whole = QuantileSketch::new(policy()).unwrap();
+    let mut left = QuantileSketch::new(policy()).unwrap();
+    let mut right = QuantileSketch::new(policy()).unwrap();
+    for value in 0..4_000 {
+        whole.insert(value as f64).unwrap();
+        if value % 2 == 0 {
+            left.insert(value as f64).unwrap();
+        } else {
+            right.insert(value as f64).unwrap();
+        }
+    }
+    left.merge(&right).unwrap();
+    assert_eq!(left.len(), whole.len());
+    assert!(left.retained_entries() <= policy().max_summary_entries);
+    for quantile in [0.1, 0.5, 0.9] {
+        let merged = left.estimate(quantile).unwrap().value;
+        assert!((merged / 3_999.0 - quantile).abs() <= 2.0 * policy().rank_error + 0.002);
+    }
+}
+
+#[test]
+fn invalid_values_policies_and_memory_fail_closed() {
+    assert!(matches!(
+        QuantilePolicy::new(0.5, 1, 1),
+        Err(QuantileError::InvalidPolicy { .. })
+    ));
+    assert!(matches!(
+        exact_quantile(&[1.0, f64::NAN], 0.5),
+        Err(QuantileError::NonFinite { .. })
+    ));
+
+    let tight = QuantilePolicy::new(0.0, 2, 2).unwrap();
+    let mut sketch = QuantileSketch::new(tight).unwrap();
+    sketch.insert(1.0).unwrap();
+    sketch.insert(2.0).unwrap();
+    let before = sketch.clone();
+    assert!(matches!(
+        sketch.insert(3.0),
+        Err(QuantileError::MemoryLimit { .. })
+    ));
+    assert_eq!(sketch, before);
 }
 ```
 
@@ -607,6 +948,432 @@ sim_citizen::inventory::submit! {
         install: install_tensor_value_citizen,
         conformance: conformance_tensor_value_citizen,
     }
+}
+```
+
+### `feature/sim-numbers/statistical-inference`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/hmm_tests.rs`:
+
+```rust
+use super::{hmm_fit::*, hmm_inference::*, hmm_model::*, markov::*};
+
+// conformance: finite discrete/Gaussian HMM inference and bounded fitting.
+
+fn discrete_model() -> HiddenMarkovModel<&'static str> {
+    HiddenMarkovModel::discrete(
+        vec!["fair", "loaded"],
+        vec![0.6, 0.4],
+        vec![vec![0.7, 0.3], vec![0.4, 0.6]],
+        vec![vec![0.5, 0.5], vec![0.1, 0.9]],
+    )
+    .unwrap()
+}
+
+fn path_probability(
+    model: &HiddenMarkovModel<&str>,
+    path: &[usize],
+    observations: &[usize],
+) -> f64 {
+    let emissions = model.emissions().discrete_probabilities().unwrap();
+    let mut probability =
+        model.initial_probabilities()[path[0]] * emissions[path[0]][observations[0]];
+    for position in 1..path.len() {
+        probability *= model
+            .transitions()
+            .probability_by_index(path[position - 1], path[position])
+            .unwrap();
+        probability *= emissions[path[position]][observations[position]];
+    }
+    probability
+}
+
+fn enumerate_paths(length: usize) -> Vec<Vec<usize>> {
+    (0..(1_usize << length))
+        .map(|bits| (0..length).map(|position| (bits >> position) & 1).collect())
+        .collect()
+}
+
+#[test]
+fn normalized_inference_agrees_with_enumerated_tiny_fixture() {
+    let model = discrete_model();
+    let observations = [0, 1, 1];
+    let paths = enumerate_paths(observations.len());
+    let weighted = paths
+        .iter()
+        .map(|path| (path, path_probability(&model, path, &observations)))
+        .collect::<Vec<_>>();
+    let exact_likelihood = weighted
+        .iter()
+        .map(|(_, probability)| probability)
+        .sum::<f64>();
+    let exact_best = weighted
+        .iter()
+        .max_by(|(_, left), (_, right)| left.total_cmp(right))
+        .unwrap();
+
+    let inference = forward_backward(&model, &observations).unwrap();
+    assert!((inference.evidence.log_likelihood.exp() - exact_likelihood).abs() < 1.0e-14);
+    for row in inference
+        .forward
+        .iter()
+        .chain(&inference.backward)
+        .chain(&inference.posterior)
+    {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    for position in 0..observations.len() {
+        for state in 0..2 {
+            let exact = weighted
+                .iter()
+                .filter(|(path, _)| path[position] == state)
+                .map(|(_, probability)| probability)
+                .sum::<f64>()
+                / exact_likelihood;
+            assert!((inference.posterior[position][state] - exact).abs() < 1.0e-12);
+        }
+    }
+
+    let path = viterbi(&model, &observations).unwrap();
+    assert_eq!(&path.state_indices, exact_best.0);
+    assert!((path.log_probability.exp() - exact_best.1).abs() < 1.0e-14);
+    let posterior = posterior_decode(&model, &observations).unwrap();
+    assert_eq!(posterior.state_indices.len(), observations.len());
+    assert_eq!(posterior.evidence, inference.evidence);
+}
+
+#[test]
+fn long_and_continuous_sequences_remain_finite() {
+    let discrete = discrete_model();
+    let long = vec![1; 10_000];
+    let inference = forward_backward(&discrete, &long).unwrap();
+    assert!(inference.evidence.log_likelihood.is_finite());
+
+    let gaussian = HiddenMarkovModel::gaussian(
+        vec!["cold", "hot"],
+        vec![0.5, 0.5],
+        vec![vec![0.95, 0.05], vec![0.08, 0.92]],
+        vec![-2.0, 3.0],
+        vec![0.5, 0.75],
+        1.0e-6,
+    )
+    .unwrap();
+    let observations = [-2.2, -1.8, 2.7, 3.1];
+    assert!(
+        forward_backward(&gaussian, &observations)
+            .unwrap()
+            .evidence
+            .log_likelihood
+            .is_finite()
+    );
+    assert_eq!(viterbi(&gaussian, &observations).unwrap().states.len(), 4);
+}
+
+#[test]
+fn hmm_accepts_the_observable_markov_transition_representation() {
+    let provenance =
+        CorpusProvenance::from_bytes("weather", "fixture", "CC0-1.0", b"weather").unwrap();
+    let policy = MarkovPolicy::new(1.0, 0, provenance).unwrap();
+    let markov = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "sun"]],
+        policy,
+    )
+    .unwrap()
+    .model;
+    let hmm = HiddenMarkovModel::from_transition_matrix(
+        vec![0.5, 0.5],
+        markov.transition_matrix(),
+        EmissionModel::Discrete {
+            probabilities: vec![vec![0.8, 0.2], vec![0.3, 0.7]],
+        },
+    )
+    .unwrap();
+    assert!(forward_backward(&hmm, &[0, 1, 0]).is_ok());
+}
+
+#[test]
+fn discrete_baum_welch_is_seeded_monotone_and_bounded() {
+    let data = vec![
+        Sequence::Discrete(vec![0, 0, 1, 1, 1, 0]),
+        Sequence::Discrete(vec![0, 1, 1, 1, 0, 0]),
+        Sequence::Discrete(vec![1, 1, 1, 0, 0, 0]),
+    ];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 1.0e-6,
+    };
+    let control = HmmFitControl::new(17, 12, 1.0e-8, 20_000, 1.0e-12).unwrap();
+    let first = fit_hmm(&data, spec.clone(), control).unwrap();
+    let second = fit_hmm(&data, spec, control).unwrap();
+    assert_eq!(first, second);
+    assert_eq!(first.evidence.seed, 17);
+    assert!(first.evidence.iterations <= control.max_iterations);
+    assert!(first.evidence.work <= control.max_work);
+    assert!(first.evidence.log_likelihood.is_finite());
+    assert!(
+        first
+            .evidence
+            .likelihood_history
+            .windows(2)
+            .all(|pair| pair[1] + 1.0e-8 >= pair[0])
+    );
+    assert!(matches!(
+        first.evidence.termination,
+        HmmTermination::Converged
+            | HmmTermination::IterationLimit
+            | HmmTermination::WorkLimit
+            | HmmTermination::LikelihoodDecrease
+    ));
+}
+
+#[test]
+fn continuous_fitting_retains_variance_and_termination_evidence() {
+    let data = vec![
+        Sequence::Continuous(vec![-2.2, -2.0, -1.8, 2.8, 3.0, 3.2]),
+        Sequence::Continuous(vec![3.1, 2.9, -1.9, -2.1]),
+    ];
+    let spec = HmmSpec::Gaussian {
+        states: 2,
+        additive_smoothing: 1.0e-6,
+        variance_floor: 1.0e-4,
+    };
+    let control = HmmFitControl::new(99, 8, 1.0e-7, 10_000, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, control).unwrap();
+    let (_, variances, floor) = report.model.emissions().gaussian_parameters().unwrap();
+    assert!(variances.iter().all(|variance| *variance >= floor));
+    assert!(report.evidence.log_likelihood.is_finite());
+    assert!(report.evidence.work <= control.max_work);
+}
+
+#[test]
+fn work_and_input_failures_are_explicit() {
+    let data = vec![Sequence::Discrete(vec![0, 1, 0])];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 0.1,
+    };
+    let too_small = HmmFitControl::new(1, 4, 1.0e-6, 1, 1.0e-12).unwrap();
+    assert!(matches!(
+        fit_hmm(&data, spec.clone(), too_small),
+        Err(HmmError::InvalidFitControl {
+            field: "max_work",
+            ..
+        })
+    ));
+
+    let one_sweep = HmmFitControl::new(1, 4, 1.0e-6, 12, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, one_sweep).unwrap();
+    assert_eq!(report.evidence.iterations, 0);
+    assert_eq!(report.evidence.termination, HmmTermination::WorkLimit);
+    assert_eq!(report.evidence.work, 12);
+
+    assert!(matches!(
+        forward_backward(&discrete_model(), &[2]),
+        Err(HmmError::UnknownSymbol { .. })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/markov_tests.rs`:
+
+```rust
+use super::markov::*;
+
+// conformance: generic finite transition estimation, evidence, and serialization.
+
+const FIXTURE: &[u8] = include_bytes!("../fixtures/generated-weather-transitions.tsv");
+
+fn policy(held_out_sequences: usize) -> MarkovPolicy {
+    let provenance = CorpusProvenance::from_bytes(
+        "generated-weather-transitions-v1",
+        "deterministic synthetic finite-state fixture",
+        "CC0-1.0",
+        FIXTURE,
+    )
+    .unwrap();
+    assert_eq!(provenance.content_hash, "fnv1a64:cfa3c26f7c8d57a0");
+    MarkovPolicy::new(1.0, held_out_sequences, provenance).unwrap()
+}
+
+#[test]
+fn finite_non_music_model_is_smoothed_and_scores_holdout() {
+    let sequences = vec![
+        vec!["sun", "rain", "sun"],
+        vec!["sun", "sun", "rain"],
+        vec!["rain", "sun", "rain"],
+    ];
+    let report = fit_markov(&sequences, policy(1)).unwrap();
+
+    assert_eq!(report.training_sequences, 2);
+    assert_eq!(report.held_out_sequences, 1);
+    assert_eq!(report.model.transition_count(&"sun", &"rain").unwrap(), 2);
+    assert_eq!(report.model.transition_count(&"rain", &"rain").unwrap(), 0);
+    assert_eq!(report.held_out_score.unwrap().transitions, 2);
+    assert!(report.held_out_score.unwrap().perplexity.is_finite());
+}
+
+#[test]
+fn stable_serialization_retains_policy_provenance_and_counts() {
+    let report = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(1),
+    )
+    .unwrap();
+    let first = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+    let second = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+
+    assert_eq!(first, second);
+    assert!(first.starts_with("SIM-MARKOV-1\n"));
+    assert!(first.contains("corpus-license=4343302d312e30"));
+    assert!(first.contains("transition=0:1:"));
+}
+
+#[test]
+fn fitted_counts_project_to_the_shared_stochastic_matrix() {
+    let model = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(0),
+    )
+    .unwrap()
+    .model;
+    let transitions = model.transition_matrix();
+    assert_eq!(transitions.states(), model.states());
+    for row in transitions.rows() {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    assert_eq!(
+        transitions.probability(&"sun", &"rain"),
+        Some(model.transition_probability(&"sun", &"rain").unwrap())
+    );
+}
+
+#[test]
+fn invalid_holdout_and_unknown_states_fail_closed() {
+    let sequences = vec![vec!["sun", "rain"]];
+    assert!(matches!(
+        fit_markov(&sequences, policy(1)),
+        Err(MarkovError::InvalidHoldout { .. })
+    ));
+    assert!(matches!(
+        fit_markov(&[vec!["sun", "rain"], vec!["sun", "snow"]], policy(1)),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+
+    let model = fit_markov(&sequences, policy(0)).unwrap().model;
+    assert!(matches!(
+        model.score(&[vec!["sun", "snow"]]),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/quantile_tests.rs`:
+
+```rust
+use super::quantile::*;
+
+// conformance: exact and hard-bounded mergeable streaming quantiles.
+
+fn policy() -> QuantilePolicy {
+    QuantilePolicy::new(0.02, 32, 512).unwrap()
+}
+
+#[test]
+fn small_data_uses_the_exact_interpolated_reference() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in [9.0, 1.0, 5.0, 3.0] {
+        sketch.insert(value).unwrap();
+    }
+    let estimate = sketch.estimate(0.5).unwrap();
+    assert_eq!(
+        estimate.value,
+        exact_quantile(&[9.0, 1.0, 5.0, 3.0], 0.5).unwrap()
+    );
+    assert!(estimate.exact);
+    assert_eq!(estimate.retained_entries, 4);
+}
+
+#[test]
+fn large_stream_is_bounded_and_tracks_requested_ranks() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in 0..10_000 {
+        sketch.insert(value as f64).unwrap();
+    }
+    assert!(sketch.retained_entries() <= policy().max_summary_entries);
+    assert!(sketch.retained_entry_bytes() > 0);
+    for quantile in [0.0, 0.1, 0.5, 0.9, 1.0] {
+        let estimate = sketch.estimate(quantile).unwrap();
+        let actual_rank = estimate.value / 9_999.0;
+        assert!((actual_rank - quantile).abs() <= policy().rank_error + 0.001);
+        assert!(estimate.rank_lower <= actual_rank);
+        assert!(actual_rank <= estimate.rank_upper);
+        assert!(!estimate.exact);
+    }
+}
+
+#[test]
+fn independently_built_summaries_merge_without_source_replay() {
+    let mut whole = QuantileSketch::new(policy()).unwrap();
+    let mut left = QuantileSketch::new(policy()).unwrap();
+    let mut right = QuantileSketch::new(policy()).unwrap();
+    for value in 0..4_000 {
+        whole.insert(value as f64).unwrap();
+        if value % 2 == 0 {
+            left.insert(value as f64).unwrap();
+        } else {
+            right.insert(value as f64).unwrap();
+        }
+    }
+    left.merge(&right).unwrap();
+    assert_eq!(left.len(), whole.len());
+    assert!(left.retained_entries() <= policy().max_summary_entries);
+    for quantile in [0.1, 0.5, 0.9] {
+        let merged = left.estimate(quantile).unwrap().value;
+        assert!((merged / 3_999.0 - quantile).abs() <= 2.0 * policy().rank_error + 0.002);
+    }
+}
+
+#[test]
+fn invalid_values_policies_and_memory_fail_closed() {
+    assert!(matches!(
+        QuantilePolicy::new(0.5, 1, 1),
+        Err(QuantileError::InvalidPolicy { .. })
+    ));
+    assert!(matches!(
+        exact_quantile(&[1.0, f64::NAN], 0.5),
+        Err(QuantileError::NonFinite { .. })
+    ));
+
+    let tight = QuantilePolicy::new(0.0, 2, 2).unwrap();
+    let mut sketch = QuantileSketch::new(tight).unwrap();
+    sketch.insert(1.0).unwrap();
+    sketch.insert(2.0).unwrap();
+    let before = sketch.clone();
+    assert!(matches!(
+        sketch.insert(3.0),
+        Err(QuantileError::MemoryLimit { .. })
+    ));
+    assert_eq!(sketch, before);
 }
 ```
 

@@ -9,13 +9,31 @@ mod agent_fixtures;
 mod claim;
 #[path = "function.rs"]
 mod function;
+#[path = "hmm_baum_welch.rs"]
+mod hmm_baum_welch;
+#[path = "hmm_fit.rs"]
+mod hmm_fit;
+#[path = "hmm_inference.rs"]
+mod hmm_inference;
+#[path = "hmm_model.rs"]
+mod hmm_model;
+#[cfg(test)]
+#[path = "hmm_tests.rs"]
+mod hmm_tests;
 #[path = "markov.rs"]
 mod markov;
 #[cfg(test)]
 #[path = "markov_tests.rs"]
 mod markov_tests;
+#[path = "quantile.rs"]
+mod quantile;
+#[cfg(test)]
+#[path = "quantile_tests.rs"]
+mod quantile_tests;
 #[path = "runtime.rs"]
 mod runtime;
+#[path = "transition.rs"]
+mod transition;
 
 pub use claim::{
     FairnessClaimValue, FairnessEvidence, StatsClaimEvidence, StatsClaimValue, fairness_claim,
@@ -25,10 +43,23 @@ pub use function::{
     StatsNumbersLib, stats_claims_symbol, stats_disparate_impact_claim_symbol,
     stats_entropy_claim_symbol, stats_mean_claim_symbol, stats_variance_claim_symbol,
 };
+pub use hmm_fit::{
+    HmmFitControl, HmmFitEvidence, HmmFitReport, HmmSpec, HmmTermination, Sequence, StateId,
+    fit_hmm,
+};
+pub use hmm_inference::{
+    ForwardBackward, InferenceEvidence, PosteriorPath, ViterbiPath, forward_backward,
+    posterior_decode, viterbi,
+};
+pub use hmm_model::{EmissionModel, HiddenMarkovModel, HmmError, HmmObservation};
 pub use markov::{
     CorpusProvenance, MarkovError, MarkovModel, MarkovPolicy, ModelReport, TransitionScore,
     fit_markov, fnv1a64,
 };
+pub use quantile::{
+    QuantileError, QuantileEstimate, QuantilePolicy, QuantileSketch, exact_quantile,
+};
+pub use transition::{FiniteTransitionMatrix, TransitionError};
 
 const FOUR_FIFTHS_THRESHOLD: f64 = 0.8;
 const PROBABILITY_TOLERANCE: f64 = 1.0e-12;

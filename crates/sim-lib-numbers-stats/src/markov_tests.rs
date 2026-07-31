@@ -56,6 +56,25 @@ fn stable_serialization_retains_policy_provenance_and_counts() {
 }
 
 #[test]
+fn fitted_counts_project_to_the_shared_stochastic_matrix() {
+    let model = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(0),
+    )
+    .unwrap()
+    .model;
+    let transitions = model.transition_matrix();
+    assert_eq!(transitions.states(), model.states());
+    for row in transitions.rows() {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    assert_eq!(
+        transitions.probability(&"sun", &"rain"),
+        Some(model.transition_probability(&"sun", &"rain").unwrap())
+    );
+}
+
+#[test]
 fn invalid_holdout_and_unknown_states_fail_closed() {
     let sequences = vec![vec!["sun", "rain"]];
     assert!(matches!(

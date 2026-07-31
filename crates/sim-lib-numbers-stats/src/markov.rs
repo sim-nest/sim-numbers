@@ -1,5 +1,6 @@
 //! Finite, inspectable first-order Markov transition estimation.
 
+use super::transition::FiniteTransitionMatrix;
 use std::collections::{BTreeMap, BTreeSet};
 use std::error::Error;
 use std::fmt;
@@ -147,6 +148,31 @@ impl<S: Ord + Clone> MarkovModel<S> {
     /// Returns the policy and corpus provenance used during fitting.
     pub fn policy(&self) -> &MarkovPolicy {
         &self.policy
+    }
+
+    /// Projects the fitted counts and smoothing policy into the shared finite
+    /// transition representation used by hidden-state inference.
+    pub fn transition_matrix(&self) -> FiniteTransitionMatrix<S> {
+        let probabilities = self
+            .states
+            .iter()
+            .map(|from| {
+                self.states
+                    .iter()
+                    .map(|to| {
+                        let count = self
+                            .transition_counts
+                            .get(&(from.clone(), to.clone()))
+                            .copied()
+                            .unwrap_or(0) as f64;
+                        let outgoing = self.outgoing_counts.get(from).copied().unwrap_or(0) as f64;
+                        let smoothing = self.policy.additive_smoothing;
+                        (count + smoothing) / (outgoing + smoothing * self.states.len() as f64)
+                    })
+                    .collect()
+            })
+            .collect();
+        FiniteTransitionMatrix::from_normalized(self.states.clone(), probabilities)
     }
 
     /// Returns the exact observed count for one transition.

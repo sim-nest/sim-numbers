@@ -136,6 +136,10 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/book.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/expected.txt"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml"}
