@@ -109,6 +109,11 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/setup.siml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-rk/recipes/book.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/chapter.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/setup.siml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-signal/recipes/book.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml"}

@@ -118,6 +118,11 @@
     {
       "features": [],
       "group": "workspace",
+      "package": "sim-lib-numbers-signal"
+    },
+    {
+      "features": [],
+      "group": "workspace",
       "package": "sim-lib-numbers-stats"
     },
     {

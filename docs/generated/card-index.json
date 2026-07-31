@@ -1,5 +1,5 @@
 {
-  "card_count": 34,
+  "card_count": 35,
   "cards": [
     {
       "id": "browse/catalog",
@@ -132,6 +132,12 @@
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-rk",
       "summary": "Runge-Kutta ODE solver methods."
+    },
+    {
+      "id": "cookbook/numbers/signal",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-signal",
+      "summary": "Deterministic Fourier, cosine, and sine transform examples."
     },
     {
       "id": "cookbook/numbers/stats",

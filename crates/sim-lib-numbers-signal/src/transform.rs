@@ -84,6 +84,12 @@ pub fn transform_in_place(
             reason: "real FFT changes representation and may change packed length",
         });
     }
+    if plan.length == LengthPolicy::Pad {
+        return Err(SignalError::InvalidPolicy {
+            policy: "length",
+            reason: "in-place transforms cannot extend caller storage",
+        });
+    }
     let mut out_of_place = plan.clone();
     out_of_place.placement = PlacementPolicy::OutOfPlace;
     let stride = plan.stride;

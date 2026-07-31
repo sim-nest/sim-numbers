@@ -1,6 +1,6 @@
 {
   "generator": "xtask crate-catalog v1",
-  "package_count": 33,
+  "package_count": 34,
   "packages": [
     {
       "description": "Forward and reverse automatic-differentiation primitives for SIM numeric code.",
@@ -271,6 +271,19 @@
       "publish": "true",
       "readme": "crates/sim-lib-numbers-rk/README.md",
       "root": "crates/sim-lib-numbers-rk",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Deterministic Fourier, cosine, and sine transforms over canonical SIM tensors.",
+      "generated_readme": true,
+      "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
+      "name": "sim-lib-numbers-signal",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-signal/README.md",
+      "root": "crates/sim-lib-numbers-signal",
       "target_kinds": [
         "custom-build",
         "lib"

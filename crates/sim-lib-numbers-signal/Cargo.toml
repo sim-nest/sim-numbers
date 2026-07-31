@@ -10,11 +10,19 @@ repository = "https://github.com/sim-nest/sim-numbers"
 homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
+sim-cookbook = { version = "0.1.0" }
+sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-tensor-cmplxf = { version = "0.3.0", path = "../sim-lib-numbers-tensor-cmplxf" }
 sim-lib-numbers-tensor-f64 = { version = "0.3.0", path = "../sim-lib-numbers-tensor-f64" }
 
 [dev-dependencies]
+sim-codec = { version = "0.1.0" }
+sim-codec-lisp = { version = "0.1.0" }
+sim-lib-numbers-f64 = { version = "0.3.0", path = "../sim-lib-numbers-f64" }
 sim-lib-numbers-tensor = { version = "0.2.0", path = "../sim-lib-numbers-tensor" }
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }
 
 [lints]
 workspace = true

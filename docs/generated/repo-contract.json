@@ -1,5 +1,5 @@
 {
-  "card_count": 34,
+  "card_count": 35,
   "cards": [
     {
       "id": "browse/catalog",
@@ -134,6 +134,12 @@
       "summary": "Runge-Kutta ODE solver methods."
     },
     {
+      "id": "cookbook/numbers/signal",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-signal",
+      "summary": "Deterministic Fourier, cosine, and sine transform examples."
+    },
+    {
       "id": "cookbook/numbers/stats",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-stats",
@@ -236,6 +242,7 @@
       "sim-lib-numbers-quad",
       "sim-lib-numbers-rational",
       "sim-lib-numbers-rk",
+      "sim-lib-numbers-signal",
       "sim-lib-numbers-stats",
       "sim-lib-numbers-tensor",
       "sim-lib-numbers-tensor-bcast",
@@ -373,7 +380,7 @@
       "reason": "numbers/tensor literal class marker; tensor values use the numbers/Tensor citizen descriptor"
     }
   ],
-  "package_count": 33,
+  "package_count": 34,
   "packages": [
     {
       "crate_name": "sim_lib_numbers_ad",
@@ -1870,6 +1877,73 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_signal",
+      "dependencies": [
+        {
+          "kind": "dev",
+          "optional": false,
+          "package": "sim-lib-numbers-f64",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "dev",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-cmplxf",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-f64",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Deterministic Fourier, cosine, and sine transforms over canonical SIM tensors.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
+      "name": "sim-lib-numbers-signal",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-signal",
+      "rustdoc_summary": "Deterministic one-dimensional Fourier, cosine, and sine transforms.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_signal",
+          "src": "crates/sim-lib-numbers-signal/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-signal/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_stats",
       "dependencies": [
         {
@@ -2531,10 +2605,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "75d8965dbee0c4054c994ea9629203ac90631916",
+    "git_commit": "45ecd039ac1e68c9932ac986abca2dd579fb58d3",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "75d8965dbee0c4054c994ea9629203ac90631916",
+    "source_commit": "45ecd039ac1e68c9932ac986abca2dd579fb58d3",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2547,9 +2621,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "deec62371d6b659a",
+    "workspace_hash": "053c1def7eccad7b",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 323,
+    "workspace_hash_input_count": 338,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2765,6 +2839,21 @@
       "crates/sim-lib-numbers-rk/src/solver.rs",
       "crates/sim-lib-numbers-rk/src/support.rs",
       "crates/sim-lib-numbers-rk/src/tests.rs",
+      "crates/sim-lib-numbers-signal/Cargo.toml",
+      "crates/sim-lib-numbers-signal/build.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/book.toml",
+      "crates/sim-lib-numbers-signal/src/algorithm_tests.rs",
+      "crates/sim-lib-numbers-signal/src/conformance.rs",
+      "crates/sim-lib-numbers-signal/src/error.rs",
+      "crates/sim-lib-numbers-signal/src/fft.rs",
+      "crates/sim-lib-numbers-signal/src/lib.rs",
+      "crates/sim-lib-numbers-signal/src/plan.rs",
+      "crates/sim-lib-numbers-signal/src/plan_tests.rs",
+      "crates/sim-lib-numbers-signal/src/reference.rs",
+      "crates/sim-lib-numbers-signal/src/runtime.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_tests.rs",
+      "crates/sim-lib-numbers-signal/src/transform.rs",
       "crates/sim-lib-numbers-stats/Cargo.toml",
       "crates/sim-lib-numbers-stats/build.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml",
@@ -2876,7 +2965,7 @@
       "xtask/Cargo.toml"
     ]
   },
-  "recipe_book_count": 32,
+  "recipe_book_count": 33,
   "recipes": [
     {
       "book": "numbers/ad",
@@ -3313,6 +3402,26 @@
       ],
       "summary": "Runge-Kutta ODE solver methods.",
       "title": "Numbers RK"
+    },
+    {
+      "book": "numbers/signal",
+      "book_toml": "crates/sim-lib-numbers-signal/recipes/book.toml",
+      "card_id": "cookbook/numbers/signal",
+      "group": "workspace",
+      "package": "sim-lib-numbers-signal",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/signal/01-basics/impulse-fft",
+          "codec": "lisp",
+          "id": "impulse-fft",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
+          "title": "Impulse FFT"
+        }
+      ],
+      "summary": "Deterministic Fourier, cosine, and sine transform examples.",
+      "title": "Numbers Signal Transforms"
     },
     {
       "book": "numbers/stats",

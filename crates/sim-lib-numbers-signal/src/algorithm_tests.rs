@@ -114,6 +114,22 @@ fn strided_in_place_transform_updates_only_selected_cells() {
 }
 
 #[test]
+fn in_place_transform_rejects_padding_that_cannot_fit() {
+    let mut values = [(1.0, 0.0), (0.0, 0.0)];
+    let mut plan = TransformPlan::new(TransformKind::Fft, 4);
+    plan.length = crate::LengthPolicy::Pad;
+    plan.padding = crate::PaddingPolicy::Zero;
+    plan.placement = PlacementPolicy::InPlace;
+    assert!(matches!(
+        transform_in_place(&plan, SignalViewMut::Complex(&mut values)),
+        Err(crate::SignalError::InvalidPolicy {
+            policy: "length",
+            ..
+        })
+    ));
+}
+
+#[test]
 fn real_fft_full_and_half_packing_round_trip() {
     let input = [0.25, -1.0, 2.5, 0.5, -0.75, 3.0, 1.25];
     for packing in [SpectrumPacking::Full, SpectrumPacking::HermitianHalf] {

@@ -27,7 +27,7 @@ pub fn reference_dft(
     validate_complex(input)?;
     let sign = sign.angle_sign(direction);
     let len = input.len() as f64;
-    Ok((0..input.len())
+    let output = (0..input.len())
         .map(|frequency| {
             input
                 .iter()
@@ -39,7 +39,9 @@ pub fn reference_dft(
                 })
                 .into()
         })
-        .collect())
+        .collect::<Vec<_>>();
+    validate_complex(&output)?;
+    Ok(output)
 }
 
 /// Computes DCT-I, II, III, or IV directly from its cosine definition.
@@ -57,7 +59,9 @@ pub fn reference_dct(
         });
     }
     if normalization == Normalization::Orthonormal {
-        return Ok(orthonormal_dct(input, kind, direction));
+        let output = orthonormal_dct(input, kind, direction);
+        validate_real(&output)?;
+        return Ok(output);
     }
     let (kernel, factor) = match (kind, direction) {
         (DctType::I, _) => (DctType::I, 2.0 * (input.len() - 1) as f64),
@@ -71,6 +75,7 @@ pub fn reference_dct(
     };
     let mut output = raw_dct(input, kernel);
     apply_pair_normalization(&mut output, factor, direction, normalization);
+    validate_real(&output)?;
     Ok(output)
 }
 
@@ -83,7 +88,9 @@ pub fn reference_dst(
 ) -> Result<Vec<f64>, SignalError> {
     validate_real(input)?;
     if normalization == Normalization::Orthonormal {
-        return Ok(orthonormal_dst(input, kind, direction));
+        let output = orthonormal_dst(input, kind, direction);
+        validate_real(&output)?;
+        return Ok(output);
     }
     let (kernel, factor) = match (kind, direction) {
         (DstType::I, _) => (DstType::I, 2.0 * (input.len() + 1) as f64),
@@ -97,6 +104,7 @@ pub fn reference_dst(
     };
     let mut output = raw_dst(input, kernel);
     apply_pair_normalization(&mut output, factor, direction, normalization);
+    validate_real(&output)?;
     Ok(output)
 }
 

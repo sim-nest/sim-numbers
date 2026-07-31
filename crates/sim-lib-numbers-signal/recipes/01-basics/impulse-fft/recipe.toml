@@ -1,0 +1,12 @@
+id = "impulse-fft"
+title = "Impulse FFT"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "signal", "fft", "reference", "deterministic"]
+requires = ["numbers/signal", "numbers/f64", "codec/lisp"]
+
+[[expect]]
+form = 0
+result = "((1 0) (1 0) (1 0) (1 0))"
