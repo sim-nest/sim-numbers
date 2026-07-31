@@ -39,10 +39,10 @@ claims_surfaces = [
 [[feature]]
 id = "feature/sim-numbers/numbers"
 title = "Number framework"
-summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-transform, and inspectable statistics domains as loadable libraries."
+summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries."
 owner = "crate/sim-lib-numbers-core"
 audiences = ["code", "framework"]
-guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, real Fourier, cosine, or sine transform plans over canonical complex and f64 tensors. Use sim-lib-numbers-stats fit_markov for finite first-order transition estimation when callers need exact counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance rather than opaque weights; domain-owned adapters must keep their state types outside sim-numbers."
+guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, convolution, correlation, blocked-convolution, or guarded-deconvolution plans over canonical complex and f64 tensors. Use sim-lib-numbers-stats fit_markov for finite first-order transition estimation when callers need exact counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance rather than opaque weights; domain-owned adapters must keep their state types outside sim-numbers."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-ad",
   "anchor/crate/sim-lib-numbers-arith",
@@ -114,14 +114,30 @@ claims_specimens = [
 
 [[feature]]
 id = "feature/sim-numbers/signal-transforms"
-title = "Reference-checked signal transforms"
-summary = "Transform canonical complex and f64 tensor signals with direct definitions, fast paths, strided multidimensional views, and bounded Table/Dir block plans."
+title = "Reference-checked signal algorithms"
+summary = "Transform, convolve, correlate, and guardedly deconvolve canonical tensor signals with direct definitions, FFT paths, explicit conventions, and bounded block reports."
 owner = "crate/sim-lib-numbers-signal"
 audiences = ["code", "framework", "user"]
-guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable. Use TensorView plus transform_nd for borrowed multidimensional layouts. Use TransformResources and transform_nd_blocked when the complete row-major tensor lives in caller-supplied Table or Dir blocks and one selected axis line fits bounded scratch. Use reference_dft, reference_dct, or reference_dst as definition-level oracles; load SignalNumbersLib for one-dimensional signal/transform calls from Lisp."
+guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable. Use ConvolutionPlan or CorrelationPlan when geometry, boundary, normalization, lag order, direct/FFT cost selection, or retained span must be explicit. Use BlockConvolutionPlan for overlap-add/save latency and boundary evidence. Use DeconvolutionPlan only with a positive singular threshold and Tikhonov or truncated regularization. Use TensorView plus transform_nd for borrowed multidimensional layouts and TransformResources plus transform_nd_blocked for caller-supplied Table/Dir blocks. Load SignalNumbersLib for the signal/transform, signal/convolve, signal/correlate, and signal/deconvolve Lisp calls."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-signal",
   "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/boundary-policy",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-algorithm",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-cost-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-mode",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolve",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolve_blocked",
+  "anchor/rustdoc/sim-lib-numbers-signal/correlate",
+  "anchor/rustdoc/sim-lib-numbers-signal/correlation-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/deconvolution-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/deconvolution-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/deconvolve",
+  "anchor/rustdoc/sim-lib-numbers-signal/lag-order",
+  "anchor/rustdoc/sim-lib-numbers-signal/regularization",
   "anchor/rustdoc/sim-lib-numbers-signal/normalization",
   "anchor/rustdoc/sim-lib-numbers-signal/reference_dct",
   "anchor/rustdoc/sim-lib-numbers-signal/reference_dft",
@@ -141,7 +157,9 @@ claims_anchors = [
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/runtime_tests",
 ]
 
 [[feature]]
@@ -304,9 +322,11 @@ task = "Transform a real or complex signal"
 audiences = ["code", "framework", "user"]
 steps = [
   { feature = "feature/sim-numbers/tensors", why = "The tensor row owns canonical complex and f64 storage shared by signal inputs and outputs." },
-  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns explicit transform conventions, direct references, fast Fourier plans, strided tensor axes, bounded Table/Dir blocks, and execution reports." },
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns explicit transform conventions, direct references, fast Fourier plans, typed convolution/correlation geometry, guarded spectral inverse, strided tensor axes, bounded blocks, and execution reports." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance", why = "The checked one-dimensional specimen proves impulse and tone bins, orthonormal Parseval and round trips, prime-length coverage, and fail-closed inputs." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests", why = "The checked multidimensional specimen proves strided direct-definition agreement, scratch admission, stable plan evidence, and blocked/in-memory equality." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests", why = "The checked convolution specimen proves direct/FFT agreement, overlap-add/save equality and reports, correlation symmetry, identity/commutativity, and finite guarded deconvolution diagnostics." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/convolution-evidence", why = "The checked Lisp specimen exposes automatic convolution cost selection beside the retained result." },
 ]
 
 [[route]]

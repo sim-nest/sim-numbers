@@ -137,7 +137,7 @@
       "id": "cookbook/numbers/signal",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-signal",
-      "summary": "Deterministic Fourier, cosine, and sine transform examples."
+      "summary": "Deterministic transforms, convolution, correlation, and guarded inverse examples."
     },
     {
       "id": "cookbook/numbers/stats",

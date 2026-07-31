@@ -1,0 +1,12 @@
+id = "convolution-evidence"
+title = "Inspectable convolution selection"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 30
+tags = ["numbers", "signal", "convolution", "fft", "cost-plan", "deterministic"]
+requires = ["numbers/signal", "numbers/f64", "codec/lisp"]
+
+[[expect]]
+form = 0
+result = "(expr:map [algorithm direct] [direct-cost-units 6] [fft-cost-units 40] [fft-len 4] [retained-len 4] [retained-start 0] [samples (1 1 1 -3)])"

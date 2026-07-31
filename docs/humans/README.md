@@ -18,8 +18,8 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | Feature | Subject | Specimens | Summary |
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
-| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 2 | Provide arithmetic, exact, floating, symbolic, tensor, signal-transform, and inspectable statistics domains as loadable libraries. |
-| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 2 | Transform canonical complex and f64 tensor signals with direct definitions, fast paths, strided multidimensional views, and bounded Table/Dir block plans. |
+| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 2 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistics domains as loadable libraries. |
+| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 4 | Transform, convolve, correlate, and guardedly deconvolve canonical tensor signals with direct definitions, FFT paths, explicit conventions, and bounded block reports. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
@@ -152,6 +152,9 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/setup.siml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/setup.siml`
@@ -722,6 +725,227 @@ fn empty_and_non_finite_inputs_fail_closed() {
 }
 ```
 
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/convolution_tests.rs`:
+
+```rust
+// conformance: convolution, correlation, blocking, and guarded spectral inverse.
+
+use crate::{
+    BlockConvolutionMethod, BlockConvolutionPlan, BoundaryPolicy, ConvolutionAlgorithm,
+    ConvolutionMode, ConvolutionNormalization, ConvolutionPlan, CorrelationNormalization,
+    CorrelationPlan, DeconvolutionPlan, LagOrder, LinearOutput, Regularization, convolve,
+    convolve_blocked, correlate, deconvolve,
+};
+
+const TOLERANCE: f64 = 2.0e-9;
+
+#[test]
+fn automatic_cost_plan_is_inspectable_and_selects_both_paths() {
+    let plan = ConvolutionPlan::linear_full();
+    let small = plan.inspect(4, 3).unwrap();
+    assert_eq!(small.selected, ConvolutionAlgorithm::Direct);
+    assert!(small.direct_cost_units < small.fft_cost_units);
+    assert_eq!(small.fft_len, 8);
+
+    let large = plan.inspect(256, 129).unwrap();
+    assert_eq!(large.selected, ConvolutionAlgorithm::Fft);
+    assert!(large.fft_cost_units < large.direct_cost_units);
+    assert_eq!(large.fft_len, 512);
+    assert!(large.fft_scratch_bytes > 0);
+}
+
+#[test]
+fn direct_and_fft_convolution_agree_for_every_linear_span() {
+    let signal = (0..33)
+        .map(|index| (index as f64 * 0.37).sin() + index as f64 / 71.0)
+        .collect::<Vec<_>>();
+    let kernel = (0..9)
+        .map(|index| (index as f64 * 0.23).cos() - 0.4)
+        .collect::<Vec<_>>();
+    for span in [LinearOutput::Full, LinearOutput::Same, LinearOutput::Valid] {
+        let mut direct = ConvolutionPlan::linear_full();
+        direct.mode = ConvolutionMode::Linear(span);
+        direct.algorithm = ConvolutionAlgorithm::Direct;
+        let mut fast = direct.clone();
+        fast.algorithm = ConvolutionAlgorithm::Fft;
+        let direct = convolve(&signal, &kernel, &direct).unwrap();
+        let fast = convolve(&signal, &kernel, &fast).unwrap();
+        assert_close(direct.samples.as_slice(), fast.samples.as_slice());
+        assert_eq!(direct.report.retained_start, fast.report.retained_start);
+        assert_eq!(direct.report.retained_len, fast.report.retained_len);
+    }
+}
+
+#[test]
+fn full_and_circular_convolution_are_commutative_and_identity_preserving() {
+    let left = [0.5, -1.0, 2.0, 0.25, 3.0];
+    let right = [1.5, 0.0, -0.5];
+    let mut plan = ConvolutionPlan::linear_full();
+    plan.algorithm = ConvolutionAlgorithm::Direct;
+    let left_right = convolve(&left, &right, &plan).unwrap();
+    let right_left = convolve(&right, &left, &plan).unwrap();
+    assert_close(left_right.samples.as_slice(), right_left.samples.as_slice());
+    assert_close(
+        convolve(&left, &[1.0], &plan).unwrap().samples.as_slice(),
+        &left,
+    );
+
+    let mut circular = ConvolutionPlan::circular(5);
+    circular.algorithm = ConvolutionAlgorithm::Fft;
+    let left_right = convolve(&left, &right, &circular).unwrap();
+    let right_left = convolve(&right, &left, &circular).unwrap();
+    assert_close(left_right.samples.as_slice(), right_left.samples.as_slice());
+    assert_close(
+        convolve(&left, &[1.0], &circular)
+            .unwrap()
+            .samples
+            .as_slice(),
+        &left,
+    );
+}
+
+#[test]
+fn overlap_add_and_save_match_direct_with_exact_span_reports() {
+    let signal = (0..13)
+        .map(|index| (index as f64 * 0.19).sin())
+        .collect::<Vec<_>>();
+    let kernel = [0.2, -0.4, 0.7, 0.1];
+    for span in [LinearOutput::Full, LinearOutput::Same, LinearOutput::Valid] {
+        let mut ordinary = ConvolutionPlan::linear_full();
+        ordinary.mode = ConvolutionMode::Linear(span);
+        ordinary.algorithm = ConvolutionAlgorithm::Direct;
+        let expected = convolve(&signal, &kernel, &ordinary).unwrap();
+        for method in [
+            BlockConvolutionMethod::OverlapAdd,
+            BlockConvolutionMethod::OverlapSave,
+        ] {
+            let blocked = convolve_blocked(
+                &signal,
+                &kernel,
+                &BlockConvolutionPlan {
+                    convolution: ordinary.clone(),
+                    method,
+                    fft_len: 8,
+                },
+            )
+            .unwrap();
+            assert_close(
+                blocked.convolution.samples.as_slice(),
+                expected.samples.as_slice(),
+            );
+            assert_eq!(blocked.blocked.input_span_per_block, 5);
+            assert_eq!(blocked.blocked.retained_span_per_block, 5);
+            assert_eq!(blocked.blocked.latency_samples, 5);
+            assert_eq!(
+                blocked.blocked.boundary.retained_start,
+                expected.report.retained_start
+            );
+            assert_eq!(
+                blocked.blocked.boundary.retained_len,
+                expected.report.retained_len
+            );
+            if method == BlockConvolutionMethod::OverlapSave {
+                assert_eq!(blocked.blocked.boundary.left_padding, 3);
+                assert_eq!(blocked.blocked.boundary.discarded_prefix_per_block, 3);
+            }
+        }
+    }
+}
+
+#[test]
+fn correlation_has_reflected_pair_symmetry_and_typed_normalization() {
+    let left = [1.0, -2.0, 0.5, 3.0];
+    let right = [0.25, 2.0, -1.0];
+    let mut plan = CorrelationPlan::linear_full();
+    plan.algorithm = ConvolutionAlgorithm::Fft;
+    let left_right = correlate(&left, &right, &plan).unwrap();
+    let right_left = correlate(&right, &left, &plan).unwrap();
+    for (lag, value) in left_right.lags.iter().zip(left_right.samples.as_slice()) {
+        let opposite = right_left
+            .lags
+            .iter()
+            .position(|candidate| candidate == &-*lag)
+            .unwrap();
+        assert!((value - right_left.samples.as_slice()[opposite]).abs() <= TOLERANCE);
+    }
+
+    plan.normalization = CorrelationNormalization::Unbiased;
+    plan.lag_order = LagOrder::Descending;
+    let normalized = correlate(&left, &right, &plan).unwrap();
+    assert!(normalized.lags.windows(2).all(|pair| pair[0] > pair[1]));
+    assert!(
+        normalized
+            .samples
+            .as_slice()
+            .iter()
+            .all(|value| value.is_finite())
+    );
+}
+
+#[test]
+fn guarded_deconvolution_recovers_regular_inputs_and_reports_singular_bins() {
+    let signal = [0.5, -1.0, 2.0, 0.25, 1.5, -0.75];
+    let kernel = [1.0, 0.25];
+    let observation = convolve(&signal, &kernel, &ConvolutionPlan::linear_full()).unwrap();
+    let recovered = deconvolve(
+        observation.samples.as_slice(),
+        &kernel,
+        &DeconvolutionPlan::tikhonov(1.0e-12, 1.0e-10),
+    )
+    .unwrap();
+    assert_close(recovered.samples.as_slice(), &signal);
+    assert!(recovered.report.singular_bins.is_empty());
+    assert!(recovered.report.residual_l2 <= 1.0e-9);
+
+    let singular_kernel = [1.0, -1.0];
+    let observation = convolve(&signal, &singular_kernel, &ConvolutionPlan::linear_full()).unwrap();
+    let singular = deconvolve(
+        observation.samples.as_slice(),
+        &singular_kernel,
+        &DeconvolutionPlan {
+            mode: crate::DeconvolutionMode::LinearFull,
+            regularization: Regularization::Tikhonov { lambda: 1.0e-8 },
+            singular_threshold: 1.0e-12,
+        },
+    )
+    .unwrap();
+    assert!(singular.report.singular_bins.contains(&0));
+    assert_eq!(singular.report.minimum_kernel_magnitude, 0.0);
+    assert!(
+        singular
+            .samples
+            .as_slice()
+            .iter()
+            .all(|value| value.is_finite())
+    );
+    assert!(singular.report.maximum_inverse_gain.is_finite());
+    assert!(singular.report.residual_l2.is_finite());
+}
+
+#[test]
+fn invalid_boundaries_and_degenerate_normalizations_fail_closed() {
+    let mut plan = ConvolutionPlan::linear_full();
+    plan.boundary = BoundaryPolicy::Periodic;
+    assert!(convolve(&[1.0], &[1.0], &plan).is_err());
+
+    plan.boundary = BoundaryPolicy::ZeroPad;
+    plan.normalization = ConvolutionNormalization::KernelSum;
+    assert!(convolve(&[1.0, 2.0], &[1.0, -1.0], &plan).is_err());
+}
+
+fn assert_close(actual: &[f64], expected: &[f64]) {
+    assert_eq!(actual.len(), expected.len());
+    for (index, (actual, expected)) in actual.iter().zip(expected).enumerate() {
+        assert!(
+            (actual - expected).abs() <= TOLERANCE,
+            "sample {index}: {actual} != {expected}"
+        );
+    }
+}
+```
+
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests` is checked by `cargo test`.
 
 Source `crates/sim-lib-numbers-signal/src/multidimensional_tests.rs`:
@@ -925,6 +1149,120 @@ fn assert_complex_close(actual: &[(f64, f64)], expected: &[(f64, f64)]) {
         assert!((actual.0 - expected.0).abs() <= TOLERANCE);
         assert!((actual.1 - expected.1).abs() <= TOLERANCE);
     }
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/runtime_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/runtime_tests.rs`:
+
+```rust
+// conformance: checked Lisp signal operations and finite diagnostic evidence.
+
+use std::sync::Arc;
+
+use sim_codec::{Input, decode_eval_expr_with_codec, encode_value_with_codec};
+use sim_codec_lisp::LispCodecLib;
+use sim_kernel::{
+    CapabilitySet, DefaultFactory, EagerPolicy, EncodeOptions, ReadPolicy, Symbol, TrustLevel,
+};
+
+use crate::{RECIPES, SignalNumbersLib};
+
+fn cx() -> sim_kernel::Cx {
+    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
+        .unwrap();
+    cx.load_lib(&SignalNumbersLib::new()).unwrap();
+    let lisp = LispCodecLib::new(cx.registry_mut().fresh_codec_id()).unwrap();
+    cx.load_lib(&lisp).unwrap();
+    cx
+}
+
+#[test]
+fn lisp_surface_runs_an_impulse_fft() {
+    let mut cx = cx();
+    let recipes = sim_cookbook::recipes_from_embedded(RECIPES).unwrap();
+    let recipe = recipes
+        .iter()
+        .find(|recipe| recipe.id.ends_with("/impulse-fft"))
+        .unwrap();
+    let expr = decode_eval_expr_with_codec(
+        &mut cx,
+        &Symbol::qualified("codec", "lisp"),
+        Input::Text(String::from_utf8(recipe.setup.clone()).unwrap()),
+        ReadPolicy {
+            trust: TrustLevel::TrustedSource,
+            capabilities: CapabilitySet::new(),
+        },
+    )
+    .unwrap();
+    let output = cx.eval_expr(expr).unwrap();
+    let encoded = encode_value_with_codec(
+        &mut cx,
+        &Symbol::qualified("codec", "lisp"),
+        &output,
+        EncodeOptions::default(),
+    )
+    .unwrap()
+    .into_text()
+    .unwrap();
+    assert_eq!(recipe.expect.len(), 1);
+    assert_eq!(recipe.expect[0].form, 0);
+    assert_eq!(encoded, recipe.expect[0].result);
+}
+
+#[test]
+fn lisp_surface_exposes_costed_convolution_and_guarded_deconvolution() {
+    let mut cx = cx();
+    let recipes = sim_cookbook::recipes_from_embedded(RECIPES).unwrap();
+    let recipe = recipes
+        .iter()
+        .find(|recipe| recipe.id.ends_with("/convolution-evidence"))
+        .unwrap();
+    let convolution = eval_lisp(&mut cx, &String::from_utf8(recipe.setup.clone()).unwrap());
+    assert_eq!(convolution, recipe.expect[0].result);
+    assert!(convolution.contains("algorithm direct"), "{convolution}");
+    assert!(convolution.contains("samples (1 1 1 -3)"), "{convolution}");
+    assert!(convolution.contains("direct-cost-units 6"), "{convolution}");
+
+    let deconvolution = eval_lisp(
+        &mut cx,
+        "(signal/deconvolve [1.0 -1.0 0.0] [1.0 -1.0] :regularization {:kind 'tikhonov :lambda 1e-8})",
+    );
+    assert!(
+        deconvolution.contains("regularization tikhonov"),
+        "{deconvolution}"
+    );
+    assert!(
+        deconvolution.contains("singular-bins (0)"),
+        "{deconvolution}"
+    );
+    assert!(!deconvolution.contains("inf"), "{deconvolution}");
+    assert!(!deconvolution.contains("NaN"), "{deconvolution}");
+}
+
+fn eval_lisp(cx: &mut sim_kernel::Cx, source: &str) -> String {
+    let expr = decode_eval_expr_with_codec(
+        cx,
+        &Symbol::qualified("codec", "lisp"),
+        Input::Text(source.to_owned()),
+        ReadPolicy {
+            trust: TrustLevel::TrustedSource,
+            capabilities: CapabilitySet::new(),
+        },
+    )
+    .unwrap();
+    let output = cx.eval_expr(expr).unwrap();
+    encode_value_with_codec(
+        cx,
+        &Symbol::qualified("codec", "lisp"),
+        &output,
+        EncodeOptions::default(),
+    )
+    .unwrap()
+    .into_text()
+    .unwrap()
 }
 ```
 

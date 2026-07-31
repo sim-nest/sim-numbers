@@ -1,5 +1,5 @@
 book = "numbers/signal"
 title = "Numbers Signal Transforms"
-summary = "Deterministic Fourier, cosine, and sine transform examples."
+summary = "Deterministic transforms, convolution, correlation, and guarded inverse examples."
 order = 45
 chapters = ["01-basics"]

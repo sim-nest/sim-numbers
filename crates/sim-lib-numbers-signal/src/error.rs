@@ -76,6 +76,11 @@ pub enum SignalError {
         /// Component name (`real`, `imag`, or `value`).
         component: &'static str,
     },
+    /// A requested normalization has a zero or non-finite divisor.
+    DegenerateNormalization {
+        /// Name of the normalization whose divisor was unusable.
+        normalization: &'static str,
+    },
 }
 
 impl fmt::Display for SignalError {
@@ -119,6 +124,9 @@ impl fmt::Display for SignalError {
                     f,
                     "signal {component} component at index {index} is not finite"
                 )
+            }
+            Self::DegenerateNormalization { normalization } => {
+                write!(f, "{normalization} normalization has a degenerate divisor")
             }
         }
     }

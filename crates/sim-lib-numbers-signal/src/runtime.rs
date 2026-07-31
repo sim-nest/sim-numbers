@@ -10,7 +10,9 @@ use sim_kernel::{
 
 use crate::{
     DctType, Direction, DstType, Normalization, SignalBuffer, SignalError, SignalView,
-    SpectrumPacking, TransformKind, TransformPlan, transform,
+    SpectrumPacking, TransformKind, TransformPlan,
+    runtime_convolution_callable::{load_operations, operation_symbols},
+    transform,
 };
 
 /// Symbol of the Lisp-facing transform operation (`signal/transform`).
@@ -150,10 +152,13 @@ impl Lib for SignalNumbersLib {
             target: LibTarget::HostRegistered,
             requires: Vec::<Dependency>::new(),
             capabilities: Vec::new(),
-            exports: vec![Export::Function {
-                symbol: signal_transform_symbol(),
-                function_id: None,
-            }],
+            exports: std::iter::once(signal_transform_symbol())
+                .chain(operation_symbols())
+                .map(|symbol| Export::Function {
+                    symbol,
+                    function_id: None,
+                })
+                .collect(),
         }
     }
 
@@ -162,6 +167,7 @@ impl Lib for SignalNumbersLib {
             signal_transform_symbol(),
             DefaultFactory.opaque(Arc::new(SignalTransformFunction))?,
         )?;
+        load_operations(linker)?;
         Ok(())
     }
 }
