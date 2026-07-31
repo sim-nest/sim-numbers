@@ -18,7 +18,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | Feature | Subject | Specimens | Summary |
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
-| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries. |
+| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 2 | Provide arithmetic, exact, floating, symbolic, tensor, and inspectable statistics domains as loadable libraries. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
@@ -150,6 +150,9 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/setup.siml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/setup.siml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/setup.siml`
@@ -234,6 +237,94 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 ## Worked Examples
 
 ### `feature/sim-numbers/numbers`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/markov_tests.rs`:
+
+```rust
+use super::markov::*;
+
+// conformance: generic finite transition estimation, evidence, and serialization.
+
+const FIXTURE: &[u8] = include_bytes!("../fixtures/generated-weather-transitions.tsv");
+
+fn policy(held_out_sequences: usize) -> MarkovPolicy {
+    let provenance = CorpusProvenance::from_bytes(
+        "generated-weather-transitions-v1",
+        "deterministic synthetic finite-state fixture",
+        "CC0-1.0",
+        FIXTURE,
+    )
+    .unwrap();
+    assert_eq!(provenance.content_hash, "fnv1a64:cfa3c26f7c8d57a0");
+    MarkovPolicy::new(1.0, held_out_sequences, provenance).unwrap()
+}
+
+#[test]
+fn finite_non_music_model_is_smoothed_and_scores_holdout() {
+    let sequences = vec![
+        vec!["sun", "rain", "sun"],
+        vec!["sun", "sun", "rain"],
+        vec!["rain", "sun", "rain"],
+    ];
+    let report = fit_markov(&sequences, policy(1)).unwrap();
+
+    assert_eq!(report.training_sequences, 2);
+    assert_eq!(report.held_out_sequences, 1);
+    assert_eq!(report.model.transition_count(&"sun", &"rain").unwrap(), 2);
+    assert_eq!(report.model.transition_count(&"rain", &"rain").unwrap(), 0);
+    assert_eq!(report.held_out_score.unwrap().transitions, 2);
+    assert!(report.held_out_score.unwrap().perplexity.is_finite());
+}
+
+#[test]
+fn stable_serialization_retains_policy_provenance_and_counts() {
+    let report = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(1),
+    )
+    .unwrap();
+    let first = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+    let second = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+
+    assert_eq!(first, second);
+    assert!(first.starts_with("SIM-MARKOV-1\n"));
+    assert!(first.contains("corpus-license=4343302d312e30"));
+    assert!(first.contains("transition=0:1:"));
+}
+
+#[test]
+fn invalid_holdout_and_unknown_states_fail_closed() {
+    let sequences = vec![vec!["sun", "rain"]];
+    assert!(matches!(
+        fit_markov(&sequences, policy(1)),
+        Err(MarkovError::InvalidHoldout { .. })
+    ));
+    assert!(matches!(
+        fit_markov(&[vec!["sun", "rain"], vec!["sun", "snow"]], policy(1)),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+
+    let model = fit_markov(&sequences, policy(0)).unwrap().model;
+    assert!(matches!(
+        model.score(&[vec!["sun", "snow"]]),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+}
+```
 
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen` is checked by `cargo test`.
 

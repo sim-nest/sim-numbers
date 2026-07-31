@@ -39,10 +39,10 @@ claims_surfaces = [
 [[feature]]
 id = "feature/sim-numbers/numbers"
 title = "Number framework"
-summary = "Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries."
+summary = "Provide arithmetic, exact, floating, symbolic, tensor, and inspectable statistics domains as loadable libraries."
 owner = "crate/sim-lib-numbers-core"
 audiences = ["code", "framework"]
-guidance = "Use this row when adding or selecting a number domain outside the kernel."
+guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-stats fit_markov for finite first-order transition estimation when callers need exact counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance rather than opaque weights; domain-owned adapters must keep their state types outside sim-numbers."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-ad",
   "anchor/crate/sim-lib-numbers-arith",
@@ -106,6 +106,7 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
 ]
 claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
 ]
 
@@ -261,6 +262,15 @@ claims_anchors = [
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run",
+]
+
+[[route]]
+id = "route/fit-finite-transition-model"
+task = "Fit an inspectable finite transition model"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/numbers", why = "The number framework owns generic finite Markov counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance without domain-specific state types." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests", why = "The checked non-music weather specimen proves smoothing, held-out scoring, fail-closed unknown states, and byte-stable serialization." },
 ]
 
 [[route]]

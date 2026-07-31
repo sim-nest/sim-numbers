@@ -1,0 +1,8 @@
+id = "finite-markov-report"
+title = "Finite Markov report"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "stats", "markov", "transition", "provenance", "sandbox-descriptor"]
+requires = ["numbers/stats", "codec/lisp"]

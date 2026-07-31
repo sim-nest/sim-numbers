@@ -1,0 +1,1 @@
+"numbers/stats descriptor: fit_markov reserves trailing sequences for held-out scoring and retains finite counts, additive smoothing, stable serialization, and corpus provenance"

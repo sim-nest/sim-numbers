@@ -153,7 +153,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-stats/Cargo.toml",
       "package": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, and fairness metric helpers for f64 number-domain data."
+      "summary": "Probability, descriptive statistics, finite Markov transition estimation, and fairness metric helpers for number-domain data."
     },
     {
       "crate_name": "sim_lib_numbers_tensor",

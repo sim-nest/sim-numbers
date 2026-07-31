@@ -9,6 +9,11 @@ mod agent_fixtures;
 mod claim;
 #[path = "function.rs"]
 mod function;
+#[path = "markov.rs"]
+mod markov;
+#[cfg(test)]
+#[path = "markov_tests.rs"]
+mod markov_tests;
 #[path = "runtime.rs"]
 mod runtime;
 
@@ -19,6 +24,10 @@ pub use claim::{
 pub use function::{
     StatsNumbersLib, stats_claims_symbol, stats_disparate_impact_claim_symbol,
     stats_entropy_claim_symbol, stats_mean_claim_symbol, stats_variance_claim_symbol,
+};
+pub use markov::{
+    CorpusProvenance, MarkovError, MarkovModel, MarkovPolicy, ModelReport, TransitionScore,
+    fit_markov, fnv1a64,
 };
 
 const FOUR_FIFTHS_THRESHOLD: f64 = 0.8;
