@@ -1,0 +1,2 @@
+kmeans centroids=[[-3.0, -3.0], [5.0, 5.0]] inertia=0.080000 selected=0 restarts=4 converged=true work=120
+gmm means=[[-3.0, -3.0], [5.0, 5.0]] likelihood=8.877666 iterations=3 converged=true repairs=0 aic=0.244668 bic=-1.629497 work=174

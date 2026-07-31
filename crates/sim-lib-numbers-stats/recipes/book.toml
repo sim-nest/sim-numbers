@@ -1,5 +1,5 @@
 book = "numbers/stats"
 title = "Numbers Stats"
-summary = "Probability, descriptive statistics, and fairness metric helpers."
+summary = "Probability, clustering, bounded inference, and inspectable evidence."
 order = 40
 chapters = ["01-basics", "30-agents"]

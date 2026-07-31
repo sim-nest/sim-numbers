@@ -143,7 +143,7 @@
       "id": "cookbook/numbers/stats",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, and fairness metric helpers."
+      "summary": "Probability, clustering, bounded inference, and inspectable evidence."
     },
     {
       "id": "cookbook/numbers/tensor",

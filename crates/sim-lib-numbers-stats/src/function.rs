@@ -34,13 +34,25 @@ pub fn stats_claims_symbol() -> Symbol {
     Symbol::qualified("stats", "claims")
 }
 
-fn function_symbols() -> [Symbol; 9] {
+/// Returns the symbol bound to deterministic bounded k-means.
+pub fn stats_kmeans_symbol() -> Symbol {
+    Symbol::qualified("stats", "kmeans")
+}
+
+/// Returns the symbol bound to regularized Gaussian-mixture EM.
+pub fn stats_gmm_symbol() -> Symbol {
+    Symbol::qualified("stats", "gmm")
+}
+
+fn function_symbols() -> [Symbol; 11] {
     [
         stats_mean_claim_symbol(),
         stats_variance_claim_symbol(),
         stats_entropy_claim_symbol(),
         stats_disparate_impact_claim_symbol(),
         stats_claims_symbol(),
+        stats_kmeans_symbol(),
+        stats_gmm_symbol(),
         agent_fixtures::fixture_symbols()[0].clone(),
         agent_fixtures::fixture_symbols()[1].clone(),
         agent_fixtures::fixture_symbols()[2].clone(),
@@ -103,6 +115,12 @@ impl Callable for StatsFunction {
         if self.symbol == stats_claims_symbol() {
             return runtime::call_stats_claims(cx, args);
         }
+        if self.symbol == stats_kmeans_symbol() {
+            return super::runtime_clustering::call_kmeans_values(cx, args.into_vec());
+        }
+        if self.symbol == stats_gmm_symbol() {
+            return super::runtime_clustering::call_gmm_values(cx, args.into_vec());
+        }
         if let Some(value) = agent_fixtures::call_fixture(cx, &self.symbol, args)? {
             return Ok(value);
         }
@@ -110,6 +128,12 @@ impl Callable for StatsFunction {
     }
 
     fn call_exprs(&self, cx: &mut Cx, args: RawArgs) -> Result<Value> {
+        if self.symbol == stats_kmeans_symbol() {
+            return super::runtime_clustering::call_kmeans_exprs(cx, args.into_exprs());
+        }
+        if self.symbol == stats_gmm_symbol() {
+            return super::runtime_clustering::call_gmm_exprs(cx, args.into_exprs());
+        }
         let values = args
             .into_exprs()
             .into_iter()

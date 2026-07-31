@@ -42,7 +42,7 @@ title = "Number framework"
 summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries."
 owner = "crate/sim-lib-numbers-core"
 audiences = ["code", "framework"]
-guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, wavelet, convolution, correlation, blocked-convolution, guarded-deconvolution, classical or Burg/MEM spectral estimation, periodic DFT interpolation, Savitzky-Golay filtering, stable Toeplitz solving, and sampled-data interpolation over canonical complex and f64 tensors. Use the statistical-inference feature for finite Markov/HMM sequence inference and bounded streaming quantiles; domain-owned adapters must keep their state and symbol types outside sim-numbers."
+guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, wavelet, convolution, correlation, blocked-convolution, guarded-deconvolution, classical or Burg/MEM spectral estimation, periodic DFT interpolation, Savitzky-Golay filtering, stable Toeplitz solving, and sampled-data interpolation over canonical complex and f64 tensors. Use the statistical-inference feature for seeded point clustering, regularized Gaussian mixtures, finite Markov/HMM sequence inference, and bounded streaming quantiles; domain-owned adapters must keep their state and symbol types outside sim-numbers."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-ad",
   "anchor/crate/sim-lib-numbers-arith",
@@ -116,21 +116,26 @@ claims_specimens = [
 
 [[feature]]
 id = "feature/sim-numbers/statistical-inference"
-title = "Bounded streaming and sequence inference"
-summary = "Estimate mergeable streaming quantiles and infer finite hidden-state sequences with explicit numerical, convergence, memory, and termination evidence."
+title = "Bounded clustering and sequence inference"
+summary = "Cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence."
 owner = "crate/sim-lib-numbers-stats"
 audiences = ["code", "framework", "user"]
-guidance = "Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound."
+guidance = "Use fit_kmeans with KMeansControl for deterministic k-means++ initialization, explicit empty-cluster repair, bounded restarts, and lowest-inertia selection. Use fit_gmm with GmmSpec and GmmControl for log-domain diagonal or full-covariance EM, positive regularization, explicit singular-component policy, and AIC/BIC evidence. Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound. Point clustering does not own temporal alignment: compose sim-lib-discrete-graph dynamic_time_warp or layered_shortest_path when observation order matters."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-stats",
   "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_gmm",
   "anchor/rustdoc/sim-lib-numbers-stats/fit_hmm",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_kmeans",
   "anchor/rustdoc/sim-lib-numbers-stats/forward_backward",
+  "anchor/rustdoc/sim-lib-numbers-stats/gmm-model",
   "anchor/rustdoc/sim-lib-numbers-stats/hidden-markov-model",
+  "anchor/rustdoc/sim-lib-numbers-stats/kmeans-control",
   "anchor/rustdoc/sim-lib-numbers-stats/quantile-sketch",
   "anchor/rustdoc/sim-lib-numbers-stats/viterbi",
 ]
 claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/clustering_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests",
@@ -468,6 +473,16 @@ audiences = ["code", "framework"]
 steps = [
   { feature = "feature/sim-numbers/statistical-inference", why = "The statistics framework owns generic finite Markov counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance without domain-specific state types." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests", why = "The checked non-music weather specimen proves smoothing, held-out scoring, fail-closed unknown states, and byte-stable serialization." },
+]
+
+[[route]]
+id = "route/fit-point-clusters"
+task = "Fit deterministic point clusters with convergence and model-selection evidence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/statistical-inference", why = "The statistics row owns seeded k-means++ restarts, empty-cluster repair, regularized full/diagonal GMM EM, log-domain likelihood, singular-component policy, and AIC/BIC evidence while leaving temporal alignment to sim-discrete." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/clustering_tests", why = "Generated, degenerate, permuted, bounded, and non-finite fixtures prove deterministic centroids, log-domain likelihood, covariance regularization, convergence, repairs, and fail-closed control." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-stats/01-basics/clustering-evidence", why = "The runnable generated-cluster recipe prints selected restart, centroids, likelihood, repairs, AIC, BIC, and charged work and points alignment callers to the discrete graph owner." },
 ]
 
 [[route]]

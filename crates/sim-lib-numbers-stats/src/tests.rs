@@ -2,10 +2,12 @@ use crate::{
     BinaryOutcomeCounts, FairnessClaimValue, StatsClaimValue, StatsError, StatsNumbersLib,
     bayesian_update, bayesian_update_binary, disparate_impact, entropy, four_fifths_ratio, mean,
     population_variance, sample_variance, stats_claims_symbol, stats_disparate_impact_claim_symbol,
-    stats_entropy_claim_symbol, stats_mean_claim_symbol, stats_variance_claim_symbol, variance,
+    stats_entropy_claim_symbol, stats_gmm_symbol, stats_kmeans_symbol, stats_mean_claim_symbol,
+    stats_variance_claim_symbol, variance,
 };
 use sim_kernel::{
-    Args, Cx, Datum, DatumStore, DefaultFactory, EagerPolicy, Error, Expr, Ref, Symbol, Value,
+    Args, Cx, Datum, DatumStore, DefaultFactory, EagerPolicy, Error, Expr, NumberLiteral,
+    QuoteMode, Ref, Symbol, Value, force_list_to_vec,
 };
 use std::sync::Arc;
 
@@ -42,6 +44,17 @@ fn symbol_value(cx: &mut Cx, symbol: Symbol) -> Value {
 
 fn list(cx: &mut Cx, values: Vec<Value>) -> Value {
     cx.factory().list(values).unwrap()
+}
+
+fn number_expr(value: impl ToString) -> Expr {
+    Expr::Number(NumberLiteral {
+        domain: Symbol::qualified("numbers", "f64"),
+        canonical: value.to_string(),
+    })
+}
+
+fn point_expr(values: &[f64]) -> Expr {
+    Expr::Vector(values.iter().copied().map(number_expr).collect())
 }
 
 fn evidence_field(cx: &mut Cx, evidence: &Value, name: &str) -> Value {
@@ -87,6 +100,75 @@ fn close(left: f64, right: f64) {
         (left - right).abs() < 1.0e-12,
         "expected {left} to be close to {right}"
     );
+}
+
+#[test]
+fn clustering_lisp_surface_returns_model_and_convergence_evidence() {
+    let mut cx = test_cx();
+    let points = Expr::Vector(vec![
+        point_expr(&[-3.1, -3.0]),
+        point_expr(&[-3.0, -2.9]),
+        point_expr(&[-2.9, -3.1]),
+        point_expr(&[4.9, 5.0]),
+        point_expr(&[5.0, 5.1]),
+        point_expr(&[5.1, 4.9]),
+    ]);
+    let control = Expr::Map(vec![
+        (Expr::Symbol(Symbol::new(":work")), number_expr(20_000)),
+        (Expr::Symbol(Symbol::new(":results")), number_expr(4)),
+        (Expr::Symbol(Symbol::new(":seed")), number_expr(4)),
+    ]);
+    let callable = cx.resolve_function(&stats_kmeans_symbol()).unwrap();
+    let report = cx
+        .call_exprs(
+            callable,
+            vec![
+                points.clone(),
+                Expr::Symbol(Symbol::new(":k")),
+                number_expr(2),
+                Expr::Symbol(Symbol::new(":control")),
+                control,
+            ],
+        )
+        .unwrap();
+    let evidence = evidence_field(&mut cx, &report, "evidence");
+    let selected = evidence_field(&mut cx, &evidence, "selected-restart");
+    assert!(value_to_f64(&mut cx, &selected) < 4.0);
+    let completed = evidence_field(&mut cx, &evidence, "completed-restarts");
+    close(value_to_f64(&mut cx, &completed), 4.0);
+    let model = evidence_field(&mut cx, &report, "model");
+    let centroids = evidence_field(&mut cx, &model, "centroids");
+    assert_eq!(
+        force_list_to_vec(&mut cx, centroids.object().as_list().unwrap(), "centroids")
+            .unwrap()
+            .len(),
+        2
+    );
+
+    let callable = cx.resolve_function(&stats_gmm_symbol()).unwrap();
+    let report = cx
+        .call_exprs(
+            callable,
+            vec![
+                points,
+                Expr::Symbol(Symbol::new(":components")),
+                number_expr(2),
+                Expr::Symbol(Symbol::new(":covariance")),
+                Expr::Quote {
+                    mode: QuoteMode::Quote,
+                    expr: Box::new(Expr::Symbol(Symbol::new("diagonal"))),
+                },
+                Expr::Symbol(Symbol::new(":regularization")),
+                number_expr(1.0e-6),
+            ],
+        )
+        .unwrap();
+    let evidence = evidence_field(&mut cx, &report, "evidence");
+    let selection = evidence_field(&mut cx, &evidence, "model-selection");
+    let parameters = evidence_field(&mut cx, &selection, "parameters");
+    close(value_to_f64(&mut cx, &parameters), 9.0);
+    let likelihood = evidence_field(&mut cx, &evidence, "log-likelihood");
+    assert!(value_to_f64(&mut cx, &likelihood).is_finite());
 }
 
 #[test]

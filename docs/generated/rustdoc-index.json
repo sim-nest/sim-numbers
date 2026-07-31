@@ -160,7 +160,7 @@
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-stats/Cargo.toml",
       "package": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data."
+      "summary": "Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data."
     },
     {
       "crate_name": "sim_lib_numbers_tensor",

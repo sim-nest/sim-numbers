@@ -143,7 +143,7 @@
       "id": "cookbook/numbers/stats",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, and fairness metric helpers."
+      "summary": "Probability, clustering, bounded inference, and inspectable evidence."
     },
     {
       "id": "cookbook/numbers/tensor",
@@ -2009,7 +2009,7 @@
       "name": "sim-lib-numbers-stats",
       "publish": "true",
       "root": "crates/sim-lib-numbers-stats",
-      "rustdoc_summary": "Probability, descriptive statistics, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.",
+      "rustdoc_summary": "Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.",
       "target_kinds": [
         "custom-build",
         "example",
@@ -2035,6 +2035,16 @@
           ],
           "name": "bounded-sequence-inference",
           "src": "crates/sim-lib-numbers-stats/examples/bounded_sequence_inference.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "clustering-evidence",
+          "src": "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs"
         },
         {
           "crate_types": [
@@ -2664,10 +2674,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "5a01741a9ee8477aeb664babf4f398e2e7bdc0af",
+    "git_commit": "245a7996c5db0a3c45b83f920b844ee3c61cb7e8",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "5a01741a9ee8477aeb664babf4f398e2e7bdc0af",
+    "source_commit": "245a7996c5db0a3c45b83f920b844ee3c61cb7e8",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2680,9 +2690,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "62f73a64b391fa8f",
+    "workspace_hash": "063c3865895c1942",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 406,
+    "workspace_hash_input_count": 414,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2972,8 +2982,11 @@
       "crates/sim-lib-numbers-stats/Cargo.toml",
       "crates/sim-lib-numbers-stats/build.rs",
       "crates/sim-lib-numbers-stats/examples/bounded_sequence_inference.rs",
+      "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/main.rs",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml",
@@ -2984,7 +2997,11 @@
       "crates/sim-lib-numbers-stats/recipes/book.toml",
       "crates/sim-lib-numbers-stats/src/agent_fixtures.rs",
       "crates/sim-lib-numbers-stats/src/claim.rs",
+      "crates/sim-lib-numbers-stats/src/clustering.rs",
+      "crates/sim-lib-numbers-stats/src/clustering_tests.rs",
       "crates/sim-lib-numbers-stats/src/function.rs",
+      "crates/sim-lib-numbers-stats/src/gmm.rs",
+      "crates/sim-lib-numbers-stats/src/gmm_math.rs",
       "crates/sim-lib-numbers-stats/src/hmm_baum_welch.rs",
       "crates/sim-lib-numbers-stats/src/hmm_fit.rs",
       "crates/sim-lib-numbers-stats/src/hmm_inference.rs",
@@ -2997,6 +3014,7 @@
       "crates/sim-lib-numbers-stats/src/quantile.rs",
       "crates/sim-lib-numbers-stats/src/quantile_tests.rs",
       "crates/sim-lib-numbers-stats/src/runtime.rs",
+      "crates/sim-lib-numbers-stats/src/runtime_clustering.rs",
       "crates/sim-lib-numbers-stats/src/tests.rs",
       "crates/sim-lib-numbers-stats/src/transition.rs",
       "crates/sim-lib-numbers-tensor/Cargo.toml",
@@ -3604,7 +3622,7 @@
       "card_id": "cookbook/numbers/stats",
       "group": "workspace",
       "package": "sim-lib-numbers-stats",
-      "recipe_count": 8,
+      "recipe_count": 9,
       "recipes": [
         {
           "card_id": "numbers/stats/01-basics/bounded-sequence-inference",
@@ -3613,6 +3631,14 @@
           "package": "sim-lib-numbers-stats",
           "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml",
           "title": "Bounded sequence inference"
+        },
+        {
+          "card_id": "numbers/stats/01-basics/clustering-evidence",
+          "codec": "rust",
+          "id": "clustering-evidence",
+          "package": "sim-lib-numbers-stats",
+          "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml",
+          "title": "Seeded clustering evidence"
         },
         {
           "card_id": "numbers/stats/01-basics/fairness-claim",
@@ -3671,7 +3697,7 @@
           "title": "Education intelligence agent"
         }
       ],
-      "summary": "Probability, descriptive statistics, and fairness metric helpers.",
+      "summary": "Probability, clustering, bounded inference, and inspectable evidence.",
       "title": "Numbers Stats"
     },
     {

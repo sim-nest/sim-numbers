@@ -24,3 +24,7 @@ sim-cookbook = { version = "0.1.0" }
 [[example]]
 name = "bounded-sequence-inference"
 path = "examples/bounded_sequence_inference.rs"
+
+[[example]]
+name = "clustering-evidence"
+path = "examples/clustering_evidence.rs"

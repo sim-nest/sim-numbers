@@ -141,6 +141,10 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/expected.txt"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/main.rs"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/setup.siml"}
