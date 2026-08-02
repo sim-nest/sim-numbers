@@ -1,0 +1,11 @@
+id = "spectral-estimators"
+title = "Reconstructable spectral scaling"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 40
+tags = ["numbers", "signal", "periodogram", "window", "scaling", "bounded"]
+harness = "cargo-example"
+package = "sim-lib-numbers-signal"
+example = "spectral-estimators"

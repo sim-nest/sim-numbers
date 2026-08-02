@@ -1,0 +1,45 @@
+[package]
+name = "sim-lib-numbers-signal"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Deterministic transforms, autoregression, spectral estimation, and guarded signal operations."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-cookbook = { version = "0.1.0" }
+sim-kernel = { version = "0.1.0" }
+sim-lib-numbers-tensor = { version = "0.2.0", path = "../sim-lib-numbers-tensor" }
+sim-lib-numbers-tensor-cmplxf = { version = "0.3.0", path = "../sim-lib-numbers-tensor-cmplxf" }
+sim-lib-numbers-tensor-f64 = { version = "0.3.0", path = "../sim-lib-numbers-tensor-f64" }
+sim-lib-numbers-tensor-linalg = { version = "0.3.0", path = "../sim-lib-numbers-tensor-linalg" }
+
+[dev-dependencies]
+sim-codec = { version = "0.1.0" }
+sim-codec-lisp = { version = "0.1.0" }
+sim-lib-numbers-f64 = { version = "0.3.0", path = "../sim-lib-numbers-f64" }
+
+[build-dependencies]
+sim-cookbook = { version = "0.1.0" }
+
+[[example]]
+name = "blocked-transform"
+path = "examples/blocked_transform.rs"
+
+[[example]]
+name = "autoregressive-spectral"
+path = "examples/autoregressive_spectral.rs"
+
+[[example]]
+name = "spectral-estimators"
+path = "examples/spectral_estimators.rs"
+
+[[example]]
+name = "wavelet-smoothing"
+path = "examples/wavelet_smoothing.rs"
+
+[lints]
+workspace = true

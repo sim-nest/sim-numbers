@@ -1,0 +1,12 @@
+id = "clustering-evidence"
+title = "Seeded clustering evidence"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 40
+tags = ["numbers", "stats", "kmeans", "gmm", "clustering", "model-selection", "bounded"]
+requires = []
+harness = "cargo-example"
+package = "sim-lib-numbers-stats"
+example = "clustering-evidence"

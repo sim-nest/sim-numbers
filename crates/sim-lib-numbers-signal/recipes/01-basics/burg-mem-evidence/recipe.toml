@@ -1,0 +1,12 @@
+id = "burg-mem-evidence"
+title = "Burg order and MEM evidence"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 40
+tags = ["numbers", "signal", "burg", "autoregressive", "mem", "bic", "bounded"]
+requires = []
+harness = "cargo-example"
+package = "sim-lib-numbers-signal"
+example = "autoregressive-spectral"

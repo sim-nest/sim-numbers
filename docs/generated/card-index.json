@@ -1,5 +1,5 @@
 {
-  "card_count": 34,
+  "card_count": 35,
   "cards": [
     {
       "id": "browse/catalog",
@@ -134,10 +134,16 @@
       "summary": "Runge-Kutta ODE solver methods."
     },
     {
+      "id": "cookbook/numbers/signal",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-signal",
+      "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples."
+    },
+    {
       "id": "cookbook/numbers/stats",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, and fairness metric helpers."
+      "summary": "Probability, clustering, bounded inference, and inspectable evidence."
     },
     {
       "id": "cookbook/numbers/tensor",

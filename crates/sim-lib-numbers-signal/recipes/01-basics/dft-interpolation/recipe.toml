@@ -1,0 +1,12 @@
+id = "dft-interpolation"
+title = "Explicit periodic DFT interpolation"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 50
+tags = ["numbers", "signal", "dft", "interpolation", "periodic", "bounded"]
+requires = ["numbers/signal", "numbers/f64", "codec/lisp"]
+
+[[expect]]
+form = 0
+result = "(expr:map [bins 4] [endpoint excluded] [normalization unitary] [nyquist positive] [origin 0] [period 1] [periodicity wrap] [phase-cycles (0.125 0.375)] [points 2] [sign negative-forward] [values ((1 0) (1 0))] [work-limit 100000000] [work-units 8])"

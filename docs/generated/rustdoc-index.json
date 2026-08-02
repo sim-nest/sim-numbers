@@ -149,11 +149,18 @@
       "summary": "Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric ode-solve plugins."
     },
     {
+      "crate_name": "sim_lib_numbers_signal",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
+      "package": "sim-lib-numbers-signal",
+      "summary": "Deterministic transforms, convolution, autoregression, spectral estimation, interpolation, and guarded deconvolution over canonical SIM tensors."
+    },
+    {
       "crate_name": "sim_lib_numbers_stats",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-stats/Cargo.toml",
       "package": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, and fairness metric helpers for f64 number-domain data."
+      "summary": "Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data."
     },
     {
       "crate_name": "sim_lib_numbers_tensor",

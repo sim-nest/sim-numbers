@@ -18,7 +18,9 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | Feature | Subject | Specimens | Summary |
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
-| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries. |
+| `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 4 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries. |
+| `feature/sim-numbers/statistical-inference` | `crate/sim-lib-numbers-stats` | 4 | Cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence. |
+| `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 11 | Transform with Fourier or wavelet plans, smooth and differentiate polynomials, solve Toeplitz systems, interpolate periodic or sampled data, estimate spectra, and guardedly deconvolve with explicit policy and diagnostics. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
@@ -146,10 +148,48 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/recipe.toml`
 - `crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/setup.siml`
 - `crates/sim-lib-numbers-rk/recipes/book.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/expected.txt`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/expected.txt`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/main.rs`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/setup.siml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/setup.siml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/setup.siml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/expected.txt`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/main.rs`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/expected.txt`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/main.rs`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/purpose.md`
+- `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml`
+- `crates/sim-lib-numbers-signal/recipes/book.toml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/expected.txt`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/expected.txt`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/main.rs`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/setup.siml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/setup.siml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/setup.siml`
@@ -234,6 +274,430 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 ## Worked Examples
 
 ### `feature/sim-numbers/numbers`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/hmm_tests.rs`:
+
+```rust
+use super::{hmm_fit::*, hmm_inference::*, hmm_model::*, markov::*};
+
+// conformance: finite discrete/Gaussian HMM inference and bounded fitting.
+
+fn discrete_model() -> HiddenMarkovModel<&'static str> {
+    HiddenMarkovModel::discrete(
+        vec!["fair", "loaded"],
+        vec![0.6, 0.4],
+        vec![vec![0.7, 0.3], vec![0.4, 0.6]],
+        vec![vec![0.5, 0.5], vec![0.1, 0.9]],
+    )
+    .unwrap()
+}
+
+fn path_probability(
+    model: &HiddenMarkovModel<&str>,
+    path: &[usize],
+    observations: &[usize],
+) -> f64 {
+    let emissions = model.emissions().discrete_probabilities().unwrap();
+    let mut probability =
+        model.initial_probabilities()[path[0]] * emissions[path[0]][observations[0]];
+    for position in 1..path.len() {
+        probability *= model
+            .transitions()
+            .probability_by_index(path[position - 1], path[position])
+            .unwrap();
+        probability *= emissions[path[position]][observations[position]];
+    }
+    probability
+}
+
+fn enumerate_paths(length: usize) -> Vec<Vec<usize>> {
+    (0..(1_usize << length))
+        .map(|bits| (0..length).map(|position| (bits >> position) & 1).collect())
+        .collect()
+}
+
+#[test]
+fn normalized_inference_agrees_with_enumerated_tiny_fixture() {
+    let model = discrete_model();
+    let observations = [0, 1, 1];
+    let paths = enumerate_paths(observations.len());
+    let weighted = paths
+        .iter()
+        .map(|path| (path, path_probability(&model, path, &observations)))
+        .collect::<Vec<_>>();
+    let exact_likelihood = weighted
+        .iter()
+        .map(|(_, probability)| probability)
+        .sum::<f64>();
+    let exact_best = weighted
+        .iter()
+        .max_by(|(_, left), (_, right)| left.total_cmp(right))
+        .unwrap();
+
+    let inference = forward_backward(&model, &observations).unwrap();
+    assert!((inference.evidence.log_likelihood.exp() - exact_likelihood).abs() < 1.0e-14);
+    for row in inference
+        .forward
+        .iter()
+        .chain(&inference.backward)
+        .chain(&inference.posterior)
+    {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    for position in 0..observations.len() {
+        for state in 0..2 {
+            let exact = weighted
+                .iter()
+                .filter(|(path, _)| path[position] == state)
+                .map(|(_, probability)| probability)
+                .sum::<f64>()
+                / exact_likelihood;
+            assert!((inference.posterior[position][state] - exact).abs() < 1.0e-12);
+        }
+    }
+
+    let path = viterbi(&model, &observations).unwrap();
+    assert_eq!(&path.state_indices, exact_best.0);
+    assert!((path.log_probability.exp() - exact_best.1).abs() < 1.0e-14);
+    let posterior = posterior_decode(&model, &observations).unwrap();
+    assert_eq!(posterior.state_indices.len(), observations.len());
+    assert_eq!(posterior.evidence, inference.evidence);
+}
+
+#[test]
+fn long_and_continuous_sequences_remain_finite() {
+    let discrete = discrete_model();
+    let long = vec![1; 10_000];
+    let inference = forward_backward(&discrete, &long).unwrap();
+    assert!(inference.evidence.log_likelihood.is_finite());
+
+    let gaussian = HiddenMarkovModel::gaussian(
+        vec!["cold", "hot"],
+        vec![0.5, 0.5],
+        vec![vec![0.95, 0.05], vec![0.08, 0.92]],
+        vec![-2.0, 3.0],
+        vec![0.5, 0.75],
+        1.0e-6,
+    )
+    .unwrap();
+    let observations = [-2.2, -1.8, 2.7, 3.1];
+    assert!(
+        forward_backward(&gaussian, &observations)
+            .unwrap()
+            .evidence
+            .log_likelihood
+            .is_finite()
+    );
+    assert_eq!(viterbi(&gaussian, &observations).unwrap().states.len(), 4);
+}
+
+#[test]
+fn hmm_accepts_the_observable_markov_transition_representation() {
+    let provenance =
+        CorpusProvenance::from_bytes("weather", "fixture", "CC0-1.0", b"weather").unwrap();
+    let policy = MarkovPolicy::new(1.0, 0, provenance).unwrap();
+    let markov = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "sun"]],
+        policy,
+    )
+    .unwrap()
+    .model;
+    let hmm = HiddenMarkovModel::from_transition_matrix(
+        vec![0.5, 0.5],
+        markov.transition_matrix(),
+        EmissionModel::Discrete {
+            probabilities: vec![vec![0.8, 0.2], vec![0.3, 0.7]],
+        },
+    )
+    .unwrap();
+    assert!(forward_backward(&hmm, &[0, 1, 0]).is_ok());
+}
+
+#[test]
+fn discrete_baum_welch_is_seeded_monotone_and_bounded() {
+    let data = vec![
+        Sequence::Discrete(vec![0, 0, 1, 1, 1, 0]),
+        Sequence::Discrete(vec![0, 1, 1, 1, 0, 0]),
+        Sequence::Discrete(vec![1, 1, 1, 0, 0, 0]),
+    ];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 1.0e-6,
+    };
+    let control = HmmFitControl::new(17, 12, 1.0e-8, 20_000, 1.0e-12).unwrap();
+    let first = fit_hmm(&data, spec.clone(), control).unwrap();
+    let second = fit_hmm(&data, spec, control).unwrap();
+    assert_eq!(first, second);
+    assert_eq!(first.evidence.seed, 17);
+    assert!(first.evidence.iterations <= control.max_iterations);
+    assert!(first.evidence.work <= control.max_work);
+    assert!(first.evidence.log_likelihood.is_finite());
+    assert!(
+        first
+            .evidence
+            .likelihood_history
+            .windows(2)
+            .all(|pair| pair[1] + 1.0e-8 >= pair[0])
+    );
+    assert!(matches!(
+        first.evidence.termination,
+        HmmTermination::Converged
+            | HmmTermination::IterationLimit
+            | HmmTermination::WorkLimit
+            | HmmTermination::LikelihoodDecrease
+    ));
+}
+
+#[test]
+fn continuous_fitting_retains_variance_and_termination_evidence() {
+    let data = vec![
+        Sequence::Continuous(vec![-2.2, -2.0, -1.8, 2.8, 3.0, 3.2]),
+        Sequence::Continuous(vec![3.1, 2.9, -1.9, -2.1]),
+    ];
+    let spec = HmmSpec::Gaussian {
+        states: 2,
+        additive_smoothing: 1.0e-6,
+        variance_floor: 1.0e-4,
+    };
+    let control = HmmFitControl::new(99, 8, 1.0e-7, 10_000, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, control).unwrap();
+    let (_, variances, floor) = report.model.emissions().gaussian_parameters().unwrap();
+    assert!(variances.iter().all(|variance| *variance >= floor));
+    assert!(report.evidence.log_likelihood.is_finite());
+    assert!(report.evidence.work <= control.max_work);
+}
+
+#[test]
+fn work_and_input_failures_are_explicit() {
+    let data = vec![Sequence::Discrete(vec![0, 1, 0])];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 0.1,
+    };
+    let too_small = HmmFitControl::new(1, 4, 1.0e-6, 1, 1.0e-12).unwrap();
+    assert!(matches!(
+        fit_hmm(&data, spec.clone(), too_small),
+        Err(HmmError::InvalidFitControl {
+            field: "max_work",
+            ..
+        })
+    ));
+
+    let one_sweep = HmmFitControl::new(1, 4, 1.0e-6, 12, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, one_sweep).unwrap();
+    assert_eq!(report.evidence.iterations, 0);
+    assert_eq!(report.evidence.termination, HmmTermination::WorkLimit);
+    assert_eq!(report.evidence.work, 12);
+
+    assert!(matches!(
+        forward_backward(&discrete_model(), &[2]),
+        Err(HmmError::UnknownSymbol { .. })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/markov_tests.rs`:
+
+```rust
+use super::markov::*;
+
+// conformance: generic finite transition estimation, evidence, and serialization.
+
+const FIXTURE: &[u8] = include_bytes!("../fixtures/generated-weather-transitions.tsv");
+
+fn policy(held_out_sequences: usize) -> MarkovPolicy {
+    let provenance = CorpusProvenance::from_bytes(
+        "generated-weather-transitions-v1",
+        "deterministic synthetic finite-state fixture",
+        "CC0-1.0",
+        FIXTURE,
+    )
+    .unwrap();
+    assert_eq!(provenance.content_hash, "fnv1a64:cfa3c26f7c8d57a0");
+    MarkovPolicy::new(1.0, held_out_sequences, provenance).unwrap()
+}
+
+#[test]
+fn finite_non_music_model_is_smoothed_and_scores_holdout() {
+    let sequences = vec![
+        vec!["sun", "rain", "sun"],
+        vec!["sun", "sun", "rain"],
+        vec!["rain", "sun", "rain"],
+    ];
+    let report = fit_markov(&sequences, policy(1)).unwrap();
+
+    assert_eq!(report.training_sequences, 2);
+    assert_eq!(report.held_out_sequences, 1);
+    assert_eq!(report.model.transition_count(&"sun", &"rain").unwrap(), 2);
+    assert_eq!(report.model.transition_count(&"rain", &"rain").unwrap(), 0);
+    assert_eq!(report.held_out_score.unwrap().transitions, 2);
+    assert!(report.held_out_score.unwrap().perplexity.is_finite());
+}
+
+#[test]
+fn stable_serialization_retains_policy_provenance_and_counts() {
+    let report = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(1),
+    )
+    .unwrap();
+    let first = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+    let second = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+
+    assert_eq!(first, second);
+    assert!(first.starts_with("SIM-MARKOV-1\n"));
+    assert!(first.contains("corpus-license=4343302d312e30"));
+    assert!(first.contains("transition=0:1:"));
+}
+
+#[test]
+fn fitted_counts_project_to_the_shared_stochastic_matrix() {
+    let model = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(0),
+    )
+    .unwrap()
+    .model;
+    let transitions = model.transition_matrix();
+    assert_eq!(transitions.states(), model.states());
+    for row in transitions.rows() {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    assert_eq!(
+        transitions.probability(&"sun", &"rain"),
+        Some(model.transition_probability(&"sun", &"rain").unwrap())
+    );
+}
+
+#[test]
+fn invalid_holdout_and_unknown_states_fail_closed() {
+    let sequences = vec![vec!["sun", "rain"]];
+    assert!(matches!(
+        fit_markov(&sequences, policy(1)),
+        Err(MarkovError::InvalidHoldout { .. })
+    ));
+    assert!(matches!(
+        fit_markov(&[vec!["sun", "rain"], vec!["sun", "snow"]], policy(1)),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+
+    let model = fit_markov(&sequences, policy(0)).unwrap().model;
+    assert!(matches!(
+        model.score(&[vec!["sun", "snow"]]),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/quantile_tests.rs`:
+
+```rust
+use super::quantile::*;
+
+// conformance: exact and hard-bounded mergeable streaming quantiles.
+
+fn policy() -> QuantilePolicy {
+    QuantilePolicy::new(0.02, 32, 512).unwrap()
+}
+
+#[test]
+fn small_data_uses_the_exact_interpolated_reference() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in [9.0, 1.0, 5.0, 3.0] {
+        sketch.insert(value).unwrap();
+    }
+    let estimate = sketch.estimate(0.5).unwrap();
+    assert_eq!(
+        estimate.value,
+        exact_quantile(&[9.0, 1.0, 5.0, 3.0], 0.5).unwrap()
+    );
+    assert!(estimate.exact);
+    assert_eq!(estimate.retained_entries, 4);
+}
+
+#[test]
+fn large_stream_is_bounded_and_tracks_requested_ranks() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in 0..10_000 {
+        sketch.insert(value as f64).unwrap();
+    }
+    assert!(sketch.retained_entries() <= policy().max_summary_entries);
+    assert!(sketch.retained_entry_bytes() > 0);
+    for quantile in [0.0, 0.1, 0.5, 0.9, 1.0] {
+        let estimate = sketch.estimate(quantile).unwrap();
+        let actual_rank = estimate.value / 9_999.0;
+        assert!((actual_rank - quantile).abs() <= policy().rank_error + 0.001);
+        assert!(estimate.rank_lower <= actual_rank);
+        assert!(actual_rank <= estimate.rank_upper);
+        assert!(!estimate.exact);
+    }
+}
+
+#[test]
+fn independently_built_summaries_merge_without_source_replay() {
+    let mut whole = QuantileSketch::new(policy()).unwrap();
+    let mut left = QuantileSketch::new(policy()).unwrap();
+    let mut right = QuantileSketch::new(policy()).unwrap();
+    for value in 0..4_000 {
+        whole.insert(value as f64).unwrap();
+        if value % 2 == 0 {
+            left.insert(value as f64).unwrap();
+        } else {
+            right.insert(value as f64).unwrap();
+        }
+    }
+    left.merge(&right).unwrap();
+    assert_eq!(left.len(), whole.len());
+    assert!(left.retained_entries() <= policy().max_summary_entries);
+    for quantile in [0.1, 0.5, 0.9] {
+        let merged = left.estimate(quantile).unwrap().value;
+        assert!((merged / 3_999.0 - quantile).abs() <= 2.0 * policy().rank_error + 0.002);
+    }
+}
+
+#[test]
+fn invalid_values_policies_and_memory_fail_closed() {
+    assert!(matches!(
+        QuantilePolicy::new(0.5, 1, 1),
+        Err(QuantileError::InvalidPolicy { .. })
+    ));
+    assert!(matches!(
+        exact_quantile(&[1.0, f64::NAN], 0.5),
+        Err(QuantileError::NonFinite { .. })
+    ));
+
+    let tight = QuantilePolicy::new(0.0, 2, 2).unwrap();
+    let mut sketch = QuantileSketch::new(tight).unwrap();
+    sketch.insert(1.0).unwrap();
+    sketch.insert(2.0).unwrap();
+    let before = sketch.clone();
+    assert!(matches!(
+        sketch.insert(3.0),
+        Err(QuantileError::MemoryLimit { .. })
+    ));
+    assert_eq!(sketch, before);
+}
+```
 
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen` is checked by `cargo test`.
 
@@ -488,6 +952,2329 @@ sim_citizen::inventory::submit! {
         install: install_tensor_value_citizen,
         conformance: conformance_tensor_value_citizen,
     }
+}
+```
+
+### `feature/sim-numbers/statistical-inference`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/clustering_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/clustering_tests.rs`:
+
+```rust
+use super::{clustering::*, gmm::*};
+
+// conformance: generated, degenerate, permuted, and bounded clustering fixtures.
+
+fn generated_clusters() -> Vec<Vec<f64>> {
+    let centers = [[-5.0, -1.0], [0.0, 5.0], [6.0, 0.5]];
+    centers
+        .iter()
+        .flat_map(|center| {
+            (0..12).map(move |index| {
+                let x_offset = (index % 4) as f64 * 0.08 - 0.12;
+                let y_offset = (index / 4) as f64 * 0.09 - 0.09;
+                vec![center[0] + x_offset, center[1] + y_offset]
+            })
+        })
+        .collect()
+}
+
+fn close(left: f64, right: f64, tolerance: f64) {
+    assert!(
+        (left - right).abs() <= tolerance,
+        "expected {left} to be within {tolerance} of {right}"
+    );
+}
+
+#[test]
+fn seeded_kmeans_restarts_are_deterministic_and_select_lowest_inertia() {
+    let points = generated_clusters();
+    let control = KMeansControl::new(4, 50, 1.0e-10, 20_000, 4).unwrap();
+    let first = fit_kmeans(&points, 3, control).unwrap();
+    let second = fit_kmeans(&points, 3, control).unwrap();
+
+    assert_eq!(first, second);
+    assert_eq!(first.restarts.len(), 4);
+    assert_eq!(first.termination, KMeansSearchTermination::Completed);
+    assert!(first.work <= control.max_work);
+    let selected = &first.restarts[first.selected_restart];
+    assert!(
+        first
+            .restarts
+            .iter()
+            .all(|candidate| selected.inertia <= candidate.inertia)
+    );
+    assert!(first.restarts.iter().all(|candidate| candidate.converged));
+    for (centroid, expected) in
+        first
+            .model
+            .centroids
+            .iter()
+            .zip([[-5.0, -1.0], [0.0, 5.0], [6.0, 0.5]])
+    {
+        close(centroid[0], expected[0], 0.15);
+        close(centroid[1], expected[1], 0.15);
+    }
+}
+
+#[test]
+fn empty_clusters_are_repaired_and_point_permutation_preserves_the_solution() {
+    let degenerate = vec![
+        vec![0.0, 0.0],
+        vec![0.0, 0.0],
+        vec![0.0, 0.0],
+        vec![10.0, 10.0],
+        vec![10.0, 10.0],
+    ];
+    let repaired = fit_kmeans(
+        &degenerate,
+        3,
+        KMeansControl::new(9, 20, 0.0, 5_000, 2).unwrap(),
+    )
+    .unwrap();
+    assert!(
+        repaired
+            .restarts
+            .iter()
+            .any(|evidence| evidence.empty_cluster_repairs > 0)
+    );
+    assert!(
+        repaired
+            .restarts
+            .iter()
+            .all(|evidence| evidence.inertia.is_finite())
+    );
+
+    let points = generated_clusters();
+    let mut permuted = points.clone();
+    permuted.reverse();
+    let control = KMeansControl::new(23, 50, 1.0e-10, 20_000, 4).unwrap();
+    let original = fit_kmeans(&points, 3, control).unwrap();
+    let reversed = fit_kmeans(&permuted, 3, control).unwrap();
+    assert_eq!(
+        original.model.centroids.len(),
+        reversed.model.centroids.len()
+    );
+    for (left, right) in original
+        .model
+        .centroids
+        .iter()
+        .zip(&reversed.model.centroids)
+    {
+        close(left[0], right[0], 1.0e-12);
+        close(left[1], right[1], 1.0e-12);
+    }
+    close(
+        original.restarts[original.selected_restart].inertia,
+        reversed.restarts[reversed.selected_restart].inertia,
+        1.0e-12,
+    );
+}
+
+#[test]
+fn diagonal_gmm_is_seeded_log_domain_and_model_selection_is_explicit() {
+    let points = generated_clusters();
+    let spec = GmmSpec::new(
+        3,
+        CovarianceType::Diagonal,
+        1.0e-6,
+        SingularComponentPolicy::default(),
+    )
+    .unwrap();
+    let control = GmmControl::new(4, 80, 1.0e-9, 100_000).unwrap();
+    let first = fit_gmm(&points, spec, control).unwrap();
+    let second = fit_gmm(&points, spec, control).unwrap();
+
+    assert_eq!(first, second);
+    assert!(first.evidence.work <= control.max_work);
+    assert!(first.evidence.log_likelihood.is_finite());
+    assert!(
+        first
+            .evidence
+            .likelihood_history
+            .windows(2)
+            .all(|pair| pair[1] + 1.0e-8 >= pair[0])
+    );
+    assert_eq!(first.evidence.model_selection.parameters, 14);
+    assert!(first.evidence.model_selection.aic.is_finite());
+    assert!(first.evidence.model_selection.bic.is_finite());
+    let responsibilities = first.model.responsibilities(&points).unwrap();
+    assert!(responsibilities.iter().all(|row| {
+        row.iter().all(|value| value.is_finite()) && (row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12
+    }));
+    assert_eq!(first.model.predict(&points).unwrap().len(), points.len());
+}
+
+#[test]
+fn full_covariance_and_component_permutation_retain_likelihood() {
+    let points = (0..40)
+        .flat_map(|index| {
+            let x = index as f64 * 0.04;
+            [vec![-3.0 + x, -2.0 + 0.7 * x], vec![4.0 + x, 3.0 + 0.5 * x]]
+        })
+        .collect::<Vec<_>>();
+    let spec = GmmSpec::new(
+        2,
+        CovarianceType::Full,
+        1.0e-5,
+        SingularComponentPolicy::default(),
+    )
+    .unwrap();
+    let report = fit_gmm(
+        &points,
+        spec,
+        GmmControl::new(31, 80, 1.0e-9, 500_000).unwrap(),
+    )
+    .unwrap();
+    assert_eq!(report.evidence.model_selection.parameters, 11);
+    for covariance in &report.model.covariances {
+        let GaussianCovariance::Full(matrix) = covariance else {
+            panic!("expected full covariance");
+        };
+        assert!(matrix[0][0] >= spec.regularization);
+        assert!(matrix[1][1] >= spec.regularization);
+        close(matrix[0][1], matrix[1][0], 1.0e-14);
+    }
+
+    let original_likelihood = report.model.log_likelihood(&points).unwrap();
+    let mut permuted = report.model.clone();
+    permuted.weights.reverse();
+    permuted.means.reverse();
+    permuted.covariances.reverse();
+    close(
+        original_likelihood,
+        permuted.log_likelihood(&points).unwrap(),
+        1.0e-10,
+    );
+}
+
+#[test]
+fn singular_policy_and_non_finite_or_unadmitted_inputs_fail_closed() {
+    let degenerate = vec![vec![2.0, 2.0]; 6];
+    let repair_spec = GmmSpec::new(
+        3,
+        CovarianceType::Diagonal,
+        1.0e-6,
+        SingularComponentPolicy::Reinitialize {
+            minimum_weight: 0.4,
+        },
+    )
+    .unwrap();
+    let repaired = fit_gmm(
+        &degenerate,
+        repair_spec,
+        GmmControl::new(2, 5, 0.0, 20_000).unwrap(),
+    )
+    .unwrap();
+    assert!(repaired.evidence.singular_component_repairs > 0);
+    assert!(repaired.evidence.log_likelihood.is_finite());
+
+    let fail_spec = GmmSpec::new(
+        3,
+        CovarianceType::Diagonal,
+        1.0e-6,
+        SingularComponentPolicy::Fail {
+            minimum_weight: 0.4,
+        },
+    )
+    .unwrap();
+    assert!(matches!(
+        fit_gmm(
+            &degenerate,
+            fail_spec,
+            GmmControl::new(2, 5, 0.0, 20_000).unwrap()
+        ),
+        Err(ClusteringError::SingularComponent { .. })
+    ));
+
+    let non_finite = vec![vec![0.0, f64::NAN], vec![1.0, 1.0]];
+    assert!(matches!(
+        fit_kmeans(&non_finite, 1, KMeansControl::default()),
+        Err(ClusteringError::NonFiniteInput { .. })
+    ));
+    assert!(matches!(
+        fit_gmm(&non_finite, repair_spec, GmmControl::default()),
+        Err(ClusteringError::NonFiniteInput { .. })
+    ));
+    assert!(matches!(
+        fit_kmeans(
+            &generated_clusters(),
+            3,
+            KMeansControl::new(1, 2, 0.0, 1, 1).unwrap()
+        ),
+        Err(ClusteringError::WorkLimit { .. })
+    ));
+    assert!(matches!(
+        fit_gmm(
+            &generated_clusters(),
+            GmmSpec::new(
+                3,
+                CovarianceType::Full,
+                1.0e-6,
+                SingularComponentPolicy::default()
+            )
+            .unwrap(),
+            GmmControl::new(1, 2, 0.0, 1).unwrap()
+        ),
+        Err(ClusteringError::WorkLimit { .. })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/hmm_tests.rs`:
+
+```rust
+use super::{hmm_fit::*, hmm_inference::*, hmm_model::*, markov::*};
+
+// conformance: finite discrete/Gaussian HMM inference and bounded fitting.
+
+fn discrete_model() -> HiddenMarkovModel<&'static str> {
+    HiddenMarkovModel::discrete(
+        vec!["fair", "loaded"],
+        vec![0.6, 0.4],
+        vec![vec![0.7, 0.3], vec![0.4, 0.6]],
+        vec![vec![0.5, 0.5], vec![0.1, 0.9]],
+    )
+    .unwrap()
+}
+
+fn path_probability(
+    model: &HiddenMarkovModel<&str>,
+    path: &[usize],
+    observations: &[usize],
+) -> f64 {
+    let emissions = model.emissions().discrete_probabilities().unwrap();
+    let mut probability =
+        model.initial_probabilities()[path[0]] * emissions[path[0]][observations[0]];
+    for position in 1..path.len() {
+        probability *= model
+            .transitions()
+            .probability_by_index(path[position - 1], path[position])
+            .unwrap();
+        probability *= emissions[path[position]][observations[position]];
+    }
+    probability
+}
+
+fn enumerate_paths(length: usize) -> Vec<Vec<usize>> {
+    (0..(1_usize << length))
+        .map(|bits| (0..length).map(|position| (bits >> position) & 1).collect())
+        .collect()
+}
+
+#[test]
+fn normalized_inference_agrees_with_enumerated_tiny_fixture() {
+    let model = discrete_model();
+    let observations = [0, 1, 1];
+    let paths = enumerate_paths(observations.len());
+    let weighted = paths
+        .iter()
+        .map(|path| (path, path_probability(&model, path, &observations)))
+        .collect::<Vec<_>>();
+    let exact_likelihood = weighted
+        .iter()
+        .map(|(_, probability)| probability)
+        .sum::<f64>();
+    let exact_best = weighted
+        .iter()
+        .max_by(|(_, left), (_, right)| left.total_cmp(right))
+        .unwrap();
+
+    let inference = forward_backward(&model, &observations).unwrap();
+    assert!((inference.evidence.log_likelihood.exp() - exact_likelihood).abs() < 1.0e-14);
+    for row in inference
+        .forward
+        .iter()
+        .chain(&inference.backward)
+        .chain(&inference.posterior)
+    {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    for position in 0..observations.len() {
+        for state in 0..2 {
+            let exact = weighted
+                .iter()
+                .filter(|(path, _)| path[position] == state)
+                .map(|(_, probability)| probability)
+                .sum::<f64>()
+                / exact_likelihood;
+            assert!((inference.posterior[position][state] - exact).abs() < 1.0e-12);
+        }
+    }
+
+    let path = viterbi(&model, &observations).unwrap();
+    assert_eq!(&path.state_indices, exact_best.0);
+    assert!((path.log_probability.exp() - exact_best.1).abs() < 1.0e-14);
+    let posterior = posterior_decode(&model, &observations).unwrap();
+    assert_eq!(posterior.state_indices.len(), observations.len());
+    assert_eq!(posterior.evidence, inference.evidence);
+}
+
+#[test]
+fn long_and_continuous_sequences_remain_finite() {
+    let discrete = discrete_model();
+    let long = vec![1; 10_000];
+    let inference = forward_backward(&discrete, &long).unwrap();
+    assert!(inference.evidence.log_likelihood.is_finite());
+
+    let gaussian = HiddenMarkovModel::gaussian(
+        vec!["cold", "hot"],
+        vec![0.5, 0.5],
+        vec![vec![0.95, 0.05], vec![0.08, 0.92]],
+        vec![-2.0, 3.0],
+        vec![0.5, 0.75],
+        1.0e-6,
+    )
+    .unwrap();
+    let observations = [-2.2, -1.8, 2.7, 3.1];
+    assert!(
+        forward_backward(&gaussian, &observations)
+            .unwrap()
+            .evidence
+            .log_likelihood
+            .is_finite()
+    );
+    assert_eq!(viterbi(&gaussian, &observations).unwrap().states.len(), 4);
+}
+
+#[test]
+fn hmm_accepts_the_observable_markov_transition_representation() {
+    let provenance =
+        CorpusProvenance::from_bytes("weather", "fixture", "CC0-1.0", b"weather").unwrap();
+    let policy = MarkovPolicy::new(1.0, 0, provenance).unwrap();
+    let markov = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "sun"]],
+        policy,
+    )
+    .unwrap()
+    .model;
+    let hmm = HiddenMarkovModel::from_transition_matrix(
+        vec![0.5, 0.5],
+        markov.transition_matrix(),
+        EmissionModel::Discrete {
+            probabilities: vec![vec![0.8, 0.2], vec![0.3, 0.7]],
+        },
+    )
+    .unwrap();
+    assert!(forward_backward(&hmm, &[0, 1, 0]).is_ok());
+}
+
+#[test]
+fn discrete_baum_welch_is_seeded_monotone_and_bounded() {
+    let data = vec![
+        Sequence::Discrete(vec![0, 0, 1, 1, 1, 0]),
+        Sequence::Discrete(vec![0, 1, 1, 1, 0, 0]),
+        Sequence::Discrete(vec![1, 1, 1, 0, 0, 0]),
+    ];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 1.0e-6,
+    };
+    let control = HmmFitControl::new(17, 12, 1.0e-8, 20_000, 1.0e-12).unwrap();
+    let first = fit_hmm(&data, spec.clone(), control).unwrap();
+    let second = fit_hmm(&data, spec, control).unwrap();
+    assert_eq!(first, second);
+    assert_eq!(first.evidence.seed, 17);
+    assert!(first.evidence.iterations <= control.max_iterations);
+    assert!(first.evidence.work <= control.max_work);
+    assert!(first.evidence.log_likelihood.is_finite());
+    assert!(
+        first
+            .evidence
+            .likelihood_history
+            .windows(2)
+            .all(|pair| pair[1] + 1.0e-8 >= pair[0])
+    );
+    assert!(matches!(
+        first.evidence.termination,
+        HmmTermination::Converged
+            | HmmTermination::IterationLimit
+            | HmmTermination::WorkLimit
+            | HmmTermination::LikelihoodDecrease
+    ));
+}
+
+#[test]
+fn continuous_fitting_retains_variance_and_termination_evidence() {
+    let data = vec![
+        Sequence::Continuous(vec![-2.2, -2.0, -1.8, 2.8, 3.0, 3.2]),
+        Sequence::Continuous(vec![3.1, 2.9, -1.9, -2.1]),
+    ];
+    let spec = HmmSpec::Gaussian {
+        states: 2,
+        additive_smoothing: 1.0e-6,
+        variance_floor: 1.0e-4,
+    };
+    let control = HmmFitControl::new(99, 8, 1.0e-7, 10_000, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, control).unwrap();
+    let (_, variances, floor) = report.model.emissions().gaussian_parameters().unwrap();
+    assert!(variances.iter().all(|variance| *variance >= floor));
+    assert!(report.evidence.log_likelihood.is_finite());
+    assert!(report.evidence.work <= control.max_work);
+}
+
+#[test]
+fn work_and_input_failures_are_explicit() {
+    let data = vec![Sequence::Discrete(vec![0, 1, 0])];
+    let spec = HmmSpec::Discrete {
+        states: 2,
+        symbols: 2,
+        additive_smoothing: 0.1,
+    };
+    let too_small = HmmFitControl::new(1, 4, 1.0e-6, 1, 1.0e-12).unwrap();
+    assert!(matches!(
+        fit_hmm(&data, spec.clone(), too_small),
+        Err(HmmError::InvalidFitControl {
+            field: "max_work",
+            ..
+        })
+    ));
+
+    let one_sweep = HmmFitControl::new(1, 4, 1.0e-6, 12, 1.0e-12).unwrap();
+    let report = fit_hmm(&data, spec, one_sweep).unwrap();
+    assert_eq!(report.evidence.iterations, 0);
+    assert_eq!(report.evidence.termination, HmmTermination::WorkLimit);
+    assert_eq!(report.evidence.work, 12);
+
+    assert!(matches!(
+        forward_backward(&discrete_model(), &[2]),
+        Err(HmmError::UnknownSymbol { .. })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/markov_tests.rs`:
+
+```rust
+use super::markov::*;
+
+// conformance: generic finite transition estimation, evidence, and serialization.
+
+const FIXTURE: &[u8] = include_bytes!("../fixtures/generated-weather-transitions.tsv");
+
+fn policy(held_out_sequences: usize) -> MarkovPolicy {
+    let provenance = CorpusProvenance::from_bytes(
+        "generated-weather-transitions-v1",
+        "deterministic synthetic finite-state fixture",
+        "CC0-1.0",
+        FIXTURE,
+    )
+    .unwrap();
+    assert_eq!(provenance.content_hash, "fnv1a64:cfa3c26f7c8d57a0");
+    MarkovPolicy::new(1.0, held_out_sequences, provenance).unwrap()
+}
+
+#[test]
+fn finite_non_music_model_is_smoothed_and_scores_holdout() {
+    let sequences = vec![
+        vec!["sun", "rain", "sun"],
+        vec!["sun", "sun", "rain"],
+        vec!["rain", "sun", "rain"],
+    ];
+    let report = fit_markov(&sequences, policy(1)).unwrap();
+
+    assert_eq!(report.training_sequences, 2);
+    assert_eq!(report.held_out_sequences, 1);
+    assert_eq!(report.model.transition_count(&"sun", &"rain").unwrap(), 2);
+    assert_eq!(report.model.transition_count(&"rain", &"rain").unwrap(), 0);
+    assert_eq!(report.held_out_score.unwrap().transitions, 2);
+    assert!(report.held_out_score.unwrap().perplexity.is_finite());
+}
+
+#[test]
+fn stable_serialization_retains_policy_provenance_and_counts() {
+    let report = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(1),
+    )
+    .unwrap();
+    let first = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+    let second = report
+        .model
+        .to_stable_text(|state| (*state).to_owned())
+        .unwrap();
+
+    assert_eq!(first, second);
+    assert!(first.starts_with("SIM-MARKOV-1\n"));
+    assert!(first.contains("corpus-license=4343302d312e30"));
+    assert!(first.contains("transition=0:1:"));
+}
+
+#[test]
+fn fitted_counts_project_to_the_shared_stochastic_matrix() {
+    let model = fit_markov(
+        &[vec!["sun", "rain", "sun"], vec!["rain", "sun", "rain"]],
+        policy(0),
+    )
+    .unwrap()
+    .model;
+    let transitions = model.transition_matrix();
+    assert_eq!(transitions.states(), model.states());
+    for row in transitions.rows() {
+        assert!((row.iter().sum::<f64>() - 1.0).abs() < 1.0e-12);
+    }
+    assert_eq!(
+        transitions.probability(&"sun", &"rain"),
+        Some(model.transition_probability(&"sun", &"rain").unwrap())
+    );
+}
+
+#[test]
+fn invalid_holdout_and_unknown_states_fail_closed() {
+    let sequences = vec![vec!["sun", "rain"]];
+    assert!(matches!(
+        fit_markov(&sequences, policy(1)),
+        Err(MarkovError::InvalidHoldout { .. })
+    ));
+    assert!(matches!(
+        fit_markov(&[vec!["sun", "rain"], vec!["sun", "snow"]], policy(1)),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+
+    let model = fit_markov(&sequences, policy(0)).unwrap().model;
+    assert!(matches!(
+        model.score(&[vec!["sun", "snow"]]),
+        Err(MarkovError::UnknownState {
+            sequence: 0,
+            position: 1
+        })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/quantile_tests.rs`:
+
+```rust
+use super::quantile::*;
+
+// conformance: exact and hard-bounded mergeable streaming quantiles.
+
+fn policy() -> QuantilePolicy {
+    QuantilePolicy::new(0.02, 32, 512).unwrap()
+}
+
+#[test]
+fn small_data_uses_the_exact_interpolated_reference() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in [9.0, 1.0, 5.0, 3.0] {
+        sketch.insert(value).unwrap();
+    }
+    let estimate = sketch.estimate(0.5).unwrap();
+    assert_eq!(
+        estimate.value,
+        exact_quantile(&[9.0, 1.0, 5.0, 3.0], 0.5).unwrap()
+    );
+    assert!(estimate.exact);
+    assert_eq!(estimate.retained_entries, 4);
+}
+
+#[test]
+fn large_stream_is_bounded_and_tracks_requested_ranks() {
+    let mut sketch = QuantileSketch::new(policy()).unwrap();
+    for value in 0..10_000 {
+        sketch.insert(value as f64).unwrap();
+    }
+    assert!(sketch.retained_entries() <= policy().max_summary_entries);
+    assert!(sketch.retained_entry_bytes() > 0);
+    for quantile in [0.0, 0.1, 0.5, 0.9, 1.0] {
+        let estimate = sketch.estimate(quantile).unwrap();
+        let actual_rank = estimate.value / 9_999.0;
+        assert!((actual_rank - quantile).abs() <= policy().rank_error + 0.001);
+        assert!(estimate.rank_lower <= actual_rank);
+        assert!(actual_rank <= estimate.rank_upper);
+        assert!(!estimate.exact);
+    }
+}
+
+#[test]
+fn independently_built_summaries_merge_without_source_replay() {
+    let mut whole = QuantileSketch::new(policy()).unwrap();
+    let mut left = QuantileSketch::new(policy()).unwrap();
+    let mut right = QuantileSketch::new(policy()).unwrap();
+    for value in 0..4_000 {
+        whole.insert(value as f64).unwrap();
+        if value % 2 == 0 {
+            left.insert(value as f64).unwrap();
+        } else {
+            right.insert(value as f64).unwrap();
+        }
+    }
+    left.merge(&right).unwrap();
+    assert_eq!(left.len(), whole.len());
+    assert!(left.retained_entries() <= policy().max_summary_entries);
+    for quantile in [0.1, 0.5, 0.9] {
+        let merged = left.estimate(quantile).unwrap().value;
+        assert!((merged / 3_999.0 - quantile).abs() <= 2.0 * policy().rank_error + 0.002);
+    }
+}
+
+#[test]
+fn invalid_values_policies_and_memory_fail_closed() {
+    assert!(matches!(
+        QuantilePolicy::new(0.5, 1, 1),
+        Err(QuantileError::InvalidPolicy { .. })
+    ));
+    assert!(matches!(
+        exact_quantile(&[1.0, f64::NAN], 0.5),
+        Err(QuantileError::NonFinite { .. })
+    ));
+
+    let tight = QuantilePolicy::new(0.0, 2, 2).unwrap();
+    let mut sketch = QuantileSketch::new(tight).unwrap();
+    sketch.insert(1.0).unwrap();
+    sketch.insert(2.0).unwrap();
+    let before = sketch.clone();
+    assert!(matches!(
+        sketch.insert(3.0),
+        Err(QuantileError::MemoryLimit { .. })
+    ));
+    assert_eq!(sketch, before);
+}
+```
+
+### `feature/sim-numbers/signal-transforms`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/conformance.rs`:
+
+```rust
+//! Conformance: definition-level signal fixtures shared by transform users.
+
+use std::f64::consts::TAU;
+
+use crate::{
+    Direction, Normalization, SignalBuffer, SignalError, SignalView, SpectrumPacking,
+    TransformKind, TransformPlan, reference_dft, transform,
+};
+
+const TOLERANCE: f64 = 3.0e-10;
+
+#[test]
+fn impulse_and_tone_land_in_definition_level_bins() {
+    let impulse = [(1.0, 0.0), (0.0, 0.0), (0.0, 0.0), (0.0, 0.0)];
+    let plan = TransformPlan::new(TransformKind::Fft, impulse.len());
+    let SignalBuffer::Complex(spectrum) = transform(&plan, SignalView::Complex(&impulse)).unwrap()
+    else {
+        panic!("FFT must return complex values");
+    };
+    assert_eq!(
+        spectrum.as_slice(),
+        &[(1.0, 0.0), (1.0, 0.0), (1.0, 0.0), (1.0, 0.0)]
+    );
+
+    let len = 16;
+    let bin = 3;
+    let tone = (0..len)
+        .map(|sample| (TAU * bin as f64 * sample as f64 / len as f64).cos())
+        .collect::<Vec<_>>();
+    let mut plan = TransformPlan::new(TransformKind::RealFft, len);
+    plan.packing = SpectrumPacking::HermitianHalf;
+    let SignalBuffer::Complex(spectrum) = transform(&plan, SignalView::Real(&tone)).unwrap() else {
+        panic!("real FFT must return complex values");
+    };
+    for (frequency, (real, imag)) in spectrum.as_slice().iter().copied().enumerate() {
+        let magnitude = real.hypot(imag);
+        if frequency == bin {
+            assert!((magnitude - len as f64 / 2.0).abs() <= TOLERANCE);
+        } else {
+            assert!(magnitude <= TOLERANCE, "unexpected tone bin {frequency}");
+        }
+    }
+}
+
+#[test]
+fn prime_length_fast_transform_agrees_with_direct_definition() {
+    let input = (0..11)
+        .map(|index| ((index as f64 * 0.31).sin(), (index as f64 * 0.47).cos()))
+        .collect::<Vec<_>>();
+    let expected = reference_dft(
+        &input,
+        Direction::Forward,
+        crate::SignConvention::NegativeForward,
+    )
+    .unwrap();
+    let plan = TransformPlan::new(TransformKind::Fft, input.len());
+    let SignalBuffer::Complex(actual) = transform(&plan, SignalView::Complex(&input)).unwrap()
+    else {
+        panic!("FFT must return complex values");
+    };
+    for (actual, expected) in actual.as_slice().iter().zip(expected) {
+        assert!((actual.0 - expected.0).abs() <= TOLERANCE);
+        assert!((actual.1 - expected.1).abs() <= TOLERANCE);
+    }
+}
+
+#[test]
+fn orthonormal_fft_satisfies_parseval_and_round_trips() {
+    let input = [
+        (0.5, -0.25),
+        (1.25, 0.75),
+        (-2.0, 0.5),
+        (0.125, -1.0),
+        (0.75, 0.0),
+    ];
+    let mut plan = TransformPlan::new(TransformKind::Fft, input.len());
+    plan.normalization = Normalization::Orthonormal;
+    let SignalBuffer::Complex(spectrum) = transform(&plan, SignalView::Complex(&input)).unwrap()
+    else {
+        panic!("FFT must return complex values");
+    };
+    let input_energy = input
+        .iter()
+        .map(|(real, imag)| real * real + imag * imag)
+        .sum::<f64>();
+    let spectrum_energy = spectrum
+        .as_slice()
+        .iter()
+        .map(|(real, imag)| real * real + imag * imag)
+        .sum::<f64>();
+    assert!((input_energy - spectrum_energy).abs() <= TOLERANCE);
+
+    plan.direction = Direction::Inverse;
+    let SignalBuffer::Complex(recovered) =
+        transform(&plan, SignalView::Complex(spectrum.as_slice())).unwrap()
+    else {
+        panic!("inverse FFT must return complex values");
+    };
+    for (actual, expected) in recovered.as_slice().iter().zip(input) {
+        assert!((actual.0 - expected.0).abs() <= TOLERANCE);
+        assert!((actual.1 - expected.1).abs() <= TOLERANCE);
+    }
+}
+
+#[test]
+fn empty_and_non_finite_inputs_fail_closed() {
+    let empty = TransformPlan::new(TransformKind::Fft, 0);
+    assert!(matches!(
+        transform(&empty, SignalView::Complex(&[])),
+        Err(SignalError::InvalidLength { .. })
+    ));
+
+    let plan = TransformPlan::new(TransformKind::Fft, 2);
+    assert_eq!(
+        transform(&plan, SignalView::Complex(&[(1.0, 0.0), (f64::NAN, 0.0)])),
+        Err(SignalError::NonFinite {
+            index: 1,
+            component: "real"
+        })
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/analytic_tests.rs`:
+
+```rust
+// conformance: generated analytic tones, phase, instantaneous frequency, and envelopes.
+
+use std::f64::consts::{PI, TAU};
+
+use super::*;
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+#[test]
+fn hilbert_construction_matches_a_generated_periodic_tone_for_every_scaling() {
+    let len = 64;
+    let bin = 5;
+    let samples = (0..len)
+        .map(|index| (TAU * bin as f64 * index as f64 / len as f64).cos())
+        .collect::<Vec<_>>();
+    for normalization in [
+        Normalization::None,
+        Normalization::Forward,
+        Normalization::Inverse,
+        Normalization::Orthonormal,
+    ] {
+        let plan = AnalyticSignalPlan {
+            normalization,
+            ..AnalyticSignalPlan::default()
+        };
+        let analytic = analytic_signal(&samples, &plan).unwrap();
+        for (index, (real, imag)) in analytic.samples.iter().copied().enumerate() {
+            let phase = TAU * bin as f64 * index as f64 / len as f64;
+            assert_close(real, phase.cos(), 1.0e-11);
+            assert_close(imag, phase.sin(), 1.0e-11);
+        }
+        let envelope = analytic_envelope(&analytic.samples).unwrap();
+        assert!(envelope.iter().all(|value| (*value - 1.0).abs() < 1.0e-11));
+    }
+}
+
+#[test]
+fn unwrapped_phase_yields_interval_centered_instantaneous_frequency() {
+    let sample_rate_hz = 64.0;
+    let frequency_hz = 5.0;
+    let analytic = (0..64)
+        .map(|index| {
+            let phase = TAU * frequency_hz * index as f64 / sample_rate_hz;
+            (phase.cos(), phase.sin())
+        })
+        .collect::<Vec<_>>();
+    let result = instantaneous_frequency(&analytic, sample_rate_hz).unwrap();
+    assert_eq!(result.frequency_hz.len(), 63);
+    assert_close(result.time_seconds[0], 0.5 / sample_rate_hz, 1.0e-14);
+    for frequency in result.frequency_hz {
+        assert_close(frequency, frequency_hz, 1.0e-12);
+    }
+
+    let wrapped = [0.75 * PI, -0.75 * PI, -0.5 * PI];
+    let unwrapped = unwrap_phase(&wrapped, PI).unwrap();
+    assert_close(unwrapped[1], 1.25 * PI, 1.0e-14);
+    assert_close(unwrapped[2], 1.5 * PI, 1.0e-14);
+}
+
+#[test]
+fn attack_release_envelope_is_finite_and_directional() {
+    let samples = [0.0, 1.0, 1.0, 0.0, 0.0];
+    let plan = EnvelopeFollowerPlan {
+        sample_rate_hz: 10.0,
+        attack_seconds: 0.1,
+        release_seconds: 1.0,
+        initial_value: 0.0,
+    };
+    let envelope = envelope_follow(&samples, &plan).unwrap();
+    assert_eq!(envelope[0], 0.0);
+    assert!(envelope[1] > 0.5);
+    assert!(envelope[2] > envelope[1]);
+    assert!(envelope[3] < envelope[2]);
+    assert!(envelope[4] < envelope[3]);
+    assert!(envelope[3] > 0.5);
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/autoregressive_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/autoregressive_tests.rs`:
+
+```rust
+// conformance: generated AR processes, stable Burg order evidence, MEM, and bounded prediction.
+
+use std::f64::consts::TAU;
+
+use super::*;
+
+fn generated_ar2(len: usize) -> Vec<f64> {
+    let radius = 0.9;
+    let frequency = 0.125;
+    let first = 2.0 * radius * (TAU * frequency).cos();
+    let second = -(radius * radius);
+    let mut state = 0x5eed_f00d_dead_beef_u64;
+    let mut samples = vec![0.0; len];
+    for index in 2..len {
+        state = state
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1);
+        let uniform = (state >> 11) as f64 / (1_u64 << 53) as f64;
+        let innovation = (uniform - 0.5) * 0.2;
+        samples[index] = first * samples[index - 1] + second * samples[index - 2] + innovation;
+    }
+    samples
+}
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+#[test]
+fn burg_recovers_generated_ar_process_and_bic_order() {
+    let samples = generated_ar2(4096);
+    let fixed = burg(&samples, &BurgPlan::new(2)).unwrap();
+    assert_eq!(fixed.evidence.effective_order, 2);
+    assert_eq!(fixed.evidence.termination, BurgTermination::RequestedOrder);
+    assert_close(fixed.coefficients[0], -1.272792206, 0.04);
+    assert_close(fixed.coefficients[1], 0.81, 0.04);
+    assert!(fixed.evidence.minimum_reflection_margin > 0.05);
+    assert!(fixed.evidence.residual_energy > 0.0);
+
+    let mut selected = BurgPlan::new(8);
+    selected.criterion = ArOrderCriterion::Bayesian;
+    let selected = burg(&samples, &selected).unwrap();
+    assert_eq!(selected.evidence.effective_order, 2);
+    assert_eq!(selected.evidence.candidate_scores.len(), 8);
+    assert_eq!(selected.evidence.criterion, ArOrderCriterion::Bayesian);
+}
+
+#[test]
+fn maximum_entropy_spectrum_finds_the_generated_resonance() {
+    let samples = generated_ar2(4096);
+    let model = burg(&samples, &BurgPlan::new(2)).unwrap();
+    let spectrum = mem_spectrum(&model, &MemSpectrumPlan::new(1.0, 512)).unwrap();
+    let peak = spectrum
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert_close(spectrum.frequency[peak], 0.125, 2.0 / 512.0);
+    assert_eq!(spectrum.evidence.estimator, EstimatorKind::MaximumEntropy);
+    assert_eq!(spectrum.evidence.degrees_of_freedom, 4094.0);
+    assert!(
+        spectrum
+            .power
+            .iter()
+            .all(|value| value.is_finite() && *value >= 0.0)
+    );
+}
+
+#[test]
+fn forward_and_backward_predictions_are_bounded_before_recursion() {
+    let samples = generated_ar2(512);
+    let model = burg(&samples, &BurgPlan::new(2)).unwrap();
+    let mut plan = PredictionPlan::new(64);
+    plan.max_abs_value = 10.0;
+    let forward = predict_forward(&model, &samples, &plan).unwrap();
+    let backward = predict_backward(&model, &samples, &plan).unwrap();
+    assert_eq!(forward.samples.len(), 64);
+    assert_eq!(backward.samples.len(), 64);
+    assert!(forward.samples.iter().all(|value| value.abs() <= 10.0));
+    assert!(backward.samples.iter().all(|value| value.abs() <= 10.0));
+    assert_eq!(forward.work_units, 128);
+
+    plan.max_abs_value = 1.0e-12;
+    assert!(matches!(
+        predict_forward(&model, &samples, &plan),
+        Err(SignalError::PredictionLimit { .. })
+    ));
+}
+
+#[test]
+fn singular_and_unstable_models_fail_closed() {
+    assert_eq!(
+        burg(&[3.0; 16], &BurgPlan::new(2)),
+        Err(SignalError::SingularModel { order: 1 })
+    );
+    assert_eq!(
+        burg(&[1.0, -1.0, 1.0, -1.0], &BurgPlan::new(1)),
+        Err(SignalError::UnstableModel { order: 1 })
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/convolution_tests.rs`:
+
+```rust
+// conformance: convolution, correlation, blocking, and guarded spectral inverse.
+
+use crate::{
+    BlockConvolutionMethod, BlockConvolutionPlan, BoundaryPolicy, ConvolutionAlgorithm,
+    ConvolutionMode, ConvolutionNormalization, ConvolutionPlan, CorrelationNormalization,
+    CorrelationPlan, DeconvolutionPlan, LagOrder, LinearOutput, Regularization, convolve,
+    convolve_blocked, correlate, deconvolve,
+};
+
+const TOLERANCE: f64 = 2.0e-9;
+
+#[test]
+fn automatic_cost_plan_is_inspectable_and_selects_both_paths() {
+    let plan = ConvolutionPlan::linear_full();
+    let small = plan.inspect(4, 3).unwrap();
+    assert_eq!(small.selected, ConvolutionAlgorithm::Direct);
+    assert!(small.direct_cost_units < small.fft_cost_units);
+    assert_eq!(small.fft_len, 8);
+
+    let large = plan.inspect(256, 129).unwrap();
+    assert_eq!(large.selected, ConvolutionAlgorithm::Fft);
+    assert!(large.fft_cost_units < large.direct_cost_units);
+    assert_eq!(large.fft_len, 512);
+    assert!(large.fft_scratch_bytes > 0);
+}
+
+#[test]
+fn direct_and_fft_convolution_agree_for_every_linear_span() {
+    let signal = (0..33)
+        .map(|index| (index as f64 * 0.37).sin() + index as f64 / 71.0)
+        .collect::<Vec<_>>();
+    let kernel = (0..9)
+        .map(|index| (index as f64 * 0.23).cos() - 0.4)
+        .collect::<Vec<_>>();
+    for span in [LinearOutput::Full, LinearOutput::Same, LinearOutput::Valid] {
+        let mut direct = ConvolutionPlan::linear_full();
+        direct.mode = ConvolutionMode::Linear(span);
+        direct.algorithm = ConvolutionAlgorithm::Direct;
+        let mut fast = direct.clone();
+        fast.algorithm = ConvolutionAlgorithm::Fft;
+        let direct = convolve(&signal, &kernel, &direct).unwrap();
+        let fast = convolve(&signal, &kernel, &fast).unwrap();
+        assert_close(direct.samples.as_slice(), fast.samples.as_slice());
+        assert_eq!(direct.report.retained_start, fast.report.retained_start);
+        assert_eq!(direct.report.retained_len, fast.report.retained_len);
+    }
+}
+
+#[test]
+fn full_and_circular_convolution_are_commutative_and_identity_preserving() {
+    let left = [0.5, -1.0, 2.0, 0.25, 3.0];
+    let right = [1.5, 0.0, -0.5];
+    let mut plan = ConvolutionPlan::linear_full();
+    plan.algorithm = ConvolutionAlgorithm::Direct;
+    let left_right = convolve(&left, &right, &plan).unwrap();
+    let right_left = convolve(&right, &left, &plan).unwrap();
+    assert_close(left_right.samples.as_slice(), right_left.samples.as_slice());
+    assert_close(
+        convolve(&left, &[1.0], &plan).unwrap().samples.as_slice(),
+        &left,
+    );
+
+    let mut circular = ConvolutionPlan::circular(5);
+    circular.algorithm = ConvolutionAlgorithm::Fft;
+    let left_right = convolve(&left, &right, &circular).unwrap();
+    let right_left = convolve(&right, &left, &circular).unwrap();
+    assert_close(left_right.samples.as_slice(), right_left.samples.as_slice());
+    assert_close(
+        convolve(&left, &[1.0], &circular)
+            .unwrap()
+            .samples
+            .as_slice(),
+        &left,
+    );
+}
+
+#[test]
+fn overlap_add_and_save_match_direct_with_exact_span_reports() {
+    let signal = (0..13)
+        .map(|index| (index as f64 * 0.19).sin())
+        .collect::<Vec<_>>();
+    let kernel = [0.2, -0.4, 0.7, 0.1];
+    for span in [LinearOutput::Full, LinearOutput::Same, LinearOutput::Valid] {
+        let mut ordinary = ConvolutionPlan::linear_full();
+        ordinary.mode = ConvolutionMode::Linear(span);
+        ordinary.algorithm = ConvolutionAlgorithm::Direct;
+        let expected = convolve(&signal, &kernel, &ordinary).unwrap();
+        for method in [
+            BlockConvolutionMethod::OverlapAdd,
+            BlockConvolutionMethod::OverlapSave,
+        ] {
+            let blocked = convolve_blocked(
+                &signal,
+                &kernel,
+                &BlockConvolutionPlan {
+                    convolution: ordinary.clone(),
+                    method,
+                    fft_len: 8,
+                },
+            )
+            .unwrap();
+            assert_close(
+                blocked.convolution.samples.as_slice(),
+                expected.samples.as_slice(),
+            );
+            assert_eq!(blocked.blocked.input_span_per_block, 5);
+            assert_eq!(blocked.blocked.retained_span_per_block, 5);
+            assert_eq!(blocked.blocked.latency_samples, 5);
+            assert_eq!(
+                blocked.blocked.boundary.retained_start,
+                expected.report.retained_start
+            );
+            assert_eq!(
+                blocked.blocked.boundary.retained_len,
+                expected.report.retained_len
+            );
+            if method == BlockConvolutionMethod::OverlapSave {
+                assert_eq!(blocked.blocked.boundary.left_padding, 3);
+                assert_eq!(blocked.blocked.boundary.discarded_prefix_per_block, 3);
+            }
+        }
+    }
+}
+
+#[test]
+fn correlation_has_reflected_pair_symmetry_and_typed_normalization() {
+    let left = [1.0, -2.0, 0.5, 3.0];
+    let right = [0.25, 2.0, -1.0];
+    let mut plan = CorrelationPlan::linear_full();
+    plan.algorithm = ConvolutionAlgorithm::Fft;
+    let left_right = correlate(&left, &right, &plan).unwrap();
+    let right_left = correlate(&right, &left, &plan).unwrap();
+    for (lag, value) in left_right.lags.iter().zip(left_right.samples.as_slice()) {
+        let opposite = right_left
+            .lags
+            .iter()
+            .position(|candidate| candidate == &-*lag)
+            .unwrap();
+        assert!((value - right_left.samples.as_slice()[opposite]).abs() <= TOLERANCE);
+    }
+
+    plan.normalization = CorrelationNormalization::Unbiased;
+    plan.lag_order = LagOrder::Descending;
+    let normalized = correlate(&left, &right, &plan).unwrap();
+    assert!(normalized.lags.windows(2).all(|pair| pair[0] > pair[1]));
+    assert!(
+        normalized
+            .samples
+            .as_slice()
+            .iter()
+            .all(|value| value.is_finite())
+    );
+}
+
+#[test]
+fn guarded_deconvolution_recovers_regular_inputs_and_reports_singular_bins() {
+    let signal = [0.5, -1.0, 2.0, 0.25, 1.5, -0.75];
+    let kernel = [1.0, 0.25];
+    let observation = convolve(&signal, &kernel, &ConvolutionPlan::linear_full()).unwrap();
+    let recovered = deconvolve(
+        observation.samples.as_slice(),
+        &kernel,
+        &DeconvolutionPlan::tikhonov(1.0e-12, 1.0e-10),
+    )
+    .unwrap();
+    assert_close(recovered.samples.as_slice(), &signal);
+    assert!(recovered.report.singular_bins.is_empty());
+    assert!(recovered.report.residual_l2 <= 1.0e-9);
+
+    let singular_kernel = [1.0, -1.0];
+    let observation = convolve(&signal, &singular_kernel, &ConvolutionPlan::linear_full()).unwrap();
+    let singular = deconvolve(
+        observation.samples.as_slice(),
+        &singular_kernel,
+        &DeconvolutionPlan {
+            mode: crate::DeconvolutionMode::LinearFull,
+            regularization: Regularization::Tikhonov { lambda: 1.0e-8 },
+            singular_threshold: 1.0e-12,
+        },
+    )
+    .unwrap();
+    assert!(singular.report.singular_bins.contains(&0));
+    assert_eq!(singular.report.minimum_kernel_magnitude, 0.0);
+    assert!(
+        singular
+            .samples
+            .as_slice()
+            .iter()
+            .all(|value| value.is_finite())
+    );
+    assert!(singular.report.maximum_inverse_gain.is_finite());
+    assert!(singular.report.residual_l2.is_finite());
+}
+
+#[test]
+fn invalid_boundaries_and_degenerate_normalizations_fail_closed() {
+    let mut plan = ConvolutionPlan::linear_full();
+    plan.boundary = BoundaryPolicy::Periodic;
+    assert!(convolve(&[1.0], &[1.0], &plan).is_err());
+
+    plan.boundary = BoundaryPolicy::ZeroPad;
+    plan.normalization = ConvolutionNormalization::KernelSum;
+    assert!(convolve(&[1.0, 2.0], &[1.0, -1.0], &plan).is_err());
+}
+
+fn assert_close(actual: &[f64], expected: &[f64]) {
+    assert_eq!(actual.len(), expected.len());
+    for (index, (actual, expected)) in actual.iter().zip(expected).enumerate() {
+        assert!(
+            (actual - expected).abs() <= TOLERANCE,
+            "sample {index}: {actual} != {expected}"
+        );
+    }
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/multidimensional_tests.rs`:
+
+```rust
+// conformance: strided multidimensional and bounded Table-backed transforms.
+
+use std::sync::Arc;
+
+use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, Symbol};
+use sim_lib_numbers_tensor::SpecTensor;
+
+use crate::{
+    PlacementPolicy, SignalBuffer, TensorView, TransformKind, TransformPlan, TransformPrecision,
+    TransformResources, read_blocked_tensor, reference_dft, transform_nd, transform_nd_blocked,
+    transform_plan_digest, write_blocked_tensor, write_complex_f64_block,
+};
+
+const TOLERANCE: f64 = 3.0e-10;
+
+#[test]
+fn separable_fft_over_transposed_strided_view_matches_axis_definitions() {
+    let physical = [
+        (1.0, 0.0),
+        (2.0, -0.5),
+        (3.0, 0.25),
+        (4.0, 1.0),
+        (5.0, -1.0),
+        (6.0, 0.75),
+    ];
+    // Logical 3x2 transpose of the physical 2x3 row-major tensor.
+    let view = TensorView::complex(&physical, vec![3, 2], vec![1, 3], 0).unwrap();
+    assert_eq!(view.strides(), [1, 3]);
+
+    let plan = TransformPlan::new(TransformKind::Fft, 1);
+    let actual = transform_nd(view, &[0, 1], &plan).unwrap();
+    let SignalBuffer::Complex(actual) = actual.output else {
+        panic!("complex FFT must return a complex tensor");
+    };
+    assert_eq!(actual.shape(), [3, 2]);
+
+    let logical = [
+        physical[0],
+        physical[3],
+        physical[1],
+        physical[4],
+        physical[2],
+        physical[5],
+    ];
+    let mut after_axis_zero = [(0.0, 0.0); 6];
+    for column in 0..2 {
+        let line = [logical[column], logical[2 + column], logical[4 + column]];
+        let expected =
+            reference_dft(&line, plan.direction, plan.sign).expect("direct axis transform");
+        for row in 0..3 {
+            after_axis_zero[row * 2 + column] = expected[row];
+        }
+    }
+    let mut expected = [(0.0, 0.0); 6];
+    for row in 0..3 {
+        let line = [after_axis_zero[row * 2], after_axis_zero[row * 2 + 1]];
+        let transformed =
+            reference_dft(&line, plan.direction, plan.sign).expect("direct axis transform");
+        expected[row * 2..row * 2 + 2].copy_from_slice(&transformed);
+    }
+
+    assert_complex_close(actual.as_slice(), &expected);
+}
+
+#[test]
+fn tensor_view_rejects_overlapping_or_out_of_bounds_layouts() {
+    let values = [0.0; 4];
+    assert!(TensorView::real(&values, vec![2, 2], vec![1, 1], 0).is_err());
+    assert!(TensorView::real(&values, vec![2, 2], vec![3, 1], 0).is_err());
+}
+
+#[test]
+fn blocked_table_transform_matches_in_memory_with_bounded_scratch() {
+    let shape = vec![4, 4];
+    let values = (0..16)
+        .map(|index| {
+            let value = index as f64;
+            ((value * 0.37).sin(), (value * 0.19).cos())
+        })
+        .collect::<Vec<_>>();
+    let view = TensorView::complex(&values, shape, vec![4, 1], 0).unwrap();
+    let resources = TransformResources {
+        max_scratch_bytes: 4096,
+        block_len: 3,
+    };
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let store = AssocTable::new();
+    let blocked = write_blocked_tensor(
+        &mut cx,
+        &store,
+        Symbol::qualified("test", "blocked-fft"),
+        &view,
+        resources,
+    )
+    .unwrap();
+    assert_eq!(blocked.block_len(), 3);
+    assert_eq!(
+        blocked,
+        crate::BlockedTensor::new(
+            Symbol::qualified("test", "blocked-fft"),
+            vec![4, 4],
+            TransformPrecision::ComplexF64,
+            3,
+        )
+        .unwrap()
+    );
+
+    let mut blocked_plan = TransformPlan::new(TransformKind::Fft, 1);
+    blocked_plan.placement = PlacementPolicy::InPlace;
+    let report =
+        transform_nd_blocked(&mut cx, &store, &blocked, &[0, 1], &blocked_plan, resources).unwrap();
+    assert_eq!(report.passes, 2);
+    assert!(report.io_blocks > 0);
+    assert!(report.scratch_bytes <= resources.max_scratch_bytes);
+    assert_eq!(report.precision, TransformPrecision::ComplexF64);
+    assert_eq!(
+        report.plan_digest,
+        transform_plan_digest(
+            blocked.shape(),
+            &[0, 1],
+            &blocked_plan,
+            TransformPrecision::ComplexF64,
+            Some(resources),
+        )
+    );
+
+    let SignalBuffer::Complex(blocked_output) =
+        read_blocked_tensor(&mut cx, &store, &blocked).unwrap()
+    else {
+        panic!("blocked FFT must remain complex");
+    };
+    let in_memory_plan = TransformPlan::new(TransformKind::Fft, 1);
+    let in_memory = transform_nd(view, &[0, 1], &in_memory_plan).unwrap();
+    let SignalBuffer::Complex(in_memory_output) = in_memory.output else {
+        panic!("in-memory FFT must remain complex");
+    };
+    assert_eq!(blocked_output.shape(), [4, 4]);
+    assert_complex_close(blocked_output.as_slice(), in_memory_output.as_slice());
+}
+
+#[test]
+fn blocked_plan_rejects_insufficient_scratch_before_execution() {
+    let values = vec![(1.0, 0.0); 16];
+    let view = TensorView::complex(&values, vec![4, 4], vec![4, 1], 0).unwrap();
+    let write_resources = TransformResources {
+        max_scratch_bytes: 1024,
+        block_len: 2,
+    };
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let store = AssocTable::new();
+    let blocked = write_blocked_tensor(
+        &mut cx,
+        &store,
+        Symbol::qualified("test", "scratch-limit"),
+        &view,
+        write_resources,
+    )
+    .unwrap();
+    let mut plan = TransformPlan::new(TransformKind::Fft, 1);
+    plan.placement = PlacementPolicy::InPlace;
+    let too_small = TransformResources {
+        max_scratch_bytes: 64,
+        block_len: 2,
+    };
+    assert!(transform_nd_blocked(&mut cx, &store, &blocked, &[0, 1], &plan, too_small).is_err());
+}
+
+#[test]
+fn caller_can_seed_external_descriptor_one_block_at_a_time() {
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let store = AssocTable::new();
+    let tensor = crate::BlockedTensor::new(
+        Symbol::qualified("test", "incremental-blocks"),
+        vec![2, 2],
+        TransformPrecision::ComplexF64,
+        2,
+    )
+    .unwrap();
+    assert_eq!(tensor.block_count(), 2);
+    write_complex_f64_block(&mut cx, &store, &tensor, 0, &[(1.0, -1.0), (2.0, -2.0)]).unwrap();
+    write_complex_f64_block(&mut cx, &store, &tensor, 1, &[(3.0, -3.0), (4.0, -4.0)]).unwrap();
+    let SignalBuffer::Complex(materialized) =
+        read_blocked_tensor(&mut cx, &store, &tensor).unwrap()
+    else {
+        panic!("complex descriptor must materialize complex cells");
+    };
+    assert_eq!(
+        materialized.as_slice(),
+        &[(1.0, -1.0), (2.0, -2.0), (3.0, -3.0), (4.0, -4.0)]
+    );
+}
+
+fn assert_complex_close(actual: &[(f64, f64)], expected: &[(f64, f64)]) {
+    assert_eq!(actual.len(), expected.len());
+    for (actual, expected) in actual.iter().zip(expected) {
+        assert!((actual.0 - expected.0).abs() <= TOLERANCE);
+        assert!((actual.1 - expected.1).abs() <= TOLERANCE);
+    }
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/interpolation_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/interpolation_tests.rs`:
+
+```rust
+// conformance: generated analytic periodic functions under explicit DFT-series conventions.
+
+use std::f64::consts::TAU;
+
+use super::*;
+
+fn periodic_value(time: f64) -> f64 {
+    1.0 + 2.0 * (TAU * time).cos() - 0.5 * (2.0 * TAU * time).sin()
+}
+
+fn unitary_bins(len: usize) -> Vec<(f64, f64)> {
+    let samples = (0..len)
+        .map(|index| (periodic_value(index as f64 / len as f64), 0.0))
+        .collect::<Vec<_>>();
+    let mut plan = TransformPlan::new(TransformKind::Dft, len);
+    plan.normalization = Normalization::Orthonormal;
+    let SignalBuffer::Complex(bins) = transform(&plan, SignalView::Complex(&samples)).unwrap()
+    else {
+        panic!("complex DFT expected")
+    };
+    bins.as_slice().to_vec()
+}
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+#[test]
+fn dft_interpolation_matches_generated_periodic_function_between_samples() {
+    let bins = unitary_bins(16);
+    let plan = DftSeriesPlan {
+        normalization: Normalization::Orthonormal,
+        ..DftSeriesPlan::default()
+    };
+    let coordinates = [0.1375, 0.375, 1.1375];
+    let result = dft_interpolate(&bins, &coordinates, &plan).unwrap();
+    for (actual, coordinate) in result.values.iter().zip(coordinates) {
+        assert_close(actual.0, periodic_value(coordinate), 1.0e-11);
+        assert_close(actual.1, 0.0, 1.0e-11);
+    }
+    assert_eq!(result.report.work_units, 48);
+    assert_eq!(result.report.endpoint, EndpointConvention::Excluded);
+    assert_eq!(result.report.periodicity, Periodicity::Wrap);
+}
+
+#[test]
+fn dft_integration_and_endpoint_policy_are_explicit() {
+    let bins = unitary_bins(16);
+    let mut plan = DftSeriesPlan {
+        normalization: Normalization::Orthonormal,
+        periodicity: Periodicity::PrincipalPeriod,
+        endpoint: EndpointConvention::Included,
+        ..DftSeriesPlan::default()
+    };
+    let integral = dft_integrate(&bins, 0.0, 1.0, &plan).unwrap();
+    assert_close(integral.value.0, 1.0, 1.0e-11);
+    assert_close(integral.value.1, 0.0, 1.0e-11);
+
+    plan.endpoint = EndpointConvention::Excluded;
+    assert!(matches!(
+        dft_interpolate(&bins, &[1.0], &plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "DFT interpolation coordinate",
+            ..
+        })
+    ));
+}
+
+#[test]
+fn single_bin_matches_complete_reference_dft() {
+    let samples = (0..17)
+        .map(|index| {
+            let value = periodic_value(index as f64 / 17.0);
+            (value, 0.25 * value)
+        })
+        .collect::<Vec<_>>();
+    let full = reference_dft(
+        &samples,
+        Direction::Forward,
+        SignConvention::NegativeForward,
+    )
+    .unwrap();
+    for bin in [0, 1, 2, 9, 16] {
+        let single = dft_bin(
+            &samples,
+            bin,
+            Normalization::Inverse,
+            SignConvention::NegativeForward,
+        )
+        .unwrap();
+        assert_close(single.0, full[bin].0, 1.0e-11);
+        assert_close(single.1, full[bin].1, 1.0e-11);
+    }
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/runtime_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/runtime_tests.rs`:
+
+```rust
+// conformance: checked Lisp signal operations and finite diagnostic evidence.
+
+use std::sync::Arc;
+
+use sim_codec::{Input, decode_eval_expr_with_codec, encode_value_with_codec};
+use sim_codec_lisp::LispCodecLib;
+use sim_kernel::{
+    CapabilitySet, DefaultFactory, EagerPolicy, EncodeOptions, ReadPolicy, Symbol, TrustLevel,
+};
+
+use crate::{RECIPES, SignalNumbersLib};
+
+fn cx() -> sim_kernel::Cx {
+    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
+        .unwrap();
+    cx.load_lib(&SignalNumbersLib::new()).unwrap();
+    let lisp = LispCodecLib::new(cx.registry_mut().fresh_codec_id()).unwrap();
+    cx.load_lib(&lisp).unwrap();
+    cx
+}
+
+#[test]
+fn lisp_surface_runs_an_impulse_fft() {
+    let mut cx = cx();
+    let recipes = sim_cookbook::recipes_from_embedded(RECIPES).unwrap();
+    let recipe = recipes
+        .iter()
+        .find(|recipe| recipe.id.ends_with("/impulse-fft"))
+        .unwrap();
+    let expr = decode_eval_expr_with_codec(
+        &mut cx,
+        &Symbol::qualified("codec", "lisp"),
+        Input::Text(String::from_utf8(recipe.setup.clone()).unwrap()),
+        ReadPolicy {
+            trust: TrustLevel::TrustedSource,
+            capabilities: CapabilitySet::new(),
+        },
+    )
+    .unwrap();
+    let output = cx.eval_expr(expr).unwrap();
+    let encoded = encode_value_with_codec(
+        &mut cx,
+        &Symbol::qualified("codec", "lisp"),
+        &output,
+        EncodeOptions::default(),
+    )
+    .unwrap()
+    .into_text()
+    .unwrap();
+    assert_eq!(recipe.expect.len(), 1);
+    assert_eq!(recipe.expect[0].form, 0);
+    assert_eq!(encoded, recipe.expect[0].result);
+}
+
+#[test]
+fn lisp_surface_exposes_costed_convolution_and_guarded_deconvolution() {
+    let mut cx = cx();
+    let recipes = sim_cookbook::recipes_from_embedded(RECIPES).unwrap();
+    let recipe = recipes
+        .iter()
+        .find(|recipe| recipe.id.ends_with("/convolution-evidence"))
+        .unwrap();
+    let convolution = eval_lisp(&mut cx, &String::from_utf8(recipe.setup.clone()).unwrap());
+    assert_eq!(convolution, recipe.expect[0].result);
+    assert!(convolution.contains("algorithm direct"), "{convolution}");
+    assert!(convolution.contains("samples (1 1 1 -3)"), "{convolution}");
+    assert!(convolution.contains("direct-cost-units 6"), "{convolution}");
+
+    let deconvolution = eval_lisp(
+        &mut cx,
+        "(signal/deconvolve [1.0 -1.0 0.0] [1.0 -1.0] :regularization {:kind 'tikhonov :lambda 1e-8})",
+    );
+    assert!(
+        deconvolution.contains("regularization tikhonov"),
+        "{deconvolution}"
+    );
+    assert!(
+        deconvolution.contains("singular-bins (0)"),
+        "{deconvolution}"
+    );
+    assert!(!deconvolution.contains("inf"), "{deconvolution}");
+    assert!(!deconvolution.contains("NaN"), "{deconvolution}");
+}
+
+#[test]
+fn lisp_surface_exposes_burg_and_unitary_dft_interpolation_evidence() {
+    let mut cx = cx();
+    let interpolation = eval_lisp(
+        &mut cx,
+        "(signal/dft-interpolate [[2.0 0.0] [0.0 0.0] [0.0 0.0] [0.0 0.0]] :at '(0.125 0.375) :normalization 'unitary)",
+    );
+    assert!(
+        interpolation.contains("values ((1 0) (1 0))"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("normalization unitary"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("periodicity wrap"),
+        "{interpolation}"
+    );
+    assert!(
+        interpolation.contains("endpoint excluded"),
+        "{interpolation}"
+    );
+
+    let burg = eval_lisp(
+        &mut cx,
+        "(signal/burg [0.0 0.2 0.31 0.28 0.12 -0.08 -0.21 -0.19 -0.05 0.13 0.24 0.2] :order 2 :criterion 'fixed :stability 'reject)",
+    );
+    assert!(burg.contains("effective-order 2"), "{burg}");
+    assert!(burg.contains("criterion fixed"), "{burg}");
+    assert!(burg.contains("termination requested-order"), "{burg}");
+    assert!(burg.contains("residual-energy"), "{burg}");
+    assert!(!burg.contains("NaN"), "{burg}");
+    assert!(!burg.contains("inf"), "{burg}");
+}
+
+fn eval_lisp(cx: &mut sim_kernel::Cx, source: &str) -> String {
+    let expr = decode_eval_expr_with_codec(
+        cx,
+        &Symbol::qualified("codec", "lisp"),
+        Input::Text(source.to_owned()),
+        ReadPolicy {
+            trust: TrustLevel::TrustedSource,
+            capabilities: CapabilitySet::new(),
+        },
+    )
+    .unwrap();
+    let output = cx.eval_expr(expr).unwrap();
+    encode_value_with_codec(
+        cx,
+        &Symbol::qualified("codec", "lisp"),
+        &output,
+        EncodeOptions::default(),
+    )
+    .unwrap()
+    .into_text()
+    .unwrap()
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/sample_interpolation_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/sample_interpolation_tests.rs`:
+
+```rust
+use super::*;
+
+// conformance: sampled interpolation shape, duplicate, and extrapolation policy.
+
+fn plan(method: InterpolationMethod) -> InterpolationPlan {
+    InterpolationPlan {
+        method,
+        ..InterpolationPlan::default()
+    }
+}
+
+#[test]
+fn linear_and_cubic_interpolants_preserve_affine_data() {
+    let x = [0.0, 1.0, 2.5, 4.0];
+    let y = x.map(|x| 2.0 * x - 1.0);
+    let at = [0.25, 1.5, 3.75];
+    for method in [InterpolationMethod::Linear, InterpolationMethod::Cubic] {
+        let result = interpolate_samples(&x, &y, &at, plan(method)).unwrap();
+        for (&coordinate, &value) in at.iter().zip(&result.values) {
+            assert!((value - (2.0 * coordinate - 1.0)).abs() < 1e-10);
+        }
+    }
+}
+
+#[test]
+fn monotone_cubic_does_not_overshoot_sample_intervals() {
+    let interpolator = SampleInterpolator::new(
+        &[0.0, 1.0, 2.0, 4.0],
+        &[0.0, 1.0, 1.5, 3.0],
+        plan(InterpolationMethod::Monotone),
+    )
+    .unwrap();
+    let at = (0..=80)
+        .map(|index| index as f64 / 20.0)
+        .collect::<Vec<_>>();
+    let values = interpolator.evaluate(&at).unwrap().values;
+    assert!(values.windows(2).all(|pair| pair[0] <= pair[1]));
+    assert!(values.iter().all(|value| (0.0..=3.0).contains(value)));
+}
+
+#[test]
+fn duplicate_policies_are_explicit_and_reported() {
+    let x = [0.0, 1.0, 1.0, 2.0];
+    let y = [0.0, 1.0, 3.0, 4.0];
+    assert!(matches!(
+        SampleInterpolator::new(&x, &y, InterpolationPlan::default()),
+        Err(SignalError::DuplicateCoordinate { index: 2, .. })
+    ));
+    let interpolator = SampleInterpolator::new(
+        &x,
+        &y,
+        InterpolationPlan {
+            method: InterpolationMethod::Linear,
+            duplicates: DuplicateXPolicy::Average,
+            extrapolation: ExtrapolationPolicy::Reject,
+        },
+    )
+    .unwrap();
+    let result = interpolator.evaluate(&[1.0]).unwrap();
+    assert_eq!(result.values, vec![2.0]);
+    assert_eq!(result.report.duplicates_resolved, 1);
+    assert_eq!(result.report.unique_points, 3);
+}
+
+#[test]
+fn extrapolation_rejects_clamps_or_continues_endpoint_secants() {
+    let x = [0.0, 1.0, 2.0];
+    let y = [0.0, 2.0, 3.0];
+    assert!(matches!(
+        interpolate_samples(&x, &y, &[-1.0], plan(InterpolationMethod::Linear)),
+        Err(SignalError::OutOfDomain { index: 0, .. })
+    ));
+    let clamped = interpolate_samples(
+        &x,
+        &y,
+        &[-1.0, 3.0],
+        InterpolationPlan {
+            method: InterpolationMethod::Monotone,
+            duplicates: DuplicateXPolicy::Reject,
+            extrapolation: ExtrapolationPolicy::Clamp,
+        },
+    )
+    .unwrap();
+    assert_eq!(clamped.values, vec![0.0, 3.0]);
+    assert_eq!(clamped.report.extrapolated_points, 2);
+    let extended = interpolate_samples(
+        &x,
+        &y,
+        &[-1.0, 3.0],
+        InterpolationPlan {
+            method: InterpolationMethod::Cubic,
+            duplicates: DuplicateXPolicy::Reject,
+            extrapolation: ExtrapolationPolicy::Linear,
+        },
+    )
+    .unwrap();
+    assert_eq!(extended.values, vec![-2.0, 4.0]);
+}
+
+#[test]
+fn interpolation_rejects_unsorted_and_non_finite_inputs() {
+    assert!(
+        SampleInterpolator::new(
+            &[0.0, 2.0, 1.0],
+            &[0.0, 1.0, 2.0],
+            InterpolationPlan::default(),
+        )
+        .is_err()
+    );
+    assert!(
+        interpolate_samples(
+            &[0.0, 1.0],
+            &[0.0, f64::NAN],
+            &[0.5],
+            InterpolationPlan::default(),
+        )
+        .is_err()
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/smoothing_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/smoothing_tests.rs`:
+
+```rust
+use super::*;
+
+// conformance: Savitzky-Golay polynomial laws and Toeplitz diagnostics.
+
+#[test]
+fn savitzky_golay_preserves_fitted_polynomials() {
+    let filter = savitzky_golay(SavitzkyGolaySpec {
+        window_length: 7,
+        polynomial_order: 3,
+        ..SavitzkyGolaySpec::default()
+    })
+    .unwrap();
+    let samples = (-10..=10)
+        .map(|x| {
+            let x = f64::from(x);
+            2.0 - 0.5 * x + 0.25 * x * x - 0.125 * x * x * x
+        })
+        .collect::<Vec<_>>();
+    let smoothed = apply_savitzky_golay(&samples, &filter, BoundaryMode::Symmetric).unwrap();
+    for index in 3..samples.len() - 3 {
+        assert!((smoothed[index] - samples[index]).abs() < 1e-9);
+    }
+}
+
+#[test]
+fn derivatives_include_factorial_and_physical_spacing() {
+    let spacing = 0.25;
+    let filter = savitzky_golay(SavitzkyGolaySpec {
+        window_length: 7,
+        polynomial_order: 3,
+        derivative_order: 2,
+        sample_spacing: spacing,
+        ..SavitzkyGolaySpec::default()
+    })
+    .unwrap();
+    let samples = (-10..=10)
+        .map(|index| {
+            let x = f64::from(index) * spacing;
+            3.0 * x * x + 2.0 * x + 1.0
+        })
+        .collect::<Vec<_>>();
+    let derivative = apply_savitzky_golay(&samples, &filter, BoundaryMode::Zero).unwrap();
+    for value in &derivative[3..derivative.len() - 3] {
+        assert!((*value - 6.0).abs() < 1e-9, "{value}");
+    }
+}
+
+#[test]
+fn toeplitz_solver_reports_pivots_and_residual() {
+    let solution = solve_toeplitz(
+        &[4.0, 1.0, 0.5],
+        &[4.0, 2.0, -1.0],
+        &[5.5, 6.0, 3.5],
+        ToeplitzPlan::default(),
+    )
+    .unwrap();
+    assert!((solution.values[0] - 1.0).abs() < 1e-12);
+    assert!((solution.values[1] - 1.0).abs() < 1e-12);
+    assert!((solution.values[2] - 0.5).abs() < 1e-12);
+    assert!(solution.diagnostics.reciprocal_pivot_condition > 0.0);
+    assert!(solution.diagnostics.residual_l2 < 1e-12);
+}
+
+#[test]
+fn toeplitz_singularity_returns_threshold_diagnostics() {
+    let error = solve_toeplitz(
+        &[1.0, 1.0],
+        &[1.0, 1.0],
+        &[2.0, 2.0],
+        ToeplitzPlan::default(),
+    )
+    .unwrap_err();
+    assert!(matches!(
+        error,
+        SignalError::SingularSystem {
+            operation: "Toeplitz",
+            step: 1,
+            pivot_magnitude,
+            threshold,
+        } if pivot_magnitude <= threshold
+    ));
+}
+
+#[test]
+fn smoothing_policies_fail_closed() {
+    assert!(
+        savitzky_golay(SavitzkyGolaySpec {
+            window_length: 4,
+            ..SavitzkyGolaySpec::default()
+        })
+        .is_err()
+    );
+    assert!(
+        savitzky_golay(SavitzkyGolaySpec {
+            derivative_order: 3,
+            polynomial_order: 2,
+            ..SavitzkyGolaySpec::default()
+        })
+        .is_err()
+    );
+    assert!(
+        solve_toeplitz(
+            &[1.0, 0.0],
+            &[2.0, 0.0],
+            &[1.0, 1.0],
+            ToeplitzPlan::default(),
+        )
+        .is_err()
+    );
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/spectral_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/spectral_tests.rs`:
+
+```rust
+// conformance: reference windows and bounded classical spectrum estimators.
+
+use std::f64::consts::TAU;
+
+use super::*;
+use crate::multitaper::dpss_tapers;
+
+const TOLERANCE: f64 = 1e-10;
+
+fn assert_close(actual: f64, expected: f64, tolerance: f64) {
+    assert!(
+        (actual - expected).abs() <= tolerance,
+        "expected {expected}, got {actual}"
+    );
+}
+
+fn rectangular() -> WindowSpec {
+    WindowSpec::new(WindowFunction::Rectangular)
+}
+
+fn tone(len: usize, sample_rate_hz: f64, frequency_hz: f64, amplitude: f64) -> Vec<f64> {
+    (0..len)
+        .map(|index| amplitude * (TAU * frequency_hz * index as f64 / sample_rate_hz).sin())
+        .collect()
+}
+
+#[test]
+fn reference_windows_match_known_coefficients_and_invariants() {
+    let hann = WindowSpec::new(WindowFunction::Hann).generate(5).unwrap();
+    for (actual, expected) in hann.samples.iter().zip([0.0, 0.5, 1.0, 0.5, 0.0]) {
+        assert_close(*actual, expected, TOLERANCE);
+    }
+    let hamming = WindowSpec::new(WindowFunction::Hamming)
+        .generate(5)
+        .unwrap();
+    for (actual, expected) in hamming.samples.iter().zip([0.08, 0.54, 1.0, 0.54, 0.08]) {
+        assert_close(*actual, expected, TOLERANCE);
+    }
+    let blackman = WindowSpec::new(WindowFunction::Blackman { alpha: 0.16 })
+        .generate(5)
+        .unwrap();
+    assert_close(blackman.samples[0], 0.0, TOLERANCE);
+    assert_close(blackman.samples[2], 1.0, TOLERANCE);
+    let blackman_harris = WindowSpec::new(WindowFunction::BlackmanHarris)
+        .generate(5)
+        .unwrap();
+    assert_close(blackman_harris.samples[0], 0.00006, TOLERANCE);
+    assert_close(blackman_harris.samples[2], 1.0, TOLERANCE);
+    let kaiser = WindowSpec::new(WindowFunction::Kaiser { beta: 8.6 })
+        .generate(9)
+        .unwrap();
+    assert_close(kaiser.samples[0], kaiser.samples[8], TOLERANCE);
+    assert_close(kaiser.samples[4], 1.0, TOLERANCE);
+    assert!(
+        kaiser
+            .samples
+            .windows(2)
+            .take(4)
+            .all(|pair| pair[0] < pair[1])
+    );
+    let rectangular = rectangular().generate(7).unwrap();
+    assert!(rectangular.samples.iter().all(|value| *value == 1.0));
+
+    let explicit = WindowSpec::new(WindowFunction::Explicit(vec![1.0, 2.0, 1.0]))
+        .generate(3)
+        .unwrap();
+    assert_eq!(explicit.samples, vec![1.0, 2.0, 1.0]);
+    assert_close(explicit.metrics.coherent_gain, 4.0 / 3.0, TOLERANCE);
+    assert_close(explicit.metrics.energy, 6.0, TOLERANCE);
+}
+
+#[test]
+fn window_normalizations_report_raw_and_applied_scale() {
+    let mut coherent = WindowSpec::new(WindowFunction::Hann);
+    coherent.sampling = WindowSampling::Periodic;
+    coherent.normalization = WindowNormalization::CoherentGain;
+    let coherent = coherent.generate(64).unwrap();
+    assert_close(coherent.metrics.raw_coherent_gain, 0.5, TOLERANCE);
+    assert_close(coherent.metrics.normalization_scale, 2.0, TOLERANCE);
+    assert_close(coherent.metrics.coherent_gain, 1.0, TOLERANCE);
+    assert_close(
+        coherent.metrics.equivalent_noise_bandwidth_bins.unwrap(),
+        1.5,
+        TOLERANCE,
+    );
+
+    let mut energy = WindowSpec::new(WindowFunction::Hann);
+    energy.sampling = WindowSampling::Periodic;
+    energy.normalization = WindowNormalization::UnitEnergy;
+    let energy = energy.generate(64).unwrap();
+    assert_close(energy.metrics.raw_energy, 24.0, TOLERANCE);
+    assert_close(energy.metrics.energy, 1.0, TOLERANCE);
+}
+
+#[test]
+fn periodogram_recovers_tone_power_and_parseval_noise_energy() {
+    let sample_rate_hz = 1024.0;
+    let samples = tone(256, sample_rate_hz, 128.0, 2.0);
+    let mut plan = PeriodogramPlan::new(sample_rate_hz, samples.len());
+    plan.window = rectangular();
+    plan.scaling = SpectrumScalingKind::Power;
+    let estimate = periodogram(&samples, &plan).unwrap();
+    let peak = estimate
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert_close(estimate.frequency[peak], 128.0, TOLERANCE);
+    assert_close(estimate.power[peak], 2.0, TOLERANCE);
+    assert_eq!(estimate.evidence.degrees_of_freedom, 2.0);
+    assert_close(
+        estimate.scaling.normalization_denominator,
+        (samples.len() * samples.len()) as f64,
+        TOLERANCE,
+    );
+
+    let noise = (0..256)
+        .scan(0x1234_5678_u64, |state, _| {
+            *state = state
+                .wrapping_mul(6_364_136_223_846_793_005)
+                .wrapping_add(1);
+            Some(((*state >> 11) as f64 / (1_u64 << 53) as f64) * 2.0 - 1.0)
+        })
+        .collect::<Vec<_>>();
+    plan.scaling = SpectrumScalingKind::Density;
+    let density = periodogram(&noise, &plan).unwrap();
+    let integrated = density.power.iter().sum::<f64>() * sample_rate_hz / plan.fft_len as f64;
+    let mean_square = noise.iter().map(|value| value * value).sum::<f64>() / noise.len() as f64;
+    assert_close(integrated, mean_square, TOLERANCE);
+}
+
+#[test]
+fn welch_and_cross_spectrum_report_segments_dof_and_coherence() {
+    let sample_rate_hz = 1024.0;
+    let samples = tone(768, sample_rate_hz, 128.0, 1.0);
+    let mut plan = WelchPlan::new(sample_rate_hz, 256);
+    plan.window = rectangular();
+    let estimate = welch(&samples, &plan).unwrap();
+    assert_eq!(estimate.evidence.segment_count, 5);
+    assert_eq!(estimate.evidence.degrees_of_freedom, 10.0);
+    let peak = estimate
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert_close(estimate.frequency[peak], 128.0, TOLERANCE);
+
+    let shifted = tone(768, sample_rate_hz, 128.0, 0.25);
+    let cross = cross_spectrum(&samples, &shifted, &plan).unwrap();
+    assert_close(cross.coherence[peak], 1.0, TOLERANCE);
+    assert_eq!(cross.evidence.estimator, EstimatorKind::CrossSpectrum);
+    assert_eq!(cross.evidence.degrees_of_freedom, 10.0);
+}
+
+#[test]
+fn linear_frequency_grid_uses_bounded_direct_fourier_evaluation() {
+    let samples = tone(64, 64.0, 7.25, 1.0);
+    let mut plan = PeriodogramPlan::new(64.0, 64);
+    plan.window = rectangular();
+    plan.scaling = SpectrumScalingKind::Power;
+    plan.grid = FrequencyGridPolicy::Linear {
+        start_hz: 6.0,
+        end_hz: 8.0,
+        bins: 41,
+        side: SpectrumSide::OneSided,
+    };
+    let estimate = periodogram(&samples, &plan).unwrap();
+    assert_eq!(estimate.evidence.work_units, 64 * 41);
+    let peak = estimate
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert!((estimate.frequency[peak] - 7.25).abs() <= 0.05);
+}
+
+#[test]
+fn slepian_tapers_are_orthonormal_concentrated_and_find_a_tone() {
+    let (tapers, concentrations) = dpss_tapers(32, 2.5, 4).unwrap();
+    for left in 0..tapers.len() {
+        for right in 0..tapers.len() {
+            let product = tapers[left]
+                .iter()
+                .zip(&tapers[right])
+                .map(|(a, b)| a * b)
+                .sum::<f64>();
+            assert_close(product, if left == right { 1.0 } else { 0.0 }, 1e-8);
+        }
+    }
+    assert!(concentrations.windows(2).all(|pair| pair[0] >= pair[1]));
+    assert!(concentrations.iter().all(|value| *value > 0.9));
+
+    let samples = tone(32, 32.0, 5.0, 1.0);
+    let plan = MultitaperPlan::new(32.0, 32, 2.5, 4);
+    let estimate = multitaper(&samples, &plan).unwrap();
+    let peak = estimate
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert!((estimate.frequency[peak] - 5.0).abs() <= 1.0);
+    assert_eq!(estimate.evidence.degrees_of_freedom, 8.0);
+    assert_eq!(estimate.evidence.taper_concentrations, concentrations);
+}
+
+#[test]
+fn uneven_sample_lomb_scargle_recovers_known_tone_and_scale() {
+    let mut time = 0.0;
+    let times = (0..80)
+        .map(|index| {
+            time += 0.01 + (index % 7) as f64 * 0.0003;
+            time
+        })
+        .collect::<Vec<_>>();
+    let samples = times
+        .iter()
+        .map(|time| 1.25 + 0.8 * (TAU * 7.3 * time).sin())
+        .collect::<Vec<_>>();
+    let mut plan = LombScarglePlan::new(64.0, 256);
+    plan.grid = FrequencyGridPolicy::Linear {
+        start_hz: 1.0,
+        end_hz: 15.0,
+        bins: 281,
+        side: SpectrumSide::OneSided,
+    };
+    let estimate = lomb_scargle(&times, &samples, &plan).unwrap();
+    let peak = estimate
+        .power
+        .iter()
+        .enumerate()
+        .max_by(|left, right| left.1.total_cmp(right.1))
+        .unwrap()
+        .0;
+    assert_close(estimate.frequency[peak], 7.3, 0.05);
+    assert!(estimate.power[peak] > 0.999);
+    assert_eq!(
+        estimate.scaling.kind,
+        SpectrumScalingKind::LombScargleNormalized
+    );
+    assert!(estimate.scaling.normalization_denominator > 0.0);
+    assert_eq!(estimate.evidence.degrees_of_freedom, 77.0);
+}
+
+#[test]
+fn segment_taper_grid_and_work_limits_fail_before_execution() {
+    let samples = tone(512, 512.0, 32.0, 1.0);
+    let mut welch_plan = WelchPlan::new(512.0, 64);
+    welch_plan.limits.max_segments = 2;
+    assert!(matches!(
+        welch(&samples, &welch_plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "segment limit",
+            ..
+        })
+    ));
+
+    let mut periodogram_plan = PeriodogramPlan::new(512.0, 512);
+    periodogram_plan.limits.max_frequency_bins = 4;
+    assert!(matches!(
+        periodogram(&samples, &periodogram_plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "frequency-bin limit",
+            ..
+        })
+    ));
+    periodogram_plan.limits.max_frequency_bins = 513;
+    periodogram_plan.limits.max_work = 1;
+    assert!(matches!(
+        periodogram(&samples, &periodogram_plan),
+        Err(SignalError::WorkLimit { .. })
+    ));
+
+    let mut multitaper_plan = MultitaperPlan::new(512.0, 512, 3.0, 5);
+    multitaper_plan.limits.max_tapers = 2;
+    assert!(matches!(
+        multitaper(&samples, &multitaper_plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "taper limit",
+            ..
+        })
+    ));
+}
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/wavelet_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/wavelet_tests.rs`:
+
+```rust
+use super::*;
+
+// conformance: wavelet inverse and polynomial-annihilation laws.
+
+fn assert_close(left: &[f64], right: &[f64], tolerance: f64) {
+    assert_eq!(left.len(), right.len());
+    for (index, (&left, &right)) in left.iter().zip(right).enumerate() {
+        assert!(
+            (left - right).abs() <= tolerance,
+            "sample {index}: {left} != {right}"
+        );
+    }
+}
+
+#[test]
+fn every_wavelet_and_boundary_round_trips_odd_multilevel_signal() {
+    let signal = [0.5, -1.0, 2.5, 4.0, -3.25, 1.5, 0.125, 7.0, -2.0];
+    for wavelet in [Wavelet::Haar, Wavelet::LeGall53] {
+        for boundary in [
+            BoundaryMode::Periodic,
+            BoundaryMode::Symmetric,
+            BoundaryMode::Zero,
+        ] {
+            let plan = WaveletPlan {
+                wavelet,
+                levels: 3,
+                boundary,
+            };
+            let coefficients = dwt(&signal, &plan).unwrap();
+            assert_eq!(coefficients.levels.len(), 3);
+            assert_eq!(coefficients.levels[0].input_len, signal.len());
+            assert_close(&idwt(&coefficients, &plan).unwrap(), &signal, 1e-12);
+        }
+    }
+}
+
+#[test]
+fn legall_detail_annihilates_a_linear_polynomial() {
+    let signal = (0..9)
+        .map(|index| 2.0 * index as f64 - 3.0)
+        .collect::<Vec<_>>();
+    let plan = WaveletPlan {
+        wavelet: Wavelet::LeGall53,
+        levels: 1,
+        boundary: BoundaryMode::Symmetric,
+    };
+    let coefficients = dwt(&signal, &plan).unwrap();
+    assert!(
+        coefficients.levels[0]
+            .detail
+            .iter()
+            .all(|value| value.abs() <= 1e-12)
+    );
+}
+
+#[test]
+fn wavelet_plans_and_coefficients_fail_closed() {
+    let plan = WaveletPlan::new(Wavelet::Haar, 0);
+    assert!(matches!(
+        dwt(&[1.0, 2.0], &plan),
+        Err(SignalError::InvalidPolicy {
+            policy: "wavelet levels",
+            ..
+        })
+    ));
+
+    let plan = WaveletPlan::new(Wavelet::Haar, 2);
+    assert!(dwt(&[1.0, 2.0], &plan).is_err());
+    assert!(dwt(&[1.0, f64::NAN], &WaveletPlan::new(Wavelet::Haar, 1)).is_err());
+
+    let mut coefficients = dwt(&[1.0, 2.0, 3.0, 4.0], &WaveletPlan::new(Wavelet::Haar, 1)).unwrap();
+    coefficients.levels[0].detail.pop();
+    assert!(idwt(&coefficients, &WaveletPlan::new(Wavelet::Haar, 1)).is_err());
 }
 ```
 

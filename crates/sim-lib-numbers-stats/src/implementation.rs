@@ -7,19 +7,79 @@ use std::{error::Error, fmt};
 mod agent_fixtures;
 #[path = "claim.rs"]
 mod claim;
+#[path = "clustering.rs"]
+mod clustering;
+#[cfg(test)]
+#[path = "clustering_tests.rs"]
+mod clustering_tests;
 #[path = "function.rs"]
 mod function;
+#[path = "gmm.rs"]
+mod gmm;
+#[path = "gmm_math.rs"]
+mod gmm_math;
+#[path = "hmm_baum_welch.rs"]
+mod hmm_baum_welch;
+#[path = "hmm_fit.rs"]
+mod hmm_fit;
+#[path = "hmm_inference.rs"]
+mod hmm_inference;
+#[path = "hmm_model.rs"]
+mod hmm_model;
+#[cfg(test)]
+#[path = "hmm_tests.rs"]
+mod hmm_tests;
+#[path = "markov.rs"]
+mod markov;
+#[cfg(test)]
+#[path = "markov_tests.rs"]
+mod markov_tests;
+#[path = "quantile.rs"]
+mod quantile;
+#[cfg(test)]
+#[path = "quantile_tests.rs"]
+mod quantile_tests;
 #[path = "runtime.rs"]
 mod runtime;
+#[path = "runtime_clustering.rs"]
+mod runtime_clustering;
+#[path = "transition.rs"]
+mod transition;
 
 pub use claim::{
     FairnessClaimValue, FairnessEvidence, StatsClaimEvidence, StatsClaimValue, fairness_claim,
     fairness_claim_value, stats_result_claim, stats_result_claim_value,
 };
+pub use clustering::{
+    ClusteringError, KMeansControl, KMeansModel, KMeansReport, KMeansRestartEvidence,
+    KMeansSearchTermination, KMeansTermination, fit_kmeans,
+};
 pub use function::{
     StatsNumbersLib, stats_claims_symbol, stats_disparate_impact_claim_symbol,
-    stats_entropy_claim_symbol, stats_mean_claim_symbol, stats_variance_claim_symbol,
+    stats_entropy_claim_symbol, stats_gmm_symbol, stats_kmeans_symbol, stats_mean_claim_symbol,
+    stats_variance_claim_symbol,
 };
+pub use gmm::{
+    CovarianceType, GaussianCovariance, GmmControl, GmmEvidence, GmmModel, GmmReport, GmmSpec,
+    GmmTermination, ModelSelectionEvidence, SingularComponentPolicy, fit_gmm,
+};
+pub use hmm_fit::{
+    HmmFitControl, HmmFitEvidence, HmmFitReport, HmmSpec, HmmTermination, Sequence, StateId,
+    fit_hmm,
+};
+pub use hmm_inference::{
+    ForwardBackward, InferenceEvidence, PosteriorPath, ViterbiPath, forward_backward,
+    posterior_decode, viterbi,
+};
+pub use hmm_model::{EmissionModel, HiddenMarkovModel, HmmError, HmmObservation};
+pub use markov::{
+    CorpusProvenance, MarkovError, MarkovModel, MarkovPolicy, ModelReport, TransitionScore,
+    fit_markov, fnv1a64,
+};
+pub use quantile::{
+    QuantileError, QuantileEstimate, QuantilePolicy, QuantileSketch, exact_quantile,
+};
+pub use transition::{FiniteTransitionMatrix, TransitionError};
 
 const FOUR_FIFTHS_THRESHOLD: f64 = 0.8;
 const PROBABILITY_TOLERANCE: f64 = 1.0e-12;

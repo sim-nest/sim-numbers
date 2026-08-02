@@ -1,0 +1,3 @@
+shape=[2, 2]
+passes=2 scratch=544 bounded=true
+blocked-equals-memory=true

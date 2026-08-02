@@ -1,0 +1,11 @@
+id = "blocked-transform"
+title = "Bounded multidimensional transform"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 20
+tags = ["numbers", "signal", "fft", "tensor", "blocked", "table", "bounded"]
+harness = "cargo-example"
+package = "sim-lib-numbers-signal"
+example = "blocked-transform"

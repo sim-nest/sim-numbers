@@ -1,0 +1,1 @@
+(signal/dft-interpolate [[2.0 0.0] [0.0 0.0] [0.0 0.0] [0.0 0.0]] :at '(0.125 0.375) :normalization 'unitary)

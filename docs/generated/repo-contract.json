@@ -1,5 +1,5 @@
 {
-  "card_count": 34,
+  "card_count": 35,
   "cards": [
     {
       "id": "browse/catalog",
@@ -134,10 +134,16 @@
       "summary": "Runge-Kutta ODE solver methods."
     },
     {
+      "id": "cookbook/numbers/signal",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-signal",
+      "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples."
+    },
+    {
       "id": "cookbook/numbers/stats",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-stats",
-      "summary": "Probability, descriptive statistics, and fairness metric helpers."
+      "summary": "Probability, clustering, bounded inference, and inspectable evidence."
     },
     {
       "id": "cookbook/numbers/tensor",
@@ -236,6 +242,7 @@
       "sim-lib-numbers-quad",
       "sim-lib-numbers-rational",
       "sim-lib-numbers-rk",
+      "sim-lib-numbers-signal",
       "sim-lib-numbers-stats",
       "sim-lib-numbers-tensor",
       "sim-lib-numbers-tensor-bcast",
@@ -373,7 +380,7 @@
       "reason": "numbers/tensor literal class marker; tensor values use the numbers/Tensor citizen descriptor"
     }
   ],
-  "package_count": 33,
+  "package_count": 34,
   "packages": [
     {
       "crate_name": "sim_lib_numbers_ad",
@@ -1870,6 +1877,121 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_signal",
+      "dependencies": [
+        {
+          "kind": "dev",
+          "optional": false,
+          "package": "sim-lib-numbers-f64",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-cmplxf",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-f64",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-linalg",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Deterministic transforms, autoregression, spectral estimation, and guarded signal operations.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
+      "name": "sim-lib-numbers-signal",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-signal",
+      "rustdoc_summary": "Deterministic transforms, convolution, autoregression, spectral estimation, interpolation, and guarded deconvolution over canonical SIM tensors.",
+      "target_kinds": [
+        "custom-build",
+        "example",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_signal",
+          "src": "crates/sim-lib-numbers-signal/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "autoregressive-spectral",
+          "src": "crates/sim-lib-numbers-signal/examples/autoregressive_spectral.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "blocked-transform",
+          "src": "crates/sim-lib-numbers-signal/examples/blocked_transform.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "spectral-estimators",
+          "src": "crates/sim-lib-numbers-signal/examples/spectral_estimators.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "wavelet-smoothing",
+          "src": "crates/sim-lib-numbers-signal/examples/wavelet_smoothing.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-signal/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_stats",
       "dependencies": [
         {
@@ -1887,9 +2009,10 @@
       "name": "sim-lib-numbers-stats",
       "publish": "true",
       "root": "crates/sim-lib-numbers-stats",
-      "rustdoc_summary": "Probability, descriptive statistics, and fairness metric helpers for f64 number-domain data.",
+      "rustdoc_summary": "Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.",
       "target_kinds": [
         "custom-build",
+        "example",
         "lib"
       ],
       "targets": [
@@ -1902,6 +2025,26 @@
           ],
           "name": "sim_lib_numbers_stats",
           "src": "crates/sim-lib-numbers-stats/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "bounded-sequence-inference",
+          "src": "crates/sim-lib-numbers-stats/examples/bounded_sequence_inference.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "clustering-evidence",
+          "src": "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs"
         },
         {
           "crate_types": [
@@ -2531,10 +2674,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "cd13dd75e659a773cdfa4a4cbaef6e38508fe98b",
+    "git_commit": "c9e3cc7e2f52c44496a29973d359b64761d76b47",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "cd13dd75e659a773cdfa4a4cbaef6e38508fe98b",
+    "source_commit": "c9e3cc7e2f52c44496a29973d359b64761d76b47",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2547,9 +2690,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "eeddedb99b95134e",
+    "workspace_hash": "63183d6e191e45c4",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 320,
+    "workspace_hash_input_count": 414,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2765,9 +2908,87 @@
       "crates/sim-lib-numbers-rk/src/solver.rs",
       "crates/sim-lib-numbers-rk/src/support.rs",
       "crates/sim-lib-numbers-rk/src/tests.rs",
+      "crates/sim-lib-numbers-signal/Cargo.toml",
+      "crates/sim-lib-numbers-signal/build.rs",
+      "crates/sim-lib-numbers-signal/examples/autoregressive_spectral.rs",
+      "crates/sim-lib-numbers-signal/examples/blocked_transform.rs",
+      "crates/sim-lib-numbers-signal/examples/spectral_estimators.rs",
+      "crates/sim-lib-numbers-signal/examples/wavelet_smoothing.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/main.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/main.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/main.rs",
+      "crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml",
+      "crates/sim-lib-numbers-signal/recipes/book.toml",
+      "crates/sim-lib-numbers-signal/src/algorithm_tests.rs",
+      "crates/sim-lib-numbers-signal/src/analytic.rs",
+      "crates/sim-lib-numbers-signal/src/analytic_tests.rs",
+      "crates/sim-lib-numbers-signal/src/autoregressive.rs",
+      "crates/sim-lib-numbers-signal/src/autoregressive_tests.rs",
+      "crates/sim-lib-numbers-signal/src/block_io.rs",
+      "crates/sim-lib-numbers-signal/src/blocked.rs",
+      "crates/sim-lib-numbers-signal/src/blocked_convolution.rs",
+      "crates/sim-lib-numbers-signal/src/conformance.rs",
+      "crates/sim-lib-numbers-signal/src/convolution.rs",
+      "crates/sim-lib-numbers-signal/src/convolution_plan.rs",
+      "crates/sim-lib-numbers-signal/src/convolution_tests.rs",
+      "crates/sim-lib-numbers-signal/src/correlation.rs",
+      "crates/sim-lib-numbers-signal/src/deconvolution.rs",
+      "crates/sim-lib-numbers-signal/src/error.rs",
+      "crates/sim-lib-numbers-signal/src/fft.rs",
+      "crates/sim-lib-numbers-signal/src/interpolate.rs",
+      "crates/sim-lib-numbers-signal/src/interpolation_tests.rs",
+      "crates/sim-lib-numbers-signal/src/io_plan.rs",
+      "crates/sim-lib-numbers-signal/src/lib.rs",
+      "crates/sim-lib-numbers-signal/src/linalg_support.rs",
+      "crates/sim-lib-numbers-signal/src/lomb.rs",
+      "crates/sim-lib-numbers-signal/src/mem.rs",
+      "crates/sim-lib-numbers-signal/src/multidimensional.rs",
+      "crates/sim-lib-numbers-signal/src/multidimensional_tests.rs",
+      "crates/sim-lib-numbers-signal/src/multitaper.rs",
+      "crates/sim-lib-numbers-signal/src/periodogram.rs",
+      "crates/sim-lib-numbers-signal/src/plan.rs",
+      "crates/sim-lib-numbers-signal/src/plan_tests.rs",
+      "crates/sim-lib-numbers-signal/src/prediction.rs",
+      "crates/sim-lib-numbers-signal/src/reference.rs",
+      "crates/sim-lib-numbers-signal/src/runtime.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_convolution.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_convolution_callable.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_convolution_render.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_convolution_value.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_spectral.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_spectral_callable.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_spectral_value.rs",
+      "crates/sim-lib-numbers-signal/src/runtime_tests.rs",
+      "crates/sim-lib-numbers-signal/src/sample_interpolation.rs",
+      "crates/sim-lib-numbers-signal/src/sample_interpolation_tests.rs",
+      "crates/sim-lib-numbers-signal/src/savitzky_golay.rs",
+      "crates/sim-lib-numbers-signal/src/smoothing_tests.rs",
+      "crates/sim-lib-numbers-signal/src/spectral_tests.rs",
+      "crates/sim-lib-numbers-signal/src/spectrum_core.rs",
+      "crates/sim-lib-numbers-signal/src/spectrum_types.rs",
+      "crates/sim-lib-numbers-signal/src/tensor_view.rs",
+      "crates/sim-lib-numbers-signal/src/toeplitz.rs",
+      "crates/sim-lib-numbers-signal/src/transform.rs",
+      "crates/sim-lib-numbers-signal/src/wavelet.rs",
+      "crates/sim-lib-numbers-signal/src/wavelet_tests.rs",
+      "crates/sim-lib-numbers-signal/src/window.rs",
       "crates/sim-lib-numbers-stats/Cargo.toml",
       "crates/sim-lib-numbers-stats/build.rs",
+      "crates/sim-lib-numbers-stats/examples/bounded_sequence_inference.rs",
+      "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/main.rs",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/30-agents/a30-010-data-analysis/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/30-agents/a30-024-healthcare-intelligence/recipe.toml",
@@ -2776,11 +2997,26 @@
       "crates/sim-lib-numbers-stats/recipes/book.toml",
       "crates/sim-lib-numbers-stats/src/agent_fixtures.rs",
       "crates/sim-lib-numbers-stats/src/claim.rs",
+      "crates/sim-lib-numbers-stats/src/clustering.rs",
+      "crates/sim-lib-numbers-stats/src/clustering_tests.rs",
       "crates/sim-lib-numbers-stats/src/function.rs",
+      "crates/sim-lib-numbers-stats/src/gmm.rs",
+      "crates/sim-lib-numbers-stats/src/gmm_math.rs",
+      "crates/sim-lib-numbers-stats/src/hmm_baum_welch.rs",
+      "crates/sim-lib-numbers-stats/src/hmm_fit.rs",
+      "crates/sim-lib-numbers-stats/src/hmm_inference.rs",
+      "crates/sim-lib-numbers-stats/src/hmm_model.rs",
+      "crates/sim-lib-numbers-stats/src/hmm_tests.rs",
       "crates/sim-lib-numbers-stats/src/implementation.rs",
       "crates/sim-lib-numbers-stats/src/lib.rs",
+      "crates/sim-lib-numbers-stats/src/markov.rs",
+      "crates/sim-lib-numbers-stats/src/markov_tests.rs",
+      "crates/sim-lib-numbers-stats/src/quantile.rs",
+      "crates/sim-lib-numbers-stats/src/quantile_tests.rs",
       "crates/sim-lib-numbers-stats/src/runtime.rs",
+      "crates/sim-lib-numbers-stats/src/runtime_clustering.rs",
       "crates/sim-lib-numbers-stats/src/tests.rs",
+      "crates/sim-lib-numbers-stats/src/transition.rs",
       "crates/sim-lib-numbers-tensor/Cargo.toml",
       "crates/sim-lib-numbers-tensor/build.rs",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml",
@@ -2862,6 +3098,7 @@
       "crates/sim-lib-numbers-tensor-linalg/src/implementation/support.rs",
       "crates/sim-lib-numbers-tensor-linalg/src/implementation.rs",
       "crates/sim-lib-numbers-tensor-linalg/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-linalg/src/solve.rs",
       "crates/sim-lib-numbers-tensor-linalg/src/tests.rs",
       "crates/sim-lib-numbers-tensor-rat64/Cargo.toml",
       "crates/sim-lib-numbers-tensor-rat64/build.rs",
@@ -2873,7 +3110,7 @@
       "xtask/Cargo.toml"
     ]
   },
-  "recipe_book_count": 32,
+  "recipe_book_count": 33,
   "recipes": [
     {
       "book": "numbers/ad",
@@ -3312,13 +3549,97 @@
       "title": "Numbers RK"
     },
     {
+      "book": "numbers/signal",
+      "book_toml": "crates/sim-lib-numbers-signal/recipes/book.toml",
+      "card_id": "cookbook/numbers/signal",
+      "group": "workspace",
+      "package": "sim-lib-numbers-signal",
+      "recipe_count": 7,
+      "recipes": [
+        {
+          "card_id": "numbers/signal/01-basics/blocked-transform",
+          "codec": "rust",
+          "id": "blocked-transform",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/recipe.toml",
+          "title": "Bounded multidimensional transform"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/burg-mem-evidence",
+          "codec": "rust",
+          "id": "burg-mem-evidence",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/burg-mem-evidence/recipe.toml",
+          "title": "Burg order and MEM evidence"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/convolution-evidence",
+          "codec": "lisp",
+          "id": "convolution-evidence",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/convolution-evidence/recipe.toml",
+          "title": "Inspectable convolution selection"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/dft-interpolation",
+          "codec": "lisp",
+          "id": "dft-interpolation",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/dft-interpolation/recipe.toml",
+          "title": "Explicit periodic DFT interpolation"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/impulse-fft",
+          "codec": "lisp",
+          "id": "impulse-fft",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/impulse-fft/recipe.toml",
+          "title": "Impulse FFT"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/spectral-estimators",
+          "codec": "rust",
+          "id": "spectral-estimators",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/spectral-estimators/recipe.toml",
+          "title": "Reconstructable spectral scaling"
+        },
+        {
+          "card_id": "numbers/signal/01-basics/wavelet-smoothing",
+          "codec": "rust",
+          "id": "wavelet-smoothing",
+          "package": "sim-lib-numbers-signal",
+          "recipe_toml": "crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml",
+          "title": "Wavelet, smoothing, Toeplitz, and interpolation evidence"
+        }
+      ],
+      "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples.",
+      "title": "Numbers Signal Transforms"
+    },
+    {
       "book": "numbers/stats",
       "book_toml": "crates/sim-lib-numbers-stats/recipes/book.toml",
       "card_id": "cookbook/numbers/stats",
       "group": "workspace",
       "package": "sim-lib-numbers-stats",
-      "recipe_count": 6,
+      "recipe_count": 9,
       "recipes": [
+        {
+          "card_id": "numbers/stats/01-basics/bounded-sequence-inference",
+          "codec": "rust",
+          "id": "bounded-sequence-inference",
+          "package": "sim-lib-numbers-stats",
+          "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml",
+          "title": "Bounded sequence inference"
+        },
+        {
+          "card_id": "numbers/stats/01-basics/clustering-evidence",
+          "codec": "rust",
+          "id": "clustering-evidence",
+          "package": "sim-lib-numbers-stats",
+          "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml",
+          "title": "Seeded clustering evidence"
+        },
         {
           "card_id": "numbers/stats/01-basics/fairness-claim",
           "codec": "lisp",
@@ -3326,6 +3647,14 @@
           "package": "sim-lib-numbers-stats",
           "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml",
           "title": "Fairness Claim"
+        },
+        {
+          "card_id": "numbers/stats/01-basics/finite-markov-report",
+          "codec": "lisp",
+          "id": "finite-markov-report",
+          "package": "sim-lib-numbers-stats",
+          "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml",
+          "title": "Finite Markov report"
         },
         {
           "card_id": "numbers/stats/01-basics/stats-helpers",
@@ -3368,7 +3697,7 @@
           "title": "Education intelligence agent"
         }
       ],
-      "summary": "Probability, descriptive statistics, and fairness metric helpers.",
+      "summary": "Probability, clustering, bounded inference, and inspectable evidence.",
       "title": "Numbers Stats"
     },
     {

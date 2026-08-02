@@ -1,0 +1,7 @@
+# id: generated-weather-transitions-v1
+# source: deterministic synthetic finite-state fixture
+# license: CC0-1.0
+# format: comma-separated states, one sequence per line
+sun,rain,sun
+sun,sun,rain
+rain,sun,rain

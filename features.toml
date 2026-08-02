@@ -39,10 +39,10 @@ claims_surfaces = [
 [[feature]]
 id = "feature/sim-numbers/numbers"
 title = "Number framework"
-summary = "Provide arithmetic, exact, floating, symbolic, tensor, and statistics number domains as loadable libraries."
+summary = "Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries."
 owner = "crate/sim-lib-numbers-core"
 audiences = ["code", "framework"]
-guidance = "Use this row when adding or selecting a number domain outside the kernel."
+guidance = "Use this row when adding or selecting a number domain outside the kernel. Use sim-lib-numbers-signal for explicit Fourier, cosine, sine, wavelet, convolution, correlation, blocked-convolution, guarded-deconvolution, classical or Burg/MEM spectral estimation, periodic DFT interpolation, Savitzky-Golay filtering, stable Toeplitz solving, and sampled-data interpolation over canonical complex and f64 tensors. Use the statistical-inference feature for seeded point clustering, regularized Gaussian mixtures, finite Markov/HMM sequence inference, and bounded streaming quantiles; domain-owned adapters must keep their state and symbol types outside sim-numbers."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-ad",
   "anchor/crate/sim-lib-numbers-arith",
@@ -65,6 +65,7 @@ claims_anchors = [
   "anchor/crate/sim-lib-numbers-quad",
   "anchor/crate/sim-lib-numbers-rational",
   "anchor/crate/sim-lib-numbers-rk",
+  "anchor/crate/sim-lib-numbers-signal",
   "anchor/crate/sim-lib-numbers-stats",
   "anchor/crate/sim-lib-numbers-tensor",
   "anchor/crate/sim-lib-numbers-tensor-bcast",
@@ -93,6 +94,7 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-quad/quad-numbers-lib",
   "anchor/runtime-lib/sim-lib-numbers-rational/rational-numbers-lib",
   "anchor/runtime-lib/sim-lib-numbers-rk/rk-numbers-lib",
+  "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
   "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-bcast/tensor-broadcast-lib",
   "anchor/runtime-lib/sim-lib-numbers-tensor-bit/bit-tensor-lib",
@@ -106,9 +108,162 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-tensor/tensor-numbers-lib",
 ]
 claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
 ]
 
+[[feature]]
+id = "feature/sim-numbers/statistical-inference"
+title = "Bounded clustering and sequence inference"
+summary = "Cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence."
+owner = "crate/sim-lib-numbers-stats"
+audiences = ["code", "framework", "user"]
+guidance = "Use fit_kmeans with KMeansControl for deterministic k-means++ initialization, explicit empty-cluster repair, bounded restarts, and lowest-inertia selection. Use fit_gmm with GmmSpec and GmmControl for log-domain diagonal or full-covariance EM, positive regularization, explicit singular-component policy, and AIC/BIC evidence. Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound. Point clustering does not own temporal alignment: compose sim-lib-discrete-graph dynamic_time_warp or layered_shortest_path when observation order matters."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-stats",
+  "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_gmm",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_hmm",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_kmeans",
+  "anchor/rustdoc/sim-lib-numbers-stats/forward_backward",
+  "anchor/rustdoc/sim-lib-numbers-stats/gmm-model",
+  "anchor/rustdoc/sim-lib-numbers-stats/hidden-markov-model",
+  "anchor/rustdoc/sim-lib-numbers-stats/kmeans-control",
+  "anchor/rustdoc/sim-lib-numbers-stats/quantile-sketch",
+  "anchor/rustdoc/sim-lib-numbers-stats/viterbi",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/clustering_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests",
+]
+
+[[feature]]
+id = "feature/sim-numbers/signal-transforms"
+title = "Reference-checked signal algorithms"
+summary = "Transform with Fourier or wavelet plans, smooth and differentiate polynomials, solve Toeplitz systems, interpolate periodic or sampled data, estimate spectra, and guardedly deconvolve with explicit policy and diagnostics."
+owner = "crate/sim-lib-numbers-signal"
+audiences = ["code", "framework", "user"]
+guidance = "Use TransformPlan when sign, normalization, packing, length, padding, stride, and placement must be reviewable, and WaveletPlan when family, level count, and periodic, symmetric, or zero extension must survive inverse reconstruction. Use SavitzkyGolaySpec for canonical factorial/sample-spacing derivative filters, ToeplitzPlan when singular pivots and residual evidence must be retained, and InterpolationPlan for linear, natural-cubic, or monotone-cubic sampled data with explicit duplicate-x and extrapolation policy. Use ConvolutionPlan or CorrelationPlan when geometry, boundary, normalization, lag order, direct/FFT cost selection, or retained span must be explicit. Use BlockConvolutionPlan for overlap-add/save latency and boundary evidence. Use DeconvolutionPlan only with a positive singular threshold and Tikhonov or truncated regularization. Use WindowSpec plus PeriodogramPlan, WelchPlan, MultitaperPlan, LombScarglePlan, or BurgPlan plus MemSpectrumPlan when window gain/energy, autoregressive stability/order, frequency grid, output scaling, residuals, degrees of freedom, and work admission must remain reconstructable; sound-spectrum is a domain adapter over the generic real FFT and must not introduce another Fourier convention. Use DftSeriesPlan for continuous periodic interpolation/integration and AnalyticSignalPlan for Hilbert, phase, frequency, and envelope workflows under the same Fourier conventions. Use TensorView plus transform_nd for borrowed multidimensional layouts and TransformResources plus transform_nd_blocked for caller-supplied Table/Dir blocks. Load SignalNumbersLib for the signal/transform, signal/convolve, signal/correlate, signal/deconvolve, signal/burg, and signal/dft-interpolate Lisp calls."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-signal",
+  "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic_envelope",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic_signal",
+  "anchor/rustdoc/sim-lib-numbers-signal/ar-model",
+  "anchor/rustdoc/sim-lib-numbers-signal/ar-order-criterion",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg-evidence",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/burg-stability",
+  "anchor/rustdoc/sim-lib-numbers-signal/boundary-policy",
+  "anchor/rustdoc/sim-lib-numbers-signal/boundary-mode",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-algorithm",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-cost-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-mode",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolution-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolve",
+  "anchor/rustdoc/sim-lib-numbers-signal/convolve_blocked",
+  "anchor/rustdoc/sim-lib-numbers-signal/correlate",
+  "anchor/rustdoc/sim-lib-numbers-signal/correlation-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/deconvolution-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/deconvolution-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/deconvolve",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft_bin",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft-integral",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft-interpolation",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft-series-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft_integrate",
+  "anchor/rustdoc/sim-lib-numbers-signal/dft_interpolate",
+  "anchor/rustdoc/sim-lib-numbers-signal/duplicate-xpolicy",
+  "anchor/rustdoc/sim-lib-numbers-signal/dwt",
+  "anchor/rustdoc/sim-lib-numbers-signal/envelope-follower-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/envelope_follow",
+  "anchor/rustdoc/sim-lib-numbers-signal/estimator-evidence",
+  "anchor/rustdoc/sim-lib-numbers-signal/estimator-limits",
+  "anchor/rustdoc/sim-lib-numbers-signal/frequency-grid-policy",
+  "anchor/rustdoc/sim-lib-numbers-signal/finite-impulse-response",
+  "anchor/rustdoc/sim-lib-numbers-signal/interpolate_samples",
+  "anchor/rustdoc/sim-lib-numbers-signal/interpolation-method",
+  "anchor/rustdoc/sim-lib-numbers-signal/interpolation-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/lag-order",
+  "anchor/rustdoc/sim-lib-numbers-signal/lomb-scargle-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/lomb_scargle",
+  "anchor/rustdoc/sim-lib-numbers-signal/idwt",
+  "anchor/rustdoc/sim-lib-numbers-signal/multitaper",
+  "anchor/rustdoc/sim-lib-numbers-signal/multitaper-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/mem-spectrum-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/mem_spectrum",
+  "anchor/rustdoc/sim-lib-numbers-signal/prediction-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/predict_backward",
+  "anchor/rustdoc/sim-lib-numbers-signal/predict_forward",
+  "anchor/rustdoc/sim-lib-numbers-signal/sample-interpolator",
+  "anchor/rustdoc/sim-lib-numbers-signal/savitzky-golay-spec",
+  "anchor/rustdoc/sim-lib-numbers-signal/savitzky_golay",
+  "anchor/rustdoc/sim-lib-numbers-signal/apply_savitzky_golay",
+  "anchor/rustdoc/sim-lib-numbers-signal/solve_toeplitz",
+  "anchor/rustdoc/sim-lib-numbers-signal/regularization",
+  "anchor/rustdoc/sim-lib-numbers-signal/normalization",
+  "anchor/rustdoc/sim-lib-numbers-signal/periodogram",
+  "anchor/rustdoc/sim-lib-numbers-signal/periodogram-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/reference_dct",
+  "anchor/rustdoc/sim-lib-numbers-signal/reference_dft",
+  "anchor/rustdoc/sim-lib-numbers-signal/reference_dst",
+  "anchor/rustdoc/sim-lib-numbers-signal/signal-buffer",
+  "anchor/rustdoc/sim-lib-numbers-signal/signal-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-signal/spectrum-packing",
+  "anchor/rustdoc/sim-lib-numbers-signal/spectrum-estimate",
+  "anchor/rustdoc/sim-lib-numbers-signal/spectrum-scaling",
+  "anchor/rustdoc/sim-lib-numbers-signal/spectrum-scaling-kind",
+  "anchor/rustdoc/sim-lib-numbers-signal/spectrum-side",
+  "anchor/rustdoc/sim-lib-numbers-signal/tensor-view",
+  "anchor/rustdoc/sim-lib-numbers-signal/toeplitz-diagnostics",
+  "anchor/rustdoc/sim-lib-numbers-signal/toeplitz-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform_nd",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform_nd_blocked",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-kind",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-precision",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-report",
+  "anchor/rustdoc/sim-lib-numbers-signal/transform-resources",
+  "anchor/rustdoc/sim-lib-numbers-signal/unwrap_phase",
+  "anchor/rustdoc/sim-lib-numbers-signal/welch",
+  "anchor/rustdoc/sim-lib-numbers-signal/welch-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/window",
+  "anchor/rustdoc/sim-lib-numbers-signal/window-function",
+  "anchor/rustdoc/sim-lib-numbers-signal/window-metrics",
+  "anchor/rustdoc/sim-lib-numbers-signal/window-normalization",
+  "anchor/rustdoc/sim-lib-numbers-signal/window-sampling",
+  "anchor/rustdoc/sim-lib-numbers-signal/window-spec",
+  "anchor/rustdoc/sim-lib-numbers-signal/wavelet",
+  "anchor/rustdoc/sim-lib-numbers-signal/wavelet-coefficients",
+  "anchor/rustdoc/sim-lib-numbers-signal/wavelet-plan",
+  "anchor/rustdoc/sim-lib-numbers-signal/extrapolation-policy",
+  "anchor/rustdoc/sim-lib-numbers-signal/cross-spectrum-estimate",
+  "anchor/rustdoc/sim-lib-numbers-signal/cross_spectrum",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/autoregressive_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/interpolation_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/runtime_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/sample_interpolation_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/smoothing_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/spectral_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/wavelet_tests",
+]
 [[feature]]
 id = "feature/sim-numbers/tensors"
 title = "Tensor operations"
@@ -261,6 +416,83 @@ claims_anchors = [
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-numeric/src/pipeline_run",
+]
+
+[[route]]
+id = "route/process-sampled-signal"
+task = "Transform, smooth, solve, or interpolate sampled data"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns wavelet boundaries and inverse shapes, canonical Savitzky-Golay derivative scaling, stable Toeplitz diagnostics, and duplicate/extrapolation interpolation policy." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/wavelet_tests", why = "The checked wavelet specimen proves multilevel odd-length inverses under periodic, symmetric, and zero extension plus the Le Gall linear-polynomial law." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/smoothing_tests", why = "The checked smoothing specimen proves polynomial preservation, factorial and sample-spacing derivative scaling, Toeplitz residuals, and singular-pivot diagnostics." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/sample_interpolation_tests", why = "The checked interpolation specimen proves affine preservation, monotonicity, duplicate resolution, extrapolation policy, and fail-closed input." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/wavelet-smoothing", why = "The runnable recipe composes all four generic algorithms with their visible reports." },
+]
+
+[[route]]
+id = "route/transform-signal"
+task = "Transform a real or complex signal"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/tensors", why = "The tensor row owns canonical complex and f64 storage shared by signal inputs and outputs." },
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns explicit transform conventions, direct references, fast Fourier plans, typed convolution/correlation geometry, guarded spectral inverse, strided tensor axes, bounded blocks, and execution reports." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/conformance", why = "The checked one-dimensional specimen proves impulse and tone bins, orthonormal Parseval and round trips, prime-length coverage, and fail-closed inputs." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/multidimensional_tests", why = "The checked multidimensional specimen proves strided direct-definition agreement, scratch admission, stable plan evidence, and blocked/in-memory equality." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/convolution_tests", why = "The checked convolution specimen proves direct/FFT agreement, overlap-add/save equality and reports, correlation symmetry, identity/commutativity, and finite guarded deconvolution diagnostics." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/convolution-evidence", why = "The checked Lisp specimen exposes automatic convolution cost selection beside the retained result." },
+]
+
+[[route]]
+id = "route/estimate-classical-spectrum"
+task = "Estimate a classical or autoregressive spectrum with reconstructable scaling"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns reference windows, periodogram/Welch/cross/coherence, Slepian multitaper, uneven-sample Lomb-Scargle, stable Burg/MEM models, explicit grids and scaling, and bounded evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/spectral_tests", why = "The checked tone/noise specimen proves window invariants, Parseval density, peak recovery, coherence, Slepian concentration, uneven-sample recovery, and fail-closed work limits." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/autoregressive_tests", why = "The generated AR-process specimen proves BIC order recovery, stable reflections, MEM resonance, bounded bidirectional prediction, and singular or unstable fail-closed behavior." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/spectral-estimators", why = "The runnable periodogram specimen prints coherent gain, equivalent noise bandwidth, peak power, degrees of freedom, and admitted work." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/burg-mem-evidence", why = "The deterministic generated AR(2) recipe prints selected order, residual variance, reflection margin, MEM peak, and admitted work." },
+]
+
+[[route]]
+id = "route/interpolate-periodic-spectrum"
+task = "Interpolate or analyze a periodic signal under explicit Fourier conventions"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/signal-transforms", why = "The signal row owns continuous DFT-series evaluation and integration, single-bin evaluation, Hilbert construction, unwrapped phase, instantaneous frequency, and envelope following under one explicit convention." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/interpolation_tests", why = "The generated analytic periodic-function specimen proves off-grid interpolation, exact integration, endpoint refusal, wrapping, and single-bin parity." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests", why = "The generated tone specimen proves Hilbert quadrature under every normalization, phase unwrapping, interval-centered frequency, and finite attack/release envelopes." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-signal/01-basics/dft-interpolation", why = "The Lisp recipe retains unitary scaling, period, origin, endpoint, wrapping, sign, Nyquist, phase, and work evidence." },
+]
+
+[[route]]
+id = "route/fit-finite-transition-model"
+task = "Fit an inspectable finite transition model"
+audiences = ["code", "framework"]
+steps = [
+  { feature = "feature/sim-numbers/statistical-inference", why = "The statistics framework owns generic finite Markov counts, additive smoothing, held-out likelihood, deterministic serialization, and corpus provenance without domain-specific state types." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests", why = "The checked non-music weather specimen proves smoothing, held-out scoring, fail-closed unknown states, and byte-stable serialization." },
+]
+
+[[route]]
+id = "route/fit-point-clusters"
+task = "Fit deterministic point clusters with convergence and model-selection evidence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/statistical-inference", why = "The statistics row owns seeded k-means++ restarts, empty-cluster repair, regularized full/diagonal GMM EM, log-domain likelihood, singular-component policy, and AIC/BIC evidence while leaving temporal alignment to sim-discrete." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/clustering_tests", why = "Generated, degenerate, permuted, bounded, and non-finite fixtures prove deterministic centroids, log-domain likelihood, covariance regularization, convergence, repairs, and fail-closed control." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-stats/01-basics/clustering-evidence", why = "The runnable generated-cluster recipe prints selected restart, centroids, likelihood, repairs, AIC, BIC, and charged work and points alignment callers to the discrete graph owner." },
+]
+
+[[route]]
+id = "route/infer-hidden-sequence"
+task = "Summarize a stream or infer a finite hidden-state sequence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/statistical-inference", why = "The statistics row owns hard-bounded mergeable quantiles, shared finite transitions, normalized discrete/Gaussian HMM inference, and seeded bounded fitting evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests", why = "The checked monotone-stream specimen proves exact small data, bounded retained entries, rank accuracy, merge behavior, and transactional refusal." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests", why = "The enumerated tiny fixture proves likelihood, posterior, and Viterbi agreement; long, continuous, seeded-fit, and work-limit fixtures prove numerical and termination behavior." },
 ]
 
 [[route]]

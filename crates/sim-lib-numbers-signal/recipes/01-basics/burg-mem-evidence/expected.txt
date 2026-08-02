@@ -1,0 +1,2 @@
+effective-order=2 residual-variance=0.003265 reflection-margin=0.185728
+mem-peak=0.125000 work=771/100000000

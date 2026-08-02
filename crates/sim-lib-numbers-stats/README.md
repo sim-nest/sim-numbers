@@ -12,4 +12,4 @@ Statistical and probability helpers for the SIM number stack.
 
 ## Crate Documentation
 
-Probability, descriptive statistics, and fairness metric helpers for f64 number-domain data.
+Probability, descriptive statistics, finite Markov transition estimation, and fairness metric helpers for number-domain data.

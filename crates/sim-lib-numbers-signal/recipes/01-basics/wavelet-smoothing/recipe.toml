@@ -1,0 +1,12 @@
+id = "wavelet-smoothing"
+title = "Wavelet, smoothing, Toeplitz, and interpolation evidence"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 60
+tags = ["numbers", "signal", "wavelet", "savitzky-golay", "toeplitz", "interpolation"]
+requires = []
+harness = "cargo-example"
+package = "sim-lib-numbers-signal"
+example = "wavelet-smoothing"
