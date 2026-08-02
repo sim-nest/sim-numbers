@@ -9,4 +9,4 @@ requires = ["numbers/signal", "numbers/f64", "codec/lisp"]
 
 [[expect]]
 form = 0
-result = "(expr:map [bins 4] [endpoint excluded] [normalization unitary] [nyquist positive] [origin 0] [period 1] [periodicity wrap] [phase-cycles (0.125 0.375)] [points 2] [sign negative-forward] [values ((1 0) (1 0))] [work-limit 100000000] [work-units 8])"
+result = "(expr:map [bins (expr:number numbers/f64 \"4\")] [endpoint excluded] [normalization unitary] [nyquist positive] [origin (expr:number numbers/f64 \"0\")] [period (expr:number numbers/f64 \"1\")] [periodicity wrap] [phase-cycles (0.125 0.375)] [points (expr:number numbers/f64 \"2\")] [sign negative-forward] [values (((expr:number numbers/f64 \"1\") (expr:number numbers/f64 \"0\")) ((expr:number numbers/f64 \"1\") (expr:number numbers/f64 \"0\")))] [work-limit (expr:number numbers/f64 \"100000000\")] [work-units (expr:number numbers/f64 \"8\")])"
