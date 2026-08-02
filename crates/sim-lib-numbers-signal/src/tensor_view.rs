@@ -1,6 +1,6 @@
 //! Borrowed multidimensional tensor layouts.
 
-use sim_lib_numbers_tensor::{SpecTensor, checked_element_count};
+use sim_lib_numbers_tensor::checked_element_count;
 use sim_lib_numbers_tensor_cmplxf::ComplexFTensor;
 use sim_lib_numbers_tensor_f64::F64Tensor;
 

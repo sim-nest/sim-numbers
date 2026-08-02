@@ -75,6 +75,16 @@ impl F64Tensor {
         self.storage().cell_slice()
     }
 
+    /// Returns the tensor extents.
+    pub fn shape(&self) -> &[usize] {
+        self.tensor.shape()
+    }
+
+    /// Returns the tensor element-domain symbol.
+    pub fn dtype(&self) -> Symbol {
+        domains::f64()
+    }
+
     /// Adds a scalar to every cell, operating directly on the native buffer.
     pub fn add_scalar(&self, scalar: f64) -> Self {
         Self::new(
@@ -148,11 +158,11 @@ impl PartialEq for F64Tensor {
 
 impl SpecTensor for F64Tensor {
     fn shape(&self) -> &[usize] {
-        self.tensor.shape()
+        Self::shape(self)
     }
 
     fn dtype(&self) -> Symbol {
-        domains::f64()
+        Self::dtype(self)
     }
 
     fn to_uniform(&self) -> Tensor {

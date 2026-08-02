@@ -4,9 +4,8 @@
 use std::sync::Arc;
 
 use sim_kernel::{Cx, Result, Symbol, Value};
-use sim_lib_numbers_func::Func;
 use sim_lib_numbers_numeric::{
-    DiffOpts, Differentiator, NumericCallable, NumericKind, NumericPlugin,
+    DiffOpts, Differentiator, Func, NumericCallable, NumericKind, NumericPlugin,
 };
 
 use super::support::{add, add_scaled, call_unary_callable, div, f64_value, scale, sub, zero_like};

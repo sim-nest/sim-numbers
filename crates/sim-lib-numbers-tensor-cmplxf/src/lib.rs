@@ -74,6 +74,16 @@ impl ComplexFTensor {
         self.storage().cell_slice()
     }
 
+    /// Returns the tensor extents.
+    pub fn shape(&self) -> &[usize] {
+        self.tensor.shape()
+    }
+
+    /// Returns the tensor element-domain symbol.
+    pub fn dtype(&self) -> Symbol {
+        domains::complex()
+    }
+
     fn storage(&self) -> &ComplexFStorage {
         self.tensor
             .storage()
@@ -100,11 +110,11 @@ impl PartialEq for ComplexFTensor {
 
 impl SpecTensor for ComplexFTensor {
     fn shape(&self) -> &[usize] {
-        self.tensor.shape()
+        Self::shape(self)
     }
 
     fn dtype(&self) -> Symbol {
-        domains::complex()
+        Self::dtype(self)
     }
 
     fn to_uniform(&self) -> Tensor {

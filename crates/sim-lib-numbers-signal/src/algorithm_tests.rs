@@ -3,7 +3,6 @@ use crate::{
     SignalViewMut, SpectrumPacking, Stride, TransformKind, TransformPlan, reference_dct,
     reference_dft, reference_dst, transform, transform_in_place,
 };
-use sim_lib_numbers_tensor::SpecTensor;
 use sim_lib_numbers_tensor_cmplxf::ComplexFTensor;
 use sim_lib_numbers_tensor_f64::F64Tensor;
 
