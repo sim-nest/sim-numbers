@@ -25,12 +25,15 @@
 | `sim-lib-numbers-quad` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-rational` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-rk` | `workspace` | 0 | 0 |
+| `sim-lib-numbers-signal` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-stats` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-tensor` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-tensor-bcast` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-tensor-bit` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-tensor-cmplxf` | `workspace` | 0 | 0 |
+| `sim-lib-numbers-tensor-f32` | `workspace` | 1 | 0 |
 | `sim-lib-numbers-tensor-f64` | `workspace` | 1 | 0 |
+| `sim-lib-numbers-tensor-half` | `workspace` | 1 | 0 |
 | `sim-lib-numbers-tensor-i64` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-tensor-linalg` | `workspace` | 0 | 0 |
 | `sim-lib-numbers-tensor-rat64` | `workspace` | 0 | 0 |

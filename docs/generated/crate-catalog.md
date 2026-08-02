@@ -27,8 +27,8 @@ Generated from Cargo metadata by `xtask crate-catalog v1`.
 | `sim-lib-numbers-quad` | `true` | `custom-build, lib` | Quadrature and finite-difference plugins for the SIM numeric surface. |
 | `sim-lib-numbers-rational` | `true` | `custom-build, lib` | Exact rational number domain over arbitrary-precision integer numerators and denominators. |
 | `sim-lib-numbers-rk` | `true` | `custom-build, lib` | Runge-Kutta ODE solver plugins for the SIM numeric surface. |
-| `sim-lib-numbers-signal` | `true` | `custom-build, lib` | Deterministic Fourier, cosine, and sine transforms over canonical SIM tensors. |
-| `sim-lib-numbers-stats` | `true` | `custom-build, lib` | Statistical and probability helpers for the SIM number stack. |
+| `sim-lib-numbers-signal` | `true` | `custom-build, example, lib` | Deterministic transforms, autoregression, spectral estimation, and guarded signal operations. |
+| `sim-lib-numbers-stats` | `true` | `custom-build, example, lib` | Statistical and probability helpers for the SIM number stack. |
 | `sim-lib-numbers-tensor-bcast` | `true` | `custom-build, lib` | NumPy-style tensor broadcasting and promoted element-wise operations for SIM tensors. |
 | `sim-lib-numbers-tensor-bit` | `true` | `custom-build, lib` | Packed boolean tensor specialization with bitwise tensor operations. |
 | `sim-lib-numbers-tensor-cmplxf` | `true` | `custom-build, lib` | Complex f64-pair tensor specialization for SIM tensor values. |

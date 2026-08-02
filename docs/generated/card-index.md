@@ -26,12 +26,15 @@
 | `cookbook/numbers/quad` | `cookbook-recipe` | `sim-lib-numbers-quad` | Quadrature algorithms for numeric integration. |
 | `cookbook/numbers/rational` | `cookbook-recipe` | `sim-lib-numbers-rational` | Exact rational values and constructor forms. |
 | `cookbook/numbers/rk` | `cookbook-recipe` | `sim-lib-numbers-rk` | Runge-Kutta ODE solver methods. |
-| `cookbook/numbers/stats` | `cookbook-recipe` | `sim-lib-numbers-stats` | Probability, descriptive statistics, and fairness metric helpers. |
+| `cookbook/numbers/signal` | `cookbook-recipe` | `sim-lib-numbers-signal` | Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples. |
+| `cookbook/numbers/stats` | `cookbook-recipe` | `sim-lib-numbers-stats` | Probability, clustering, bounded inference, and inspectable evidence. |
 | `cookbook/numbers/tensor` | `cookbook-recipe` | `sim-lib-numbers-tensor` | Generic tensor values and indexing. |
 | `cookbook/numbers/tensor-bcast` | `cookbook-recipe` | `sim-lib-numbers-tensor-bcast` | Broadcasting helpers for tensor values. |
 | `cookbook/numbers/tensor-bit` | `cookbook-recipe` | `sim-lib-numbers-tensor-bit` | Packed boolean tensor helpers. |
 | `cookbook/numbers/tensor-cmplxf` | `cookbook-recipe` | `sim-lib-numbers-tensor-cmplxf` | Complex-cell tensor helpers. |
+| `cookbook/numbers/tensor-f32` | `cookbook-recipe` | `sim-lib-numbers-tensor-f32` | F32-specialized tensor helpers. |
 | `cookbook/numbers/tensor-f64` | `cookbook-recipe` | `sim-lib-numbers-tensor-f64` | F64-specialized tensor helpers. |
+| `cookbook/numbers/tensor-half` | `cookbook-recipe` | `sim-lib-numbers-tensor-half` | F16 and bf16 tensor descriptors with f32-widened host helpers. |
 | `cookbook/numbers/tensor-i64` | `cookbook-recipe` | `sim-lib-numbers-tensor-i64` | I64-specialized tensor helpers. |
 | `cookbook/numbers/tensor-linalg` | `cookbook-recipe` | `sim-lib-numbers-tensor-linalg` | Linear algebra helpers for tensors. |
 | `cookbook/numbers/tensor-rat64` | `cookbook-recipe` | `sim-lib-numbers-tensor-rat64` | Rational-cell tensor helpers. |

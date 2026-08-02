@@ -8,8 +8,8 @@ Statistical and probability helpers for the SIM number stack.
 
 - Manifest: `crates/sim-lib-numbers-stats/Cargo.toml`
 - Publish: `true`
-- Targets: `custom-build, lib`
+- Targets: `custom-build, example, lib`
 
 ## Crate Documentation
 
-Probability, descriptive statistics, finite Markov transition estimation, and fairness metric helpers for number-domain data.
+Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.

@@ -277,7 +277,7 @@
       ]
     },
     {
-      "description": "Deterministic Fourier, cosine, and sine transforms over canonical SIM tensors.",
+      "description": "Deterministic transforms, autoregression, spectral estimation, and guarded signal operations.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
       "name": "sim-lib-numbers-signal",
@@ -286,6 +286,7 @@
       "root": "crates/sim-lib-numbers-signal",
       "target_kinds": [
         "custom-build",
+        "example",
         "lib"
       ]
     },
@@ -299,6 +300,7 @@
       "root": "crates/sim-lib-numbers-stats",
       "target_kinds": [
         "custom-build",
+        "example",
         "lib"
       ]
     },
