@@ -2207,7 +2207,6 @@ Source `crates/sim-lib-numbers-signal/src/multidimensional_tests.rs`:
 use std::sync::Arc;
 
 use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, Symbol};
-use sim_lib_numbers_tensor::SpecTensor;
 
 use crate::{
     PlacementPolicy, SignalBuffer, TensorView, TransformKind, TransformPlan, TransformPrecision,
