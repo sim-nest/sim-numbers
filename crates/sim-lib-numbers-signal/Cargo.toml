@@ -13,7 +13,7 @@ homepage = "https://github.com/sim-nest/sim-numbers"
 sim-cookbook = { version = "0.1.0" }
 sim-kernel = { version = "0.1.0" }
 sim-lib-numbers-tensor = { version = "0.2.0", path = "../sim-lib-numbers-tensor" }
-sim-lib-numbers-tensor-cmplxf = { version = "0.3.0", path = "../sim-lib-numbers-tensor-cmplxf" }
+sim-lib-numbers-tensor-cmplxf = { version = "0.3.1", path = "../sim-lib-numbers-tensor-cmplxf" }
 sim-lib-numbers-tensor-f64 = { version = "0.3.0", path = "../sim-lib-numbers-tensor-f64" }
 sim-lib-numbers-tensor-linalg = { version = "0.3.0", path = "../sim-lib-numbers-tensor-linalg" }
 

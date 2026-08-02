@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-tensor-cmplxf"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 license = "MPL-2.0"
 description = "Complex f64-pair tensor specialization for SIM tensor values."

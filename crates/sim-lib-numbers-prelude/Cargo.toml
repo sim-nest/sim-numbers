@@ -35,7 +35,7 @@ sim-lib-numbers-stats = { version = "0.3.0", path = "../sim-lib-numbers-stats" }
 sim-lib-numbers-tensor = { version = "0.2.0", path = "../sim-lib-numbers-tensor" }
 sim-lib-numbers-tensor-bcast = { version = "0.3.0", path = "../sim-lib-numbers-tensor-bcast" }
 sim-lib-numbers-tensor-bit = { version = "0.3.0", path = "../sim-lib-numbers-tensor-bit" }
-sim-lib-numbers-tensor-cmplxf = { version = "0.3.0", path = "../sim-lib-numbers-tensor-cmplxf" }
+sim-lib-numbers-tensor-cmplxf = { version = "0.3.1", path = "../sim-lib-numbers-tensor-cmplxf" }
 sim-lib-numbers-tensor-f32 = { version = "0.2.0", path = "../sim-lib-numbers-tensor-f32" }
 sim-lib-numbers-tensor-f64 = { version = "0.3.0", path = "../sim-lib-numbers-tensor-f64" }
 sim-lib-numbers-tensor-half = { version = "0.2.0", path = "../sim-lib-numbers-tensor-half" }
