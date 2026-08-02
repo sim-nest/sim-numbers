@@ -39,8 +39,12 @@ use sim_kernel::{
 };
 use sim_lib_numbers_tensor::{
     SpecTensor, SpecTensorDescriptor, Tensor, TypedTensorStorage, checked_element_count, domains,
-    parse_f64_literal_cell, spec_tensor_descriptor_value, spec_tensor_symbol,
+    parse_f64_literal_cell, spec_tensor_descriptor_value,
 };
+
+mod symbols;
+
+pub use symbols::{RECIPES, tensor_lib_symbol, tensor_spec_symbol};
 
 type F64Storage = TypedTensorStorage<f64>;
 
@@ -240,21 +244,6 @@ impl Lib for F64TensorLib {
         )
     }
 }
-
-/// The manifest id symbol for this library (`numbers/tensor-f64`).
-pub fn tensor_lib_symbol() -> Symbol {
-    domains::domain("tensor-f64")
-}
-
-/// The symbol under which the `f64`-tensor [`SpecTensor`] descriptor is
-/// exported.
-pub fn tensor_spec_symbol() -> Symbol {
-    spec_tensor_symbol("f64")
-}
-
-/// Cookbook recipes for this lib, embedded at build time.
-pub static RECIPES: sim_cookbook::EmbeddedDir =
-    include!(concat!(env!("OUT_DIR"), "/cookbook_recipes.rs"));
 
 #[cfg(test)]
 mod tests;
