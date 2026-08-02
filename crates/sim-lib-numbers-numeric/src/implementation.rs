@@ -26,6 +26,7 @@ pub use pipeline::{ComposedPipeline, PipelineKind, StateKind};
 pub use registry::{
     global_numeric_registry, register_differentiator, register_ode_solver, register_quadrature,
 };
+pub use sim_lib_numbers_func::Func;
 pub use traits::{
     DiffOpts, Differentiator, NumericCallable, NumericKind, NumericPlugin, OdeOpts, OdeProblem,
     OdeSolver, QuadOpts, Quadrature,
