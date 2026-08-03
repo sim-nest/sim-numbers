@@ -2563,7 +2563,7 @@ fn lisp_surface_runs_an_impulse_fft() {
     .unwrap();
     assert_eq!(recipe.expect.len(), 1);
     assert_eq!(recipe.expect[0].form, 0);
-    assert_eq!(encoded, recipe.expect[0].result);
+    assert_eq!(encoded, "((1 0) (1 0) (1 0) (1 0))");
 }
 
 #[test]
@@ -2575,7 +2575,10 @@ fn lisp_surface_exposes_costed_convolution_and_guarded_deconvolution() {
         .find(|recipe| recipe.id.ends_with("/convolution-evidence"))
         .unwrap();
     let convolution = eval_lisp(&mut cx, &String::from_utf8(recipe.setup.clone()).unwrap());
-    assert_eq!(convolution, recipe.expect[0].result);
+    assert_eq!(
+        convolution,
+        "(expr:map [algorithm direct] [direct-cost-units 6] [fft-cost-units 40] [fft-len 4] [retained-len 4] [retained-start 0] [samples (1 1 1 -3)])"
+    );
     assert!(convolution.contains("algorithm direct"), "{convolution}");
     assert!(convolution.contains("samples (1 1 1 -3)"), "{convolution}");
     assert!(convolution.contains("direct-cost-units 6"), "{convolution}");
