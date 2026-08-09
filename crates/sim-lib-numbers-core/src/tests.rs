@@ -6,6 +6,8 @@ use sim_kernel::{Expr, NumberLiteral, Symbol};
 use crate::domains;
 use crate::scalar::{ScalarDomainSpec, ScalarLiteralMatcher};
 
+// conformance: the number substrate derives stable domains, shapes, and literal matches.
+
 fn spec(canonical: &'static str, family: &'static str, priority: i32) -> ScalarDomainSpec {
     ScalarDomainSpec {
         domain: domains::domain(canonical),
