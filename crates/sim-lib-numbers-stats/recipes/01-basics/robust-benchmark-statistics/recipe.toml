@@ -1,0 +1,12 @@
+id = "robust-benchmark-statistics"
+title = "Robust benchmark statistics"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 30
+tags = ["numbers", "stats", "benchmark", "mad", "bootstrap", "bounded", "seeded"]
+requires = []
+harness = "cargo-example"
+package = "sim-lib-numbers-stats"
+example = "robust-benchmark-statistics"

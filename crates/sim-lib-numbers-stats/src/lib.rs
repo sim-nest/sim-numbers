@@ -1,9 +1,9 @@
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
-//! Probability, descriptive statistics, deterministic clustering, streaming
-//! quantiles, finite Markov and hidden-state sequence inference, and fairness
-//! helpers for number-domain data.
+//! Probability, descriptive and robust benchmark statistics, deterministic
+//! clustering, streaming quantiles, finite Markov and hidden-state sequence
+//! inference, and fairness helpers for number-domain data.
 //!
 //! Descriptive statistics and disparate-impact helpers also expose Claim
 //! surfaces. The Claim values carry their subject, predicate, and evidence table
@@ -17,6 +17,9 @@
 //! [`fit_kmeans`] and [`fit_gmm`] add seeded initialization, bounded convergence,
 //! regularized covariance, singular-component policy, and model-selection
 //! evidence without taking ownership of sequence alignment.
+//! [`median_absolute_deviation`] and [`bootstrap_mean_difference_interval`]
+//! serve benchmark dispersion and comparison policy without duplicating
+//! statistical formulas in tooling.
 
 mod implementation;
 

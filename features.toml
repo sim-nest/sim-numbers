@@ -106,20 +106,22 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/statistical-inference"
 title = "Bounded clustering and sequence inference"
-summary = "Cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence."
+summary = "Compute robust benchmark dispersion and seeded uncertainty, cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence."
 owner = "crate/sim-lib-numbers-stats"
 audiences = ["code", "framework", "user"]
-guidance = "Use fit_kmeans with KMeansControl for deterministic k-means++ initialization, explicit empty-cluster repair, bounded restarts, and lowest-inertia selection. Use fit_gmm with GmmSpec and GmmControl for log-domain diagonal or full-covariance EM, positive regularization, explicit singular-component policy, and AIC/BIC evidence. Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound. Point clustering does not own temporal alignment: compose sim-lib-discrete-graph dynamic_time_warp or layered_shortest_path when observation order matters."
+guidance = "Use median_absolute_deviation for benchmark dispersion in source units and bootstrap_mean_difference_interval for the benchmark comparison policy's seeded, work-bounded candidate-minus-baseline mean uncertainty. Use fit_kmeans with KMeansControl for deterministic k-means++ initialization, explicit empty-cluster repair, bounded restarts, and lowest-inertia selection. Use fit_gmm with GmmSpec and GmmControl for log-domain diagonal or full-covariance EM, positive regularization, explicit singular-component policy, and AIC/BIC evidence. Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound. Point clustering does not own temporal alignment: compose sim-lib-discrete-graph dynamic_time_warp or layered_shortest_path when observation order matters."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-stats",
   "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
   "anchor/rustdoc/sim-lib-numbers-stats/fit_gmm",
   "anchor/rustdoc/sim-lib-numbers-stats/fit_hmm",
   "anchor/rustdoc/sim-lib-numbers-stats/fit_kmeans",
+  "anchor/rustdoc/sim-lib-numbers-stats/bootstrap_mean_difference_interval",
   "anchor/rustdoc/sim-lib-numbers-stats/forward_backward",
   "anchor/rustdoc/sim-lib-numbers-stats/gmm-model",
   "anchor/rustdoc/sim-lib-numbers-stats/hidden-markov-model",
   "anchor/rustdoc/sim-lib-numbers-stats/kmeans-control",
+  "anchor/rustdoc/sim-lib-numbers-stats/median_absolute_deviation",
   "anchor/rustdoc/sim-lib-numbers-stats/quantile-sketch",
   "anchor/rustdoc/sim-lib-numbers-stats/viterbi",
 ]
