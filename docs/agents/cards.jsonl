@@ -151,6 +151,10 @@
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/setup.siml"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/expected.txt"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/main.rs"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/purpose.md"}
+{"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/purpose.md"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml"}
 {"kind":"recipe","path":"crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/setup.siml"}
