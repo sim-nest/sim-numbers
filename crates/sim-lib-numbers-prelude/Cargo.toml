@@ -11,7 +11,7 @@ homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
 sim-cookbook = { version = "0.2.0" }
-sim-kernel = { version = "0.2.0" }
+sim-kernel = { version = "0.2.1" }
 sim-lib-numbers-arith = { version = "0.3.1", path = "../sim-lib-numbers-arith" }
 sim-lib-numbers-bigint = { version = "0.3.1", path = "../sim-lib-numbers-bigint" }
 sim-lib-numbers-bool = { version = "0.3.1", path = "../sim-lib-numbers-bool" }
