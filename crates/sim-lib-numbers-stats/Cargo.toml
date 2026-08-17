@@ -1,6 +1,6 @@
 [package]
 name = "sim-lib-numbers-stats"
-version = "0.3.1"
+version = "0.4.0"
 edition = "2024"
 license = "MPL-2.0"
 description = "Statistical and probability helpers for the SIM number stack."
@@ -11,8 +11,8 @@ homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
 sim-cookbook = { version = "0.2.0" }
-sim-kernel = { version = "0.2.0" }
-sim-lib-numbers-core = { version = "0.3.1", path = "../sim-lib-numbers-core" }
+sim-kernel = { version = "0.2.1" }
+sim-lib-numbers-core = { version = "0.3.2", path = "../sim-lib-numbers-core" }
 sim-value = { version = "0.2.0" }
 
 [lints]

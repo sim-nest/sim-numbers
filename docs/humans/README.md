@@ -19,7 +19,7 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 | --- | --- | ---: | --- |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries. |
-| `feature/sim-numbers/statistical-inference` | `crate/sim-lib-numbers-stats` | 4 | Cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence. |
+| `feature/sim-numbers/statistical-inference` | `crate/sim-lib-numbers-stats` | 4 | Compute robust benchmark dispersion and seeded uncertainty, cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence. |
 | `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 11 | Transform with Fourier or wavelet plans, smooth and differentiate polynomials, solve Toeplitz systems, interpolate periodic or sampled data, estimate spectra, and guardedly deconvolve with explicit policy and diagnostics. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
 | `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
@@ -190,6 +190,10 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/setup.siml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/expected.txt`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/main.rs`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/setup.siml`

@@ -2009,7 +2009,7 @@
       "name": "sim-lib-numbers-stats",
       "publish": "true",
       "root": "crates/sim-lib-numbers-stats",
-      "rustdoc_summary": "Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.",
+      "rustdoc_summary": "Probability, descriptive and robust benchmark statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.",
       "target_kinds": [
         "custom-build",
         "example",
@@ -2045,6 +2045,16 @@
           ],
           "name": "clustering-evidence",
           "src": "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "robust_benchmark_statistics",
+          "src": "crates/sim-lib-numbers-stats/examples/robust_benchmark_statistics.rs"
         },
         {
           "crate_types": [
@@ -2674,10 +2684,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "68204cd2ff2fabce0d367e93729e687153552d1b",
+    "git_commit": "a29b1fa292fe136540df8d8bbe15e967d0bd2a66",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "68204cd2ff2fabce0d367e93729e687153552d1b",
+    "source_commit": "a29b1fa292fe136540df8d8bbe15e967d0bd2a66",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2690,9 +2700,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "6639ce284556201c",
+    "workspace_hash": "e39036dd1d97edb2",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 415,
+    "workspace_hash_input_count": 420,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2983,12 +2993,15 @@
       "crates/sim-lib-numbers-stats/build.rs",
       "crates/sim-lib-numbers-stats/examples/bounded_sequence_inference.rs",
       "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs",
+      "crates/sim-lib-numbers-stats/examples/robust_benchmark_statistics.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/main.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/fairness-claim/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/main.rs",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/30-agents/a30-010-data-analysis/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/30-agents/a30-024-healthcare-intelligence/recipe.toml",
@@ -3013,6 +3026,8 @@
       "crates/sim-lib-numbers-stats/src/markov_tests.rs",
       "crates/sim-lib-numbers-stats/src/quantile.rs",
       "crates/sim-lib-numbers-stats/src/quantile_tests.rs",
+      "crates/sim-lib-numbers-stats/src/robust.rs",
+      "crates/sim-lib-numbers-stats/src/robust_tests.rs",
       "crates/sim-lib-numbers-stats/src/runtime.rs",
       "crates/sim-lib-numbers-stats/src/runtime_clustering.rs",
       "crates/sim-lib-numbers-stats/src/tests.rs",
@@ -3623,7 +3638,7 @@
       "card_id": "cookbook/numbers/stats",
       "group": "workspace",
       "package": "sim-lib-numbers-stats",
-      "recipe_count": 9,
+      "recipe_count": 10,
       "recipes": [
         {
           "card_id": "numbers/stats/01-basics/bounded-sequence-inference",
@@ -3656,6 +3671,14 @@
           "package": "sim-lib-numbers-stats",
           "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml",
           "title": "Finite Markov report"
+        },
+        {
+          "card_id": "numbers/stats/01-basics/robust-benchmark-statistics",
+          "codec": "rust",
+          "id": "robust-benchmark-statistics",
+          "package": "sim-lib-numbers-stats",
+          "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml",
+          "title": "Robust benchmark statistics"
         },
         {
           "card_id": "numbers/stats/01-basics/stats-helpers",

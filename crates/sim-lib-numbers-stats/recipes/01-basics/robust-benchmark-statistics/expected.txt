@@ -1,0 +1,4 @@
+baseline MAD: 1.0
+candidate-minus-baseline mean: -10.0
+95% interval: [-11.8, -8.2]
+seed: 19, resamples: 2000

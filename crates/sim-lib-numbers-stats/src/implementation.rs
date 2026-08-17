@@ -39,6 +39,11 @@ mod quantile;
 #[cfg(test)]
 #[path = "quantile_tests.rs"]
 mod quantile_tests;
+#[path = "robust.rs"]
+mod robust;
+#[cfg(test)]
+#[path = "robust_tests.rs"]
+mod robust_tests;
 #[path = "runtime.rs"]
 mod runtime;
 #[path = "runtime_clustering.rs"]
@@ -78,6 +83,10 @@ pub use markov::{
 };
 pub use quantile::{
     QuantileError, QuantileEstimate, QuantilePolicy, QuantileSketch, exact_quantile,
+};
+pub use robust::{
+    BootstrapControl, BootstrapEffectInterval, bootstrap_mean_difference_interval,
+    median_absolute_deviation,
 };
 pub use transition::{FiniteTransitionMatrix, TransitionError};
 
@@ -147,6 +156,20 @@ pub enum StatsError {
         /// Name of the helper that rejected the input.
         metric: &'static str,
     },
+    /// A bounded statistics control contained an invalid field.
+    InvalidControl {
+        /// Name of the rejected control field.
+        field: &'static str,
+        /// Stable explanation of the accepted range.
+        reason: &'static str,
+    },
+    /// A requested computation exceeded its explicit work allowance.
+    WorkLimitExceeded {
+        /// Work units required by the request.
+        required: u64,
+        /// Work units admitted by the caller.
+        limit: u64,
+    },
 }
 
 impl fmt::Display for StatsError {
@@ -191,6 +214,13 @@ impl fmt::Display for StatsError {
             Self::ZeroReferenceRate { metric } => {
                 write!(f, "{metric} reference rate must be nonzero")
             }
+            Self::InvalidControl { field, reason } => {
+                write!(f, "invalid statistics control {field}: {reason}")
+            }
+            Self::WorkLimitExceeded { required, limit } => write!(
+                f,
+                "statistics computation requires {required} work units, limit is {limit}"
+            ),
         }
     }
 }
@@ -418,7 +448,7 @@ pub fn disparate_impact(
     })
 }
 
-fn validate_values(metric: &'static str, values: &[f64]) -> StatsResult<()> {
+pub(super) fn validate_values(metric: &'static str, values: &[f64]) -> StatsResult<()> {
     if values.is_empty() {
         return Err(StatsError::EmptyInput { metric });
     }
