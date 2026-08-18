@@ -12,4 +12,4 @@ Statistical and probability helpers for the SIM number stack.
 
 ## Crate Documentation
 
-Probability, descriptive statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data.
+Probability, descriptive and robust benchmark statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers .
