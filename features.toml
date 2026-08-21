@@ -270,12 +270,10 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-location",
   "anchor/rustdoc/sim-lib-numbers-tensor/boxed-tensor-storage",
   "anchor/rustdoc/sim-lib-numbers-tensor/spec-tensor",
-  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-function",
   "anchor/rustdoc/sim-lib-numbers-tensor/build_tensor_value",
   "anchor/rustdoc/sim-lib-numbers-tensor/cast_tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/checked_element_count",
   "anchor/rustdoc/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
-  "anchor/rustdoc/sim-lib-numbers-tensor-linalg/dispatch",
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
