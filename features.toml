@@ -285,7 +285,7 @@ title = "Tensor execution"
 summary = "Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
 owner = "crate/sim-lib-numbers-tensor"
 audiences = ["code", "framework"]
-guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib and TensorLinalgLib submit element-wise add, sub, mul, div, rem, pow, neg, whole-tensor sum/min/max/norm, transpose, dot, matmul, sqrt, exp, sin, and cos through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor and realize through TensorSite so the caller environment is restored after evaluation."
+guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib and TensorLinalgLib submit element-wise add, sub, mul, div, rem, pow, neg, whole-tensor sum/min/max/norm, transpose, dot, matmul, sqrt, exp, sin, and cos through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor, pass model time and resource profiles explicitly, and realize through TensorSite so executor binding stays child-Env scoped and the caller environment is restored after evaluation. Concrete clocks, probes, temporary storage, and other host facts belong in platform or compute providers, never numbers."
 claims_anchors = [
   "anchor/export/sim-lib-numbers-tensor/site/tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/active_tensor_executor",

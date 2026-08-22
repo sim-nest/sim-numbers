@@ -31,7 +31,7 @@
 //! assert!(F64Tensor::new(vec![2, 2], vec![0.0]).is_none());
 //! ```
 
-use std::{fmt, sync::Arc, time::Instant};
+use std::{fmt, sync::Arc};
 
 use sim_kernel::{
     AbiVersion, DefaultFactory, Dependency, Export, Factory, Lib, LibManifest, LibTarget, Linker,
@@ -117,23 +117,6 @@ impl F64Tensor {
                 .collect(),
         )
         .expect("uniform f64 tensor conversion should stay valid")
-    }
-
-    /// Times both add-scalar paths once and returns `(fast_ns, slow_ns)`.
-    ///
-    /// A coarse smoke measurement comparing the native
-    /// [`add_scalar`](Self::add_scalar) against
-    /// [`add_uniform_scalar_slow`](Self::add_uniform_scalar_slow); each
-    /// duration is clamped to at least one nanosecond.
-    pub fn smoke_speed_ratio(&self, scalar: f64) -> (u128, u128) {
-        let fast_start = Instant::now();
-        let _ = self.add_scalar(scalar);
-        let fast = fast_start.elapsed().as_nanos();
-
-        let slow_start = Instant::now();
-        let _ = self.add_uniform_scalar_slow(scalar);
-        let slow = slow_start.elapsed().as_nanos();
-        (fast.max(1), slow.max(1))
     }
 
     fn storage(&self) -> &F64Storage {

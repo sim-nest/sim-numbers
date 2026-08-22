@@ -3,6 +3,7 @@
 //! policy checks.
 
 mod file_sizes;
+mod host_blind;
 mod index_check;
 mod simdoc;
 
@@ -13,8 +14,9 @@ fn main() {
         Some("simdoc") => simdoc::run(args),
         Some("index-check") => index_check::run(args),
         Some("check-file-sizes") => file_sizes::run(),
+        Some("check-host-blind") => host_blind::run(),
         _ => Err(format!(
-            "usage: {program} simdoc [--check] | index-check [--repo PATH] [--strict SPEC] | check-file-sizes"
+            "usage: {program} simdoc [--check] | index-check [--repo PATH] [--strict SPEC] | check-file-sizes | check-host-blind"
         )),
     };
 
