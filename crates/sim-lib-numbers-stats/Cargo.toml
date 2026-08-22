@@ -19,7 +19,7 @@ sim-value = { version = "0.2.0" }
 workspace = true
 
 [build-dependencies]
-sim-cookbook = { version = "0.2.0" }
+sim-cookbook-build = { version = "0.1.0" }
 
 [[example]]
 name = "bounded-sequence-inference"

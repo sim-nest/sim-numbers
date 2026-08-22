@@ -19,4 +19,4 @@ sim-lib-numbers-tensor = { version = "0.2.1", path = "../sim-lib-numbers-tensor"
 default = []
 
 [build-dependencies]
-sim-cookbook = { version = "0.2.0" }
+sim-cookbook-build = { version = "0.1.0" }

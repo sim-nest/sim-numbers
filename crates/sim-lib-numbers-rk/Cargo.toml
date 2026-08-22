@@ -28,4 +28,4 @@ sim-lib-numbers-tensor-bcast = { version = "0.3.1", path = "../sim-lib-numbers-t
 workspace = true
 
 [build-dependencies]
-sim-cookbook = { version = "0.2.0" }
+sim-cookbook-build = { version = "0.1.0" }

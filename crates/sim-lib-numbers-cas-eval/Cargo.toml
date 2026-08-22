@@ -21,4 +21,4 @@ sim-lib-numbers-cas-diff = { version = "0.3.1", path = "../sim-lib-numbers-cas-d
 sim-lib-numbers-i64 = { version = "0.3.1", path = "../sim-lib-numbers-i64" }
 
 [build-dependencies]
-sim-cookbook = { version = "0.2.0" }
+sim-cookbook-build = { version = "0.1.0" }

@@ -26,4 +26,4 @@ sim-macros = { version = "0.2.0", optional = true }
 sim-shape = { version = "0.2.0" }
 
 [build-dependencies]
-sim-cookbook = { version = "0.2.0" }
+sim-cookbook-build = { version = "0.1.0" }
