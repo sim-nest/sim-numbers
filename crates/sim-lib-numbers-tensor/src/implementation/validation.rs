@@ -4,7 +4,7 @@ use std::cmp::Ordering;
 use std::collections::{BTreeMap, BinaryHeap};
 use std::sync::Arc;
 
-use sim_kernel::{Cx, DefaultFactory, Error, NoopEvalPolicy, Result, Symbol, Value};
+use sim_kernel::{Cx, DefaultFactory, Error, HandleSeed, NoopEvalPolicy, Result, Symbol, Value};
 
 use crate::spec::checked_element_count;
 
@@ -55,7 +55,11 @@ pub(super) fn validate_dtype_accepts_cells(
 }
 
 pub(super) fn validate_exact_cell_dtype(dtype: &Symbol, data: &[Value]) -> Result<()> {
-    let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(1),
+    );
     for cell in data {
         let Some(number) = cell.object().as_number_value() else {
             return Err(Error::Eval(
