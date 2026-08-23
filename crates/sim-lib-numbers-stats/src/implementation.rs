@@ -12,6 +12,11 @@ mod clustering;
 #[cfg(test)]
 #[path = "clustering_tests.rs"]
 mod clustering_tests;
+#[path = "decision.rs"]
+mod decision;
+#[cfg(test)]
+#[path = "decision_tests.rs"]
+mod decision_tests;
 #[path = "function.rs"]
 mod function;
 #[path = "gmm.rs"]
@@ -48,6 +53,8 @@ mod robust_tests;
 mod runtime;
 #[path = "runtime_clustering.rs"]
 mod runtime_clustering;
+#[path = "runtime_decision.rs"]
+mod runtime_decision;
 #[path = "transition.rs"]
 mod transition;
 
@@ -59,10 +66,17 @@ pub use clustering::{
     ClusteringError, KMeansControl, KMeansModel, KMeansReport, KMeansRestartEvidence,
     KMeansSearchTermination, KMeansTermination, fit_kmeans,
 };
+pub use decision::{
+    BinaryInterval, ClusterSample, IsotonicFit, IsotonicPoint, RegisteredLook,
+    RegisteredLookSequence, SequentialInterval, ThresholdReadout, clustered_bootstrap_interval,
+    exact_binary_interval, fit_isotonic, paired_bootstrap_interval,
+};
 pub use function::{
-    StatsNumbersLib, stats_claims_symbol, stats_disparate_impact_claim_symbol,
-    stats_entropy_claim_symbol, stats_gmm_symbol, stats_kmeans_symbol, stats_mean_claim_symbol,
-    stats_variance_claim_symbol,
+    StatsNumbersLib, stats_claims_symbol, stats_clustered_bootstrap_symbol,
+    stats_disparate_impact_claim_symbol, stats_entropy_claim_symbol,
+    stats_exact_binary_interval_symbol, stats_gmm_symbol, stats_isotonic_symbol,
+    stats_kmeans_symbol, stats_mean_claim_symbol, stats_paired_bootstrap_symbol,
+    stats_registered_look_symbol, stats_variance_claim_symbol,
 };
 pub use gmm::{
     CovarianceType, GaussianCovariance, GmmControl, GmmEvidence, GmmModel, GmmReport, GmmSpec,

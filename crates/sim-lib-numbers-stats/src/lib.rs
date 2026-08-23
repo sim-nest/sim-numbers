@@ -17,9 +17,11 @@
 //! [`fit_kmeans`] and [`fit_gmm`] add seeded initialization, bounded convergence,
 //! regularized covariance, singular-component policy, and model-selection
 //! evidence without taking ownership of sequence alignment.
-//! [`median_absolute_deviation`] and [`bootstrap_mean_difference_interval`]
-//! serve benchmark dispersion and comparison policy without duplicating
-//! statistical formulas in tooling.
+//! [`exact_binary_interval`], paired and clustered bootstrap, sealed
+//! [`RegisteredLookSequence`] contracts, and [`fit_isotonic`] provide the
+//! bounded mathematical owner for sequential study decisions. They reuse
+//! [`BootstrapControl`] and keep confidence, work, cluster independence,
+//! censoring, and replay evidence explicit.
 
 mod implementation;
 

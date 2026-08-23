@@ -44,7 +44,28 @@ pub fn stats_gmm_symbol() -> Symbol {
     Symbol::qualified("stats", "gmm")
 }
 
-fn function_symbols() -> [Symbol; 11] {
+/// Returns the symbol bound to exact finite binary intervals.
+pub fn stats_exact_binary_interval_symbol() -> Symbol {
+    Symbol::qualified("stats", "exact-binary-interval")
+}
+/// Returns the symbol bound to paired bootstrap intervals.
+pub fn stats_paired_bootstrap_symbol() -> Symbol {
+    Symbol::qualified("stats", "paired-bootstrap")
+}
+/// Returns the symbol bound to cluster-preserving bootstrap intervals.
+pub fn stats_clustered_bootstrap_symbol() -> Symbol {
+    Symbol::qualified("stats", "clustered-bootstrap")
+}
+/// Returns the symbol bound to registered-look intervals.
+pub fn stats_registered_look_symbol() -> Symbol {
+    Symbol::qualified("stats", "registered-look-interval")
+}
+/// Returns the symbol bound to weighted isotonic fitting.
+pub fn stats_isotonic_symbol() -> Symbol {
+    Symbol::qualified("stats", "isotonic")
+}
+
+fn function_symbols() -> [Symbol; 16] {
     [
         stats_mean_claim_symbol(),
         stats_variance_claim_symbol(),
@@ -53,6 +74,11 @@ fn function_symbols() -> [Symbol; 11] {
         stats_claims_symbol(),
         stats_kmeans_symbol(),
         stats_gmm_symbol(),
+        stats_exact_binary_interval_symbol(),
+        stats_paired_bootstrap_symbol(),
+        stats_clustered_bootstrap_symbol(),
+        stats_registered_look_symbol(),
+        stats_isotonic_symbol(),
         agent_fixtures::fixture_symbols()[0].clone(),
         agent_fixtures::fixture_symbols()[1].clone(),
         agent_fixtures::fixture_symbols()[2].clone(),
@@ -120,6 +146,9 @@ impl Callable for StatsFunction {
         }
         if self.symbol == stats_gmm_symbol() {
             return super::runtime_clustering::call_gmm_values(cx, args.into_vec());
+        }
+        if super::runtime_decision::is_symbol(&self.symbol) {
+            return super::runtime_decision::call(cx, &self.symbol, args.into_vec());
         }
         if let Some(value) = agent_fixtures::call_fixture(cx, &self.symbol, args)? {
             return Ok(value);

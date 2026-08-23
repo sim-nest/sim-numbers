@@ -11,7 +11,7 @@ use super::{
     SingularComponentPolicy, fit_gmm, fit_kmeans,
 };
 
-type Options = BTreeMap<String, Value>;
+pub(crate) type Options = BTreeMap<String, Value>;
 
 /// Parses and executes the expression-level `stats/kmeans` call.
 pub fn call_kmeans_exprs(cx: &mut Cx, args: Vec<Expr>) -> Result<Value> {
@@ -354,7 +354,7 @@ fn parse_expr_options(cx: &mut Cx, name: &str, exprs: &[Expr]) -> Result<Options
     Ok(options)
 }
 
-fn parse_table_options(cx: &mut Cx, name: &str, value: &Value) -> Result<Options> {
+pub(crate) fn parse_table_options(cx: &mut Cx, name: &str, value: &Value) -> Result<Options> {
     let Expr::Map(entries) = value.object().as_expr(cx)? else {
         return Err(Error::Eval(format!("{name} options must be a table")));
     };
@@ -403,21 +403,21 @@ fn required_usize(cx: &mut Cx, options: &Options, key: &str, name: &str) -> Resu
     option_usize(cx, options, key)?.ok_or_else(|| Error::Eval(format!("{name} requires :{key}")))
 }
 
-fn option_usize(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<usize>> {
+pub(crate) fn option_usize(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<usize>> {
     options
         .get(key)
         .map(|value| value_to_literal(cx, value, key).and_then(|value| literal_usize(value, key)))
         .transpose()
 }
 
-fn option_u64(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<u64>> {
+pub(crate) fn option_u64(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<u64>> {
     options
         .get(key)
         .map(|value| value_to_literal(cx, value, key).and_then(|value| literal_u64(value, key)))
         .transpose()
 }
 
-fn option_f64(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<f64>> {
+pub(crate) fn option_f64(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<f64>> {
     options
         .get(key)
         .map(|value| value_to_f64(cx, value, key))
@@ -436,7 +436,7 @@ fn option_symbol(cx: &mut Cx, options: &Options, key: &str) -> Result<Option<Str
         .transpose()
 }
 
-fn value_to_points(cx: &mut Cx, value: &Value, name: &str) -> Result<Vec<Vec<f64>>> {
+pub(crate) fn value_to_points(cx: &mut Cx, value: &Value, name: &str) -> Result<Vec<Vec<f64>>> {
     value_to_list(cx, value, name)?
         .iter()
         .enumerate()
@@ -498,17 +498,17 @@ fn literal_u64(literal: NumberLiteral, name: &str) -> Result<u64> {
         .map_err(|_| Error::Eval(format!("{name} must be a non-negative integer")))
 }
 
-fn f64_value(cx: &mut Cx, value: f64) -> Result<Value> {
+pub(crate) fn f64_value(cx: &mut Cx, value: f64) -> Result<Value> {
     cx.factory()
         .number_literal(domains::f64(), canonical_f64(value))
 }
 
-fn usize_value(cx: &mut Cx, value: usize) -> Result<Value> {
+pub(crate) fn usize_value(cx: &mut Cx, value: usize) -> Result<Value> {
     cx.factory()
         .number_literal(domains::u64(), value.to_string())
 }
 
-fn u64_value(cx: &mut Cx, value: u64) -> Result<Value> {
+pub(crate) fn u64_value(cx: &mut Cx, value: u64) -> Result<Value> {
     cx.factory()
         .number_literal(domains::u64(), value.to_string())
 }

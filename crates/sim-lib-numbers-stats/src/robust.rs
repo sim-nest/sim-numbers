@@ -73,6 +73,12 @@ pub struct BootstrapEffectInterval {
     pub baseline_samples: usize,
     /// Number of source candidate observations.
     pub candidate_samples: usize,
+    /// Rows excluded before resampling; current strict APIs reject rather than exclude.
+    pub exclusions: usize,
+    /// Independent clusters resampled, or zero for non-clustered intervals.
+    pub cluster_count: usize,
+    /// Sampled observations or clusters admitted under `max_work`.
+    pub admitted_work: u64,
 }
 
 /// Computes the raw median absolute deviation from the sample median.
@@ -152,6 +158,9 @@ pub fn bootstrap_mean_difference_interval(
         resamples: control.resamples,
         baseline_samples: baseline.len(),
         candidate_samples: candidate.len(),
+        exclusions: 0,
+        cluster_count: 0,
+        admitted_work: required,
     })
 }
 

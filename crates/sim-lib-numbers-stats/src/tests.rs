@@ -12,7 +12,11 @@ use sim_kernel::{
 use std::sync::Arc;
 
 fn test_cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(1),
+    );
     cx.load_lib(&StatsNumbersLib::new()).unwrap();
     cx
 }
