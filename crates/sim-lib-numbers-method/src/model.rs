@@ -48,13 +48,19 @@ impl MethodId {
     pub const KMEANS_LLOYD: &'static str = "numbers/kmeans-lloyd-v1";
     /// Periodogram-family signal estimator.
     pub const SIGNAL_ESTIMATOR: &'static str = "numbers/signal-estimator-v1";
+    /// Householder QR factorization.
+    pub const HOUSEHOLDER_QR: &'static str = "numbers/householder-qr-v1";
+    /// Symmetric real eigendecomposition.
+    pub const SYMMETRIC_EIGEN: &'static str = "numbers/symmetric-eigen-v1";
     /// Admits an identity from the closed method registry.
     pub fn new(value: impl Into<String>) -> Result<Self, MethodError> {
         let value = value.into();
         match value.as_str() {
-            Self::DENSE_SCALED_PIVOT | Self::KMEANS_LLOYD | Self::SIGNAL_ESTIMATOR => {
-                Ok(Self(value))
-            }
+            Self::DENSE_SCALED_PIVOT
+            | Self::KMEANS_LLOYD
+            | Self::SIGNAL_ESTIMATOR
+            | Self::HOUSEHOLDER_QR
+            | Self::SYMMETRIC_EIGEN => Ok(Self(value)),
             _ => Err(MethodError::UnknownMethod(value)),
         }
     }

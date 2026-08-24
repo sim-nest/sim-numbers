@@ -14,7 +14,7 @@ mod model;
 mod runtime;
 
 #[cfg(feature = "adapters")]
-pub use adapters::{DenseSolveAdapter, SignalEstimatorAdapter, StatsKMeansAdapter};
+pub use adapters::{DenseSolveAdapter, StatsKMeansAdapter};
 pub use datum::{CanonicalDatum, DatumError};
 pub use model::{
     CriterionId, ErrorMeasure, ExecutionIdentity, MethodError, MethodEvidence, MethodId,

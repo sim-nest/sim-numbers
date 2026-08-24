@@ -1,5 +1,6 @@
 //! Discrete-prolate (Slepian) multitaper spectral estimation.
 
+use sim_lib_numbers_tensor_decomp::{EigenPlan, VectorPolicy, symmetric_eigen_f64};
 use std::f64::consts::{PI, TAU};
 
 use crate::{
@@ -142,7 +143,26 @@ pub(crate) fn dpss_tapers(
             matrix[(index + 1) * len + index] = off_diagonal;
         }
     }
-    let (eigenvalues, eigenvectors) = symmetric_eigen(matrix, len);
+    let decomposition = symmetric_eigen_f64(
+        &matrix,
+        len,
+        EigenPlan {
+            max_dimension: len,
+            max_iterations: JACOBI_SWEEPS as usize * len.max(1),
+            tolerance: f64::EPSILON * 16.0,
+            symmetry_tolerance: Some(f64::EPSILON * 16.0),
+            vectors: VectorPolicy::Compute,
+            reconstruction_tolerance: 1e-8,
+        },
+    )
+    .map_err(|_| SignalError::InvalidPolicy {
+        policy: "Slepian eigendecomposition",
+        reason: "bounded symmetric eigendecomposition failed",
+    })?;
+    let eigenvalues = decomposition.eigenvalues;
+    let eigenvectors = decomposition
+        .eigenvectors
+        .expect("vector policy requests eigenvectors");
     let mut order = (0..len).collect::<Vec<_>>();
     order.sort_by(|left, right| eigenvalues[*right].total_cmp(&eigenvalues[*left]));
     let mut tapers = Vec::with_capacity(taper_count);
@@ -175,62 +195,6 @@ pub(crate) fn dpss_tapers(
         tapers.push(taper);
     }
     Ok((tapers, concentrations))
-}
-
-fn symmetric_eigen(mut matrix: Vec<f64>, len: usize) -> (Vec<f64>, Vec<f64>) {
-    let mut vectors = vec![0.0; len * len];
-    for index in 0..len {
-        vectors[index * len + index] = 1.0;
-    }
-    for _ in 0..JACOBI_SWEEPS {
-        let mut changed = false;
-        for left in 0..len.saturating_sub(1) {
-            for right in left + 1..len {
-                let cross = matrix[left * len + right];
-                let threshold = f64::EPSILON
-                    * 16.0
-                    * (matrix[left * len + left].abs() + matrix[right * len + right].abs())
-                        .max(1.0);
-                if cross.abs() <= threshold {
-                    continue;
-                }
-                changed = true;
-                let left_value = matrix[left * len + left];
-                let right_value = matrix[right * len + right];
-                let tau = (right_value - left_value) / (2.0 * cross);
-                let tangent = tau.signum() / (tau.abs() + (1.0 + tau * tau).sqrt());
-                let cosine = (1.0 + tangent * tangent).sqrt().recip();
-                let sine = tangent * cosine;
-                for index in 0..len {
-                    if index != left && index != right {
-                        let to_left = matrix[index * len + left];
-                        let to_right = matrix[index * len + right];
-                        let new_left = cosine * to_left - sine * to_right;
-                        let new_right = sine * to_left + cosine * to_right;
-                        matrix[index * len + left] = new_left;
-                        matrix[left * len + index] = new_left;
-                        matrix[index * len + right] = new_right;
-                        matrix[right * len + index] = new_right;
-                    }
-                }
-                matrix[left * len + left] = left_value - tangent * cross;
-                matrix[right * len + right] = right_value + tangent * cross;
-                matrix[left * len + right] = 0.0;
-                matrix[right * len + left] = 0.0;
-                for row in 0..len {
-                    let to_left = vectors[row * len + left];
-                    let to_right = vectors[row * len + right];
-                    vectors[row * len + left] = cosine * to_left - sine * to_right;
-                    vectors[row * len + right] = sine * to_left + cosine * to_right;
-                }
-            }
-        }
-        if !changed {
-            break;
-        }
-    }
-    let eigenvalues = (0..len).map(|index| matrix[index * len + index]).collect();
-    (eigenvalues, vectors)
 }
 
 fn spectral_concentration(taper: &[f64], half_bandwidth: f64) -> f64 {

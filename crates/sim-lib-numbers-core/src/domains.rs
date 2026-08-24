@@ -187,6 +187,11 @@ pub fn tensor_linalg() -> Symbol {
     domain("tensor-linalg")
 }
 
+/// The `numbers/tensor-decomp` factorization domain symbol.
+pub fn tensor_decomp() -> Symbol {
+    domain("tensor-decomp")
+}
+
 /// The `numbers/numeric` namespace symbol for numeric utilities.
 pub fn numeric() -> Symbol {
     domain("numeric")

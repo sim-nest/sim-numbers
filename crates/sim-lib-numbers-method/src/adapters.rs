@@ -1,6 +1,5 @@
 //! Non-destructive projections from domain-owned reports.
 
-use sim_lib_numbers_signal::EstimatorEvidence;
 use sim_lib_numbers_stats::{KMeansRestartEvidence, KMeansTermination};
 use sim_lib_numbers_tensor_linalg::DenseSolveReport;
 
@@ -82,46 +81,6 @@ impl StatsKMeansAdapter {
         };
         MethodEvidence::new(
             MethodId::new(MethodId::KMEANS_LLOYD)?,
-            termination,
-            receipt,
-            requested,
-            vec![achieved],
-            PrecisionId::Binary64,
-            execution,
-        )
-    }
-}
-
-/// Adapter for signal estimator evidence.
-pub struct SignalEstimatorAdapter;
-impl SignalEstimatorAdapter {
-    /// Projects grid resolution, work admission, and estimator execution identity.
-    pub fn evidence(
-        report: &EstimatorEvidence,
-        resolution_tolerance: f64,
-        execution: ExecutionIdentity,
-    ) -> Result<MethodEvidence, MethodError> {
-        let requested = ToleranceSet::new([ErrorMeasure::new(
-            CriterionId::SpectralResolution,
-            resolution_tolerance,
-        )?])?;
-        let resolution = 1.0 / report.fft_len.max(1) as f64;
-        let achieved = ErrorMeasure::new(CriterionId::SpectralResolution, resolution)?;
-        let limit = WorkLimit::new(report.work_limit)?;
-        let receipt = WorkReceipt::new(
-            report.work_units,
-            limit,
-            report.work_units == report.work_limit,
-        )?;
-        let termination = if resolution <= resolution_tolerance {
-            Termination::Converged {
-                criterion: CriterionId::SpectralResolution,
-            }
-        } else {
-            Termination::IterationLimit
-        };
-        MethodEvidence::new(
-            MethodId::new(MethodId::SIGNAL_ESTIMATOR)?,
             termination,
             receipt,
             requested,

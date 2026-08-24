@@ -43,6 +43,33 @@ steps = [
 ]
 
 [[feature]]
+id = "feature/sim-numbers/tensor-decomposition"
+title = "Evidence-carrying tensor decomposition"
+summary = "Factor immutable dense matrices with bounded Householder QR and symmetric real eigen plans, retaining rank, permutation, residual, orthogonality, and common method evidence."
+owner = "crate/sim-lib-numbers-tensor-decomp"
+audiences = ["code", "framework", "user"]
+guidance = "Use qr_f64 for optional column-pivoted QR and symmetric_eigen_f64 only when symmetry is exact or the caller supplies an explicit tolerance. Reuse tensor-linalg for direct solve, inverse, determinant, and norm; decomposition is the single owner of reusable factors."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-tensor-decomp",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-decomp/tensor-decomp-lib",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/qr-factorization",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/symmetric-eigen",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/tensor-decomposition"
+title = "Factor a dense tensor with reviewable evidence"
+summary = "Choose QR or symmetric eigen, set explicit admission and accuracy policy, then inspect the independent certificate."
+audiences = ["framework", "user"]
+steps = [
+  "feature/sim-numbers/tensor-decomposition",
+  "anchor/crate/sim-lib-numbers-tensor-decomp",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests",
+  "recipe/sim-numbers/crates/sim-lib-numbers-tensor-decomp/01-basics/qr-eigen",
+]
+
+[[feature]]
 id = "feature/sim-numbers/generated-docs"
 title = "Repository documentation surface"
 summary = "Publish generated package, card, rustdoc, and index facts for the number-domain crates."

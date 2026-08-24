@@ -35,6 +35,7 @@ members = [
   "crates/sim-lib-numbers-tensor-half",
   "crates/sim-lib-numbers-tensor-i64",
   "crates/sim-lib-numbers-tensor-linalg",
+  "crates/sim-lib-numbers-tensor-decomp",
   "crates/sim-lib-numbers-tensor-rat64",
   "xtask",
 ]

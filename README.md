@@ -112,6 +112,7 @@ prelude installs the standard set in one call.
 | `sim-lib-numbers-tensor-bit` | Bit-tensor specialization: a packed-word boolean element type and its `SpecTensor` backend, with bitwise operations over the tensor domain. |
 | `sim-lib-numbers-tensor-bcast` | Tensor broadcasting specialization: element-wise binary and unary tensor operations with NumPy-style shape broadcasting and promotion rules. |
 | `sim-lib-numbers-tensor-linalg` | Linear-algebra operations over the tensor domain: `dot`, `matmul`, `cross`, `transpose`, `det`, `inv`, `trace`, `norm`, and the `eye`/`zeros`/`ones` constructors. |
+| `sim-lib-numbers-tensor-decomp` | Bounded Householder QR and symmetric real eigendecomposition with numerical rank, optional vectors, and reconstruction/orthogonality evidence. |
 
 ## Number domains and the promotion lattice
 

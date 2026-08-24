@@ -115,7 +115,7 @@ fn dense_adapter_preserves_domain_report_and_common_queries() {
 
 #[test]
 #[cfg(feature = "adapters")]
-fn stats_and_signal_adapters_preserve_domain_evidence() {
+fn stats_adapter_preserves_domain_evidence() {
     let stats = KMeansRestartEvidence {
         restart: 2,
         seed: 41,
@@ -131,29 +131,6 @@ fn stats_and_signal_adapters_preserve_domain_evidence() {
     assert_eq!(stats, retained_stats);
     assert_eq!(common.work().charged(), 90);
     assert_eq!(common.achieved()[0].value(), 0.25);
-
-    let signal = EstimatorEvidence {
-        estimator: EstimatorKind::Periodogram,
-        input_len: 64,
-        fft_len: 64,
-        segment_len: 64,
-        segment_count: 1,
-        taper_count: 0,
-        frequency_bins: 33,
-        work_units: 384,
-        work_limit: 1_000,
-        degrees_of_freedom: 2.0,
-        frequency_grid: FrequencyGridPolicy::FftBins {
-            side: SpectrumSide::OneSided,
-        },
-        window: None,
-        taper_concentrations: Vec::new(),
-    };
-    let retained_signal = signal.clone();
-    let common = SignalEstimatorAdapter::evidence(&signal, 1.0 / 32.0, execution()).unwrap();
-    assert_eq!(signal, retained_signal);
-    assert_eq!(common.work().charged(), 384);
-    assert_eq!(common.achieved()[0].value(), 1.0 / 64.0);
 }
 
 #[test]
