@@ -45,15 +45,17 @@ steps = [
 [[feature]]
 id = "feature/sim-numbers/tensor-decomposition"
 title = "Evidence-carrying tensor decomposition"
-summary = "Factor immutable dense matrices with bounded Householder QR and symmetric real eigen plans, retaining rank, permutation, residual, orthogonality, and common method evidence."
+summary = "Factor immutable dense matrices with bounded QR, symmetric eigen, real Schur, and one-sided Jacobi SVD plans, retaining spectra, rank, permutation, residual, orthogonality, and execution evidence."
 owner = "crate/sim-lib-numbers-tensor-decomp"
 audiences = ["code", "framework", "user"]
-guidance = "Use qr_f64 for optional column-pivoted QR and symmetric_eigen_f64 only when symmetry is exact or the caller supplies an explicit tolerance. Reuse tensor-linalg for direct solve, inverse, determinant, and norm; decomposition is the single owner of reusable factors."
+guidance = "Use qr_f64 for optional column-pivoted QR, symmetric_eigen_f64 for admitted symmetry, real_schur_f64 for general real spectra, and svd_f64 for stable rectangular decomposition without normal equations. Derive rank, condition, pseudoinverse, least squares, and null spaces from one caller cutoff. Provider factors require local shape, ordering, reconstruction, residual, and execution-identity admission. Reuse tensor-linalg for direct solve, inverse, determinant, and norm; decomposition is the single owner of reusable factors."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-tensor-decomp",
   "anchor/runtime-lib/sim-lib-numbers-tensor-decomp/tensor-decomp-lib",
   "anchor/rustdoc/sim-lib-numbers-tensor-decomp/qr-factorization",
   "anchor/rustdoc/sim-lib-numbers-tensor-decomp/symmetric-eigen",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/real-schur",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/svd",
 ]
 claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests"]
 

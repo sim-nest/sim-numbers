@@ -52,6 +52,10 @@ impl MethodId {
     pub const HOUSEHOLDER_QR: &'static str = "numbers/householder-qr-v1";
     /// Symmetric real eigendecomposition.
     pub const SYMMETRIC_EIGEN: &'static str = "numbers/symmetric-eigen-v1";
+    /// Balanced Hessenberg real-Schur decomposition with bounded QR iteration.
+    pub const REAL_SCHUR: &'static str = "numbers/real-schur-double-shift-qr-v1";
+    /// One-sided Jacobi singular-value decomposition.
+    pub const JACOBI_SVD: &'static str = "numbers/one-sided-jacobi-svd-v1";
     /// Admits an identity from the closed method registry.
     pub fn new(value: impl Into<String>) -> Result<Self, MethodError> {
         let value = value.into();
@@ -60,7 +64,9 @@ impl MethodId {
             | Self::KMEANS_LLOYD
             | Self::SIGNAL_ESTIMATOR
             | Self::HOUSEHOLDER_QR
-            | Self::SYMMETRIC_EIGEN => Ok(Self(value)),
+            | Self::SYMMETRIC_EIGEN
+            | Self::REAL_SCHUR
+            | Self::JACOBI_SVD => Ok(Self(value)),
             _ => Err(MethodError::UnknownMethod(value)),
         }
     }
