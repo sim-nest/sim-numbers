@@ -1,0 +1,8 @@
+id = "vector-root"
+title = "Rank-diagnosed vector root"
+codec = "lisp"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "root", "newton", "vector", "svd"]
+requires = ["numbers/root", "numbers/tensor-decomp", "codec/lisp"]
+setup = "setup.siml"

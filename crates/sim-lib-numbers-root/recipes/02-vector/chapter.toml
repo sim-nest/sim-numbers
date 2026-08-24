@@ -1,0 +1,3 @@
+title = "Vector roots"
+order = 20
+summary = "Solve vector residuals with rank and Jacobian provenance."

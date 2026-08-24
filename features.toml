@@ -558,3 +558,33 @@ steps = [
   { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns Env-bound executor routing and CPU fallback for tensor operations." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests", why = "The RK tests prove tensor state across fixed/adaptive methods, hardware refusals, and CPU agreement." },
 ]
+
+[[feature]]
+id = "feature/sim-numbers/root-finding"
+title = "Evidence-carrying root finding"
+summary = "Find scalar and vector roots while preserving brackets, residuals, derivative provenance, rank diagnostics, work bounds, and replay identity."
+owner = "crate/sim-lib-numbers-root"
+audiences = ["code", "framework"]
+guidance = "Use this owner below ODE, optimization, continuation, and interval Newton. Choose bisection or Brent-Dekker when a sign-changing bracket is required; choose safeguarded Newton, secant, damped vector Newton, or bounded Broyden when residual evidence is sufficient."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-root",
+  "anchor/runtime-lib/sim-lib-numbers-root/root-lib",
+  "anchor/rustdoc/sim-lib-numbers-root/root-bracket",
+  "anchor/rustdoc/sim-lib-numbers-root/root-evidence",
+  "anchor/rustdoc/sim-lib-numbers-root/brent-dekker",
+  "anchor/rustdoc/sim-lib-numbers-root/damped-newton",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-root/src/tests",
+]
+
+[[route]]
+id = "route/find-numeric-root"
+task = "Find a scalar or vector root with reviewable evidence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/root-finding", why = "The root owner distinguishes proved sign-changing brackets from residual-only estimates and records derivative, rank, work, termination, and replay evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-root/src/tests", why = "The checked tests cover endpoint and multiple roots, invalid and discontinuous brackets, flat derivatives, scaling, singular Jacobians, bounded Broyden resets, and deterministic replay." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-root/01-basics/scalar-root", why = "The scalar recipe demonstrates bracket-preserving Brent-Dekker search." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-root/02-vector/vector-root", why = "The vector recipe demonstrates rank-diagnosed damped Newton search." },
+]

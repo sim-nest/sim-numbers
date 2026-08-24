@@ -1,0 +1,4 @@
+(load "numbers/root")
+(root/vector-newton (lambda (x) [(- (+ (* (get x 0) (get x 0)) (get x 1)) 2.0)
+                                 (- (+ (get x 0) (* (get x 1) (get x 1))) 2.0)])
+                    [1.0 1.0] :jacobian 'finite-difference :step 1e-7)
