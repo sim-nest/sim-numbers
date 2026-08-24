@@ -212,6 +212,10 @@ struct NumericCell {
     value: f64,
 }
 
+pub(crate) fn numeric_f64(cx: &mut Cx, value: &Value) -> std::result::Result<f64, TensorExecError> {
+    Ok(numeric_cell(cx, value)?.value)
+}
+
 fn numeric_cell(cx: &mut Cx, value: &Value) -> std::result::Result<NumericCell, TensorExecError> {
     let literal = number_literal_for_tensor_cell(value)
         .or_else(|| cx.number_value_ref(value.clone()).ok().flatten()?.literal)
@@ -258,7 +262,7 @@ fn parse_rational(text: &str) -> std::result::Result<f64, TensorExecError> {
     Ok(numerator / denominator)
 }
 
-fn numeric_value(
+pub(crate) fn numeric_value(
     cx: &mut Cx,
     domain: &Symbol,
     value: f64,

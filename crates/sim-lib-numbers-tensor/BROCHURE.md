@@ -11,6 +11,7 @@ Lots of real data comes in arrangements: a row of readings, a table of figures, 
 - One consistent container handles lists, tables, and higher-dimensional data alike.
 - Building vectors, matrices, and larger blocks is quick and uniform.
 - Working with grouped numbers as a single value beats juggling them one by one.
+- A complete executor-routed vocabulary covers grids, strict joins and padding, stable selection, cumulative transforms, and explicit closeness tests without caller-side arrays.
 
 ## Where it fits
 

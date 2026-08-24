@@ -316,10 +316,10 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/tensor-execution"
 title = "Tensor execution"
-summary = "Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
+summary = "Run the canonical construction, composition, selection, comparison, element-wise, reduction, linear-algebra, and transcendental Tensor vocabulary through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
 owner = "crate/sim-lib-numbers-tensor"
 audiences = ["code", "framework"]
-guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib and TensorLinalgLib submit element-wise add, sub, mul, div, rem, pow, neg, whole-tensor sum/min/max/norm, transpose, dot, matmul, sqrt, exp, sin, and cos through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor, pass model time and resource profiles explicitly, and realize through TensorSite so executor binding stays child-Env scoped and the caller environment is restored after evaluation. Concrete clocks, probes, temporary storage, and other host facts belong in platform or compute providers, never numbers."
+guidance = "Use this row for canonical Tensor work: explicit range/space/grid construction; strict concat, stack, padding, selection, cumulative, closeness, and element-wise operations; reductions and linear algebra. Every edge policy travels in the TensorOp descriptor, providers advertise the exact symbols they accept, and a decline uses the existing CPU fallback. Use machine_limits from sim-lib-numbers-core instead of copying dtype constants. Keep providers behind TensorExecutor and realize through TensorSite so binding remains child-Env scoped."
 claims_anchors = [
   "anchor/export/sim-lib-numbers-tensor/site/tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/active_tensor_executor",

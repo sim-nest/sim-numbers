@@ -13,6 +13,7 @@
 mod implementation;
 mod spec;
 
+pub use implementation::canonical_ops::*;
 pub use implementation::{
     BoxedTensorStorage, CpuTensorExecutor, SubmissionEvidence, Tensor, TensorCell, TensorExecError,
     TensorExecution, TensorExecutor, TensorExecutorCard, TensorLocation, TensorMeta,

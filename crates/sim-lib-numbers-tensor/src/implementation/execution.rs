@@ -7,6 +7,9 @@ use sim_kernel::{
 };
 
 use super::{
+    canonical_ops::{
+        canonical_tensor_op_symbols, execute_canonical_request, is_canonical_tensor_op,
+    },
     cast::cast_tensor,
     elementwise::{
         execute_elementwise_binary_request, execute_elementwise_unary_request,
@@ -424,6 +427,7 @@ impl TensorExecutor for CpuTensorExecutor {
             .into_iter()
             .chain(tensor_elementwise_op_symbols())
             .chain(tensor_executor_math_op_symbols())
+            .chain(canonical_tensor_op_symbols())
             .collect(),
             None,
         )
@@ -456,6 +460,8 @@ impl TensorExecutor for CpuTensorExecutor {
             execute_elementwise_unary_request(cx, &request)?
         } else if is_tensor_executor_math_op(&operation) {
             execute_tensor_math_request(cx, &request)?
+        } else if is_canonical_tensor_op(&operation) {
+            execute_canonical_request(cx, &request)?
         } else {
             return Ok(TensorExecution::Unsupported {
                 reason: Arc::from("unknown tensor operation"),

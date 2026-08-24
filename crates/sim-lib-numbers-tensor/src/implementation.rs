@@ -1,6 +1,7 @@
 //! Implementation of the tensor domain: its value class citizen, domain
 //! registration, constructor operations, and the `Tensor` value type.
 
+pub(crate) mod canonical_ops;
 mod cast;
 mod citizen;
 mod dimension;

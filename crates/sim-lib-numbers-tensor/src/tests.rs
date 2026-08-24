@@ -10,6 +10,7 @@ use crate::{
     tensor_value_ref,
 };
 
+mod canonical;
 mod cast;
 mod execution;
 mod storage;
