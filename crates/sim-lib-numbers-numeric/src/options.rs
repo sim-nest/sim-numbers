@@ -1,11 +1,16 @@
 //! Argument and option parsing for the numeric operations, turning expression
-//! and table inputs into typed `DiffOpts`, `QuadOpts`, and `OdeOpts`.
+//! and table inputs into typed `DiffOpts`, `QuadOpts`, and `OdePlan`.
 
 use std::{collections::BTreeMap, sync::Arc};
 
-use sim_kernel::{Cx, DefaultFactory, EagerPolicy, Error, Expr, QuoteMode, Result, Symbol, Value};
+use sim_kernel::{
+    Cx, DefaultFactory, EagerPolicy, Error, Expr, HandleSeed, QuoteMode, Result, Symbol, Value,
+};
 
-use super::traits::{DiffOpts, OdeOpts, QuadOpts};
+use super::traits::{
+    AbsoluteTolerance, ComponentTolerance, DiffOpts, MethodLimits, OdePlan, OutputPolicy, QuadOpts,
+    StepPolicy,
+};
 
 /// Parsed numeric option values keyed by keyword name without the leading `:`.
 pub type ParsedOptions = BTreeMap<String, Value>;
@@ -59,7 +64,7 @@ pub fn parse_integrate_exprs(
 pub fn parse_ode_exprs(
     cx: &mut Cx,
     args: Vec<Expr>,
-) -> Result<(Value, Symbol, Symbol, Value, Value, Value, OdeOpts)> {
+) -> Result<(Value, Symbol, Symbol, Value, Value, Value, OdePlan)> {
     let [
         dy_expr,
         var_expr,
@@ -85,10 +90,27 @@ pub fn parse_ode_exprs(
     let y0 = cx.eval_expr(y0_expr.clone())?;
     let x_end = cx.eval_expr(x_end_expr.clone())?;
     let method = option_symbol(&options, "method")?.unwrap_or(Symbol::new("auto"));
-    let h = option_f64(&options, "h")?;
-    let tol = option_f64(&options, "tol")?;
-    let max_steps = option_usize(&options, "max-steps")?;
-    reject_unknown("ode-solve", &options, &["method", "h", "tol", "max-steps"])?;
+    let first = option_f64(&options, "first-step")?;
+    let fixed = option_f64(&options, "fixed-step")?;
+    let max = option_f64(&options, "max-step")?;
+    let relative = option_f64(&options, "rtol")?.unwrap_or(1.0e-8);
+    let absolute = option_f64(&options, "atol")?.unwrap_or(1.0e-10);
+    let steps = option_usize(&options, "step-limit")?.unwrap_or(100_000);
+    let work = option_usize(&options, "work-limit")?.unwrap_or(1_000_000);
+    reject_unknown(
+        "ode-solve",
+        &options,
+        &[
+            "method",
+            "first-step",
+            "fixed-step",
+            "max-step",
+            "rtol",
+            "atol",
+            "step-limit",
+            "work-limit",
+        ],
+    )?;
     Ok((
         dy,
         var,
@@ -96,11 +118,22 @@ pub fn parse_ode_exprs(
         x0,
         y0,
         x_end,
-        OdeOpts {
+        OdePlan {
             method,
-            h,
-            tol,
-            max_steps,
+            tolerance: ComponentTolerance {
+                relative,
+                absolute: AbsoluteTolerance::Scalar(absolute),
+            },
+            step: StepPolicy { fixed, first, max },
+            output: OutputPolicy {
+                samples: Vec::new(),
+                retain_dense: false,
+            },
+            limits: MethodLimits {
+                steps,
+                work,
+                trace: 256,
+            },
         },
     ))
 }
@@ -215,5 +248,9 @@ fn keyword(expr: &Expr) -> Result<String> {
 }
 
 fn dummy_cx() -> Cx {
-    Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+    Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x4f44_4500),
+    )
 }

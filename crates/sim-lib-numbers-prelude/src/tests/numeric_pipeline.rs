@@ -169,7 +169,7 @@ fn numeric6_rk_over_func_composed_pipeline() {
                             Symbol::new(":method"),
                             cx.factory().symbol(Symbol::new("rk4")).unwrap(),
                         ),
-                        (Symbol::new(":h"), dt),
+                        (Symbol::new(":fixed-step"), dt),
                     ])
                     .unwrap(),
             ]),

@@ -93,7 +93,11 @@ mod tests {
     use crate::{ComposedPipeline, PipelineKind};
 
     fn test_cx() -> Cx {
-        Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+        Cx::new(
+            Arc::new(EagerPolicy),
+            Arc::new(DefaultFactory),
+            sim_kernel::HandleSeed::new(0x4f44_4503),
+        )
     }
 
     #[test]

@@ -404,7 +404,7 @@ title = "Numeric pipelines"
 summary = "Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when composing or running numeric jobs through the numeric registry. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry; quadrature remains scalar."
+guidance = "Use this row when composing or running numeric jobs through the numeric registry. ODE work uses the single OdeProblem/OdePlan/OdeSolution contract: mathematical callables and span stay in the problem, numerical tolerances, stepping, output, and limits stay in the plan, and every backend returns a dense trajectory with bounded method evidence. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry; quadrature remains scalar."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-numeric",
   "anchor/runtime-lib/sim-lib-numbers-numeric/numeric-numbers-lib",
@@ -428,7 +428,7 @@ title = "Tensor ODE pipelines"
 summary = "Run tensor-valued ODE state through the existing numeric ODE pipeline and Runge-Kutta solver registry."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when an ODE state is a Tensor. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state."
+guidance = "Use this row when an ODE state is a Tensor. Tensor state uses the same OdeProblem/OdePlan/OdeSolution surface and capability admission as scalar state. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state."
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
 ]

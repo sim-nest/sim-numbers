@@ -28,6 +28,9 @@ pub use registry::{
 };
 pub use sim_lib_numbers_func::Func;
 pub use traits::{
-    DiffOpts, Differentiator, NumericCallable, NumericKind, NumericPlugin, OdeOpts, OdeProblem,
-    OdeSolver, QuadOpts, Quadrature,
+    AbsoluteTolerance, AcceptedStep, ComponentTolerance, DenseSegment, DiffOpts, Differentiator,
+    EventDirection, EventFunction, ImplicitForm, JacobianFunction, LocatedEvent, MethodEvidence,
+    MethodLimits, NumericCallable, NumericKind, NumericPlugin, OdeCapabilities, OdePlan,
+    OdeProblem, OdeSolution, OdeSolver, OdeTermination, OutputPolicy, QuadOpts, Quadrature,
+    StepPolicy, TimeSpan, Trajectory,
 };

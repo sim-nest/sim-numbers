@@ -10,7 +10,10 @@ use super::{
     pipeline::{ComposedPipeline, PipelineKind},
     registry::global_numeric_registry,
     state::{ensure_quadrature_state, validate_ode_state},
-    traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
+    traits::{
+        AbsoluteTolerance, ComponentTolerance, MethodLimits, NumericCallable, NumericKind, OdePlan,
+        OdeProblem, OutputPolicy, QuadOpts, Quadrature, StepPolicy, TimeSpan,
+    },
 };
 
 pub fn call_numeric_run_composed(cx: &mut Cx, args: Args) -> Result<Value> {
@@ -187,24 +190,53 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     } else {
         None
     };
+    let span = TimeSpan {
+        start: value_to_f64(cx, &t0, "numeric/run-composed :t0")?,
+        end: value_to_f64(cx, &t1, "numeric/run-composed :t1")?,
+    };
     let points = plugin.solve(
         cx,
         OdeProblem {
-            dy: &dy,
+            rhs: &dy,
             var: &dy.vars()[0],
             y_var: &dy.vars()[1],
-            x0: &t0,
-            y0: &y0,
-            x_end: &t1,
+            span,
+            initial: &y0,
+            events: &[],
+            jacobian: None,
+            implicit: None,
         },
-        OdeOpts {
+        OdePlan {
             method: method.clone(),
-            h: Some(dt),
-            tol,
-            max_steps: None,
+            tolerance: ComponentTolerance {
+                relative: tol.unwrap_or(1.0e-8),
+                absolute: AbsoluteTolerance::Scalar(1.0e-10),
+            },
+            step: StepPolicy {
+                fixed: if plugin_kind == NumericKind::OdeFixed {
+                    Some(dt)
+                } else {
+                    None
+                },
+                first: if plugin_kind == NumericKind::OdeAdaptive {
+                    Some(dt)
+                } else {
+                    None
+                },
+                max: None,
+            },
+            output: OutputPolicy {
+                samples: Vec::new(),
+                retain_dense: false,
+            },
+            limits: MethodLimits {
+                steps: 100_000,
+                work: 1_000_000,
+                trace: 256,
+            },
         },
     )?;
-    let steps = points.len().saturating_sub(1);
+    let steps = points.path.accepted.len().saturating_sub(1);
     let steps_value = if plugin_kind == NumericKind::OdeAdaptive {
         cx.factory()
             .number_literal(domains::f64(), tol.unwrap_or(1.0e-8).to_string())?
@@ -213,8 +245,10 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
             .number_literal(domains::i64(), steps.to_string())?
     };
     let value = points
+        .path
+        .accepted
         .last()
-        .map(|(_, y)| y.clone())
+        .map(|point| point.state.clone())
         .ok_or_else(|| Error::Eval("numeric/run-composed solver returned no points".to_owned()))?;
     cx.factory().table(vec![
         (Symbol::new("value"), value),
@@ -427,7 +461,11 @@ mod tests {
     use crate::StateKind;
 
     fn test_cx() -> Cx {
-        Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+        Cx::new(
+            Arc::new(EagerPolicy),
+            Arc::new(DefaultFactory),
+            sim_kernel::HandleSeed::new(0x4f44_4502),
+        )
     }
 
     fn pipeline_value(cx: &mut Cx, kind: PipelineKind, state: StateKind) -> Value {

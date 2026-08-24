@@ -13,7 +13,11 @@ use crate::{
 };
 
 fn test_cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x4f44_4504),
+    );
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
@@ -373,12 +377,12 @@ fn duplicate_expr_options_fail_closed() {
                 f64_number("0.0"),
                 f64_number("1.0"),
                 f64_number("2.0"),
-                keyword("max-steps"),
+                keyword("step-limit"),
                 f64_number("4"),
-                keyword("max-steps"),
+                keyword("step-limit"),
                 f64_number("8"),
             ],
-            "max-steps",
+            "step-limit",
         ),
     ];
 
@@ -445,7 +449,7 @@ fn duplicate_table_options_fail_closed() {
     assert_duplicate_option(err, "tol");
 
     let ode_max_steps_options =
-        duplicate_option_table(&mut cx, "max-steps", f64_number("4"), f64_number("8"));
+        duplicate_option_table(&mut cx, "step-limit", f64_number("4"), f64_number("8"));
     let x0 = f64_value(&mut cx, "0.0");
     let y0 = f64_value(&mut cx, "1.0");
     let x_end = f64_value(&mut cx, "2.0");
@@ -455,7 +459,7 @@ fn duplicate_table_options_fail_closed() {
             Args::new(vec![func, x, y, x0, y0, x_end, ode_max_steps_options]),
         )
         .unwrap_err();
-    assert_duplicate_option(err, "max-steps");
+    assert_duplicate_option(err, "step-limit");
 }
 
 #[test]

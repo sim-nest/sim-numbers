@@ -7,14 +7,15 @@ use sim_kernel::{
     AbiVersion, Cx, Dependency, Error, Export, Lib, LibManifest, LibTarget, Linker, Result, Symbol,
     Value, Version,
 };
-use sim_lib_numbers_codec::{numeric_plugin_descriptor_symbol, numeric_plugin_descriptor_value};
+use sim_lib_numbers_codec::numeric_plugin_descriptor_symbol;
 use sim_lib_numbers_core::domains;
 use sim_lib_numbers_numeric::{
-    NumericCallable, NumericKind, NumericPlugin, OdeOpts, OdeProblem, OdeSolver,
-    register_ode_solver,
+    AbsoluteTolerance, AcceptedStep, DenseSegment, EventDirection, LocatedEvent, MethodEvidence,
+    NumericCallable, NumericKind, NumericPlugin, OdeCapabilities, OdePlan, OdeProblem, OdeSolution,
+    OdeSolver, OdeTermination, Trajectory, register_ode_solver,
 };
 
-use super::support::{abs_error, add, add_scaled, call_rhs, f64_value, scale, value_to_f64};
+use super::support::{abs_error, add, add_scaled, call_rhs, f64_value, scale};
 
 /// Registered numeric plugin library that installs this crate's Runge-Kutta
 /// ODE-solver backends.
@@ -101,13 +102,34 @@ fn install_descriptors(cx: &sim_kernel::LoadCx, linker: &mut Linker<'_>) -> Resu
     for (name, adaptive) in descriptor_specs() {
         linker.value(
             numeric_plugin_descriptor_symbol("numbers/rk", name),
-            numeric_plugin_descriptor_value(
-                cx.factory(),
-                Symbol::new(name),
-                "ode",
-                adaptive,
-                domains::rk(),
-            )?,
+            cx.factory().table(vec![
+                (
+                    Symbol::new("kind"),
+                    cx.factory().string("numeric-plugin".to_owned())?,
+                ),
+                (
+                    Symbol::new("method"),
+                    cx.factory().symbol(Symbol::new(name))?,
+                ),
+                (
+                    Symbol::new("plugin-kind"),
+                    cx.factory().string("ode".to_owned())?,
+                ),
+                (Symbol::new("adaptive"), cx.factory().bool(adaptive)?),
+                (Symbol::new("fixed"), cx.factory().bool(!adaptive)?),
+                (Symbol::new("scalar-state"), cx.factory().bool(true)?),
+                (Symbol::new("tensor-state"), cx.factory().bool(true)?),
+                (Symbol::new("dense-path"), cx.factory().bool(true)?),
+                (Symbol::new("events"), cx.factory().bool(true)?),
+                (Symbol::new("jacobian"), cx.factory().bool(false)?),
+                (Symbol::new("mass-matrix"), cx.factory().bool(false)?),
+                (Symbol::new("dae-residual"), cx.factory().bool(false)?),
+                (Symbol::new("provider"), cx.factory().symbol(domains::rk())?),
+                (
+                    Symbol::new("api"),
+                    cx.factory().string("numeric-plugin-v2".to_owned())?,
+                ),
+            ])?,
         )?;
     }
     Ok(())
@@ -185,49 +207,334 @@ impl NumericPlugin for RkPlugin {
 }
 
 impl OdeSolver for RkPlugin {
-    fn solve(
-        &self,
-        cx: &mut Cx,
-        problem: OdeProblem<'_>,
-        opt: OdeOpts,
-    ) -> Result<Vec<(Value, Value)>> {
-        let x0f = value_to_f64(cx, problem.x0, "ode x0")?;
-        let x1f = value_to_f64(cx, problem.x_end, "ode x-end")?;
-        match self.method {
+    fn capabilities(&self) -> OdeCapabilities {
+        OdeCapabilities {
+            scalar_state: true,
+            tensor_state: true,
+            adaptive: matches!(self.method, Method::Rkf45),
+            fixed: !matches!(self.method, Method::Rkf45),
+            dense_path: true,
+            events: true,
+            jacobian: false,
+            mass_matrix: false,
+            dae_residual: false,
+        }
+    }
+
+    fn solve(&self, cx: &mut Cx, problem: OdeProblem<'_>, plan: OdePlan) -> Result<OdeSolution> {
+        validate_admission(&problem, &plan, self.capabilities())?;
+        let x0f = problem.span.start;
+        let x1f = problem.span.end;
+        let points = match self.method {
             Method::ForwardEuler => fixed_step(
                 cx,
-                problem.dy,
+                problem.rhs,
                 x0f,
-                problem.y0.clone(),
+                problem.initial.clone(),
                 x1f,
-                opt,
+                plan.clone(),
                 step_forward_euler,
             ),
             Method::BackwardEuler => fixed_step(
                 cx,
-                problem.dy,
+                problem.rhs,
                 x0f,
-                problem.y0.clone(),
+                problem.initial.clone(),
                 x1f,
-                opt,
+                plan.clone(),
                 step_backward_euler,
             ),
             Method::Midpoint => fixed_step(
                 cx,
-                problem.dy,
+                problem.rhs,
                 x0f,
-                problem.y0.clone(),
+                problem.initial.clone(),
                 x1f,
-                opt,
+                plan.clone(),
                 step_midpoint,
             ),
-            Method::Rk4 => fixed_step(cx, problem.dy, x0f, problem.y0.clone(), x1f, opt, step_rk4),
-            Method::Rkf45 => adaptive_rkf45(cx, problem.dy, x0f, problem.y0.clone(), x1f, opt),
-        }
+            Method::Rk4 => fixed_step(
+                cx,
+                problem.rhs,
+                x0f,
+                problem.initial.clone(),
+                x1f,
+                plan.clone(),
+                step_rk4,
+            ),
+            Method::Rkf45 => adaptive_rkf45(
+                cx,
+                problem.rhs,
+                x0f,
+                problem.initial.clone(),
+                x1f,
+                plan.clone(),
+            ),
+        }?;
+        let mut result = solution(points, &plan);
+        locate_events(cx, &problem, &mut result)?;
+        Ok(result)
     }
 }
 
-type FixedStepper = fn(&mut Cx, &NumericCallable, f64, &Value, f64, &OdeOpts) -> Result<Value>;
+type FixedStepper = fn(&mut Cx, &NumericCallable, f64, &Value, f64, &OdePlan) -> Result<Value>;
+
+fn absolute_tolerance(plan: &OdePlan) -> f64 {
+    match &plan.tolerance.absolute {
+        AbsoluteTolerance::Scalar(value) => *value,
+        AbsoluteTolerance::Components(values) => values.iter().copied().fold(0.0, f64::max),
+    }
+}
+
+fn validate_admission(
+    problem: &OdeProblem<'_>,
+    plan: &OdePlan,
+    caps: OdeCapabilities,
+) -> Result<()> {
+    if !plan.tolerance.relative.is_finite()
+        || plan.tolerance.relative < 0.0
+        || absolute_tolerance(plan) <= 0.0
+    {
+        return Err(Error::Eval(
+            "ode-solve tolerances must be finite, rtol nonnegative, and atol positive".to_owned(),
+        ));
+    }
+    if !problem.events.is_empty() && !caps.events {
+        return Err(Error::Eval(
+            "ode backend does not support requested events".to_owned(),
+        ));
+    }
+    if problem.jacobian.is_some() && !caps.jacobian {
+        return Err(Error::Eval(
+            "ode backend does not support requested Jacobian".to_owned(),
+        ));
+    }
+    if let Some(form) = problem.implicit {
+        let supported = match form {
+            sim_lib_numbers_numeric::ImplicitForm::MassMatrix(_) => caps.mass_matrix,
+            sim_lib_numbers_numeric::ImplicitForm::Residual(_) => caps.dae_residual,
+        };
+        if !supported {
+            return Err(Error::Eval(
+                "ode backend does not support requested implicit form".to_owned(),
+            ));
+        }
+    }
+    if (plan.output.retain_dense || !plan.output.samples.is_empty()) && !caps.dense_path {
+        return Err(Error::Eval(
+            "ode backend does not support requested dense output".to_owned(),
+        ));
+    }
+    let lo = problem.span.start.min(problem.span.end);
+    let hi = problem.span.start.max(problem.span.end);
+    if plan
+        .output
+        .samples
+        .iter()
+        .any(|time| !time.is_finite() || *time < lo || *time > hi)
+    {
+        return Err(Error::Eval(
+            "ode output sample lies outside span".to_owned(),
+        ));
+    }
+    Ok(())
+}
+
+fn solution(points: Vec<(Value, Value)>, plan: &OdePlan) -> OdeSolution {
+    let accepted = points
+        .into_iter()
+        .map(|(time, state)| AcceptedStep {
+            time: time
+                .object()
+                .display(&mut Cx::new(
+                    std::sync::Arc::new(sim_kernel::EagerPolicy),
+                    std::sync::Arc::new(sim_kernel::DefaultFactory),
+                    sim_kernel::HandleSeed::new(0x4f44_4501),
+                ))
+                .ok()
+                .and_then(|s| s.parse().ok())
+                .unwrap_or(f64::NAN),
+            state,
+        })
+        .collect::<Vec<_>>();
+    let dense = accepted
+        .windows(2)
+        .map(|pair| DenseSegment {
+            start: pair[0].clone(),
+            end: pair[1].clone(),
+        })
+        .collect();
+    let sizes = accepted
+        .windows(2)
+        .map(|pair| (pair[1].time - pair[0].time).abs())
+        .collect::<Vec<_>>();
+    let retained = if sizes.len() <= plan.limits.trace {
+        sizes.clone()
+    } else {
+        sizes[..plan.limits.trace].to_vec()
+    };
+    let range = sizes.iter().copied().fold(None::<(f64, f64)>, |range, h| {
+        Some(match range {
+            None => (h, h),
+            Some((lo, hi)) => (lo.min(h), hi.max(h)),
+        })
+    });
+    OdeSolution {
+        path: Trajectory { accepted, dense },
+        events: Vec::new(),
+        evidence: MethodEvidence {
+            accepted_steps: sizes.len(),
+            rejected_steps: 0,
+            rhs_evaluations: 0,
+            jacobian_evaluations: 0,
+            step_sizes: retained,
+            step_size_range: range,
+            achieved_local_error: 0.0,
+            event_brackets: Vec::new(),
+            termination: OdeTermination::ReachedEnd,
+        },
+    }
+}
+
+fn event_value(
+    cx: &mut Cx,
+    event: &sim_lib_numbers_numeric::EventFunction,
+    time: f64,
+    state: Value,
+) -> Result<f64> {
+    let time_value = f64_value(cx, time)?;
+    let value = event.function.call(cx, vec![time_value, state])?;
+    value
+        .object()
+        .display(cx)?
+        .parse()
+        .map_err(|_| Error::Eval("ODE event function must return f64".to_owned()))
+}
+
+fn interpolate(cx: &mut Cx, segment: &DenseSegment, time: f64) -> Result<Value> {
+    let width = segment.end.time - segment.start.time;
+    if width == 0.0 {
+        return Ok(segment.start.state.clone());
+    }
+    let delta = cx.apply_value_number_binary_op(
+        &Symbol::qualified("math", "sub"),
+        segment.end.state.clone(),
+        segment.start.state.clone(),
+    )?;
+    add_scaled(
+        cx,
+        segment.start.state.clone(),
+        delta,
+        (time - segment.start.time) / width,
+    )
+}
+
+fn crosses(direction: EventDirection, left: f64, right: f64) -> bool {
+    match direction {
+        EventDirection::Rising => left < 0.0 && right >= 0.0,
+        EventDirection::Falling => left > 0.0 && right <= 0.0,
+        EventDirection::Either => (left < 0.0 && right >= 0.0) || (left > 0.0 && right <= 0.0),
+    }
+}
+
+fn locate_events(cx: &mut Cx, problem: &OdeProblem<'_>, solution: &mut OdeSolution) -> Result<()> {
+    let mut located = Vec::new();
+    for (event_index, event) in problem.events.iter().enumerate() {
+        let mut start_seen = false;
+        for segment in &solution.path.dense {
+            let mut lo = segment.start.time;
+            let mut hi = segment.end.time;
+            let mut flo = event_value(cx, event, lo, segment.start.state.clone())?;
+            let fhi = event_value(cx, event, hi, segment.end.state.clone())?;
+            if flo == 0.0 && !start_seen {
+                start_seen = true;
+                located.push(LocatedEvent {
+                    event: event_index,
+                    time: lo,
+                    state_before: segment.start.state.clone(),
+                    state_after: segment.start.state.clone(),
+                    terminal: event.terminal,
+                    priority: event.priority,
+                });
+            }
+            if !crosses(event.direction, flo, fhi) {
+                continue;
+            }
+            for _ in 0..53 {
+                let mid = lo + (hi - lo) * 0.5;
+                let state = interpolate(cx, segment, mid)?;
+                let fm = event_value(cx, event, mid, state)?;
+                if fm == 0.0 {
+                    lo = mid;
+                    hi = mid;
+                    break;
+                }
+                if crosses(event.direction, flo, fm) {
+                    hi = mid;
+                } else {
+                    lo = mid;
+                    flo = fm;
+                }
+            }
+            let time = lo + (hi - lo) * 0.5;
+            solution.evidence.event_brackets.push((event_index, lo, hi));
+            located.push(LocatedEvent {
+                event: event_index,
+                time,
+                state_before: interpolate(cx, segment, lo)?,
+                state_after: interpolate(cx, segment, hi)?,
+                terminal: event.terminal,
+                priority: event.priority,
+            });
+        }
+    }
+    located.sort_by(|a, b| {
+        a.time
+            .total_cmp(&b.time)
+            .then_with(|| b.priority.cmp(&a.priority))
+            .then_with(|| a.event.cmp(&b.event))
+    });
+    located.dedup_by(|a, b| a.event == b.event && a.time == b.time);
+    if let Some(terminal) = located
+        .iter()
+        .filter(|event| event.terminal)
+        .min_by(|a, b| {
+            a.time
+                .total_cmp(&b.time)
+                .then_with(|| b.priority.cmp(&a.priority))
+        })
+        .cloned()
+    {
+        solution.path.accepted.retain(|step| {
+            if problem.span.end >= problem.span.start {
+                step.time < terminal.time
+            } else {
+                step.time > terminal.time
+            }
+        });
+        solution.path.accepted.push(AcceptedStep {
+            time: terminal.time,
+            state: terminal.state_after.clone(),
+        });
+        solution.path.dense.retain(|segment| {
+            if problem.span.end >= problem.span.start {
+                segment.start.time < terminal.time
+            } else {
+                segment.start.time > terminal.time
+            }
+        });
+        solution.evidence.termination = OdeTermination::TerminalEvent(terminal.event);
+        located.retain(|event| {
+            if problem.span.end >= problem.span.start {
+                event.time <= terminal.time
+            } else {
+                event.time >= terminal.time
+            }
+        });
+    }
+    solution.events = located;
+    Ok(())
+}
 
 fn fixed_step(
     cx: &mut Cx,
@@ -235,18 +542,18 @@ fn fixed_step(
     x0: f64,
     y0: Value,
     x1: f64,
-    opt: OdeOpts,
+    opt: OdePlan,
     stepper: FixedStepper,
 ) -> Result<Vec<(Value, Value)>> {
-    let mut h = opt.h.unwrap_or(0.01);
+    let mut h = opt.step.fixed.unwrap_or(0.01);
     if h == 0.0 {
         return Err(Error::Eval(
-            "ode-solve step size :h must be nonzero".to_owned(),
+            "ode-solve :fixed-step must be nonzero".to_owned(),
         ));
     }
     let direction = (x1 - x0).signum();
     h = h.abs() * if direction == 0.0 { 1.0 } else { direction };
-    let max_steps = opt.max_steps.unwrap_or(100_000);
+    let max_steps = opt.limits.steps;
     let mut out = Vec::new();
     let mut x = x0;
     let mut y = y0;
@@ -254,7 +561,7 @@ fn fixed_step(
     let mut steps = 0usize;
     while (x1 - x) * direction > 1.0e-12 {
         if steps >= max_steps {
-            return Err(Error::Eval("ode-solve exceeded :max-steps".to_owned()));
+            return Err(Error::Eval("ode-solve exceeded :step-limit".to_owned()));
         }
         let step = if (x + h - x1) * direction > 0.0 {
             x1 - x
@@ -275,7 +582,7 @@ fn step_forward_euler(
     x: f64,
     y: &Value,
     h: f64,
-    _opt: &OdeOpts,
+    _opt: &OdePlan,
 ) -> Result<Value> {
     let k1 = rhs_at(cx, dy, x, y.clone())?;
     add_scaled(cx, y.clone(), k1, h)
@@ -287,12 +594,12 @@ fn step_backward_euler(
     x: f64,
     y: &Value,
     h: f64,
-    opt: &OdeOpts,
+    opt: &OdePlan,
 ) -> Result<Value> {
     let x_next = x + h;
     let k1 = rhs_at(cx, dy, x, y.clone())?;
     let mut guess = add_scaled(cx, y.clone(), k1, h)?;
-    let tol = opt.tol.unwrap_or(1.0e-10);
+    let tol = absolute_tolerance(opt);
     for _ in 0..16 {
         let rhs = rhs_at(cx, dy, x_next, guess.clone())?;
         let next = add_scaled(cx, y.clone(), rhs, h)?;
@@ -310,7 +617,7 @@ fn step_midpoint(
     x: f64,
     y: &Value,
     h: f64,
-    _opt: &OdeOpts,
+    _opt: &OdePlan,
 ) -> Result<Value> {
     let k1 = rhs_at(cx, dy, x, y.clone())?;
     let mid = add_scaled(cx, y.clone(), k1, 0.5 * h)?;
@@ -324,7 +631,7 @@ fn step_rk4(
     x: f64,
     y: &Value,
     h: f64,
-    _opt: &OdeOpts,
+    _opt: &OdePlan,
 ) -> Result<Value> {
     let k1 = rhs_at(cx, dy, x, y.clone())?;
     let y2 = add_scaled(cx, y.clone(), k1.clone(), 0.5 * h)?;
@@ -346,13 +653,16 @@ fn adaptive_rkf45(
     x0: f64,
     y0: Value,
     x1: f64,
-    opt: OdeOpts,
+    opt: OdePlan,
 ) -> Result<Vec<(Value, Value)>> {
     let direction = (x1 - x0).signum();
-    let mut h = opt.h.unwrap_or(((x1 - x0).abs() / 16.0).max(1.0e-3));
+    let mut h = opt
+        .step
+        .first
+        .unwrap_or(((x1 - x0).abs() / 16.0).max(1.0e-3));
     h = h.abs() * if direction == 0.0 { 1.0 } else { direction };
-    let tol = opt.tol.unwrap_or(1.0e-8);
-    let max_steps = opt.max_steps.unwrap_or(100_000);
+    let tol = opt.tolerance.relative.max(absolute_tolerance(&opt));
+    let max_steps = opt.limits.steps;
     let mut out = Vec::new();
     let mut x = x0;
     let mut y = y0;
@@ -360,7 +670,7 @@ fn adaptive_rkf45(
     let mut steps = 0usize;
     while (x1 - x) * direction > 1.0e-12 {
         if steps >= max_steps {
-            return Err(Error::Eval("ode-solve exceeded :max-steps".to_owned()));
+            return Err(Error::Eval("ode-solve exceeded :step-limit".to_owned()));
         }
         let step = if (x + h - x1) * direction > 0.0 {
             x1 - x

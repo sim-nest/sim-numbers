@@ -158,7 +158,8 @@ pub fn register_ode_solver(plugin: Arc<dyn OdeSolver>) -> Result<()> {
 mod tests {
     use super::*;
     use crate::implementation::traits::{
-        DiffOpts, NumericCallable, NumericPlugin, OdeOpts, OdeProblem, QuadOpts,
+        DiffOpts, NumericCallable, NumericPlugin, OdeCapabilities, OdePlan, OdeProblem,
+        OdeSolution, QuadOpts,
     };
     use sim_kernel::{Cx, Value};
     use sim_lib_numbers_func::Func;
@@ -215,13 +216,17 @@ mod tests {
     }
 
     impl OdeSolver for TestPlugin {
+        fn capabilities(&self) -> OdeCapabilities {
+            OdeCapabilities::default()
+        }
+
         fn solve(
             &self,
             _cx: &mut Cx,
             _problem: OdeProblem<'_>,
-            _opt: OdeOpts,
-        ) -> Result<Vec<(Value, Value)>> {
-            Ok(Vec::new())
+            _plan: OdePlan,
+        ) -> Result<OdeSolution> {
+            Err(Error::Eval("test solver is not executable".to_owned()))
         }
     }
 

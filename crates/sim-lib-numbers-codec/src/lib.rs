@@ -76,7 +76,11 @@ mod tests {
     #[test]
     fn descriptor_value_has_stable_table_surface() {
         let factory = DefaultFactory;
-        let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+        let mut cx = sim_kernel::Cx::new(
+            Arc::new(NoopEvalPolicy),
+            Arc::new(DefaultFactory),
+            sim_kernel::HandleSeed::new(0x4e50_4301),
+        );
         let value = numeric_plugin_descriptor_value(
             &factory,
             sim_kernel::Symbol::new("rkf45"),
