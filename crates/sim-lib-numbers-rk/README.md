@@ -12,4 +12,7 @@ Runge-Kutta ODE solver plugins for the SIM numeric surface.
 
 ## Crate Documentation
 
-Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric ode-solve plugins.
+Runge-Kutta ODE integrators for the numeric domain: fixed-step, RKF45, and the
+bounded eighth-order DOP853 reference backend registered as numeric ode-solve
+plugins. DOP853 retains coefficient provenance, embedded third/fifth-order
+error evidence, rejected-step accounting, and fail-closed step/work limits.

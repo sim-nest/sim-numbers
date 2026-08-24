@@ -197,6 +197,7 @@ fn ode_methods_reach_e_within_tolerance() {
         ("midpoint", 0.01, 3.0e-4),
         ("rk4", 0.01, 1.0e-8),
         ("rkf45", 0.1, 1.0e-6),
+        ("dop853", 0.1, 2.0e-9),
     ] {
         let mut entries = vec![
             (
@@ -204,7 +205,7 @@ fn ode_methods_reach_e_within_tolerance() {
                 cx.factory().symbol(Symbol::new(method)).unwrap(),
             ),
             (
-                Symbol::new(if method == "rkf45" {
+                Symbol::new(if matches!(method, "rkf45" | "dop853") {
                     ":first-step"
                 } else {
                     ":fixed-step"
@@ -212,7 +213,7 @@ fn ode_methods_reach_e_within_tolerance() {
                 f64_value(&mut cx, h),
             ),
         ];
-        if method == "rkf45" {
+        if matches!(method, "rkf45" | "dop853") {
             entries.push((Symbol::new(":rtol"), f64_value(&mut cx, 1.0e-8)));
         }
         let options = cx.factory().table(entries).unwrap();
@@ -270,6 +271,7 @@ fn tensor_ode_pipeline_runs_all_rk_methods_and_matches_scalar_cpu() {
         ("midpoint", 0.01, 3.0e-4),
         ("rk4", 0.01, 1.0e-8),
         ("rkf45", 0.1, 1.0e-6),
+        ("dop853", 0.1, 2.0e-9),
     ] {
         let pipeline = cx
             .call_function(

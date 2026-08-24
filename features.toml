@@ -428,7 +428,7 @@ title = "Tensor ODE pipelines"
 summary = "Run tensor-valued ODE state through the existing numeric ODE pipeline and Runge-Kutta solver registry."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when an ODE state is a Tensor. Tensor state uses the same OdeProblem/OdePlan/OdeSolution surface and capability admission as scalar state. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state."
+guidance = "Use this row when an ODE state is a Tensor. Tensor state uses the same OdeProblem/OdePlan/OdeSolution surface and capability admission as scalar state. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state. The DOP853 reference backend provides eighth-order adaptive scalar/tensor parity with hard step and work refusal."
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
 ]

@@ -15,6 +15,7 @@ use sim_lib_numbers_numeric::{
     OdeSolver, OdeTermination, Trajectory, register_ode_solver,
 };
 
+use super::dop853::adaptive_dop853;
 use super::support::{abs_error, add, add_scaled, call_rhs, f64_value, scale};
 
 /// Registered numeric plugin library that installs this crate's Runge-Kutta
@@ -35,7 +36,7 @@ use super::support::{abs_error, add, add_scaled, call_rhs, f64_value, scale};
 /// let lib = RkNumbersLib::new();
 /// let manifest = lib.manifest();
 /// // One descriptor export per registered solver (4 fixed-step plus RKF45).
-/// assert_eq!(manifest.exports.len(), 5);
+/// assert_eq!(manifest.exports.len(), 6);
 /// ```
 pub struct RkNumbersLib;
 
@@ -142,6 +143,7 @@ fn descriptor_specs() -> Vec<(&'static str, bool)> {
         ("midpoint", false),
         ("rk4", false),
         ("rkf45", true),
+        ("dop853", true),
     ]
 }
 
@@ -152,6 +154,7 @@ enum Method {
     Midpoint,
     Rk4,
     Rkf45,
+    Dop853,
 }
 
 fn solvers() -> Vec<Arc<dyn OdeSolver>> {
@@ -176,6 +179,11 @@ fn solvers() -> Vec<Arc<dyn OdeSolver>> {
             "rkf45",
             NumericKind::OdeAdaptive,
             Method::Rkf45,
+        )),
+        Arc::new(RkPlugin::new(
+            "dop853",
+            NumericKind::OdeAdaptive,
+            Method::Dop853,
         )),
     ]
 }
@@ -211,8 +219,8 @@ impl OdeSolver for RkPlugin {
         OdeCapabilities {
             scalar_state: true,
             tensor_state: true,
-            adaptive: matches!(self.method, Method::Rkf45),
-            fixed: !matches!(self.method, Method::Rkf45),
+            adaptive: matches!(self.method, Method::Rkf45 | Method::Dop853),
+            fixed: !matches!(self.method, Method::Rkf45 | Method::Dop853),
             dense_path: true,
             events: true,
             jacobian: false,
@@ -225,54 +233,74 @@ impl OdeSolver for RkPlugin {
         validate_admission(&problem, &plan, self.capabilities())?;
         let x0f = problem.span.start;
         let x1f = problem.span.end;
-        let points = match self.method {
-            Method::ForwardEuler => fixed_step(
-                cx,
-                problem.rhs,
-                x0f,
-                problem.initial.clone(),
-                x1f,
-                plan.clone(),
-                step_forward_euler,
+        let (points, evidence) = match self.method {
+            Method::ForwardEuler => (
+                fixed_step(
+                    cx,
+                    problem.rhs,
+                    x0f,
+                    problem.initial.clone(),
+                    x1f,
+                    plan.clone(),
+                    step_forward_euler,
+                )?,
+                None,
             ),
-            Method::BackwardEuler => fixed_step(
-                cx,
-                problem.rhs,
-                x0f,
-                problem.initial.clone(),
-                x1f,
-                plan.clone(),
-                step_backward_euler,
+            Method::BackwardEuler => (
+                fixed_step(
+                    cx,
+                    problem.rhs,
+                    x0f,
+                    problem.initial.clone(),
+                    x1f,
+                    plan.clone(),
+                    step_backward_euler,
+                )?,
+                None,
             ),
-            Method::Midpoint => fixed_step(
-                cx,
-                problem.rhs,
-                x0f,
-                problem.initial.clone(),
-                x1f,
-                plan.clone(),
-                step_midpoint,
+            Method::Midpoint => (
+                fixed_step(
+                    cx,
+                    problem.rhs,
+                    x0f,
+                    problem.initial.clone(),
+                    x1f,
+                    plan.clone(),
+                    step_midpoint,
+                )?,
+                None,
             ),
-            Method::Rk4 => fixed_step(
-                cx,
-                problem.rhs,
-                x0f,
-                problem.initial.clone(),
-                x1f,
-                plan.clone(),
-                step_rk4,
+            Method::Rk4 => (
+                fixed_step(
+                    cx,
+                    problem.rhs,
+                    x0f,
+                    problem.initial.clone(),
+                    x1f,
+                    plan.clone(),
+                    step_rk4,
+                )?,
+                None,
             ),
-            Method::Rkf45 => adaptive_rkf45(
-                cx,
-                problem.rhs,
-                x0f,
-                problem.initial.clone(),
-                x1f,
-                plan.clone(),
+            Method::Rkf45 => (
+                adaptive_rkf45(
+                    cx,
+                    problem.rhs,
+                    x0f,
+                    problem.initial.clone(),
+                    x1f,
+                    plan.clone(),
+                )?,
+                None,
             ),
-        }?;
-        let mut result = solution(points, &plan);
-        locate_events(cx, &problem, &mut result)?;
+            Method::Dop853 => {
+                let run =
+                    adaptive_dop853(cx, problem.rhs, x0f, problem.initial.clone(), x1f, &plan)?;
+                (run.points, Some(run.evidence))
+            }
+        };
+        let mut result = solution(points, &plan, evidence);
+        locate_events(cx, &problem, &plan, &mut result)?;
         Ok(result)
     }
 }
@@ -340,7 +368,11 @@ fn validate_admission(
     Ok(())
 }
 
-fn solution(points: Vec<(Value, Value)>, plan: &OdePlan) -> OdeSolution {
+fn solution(
+    points: Vec<(Value, Value)>,
+    plan: &OdePlan,
+    evidence: Option<MethodEvidence>,
+) -> OdeSolution {
     let accepted = points
         .into_iter()
         .map(|(time, state)| AcceptedStep {
@@ -382,7 +414,7 @@ fn solution(points: Vec<(Value, Value)>, plan: &OdePlan) -> OdeSolution {
     OdeSolution {
         path: Trajectory { accepted, dense },
         events: Vec::new(),
-        evidence: MethodEvidence {
+        evidence: evidence.unwrap_or(MethodEvidence {
             accepted_steps: sizes.len(),
             rejected_steps: 0,
             rhs_evaluations: 0,
@@ -392,7 +424,7 @@ fn solution(points: Vec<(Value, Value)>, plan: &OdePlan) -> OdeSolution {
             achieved_local_error: 0.0,
             event_brackets: Vec::new(),
             termination: OdeTermination::ReachedEnd,
-        },
+        }),
     }
 }
 
@@ -401,7 +433,15 @@ fn event_value(
     event: &sim_lib_numbers_numeric::EventFunction,
     time: f64,
     state: Value,
+    work: &mut usize,
+    work_limit: usize,
 ) -> Result<f64> {
+    if *work >= work_limit {
+        return Err(Error::Eval(
+            "ode-solve exceeded :work-limit during event evaluation".to_owned(),
+        ));
+    }
+    *work += 1;
     let time_value = f64_value(cx, time)?;
     let value = event.function.call(cx, vec![time_value, state])?;
     value
@@ -437,15 +477,38 @@ fn crosses(direction: EventDirection, left: f64, right: f64) -> bool {
     }
 }
 
-fn locate_events(cx: &mut Cx, problem: &OdeProblem<'_>, solution: &mut OdeSolution) -> Result<()> {
+fn locate_events(
+    cx: &mut Cx,
+    problem: &OdeProblem<'_>,
+    plan: &OdePlan,
+    solution: &mut OdeSolution,
+) -> Result<()> {
+    // Dense-segment construction and event calls share the plan's hard work
+    // budget with RHS evaluations. This prevents output policy from creating
+    // an unbounded second computation after stepping succeeds.
+    let mut work = solution.evidence.rhs_evaluations + solution.evidence.accepted_steps;
     let mut located = Vec::new();
     for (event_index, event) in problem.events.iter().enumerate() {
         let mut start_seen = false;
         for segment in &solution.path.dense {
             let mut lo = segment.start.time;
             let mut hi = segment.end.time;
-            let mut flo = event_value(cx, event, lo, segment.start.state.clone())?;
-            let fhi = event_value(cx, event, hi, segment.end.state.clone())?;
+            let mut flo = event_value(
+                cx,
+                event,
+                lo,
+                segment.start.state.clone(),
+                &mut work,
+                plan.limits.work,
+            )?;
+            let fhi = event_value(
+                cx,
+                event,
+                hi,
+                segment.end.state.clone(),
+                &mut work,
+                plan.limits.work,
+            )?;
             if flo == 0.0 && !start_seen {
                 start_seen = true;
                 located.push(LocatedEvent {
@@ -463,7 +526,7 @@ fn locate_events(cx: &mut Cx, problem: &OdeProblem<'_>, solution: &mut OdeSoluti
             for _ in 0..53 {
                 let mid = lo + (hi - lo) * 0.5;
                 let state = interpolate(cx, segment, mid)?;
-                let fm = event_value(cx, event, mid, state)?;
+                let fm = event_value(cx, event, mid, state, &mut work, plan.limits.work)?;
                 if fm == 0.0 {
                     lo = mid;
                     hi = mid;
