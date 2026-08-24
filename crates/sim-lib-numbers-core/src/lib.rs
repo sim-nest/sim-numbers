@@ -10,6 +10,7 @@
 pub mod domains;
 pub mod literal;
 pub mod magnitude;
+pub mod real_scalar;
 pub mod scalar;
 pub mod value_shape;
 
@@ -19,6 +20,7 @@ pub use literal::{
 pub use magnitude::{
     DEFAULT_MAX_ARBITRARY_MAGNITUDE_BITS, MagnitudeLimit, decimal_digits_to_bits_ceil,
 };
+pub use real_scalar::RealScalar;
 pub use scalar::{
     DomainLiteralMatcher, ScalarBinaryOp, ScalarDomainSpec, ScalarLiteralMatcher, ScalarOps,
     ScalarReductionOp, ScalarUnaryOp, install_scalar_ops, number_domain_class_stub,

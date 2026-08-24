@@ -1,0 +1,5 @@
+book = "numbers/method"
+title = "Bounded numerical methods"
+summary = "Plan bounded algorithms and inspect non-forgeable common evidence."
+order = 38
+chapters = ["01-basics"]
