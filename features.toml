@@ -14,6 +14,34 @@ major_entrypoints = "advisory"
 frameworks = "advisory"
 
 [[feature]]
+id = "feature/sim-numbers/bounded-optimization"
+title = "Evidence-carrying bounded optimization"
+owner = "crate/sim-lib-numbers-optimize"
+summary = "Bounded scalar, smooth multivariate, nonlinear, and linear least-squares methods with explicit plans and convergence evidence."
+guidance = "Use the bounded paths for box constraints; they use projected or active-set steps rather than clipping LM. Covariance is an availability result. Enable assignment only to convert numeric matrices into sim-discrete's certified solver; that crate remains the sole matching owner."
+anchors = [
+  "anchor/crate/sim-lib-numbers-optimize",
+  "anchor/rustdoc/sim-lib-numbers-optimize/objective-plan",
+  "anchor/rustdoc/sim-lib-numbers-optimize/least-squares-plan",
+  "anchor/rustdoc/sim-lib-numbers-optimize/minimize-scalar",
+  "anchor/rustdoc/sim-lib-numbers-optimize/linear-least-squares",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/bounded-optimization"
+title = "Choose and run a bounded optimizer"
+summary = "Start from explicit bounds and evidence requirements, then select scalar Brent, projected BFGS, reflective least squares, or active-set linear least squares."
+steps = [
+  "feature/sim-numbers/bounded-optimization",
+  "feature/sim-numbers/method-evidence",
+  "feature/sim-numbers/tensor-decomposition",
+  "anchor/crate/sim-lib-numbers-optimize",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests",
+  "recipe/sim-numbers/crates/sim-lib-numbers-optimize/01-basics/bounded-optimization",
+]
+
+[[feature]]
 id = "feature/sim-numbers/method-evidence"
 title = "Bounded numerical method evidence"
 summary = "Plan numerical work with validated limits and criterion-specific tolerances, then inspect exact common evidence without replacing domain reports."

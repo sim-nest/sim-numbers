@@ -1,0 +1,3 @@
+title = "Bounded optimization with convergence evidence"
+summary = "Minimize inside explicit bounds and inspect termination and the final bracket."
+entry = "setup.siml"

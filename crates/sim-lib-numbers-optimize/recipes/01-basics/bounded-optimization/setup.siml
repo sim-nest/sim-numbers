@@ -1,0 +1,2 @@
+; The Rust API exposes minimize_scalar, minimize, least_squares, and
+; linear_least_squares. Runtime loading is discovered from the crate card.
