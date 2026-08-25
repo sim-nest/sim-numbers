@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, Symbol};
+use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, HandleSeed, Symbol};
 use sim_lib_numbers_signal::{
     PlacementPolicy, TensorView, TransformKind, TransformPlan, TransformResources,
     read_blocked_tensor, transform_nd, transform_nd_blocked, write_blocked_tensor,
@@ -13,7 +13,7 @@ fn main() {
         max_scratch_bytes: 1024,
         block_len: 2,
     };
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory), HandleSeed::new(0x5349_4705));
     let store = AssocTable::new();
     let blocked = write_blocked_tensor(
         &mut cx,

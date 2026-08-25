@@ -2,6 +2,8 @@
 
 In one line: a full tower of numbers -- everyday decimals, exact fractions, huge integers, symbolic algebra, and grids -- that all add up correctly together.
 
+Special functions now own error, gamma, beta, and complete elliptic evaluation with explicit algorithm and accuracy evidence. Statistics composes stable normal and Student-t tails, while signal interpolation applies the established policies to explicitly ordered, bounded N-dimensional tensor grids.
+
 ## What it gives you
 
 Whole numbers of any size, fractions kept exact, complex and fixed and floating kinds, a computer-algebra system that does calculus on your formulas, numerical solvers for slopes and areas and changing systems, statistics, and multi-dimensional tensors -- every kind announcing itself the same way and combining under one consistent arithmetic. Tensor storage covers ordinary f64, compact f32, and half-precision f16/bf16 buffers, with explicit casts where precision changes.

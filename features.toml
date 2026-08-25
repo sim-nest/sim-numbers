@@ -14,6 +14,23 @@ major_entrypoints = "advisory"
 frameworks = "advisory"
 
 [[feature]]
+id = "feature/sim-numbers/special-functions-and-ranked-grid"
+title = "Evidence-carrying special functions and ranked-grid interpolation"
+owner = "crate/sim-lib-numbers-special"
+audiences = ["code", "framework", "user"]
+summary = "Compute reusable error, gamma, beta, elliptic, normal, Student-t, and ranked regular-grid results with explicit numerical regions, stable probability complements, tensor geometry, and resource evidence."
+guidance = "Use sim-lib-numbers-special for general real special functions, stats for normal and Student-t distributions, and signal's RegularGridInterpolator for dense row-major grids. Direct survival functions preserve tails. Ranked monotone interpolation composes one-dimensional shape preservation but deliberately makes no multidimensional monotonicity claim."
+claims_anchors = ["anchor/crate/sim-lib-numbers-special", "anchor/runtime-lib/sim-lib-numbers-special/special-numbers-lib", "anchor/rustdoc/sim-lib-numbers-special/accuracy-evidence", "anchor/rustdoc/sim-lib-numbers-signal/regular-grid-interpolator"]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/regular-grid-tests"]
+
+[[route]]
+id = "route/sim-numbers/special-functions-and-ranked-grid"
+title = "Compute special functions, distribution tails, or a ranked grid"
+summary = "Select the single numerical owner, declare tail or tensor policy, then inspect algorithm and bounded-work evidence."
+audiences = ["framework", "user"]
+steps = ["feature/sim-numbers/special-functions-and-ranked-grid", "anchor/crate/sim-lib-numbers-special", "anchor/crate/sim-lib-numbers-stats", "anchor/crate/sim-lib-numbers-signal", "spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", "recipe/sim-numbers/crates/sim-lib-numbers-special/01-basics/gamma-tail"]
+
+[[feature]]
 id = "feature/sim-numbers/extended-precision-convergence"
 title = "Extended-precision convergence domain"
 owner = "crate/sim-lib-numbers-extended"

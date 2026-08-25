@@ -32,6 +32,7 @@ members = [
   "crates/sim-lib-numbers-rk",
   "crates/sim-lib-numbers-root",
   "crates/sim-lib-numbers-signal",
+  "crates/sim-lib-numbers-special",
   "crates/sim-lib-numbers-stats",
   "crates/sim-lib-numbers-tensor",
   "crates/sim-lib-numbers-tensor-bcast",

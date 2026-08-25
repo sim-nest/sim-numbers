@@ -41,6 +41,8 @@ mod markov;
 #[cfg(test)]
 #[path = "markov_tests.rs"]
 mod markov_tests;
+#[path = "parametric_distribution.rs"]
+mod parametric_distribution;
 #[path = "quantile.rs"]
 mod quantile;
 #[cfg(test)]
@@ -105,6 +107,10 @@ pub use hmm_model::{EmissionModel, HiddenMarkovModel, HmmError, HmmObservation};
 pub use markov::{
     CorpusProvenance, MarkovError, MarkovModel, MarkovPolicy, ModelReport, TransitionScore,
     fit_markov, fnv1a64,
+};
+pub use parametric_distribution::{
+    normal_cdf, normal_density, normal_quantile, normal_survival, student_t_cdf, student_t_density,
+    student_t_quantile, student_t_survival,
 };
 pub use quantile::{
     QuantileError, QuantileEstimate, QuantilePolicy, QuantileSketch, exact_quantile,

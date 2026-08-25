@@ -2,7 +2,7 @@
 
 use std::sync::Arc;
 
-use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, Symbol};
+use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, HandleSeed, Symbol};
 
 use crate::{
     PlacementPolicy, SignalBuffer, TensorView, TransformKind, TransformPlan, TransformPrecision,
@@ -82,7 +82,11 @@ fn blocked_table_transform_matches_in_memory_with_bounded_scratch() {
         max_scratch_bytes: 4096,
         block_len: 3,
     };
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4701),
+    );
     let store = AssocTable::new();
     let blocked = write_blocked_tensor(
         &mut cx,
@@ -145,7 +149,11 @@ fn blocked_plan_rejects_insufficient_scratch_before_execution() {
         max_scratch_bytes: 1024,
         block_len: 2,
     };
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4702),
+    );
     let store = AssocTable::new();
     let blocked = write_blocked_tensor(
         &mut cx,
@@ -166,7 +174,11 @@ fn blocked_plan_rejects_insufficient_scratch_before_execution() {
 
 #[test]
 fn caller_can_seed_external_descriptor_one_block_at_a_time() {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4703),
+    );
     let store = AssocTable::new();
     let tensor = crate::BlockedTensor::new(
         Symbol::qualified("test", "incremental-blocks"),

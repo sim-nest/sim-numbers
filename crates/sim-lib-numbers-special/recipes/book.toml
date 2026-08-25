@@ -1,0 +1,5 @@
+book = "numbers/special"
+title = "Special functions"
+summary = "Evidence-carrying real special functions."
+order = 46
+chapters = ["01-basics"]
