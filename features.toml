@@ -1,5 +1,32 @@
 schema = "sim.features"
 
+[[feature]]
+id = "feature/sim-numbers/semantic-quantities"
+title = "Semantic physical quantities"
+owner = "crate/sim-lib-numbers-quantity"
+audiences = ["code", "framework", "user"]
+summary = "Compose generic installed scalars with bounded exact SI dimensions, open semantic kinds, exact affine units, point/interval laws, Shape admission, and canonical read construction."
+guidance = "Use Quantity when physical meaning is part of the value contract. Dimension equality is necessary but semantic-kind equality is independently required: energy and torque deliberately refuse substitution. Implement Scalar for an installed number domain so conversions use exact rational constants inside that domain; do not convert through f64. DomainQuantity source strings remain construction evidence and are not numerical quantities."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-quantity",
+  "anchor/runtime-lib/sim-lib-numbers-quantity/quantity-lib",
+  "anchor/rustdoc/sim-lib-numbers-quantity/quantity",
+  "anchor/rustdoc/sim-lib-numbers-quantity/dimension",
+  "anchor/rustdoc/sim-lib-numbers-quantity/measure-kind",
+  "anchor/rustdoc/sim-lib-numbers-quantity/unit",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-quantity/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/semantic-quantity"
+task = "Represent and combine a physical quantity"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/semantic-quantities", why = "The quantity owner composes generic scalars, exact dimensions, open semantic kinds, affine units, roles, Shape, and read construction." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-quantity/src/tests", why = "Checked laws prove kind mismatch refusal, affine behavior, exact conversion, rational powers, bounded construction, and semantic data closure." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-quantity/01-basics/energy-and-torque", why = "The runtime recipe demonstrates the required equal-dimension, different-kind distinction." },
+]
+
 [enforcement.audience]
 code = "strict"
 framework = "strict"

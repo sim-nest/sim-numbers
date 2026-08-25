@@ -27,6 +27,7 @@ members = [
   "crates/sim-lib-numbers-optimize",
   "crates/sim-lib-numbers-poly",
   "crates/sim-lib-numbers-prelude",
+  "crates/sim-lib-numbers-quantity",
   "crates/sim-lib-numbers-quad",
   "crates/sim-lib-numbers-rational",
   "crates/sim-lib-numbers-rk",

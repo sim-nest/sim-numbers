@@ -58,6 +58,7 @@ prelude installs the standard set in one call.
 | `sim-lib-numbers-core` | Shared substrate for scalar domains: the number-value shape and browse table, the shared number-literal shape and class, the scalar-domain spec, literal matcher, and op-loop installer, and the canonical number-domain symbol registry and promotion-lattice documentation. |
 | `sim-lib-numbers-prelude` | Umbrella library: `NumbersPreludeLib` installs the standard number domains and tensor backends into a runtime in one call. |
 | `sim-lib-numbers-codec` | The number-literal codec surface: helpers that build the `numeric-plugin-v1` descriptor symbols and table values advertising a numeric codec or method provider to the runtime. |
+| `sim-lib-numbers-quantity` | Semantic quantities over generic installed scalars: exact rational SI dimensions, open content-identified kinds, affine units, point/interval laws, Shape constraints, and canonical read construction. |
 
 ### Scalar number domains
 
