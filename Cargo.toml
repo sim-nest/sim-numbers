@@ -20,6 +20,7 @@ members = [
   "crates/sim-lib-numbers-func",
   "crates/sim-lib-numbers-i64",
   "crates/sim-lib-numbers-implicit",
+  "crates/sim-lib-numbers-interval",
   "crates/sim-lib-numbers-method",
   "crates/sim-lib-numbers-numeric",
   "crates/sim-lib-numbers-optimize",

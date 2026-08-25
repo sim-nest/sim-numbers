@@ -97,6 +97,7 @@ prelude installs the standard set in one call.
 | `sim-lib-numbers-rk` | Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric `ode-solve` plugins. |
 | `sim-lib-numbers-ad` | Automatic differentiation primitives: forward-mode dual numbers, a reverse-mode evaluation tape, and the `Scalarish` numeric trait they share. |
 | `sim-lib-numbers-continuation` | Bounded pseudo-arclength continuation with secant/tangent prediction, bordered Newton correction, adaptive steps, fold and domain events, and restartable evidence. |
+| `sim-lib-numbers-interval` | Sealed exact-rational and directed-binary64 enclosures, reviewed elementary kernels, verified scalar roots, and definite threshold decisions that cannot accept estimates or decoded provider claims. |
 | `sim-lib-numbers-stats` | Probability, descriptive statistics, and fairness metric helpers for `f64` number-domain data. |
 
 ### Tensor domain and specializations

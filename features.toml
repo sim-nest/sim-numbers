@@ -14,6 +14,37 @@ major_entrypoints = "advisory"
 frameworks = "advisory"
 
 [[feature]]
+id = "feature/sim-numbers/sealed-interval-certification"
+title = "Sealed interval certification"
+owner = "crate/sim-lib-numbers-interval"
+audiences = ["code", "framework", "user"]
+summary = "Keep estimates distinct from unforgeable mathematical enclosures carrying exact inputs, reviewed issuer identity, trace digest, and method evidence."
+guidance = "Use EstimateInterval for numerical spreads and CertifiedInterval only when a definite decision needs a mathematical enclosure. Certificates are issued solely by exact-rational, directed-binary64, reviewed-sqrt, and scalar-root kernels; runtime data and provider reports are inspection inputs, never certificate constructors. Compose sim-lib-numbers-rational, sim-lib-numbers-root, and sim-lib-numbers-method for domain values and broader solver evidence without promoting their estimates or brackets."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-interval",
+  "anchor/runtime-lib/sim-lib-numbers-interval/interval-lib",
+  "anchor/rustdoc/sim-lib-numbers-interval/certified-interval",
+  "anchor/rustdoc/sim-lib-numbers-interval/estimate-interval",
+  "anchor/rustdoc/sim-lib-numbers-interval/rational-interval",
+  "anchor/rustdoc/sim-lib-numbers-interval/interval-newton",
+  "anchor/rustdoc/sim-lib-numbers-interval/krawczyk",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/sealed-interval-certification"
+title = "Certify an enclosure and make a definite decision"
+summary = "Start with exact inputs or an existing certificate, use a reviewed kernel, inspect its evidence, and pass only certified intervals to definite classification."
+audiences = ["framework", "user"]
+steps = [
+  "feature/sim-numbers/sealed-interval-certification",
+  "feature/sim-numbers/method-evidence",
+  "anchor/crate/sim-lib-numbers-interval",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests",
+  "recipe/sim-numbers/crates/sim-lib-numbers-interval/01-basics/sealed-threshold",
+]
+
+[[feature]]
 id = "feature/sim-numbers/bounded-optimization"
 title = "Evidence-carrying bounded optimization"
 owner = "crate/sim-lib-numbers-optimize"
