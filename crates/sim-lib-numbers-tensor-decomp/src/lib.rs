@@ -8,6 +8,8 @@
 
 mod advanced;
 pub use advanced::*;
+mod matrix_functions;
+pub use matrix_functions::*;
 
 use sim_kernel::{
     AbiVersion, Export, Lib, LibManifest, LibTarget, Linker, Result as KernelResult, Symbol,
@@ -212,7 +214,7 @@ impl Lib for TensorDecompLib {
         }
     }
     fn load(&self, cx: &mut sim_kernel::LoadCx, linker: &mut Linker<'_>) -> KernelResult<()> {
-        linker.value(decomposition_schema_symbol(), cx.factory().string("qr symmetric-eigen real-schur svd rank condition pseudoinverse least-squares null-space provider-admission plans factors permutation residual orthogonality method-evidence".to_owned())?)
+        linker.value(decomposition_schema_symbol(), cx.factory().string("qr symmetric-eigen real-schur svd rank condition pseudoinverse least-squares null-space matrix-power matrix-exponential scaling-squaring pade sylvester lyapunov separation residual provider-admission plans factors permutation residual orthogonality method-evidence".to_owned())?)
     }
 }
 /// Symbol of the runtime decomposition inspection schema.

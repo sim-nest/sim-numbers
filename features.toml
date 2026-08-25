@@ -71,12 +71,42 @@ steps = [
 ]
 
 [[feature]]
+id = "feature/sim-numbers/coefficient-polynomial"
+title = "Certified coefficient polynomial algebra"
+summary = "Represent ordinary, integer-exponent Laurent, and rational-exponent Puiseux coefficient rows with canonical zeros, exact identities, certified floating evaluation, companion-Schur roots, and guarded Pade approximants."
+owner = "crate/sim-lib-numbers-poly"
+audiences = ["code", "framework", "user"]
+guidance = "Use sim-lib-numbers-poly when coefficients and their exponent lattice are the data: dense Polynomial, integer-exponent LaurentPolynomial, rational-exponent PuiseuxPolynomial, Horner error evidence, exact rational GCD/division, root certificates, or Pade construction. Use sim-lib-numbers-cas instead when expressions, symbols, rewriting, or formula differentiation are the data. Root extraction composes the canonical tensor-decomp Schur path; it does not introduce another eigen owner."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-poly",
+  "anchor/runtime-lib/sim-lib-numbers-poly/poly-lib",
+  "anchor/rustdoc/sim-lib-numbers-poly/polynomial",
+  "anchor/rustdoc/sim-lib-numbers-poly/laurent-polynomial",
+  "anchor/rustdoc/sim-lib-numbers-poly/puiseux-polynomial",
+  "anchor/rustdoc/sim-lib-numbers-poly/root-evidence",
+  "anchor/rustdoc/sim-lib-numbers-poly/pade-approximant",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/coefficient-polynomial"
+title = "Compute with coefficient polynomials and evidence"
+summary = "Choose the honest exponent domain, normalize coefficients, then inspect exact or numerical evidence."
+audiences = ["framework", "user"]
+steps = [
+  "feature/sim-numbers/coefficient-polynomial",
+  "anchor/crate/sim-lib-numbers-poly",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests",
+  "recipe/sim-numbers/crates/sim-lib-numbers-poly/01-basics/certified-evaluation",
+]
+
+[[feature]]
 id = "feature/sim-numbers/tensor-decomposition"
 title = "Evidence-carrying tensor decomposition"
-summary = "Factor immutable dense matrices with bounded QR, symmetric eigen, real Schur, and one-sided Jacobi SVD plans, retaining spectra, rank, permutation, residual, orthogonality, and execution evidence."
+summary = "Factor immutable dense matrices and compute matrix functions with bounded QR, eigen, Schur, SVD, scaling-and-squaring exponential, and Schur-backed matrix equations, retaining method and residual evidence."
 owner = "crate/sim-lib-numbers-tensor-decomp"
 audiences = ["code", "framework", "user"]
-guidance = "Use qr_f64 for optional column-pivoted QR, symmetric_eigen_f64 for admitted symmetry, real_schur_f64 for general real spectra, and svd_f64 for stable rectangular decomposition without normal equations. Derive rank, condition, pseudoinverse, least squares, and null spaces from one caller cutoff. Provider factors require local shape, ordering, reconstruction, residual, and execution-identity admission. Reuse tensor-linalg for direct solve, inverse, determinant, and norm; decomposition is the single owner of reusable factors."
+guidance = "Use qr_f64 for optional column-pivoted QR, symmetric_eigen_f64 for admitted symmetry, real_schur_f64 for general real spectra, and svd_f64 for stable rectangular decomposition without normal equations. Use matrix_power_f64, matrix_exponential_f64, solve_sylvester_f64, and solve_lyapunov_f64 for reviewed matrix functions and equations with scale, Pade order, squaring, separation, and residual evidence. Derive rank, condition, pseudoinverse, least squares, and null spaces from one caller cutoff. Provider factors require local admission. Reuse tensor-linalg for direct solves; decomposition remains the single matrix-function owner."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-tensor-decomp",
   "anchor/runtime-lib/sim-lib-numbers-tensor-decomp/tensor-decomp-lib",
@@ -84,6 +114,8 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-tensor-decomp/symmetric-eigen",
   "anchor/rustdoc/sim-lib-numbers-tensor-decomp/real-schur",
   "anchor/rustdoc/sim-lib-numbers-tensor-decomp/svd",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/matrix-exponential",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/matrix-equation-solution",
 ]
 claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests"]
 

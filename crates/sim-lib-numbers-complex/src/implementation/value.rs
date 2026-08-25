@@ -37,6 +37,26 @@ impl ComplexValue {
         Self { real, imag }
     }
 
+    /// Returns the real component.
+    pub fn real(&self) -> f64 {
+        self.real
+    }
+
+    /// Returns the imaginary component.
+    pub fn imaginary(&self) -> f64 {
+        self.imag
+    }
+
+    /// Returns the real component using conventional complex notation.
+    pub fn re(&self) -> f64 {
+        self.real
+    }
+
+    /// Returns the imaginary component using conventional complex notation.
+    pub fn im(&self) -> f64 {
+        self.imag
+    }
+
     fn literal(&self) -> NumberLiteral {
         NumberLiteral {
             domain: number_domain(),

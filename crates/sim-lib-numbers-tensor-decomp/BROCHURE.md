@@ -11,3 +11,8 @@ one-sided Jacobi SVD handles rectangular and rank-deficient matrices without
 forming normal equations. One explicit cutoff governs rank, two-norm condition,
 pseudoinverse, least squares, and null spaces. Exhausted factors are either
 rejected or explicitly partial and can never enter derived solves as success.
+
+Matrix functions build on those factors rather than creating another matrix
+stack. Integer powers use bounded binary composition; exponentials use the
+reviewed order-13 Pade scaling-and-squaring family; continuous Sylvester and
+Lyapunov solves traverse Schur spectra and report separation and residuals.

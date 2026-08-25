@@ -2,6 +2,41 @@ use super::*;
 fn close(x: f64, t: f64) {
     assert!(x < t, "{x} >= {t}")
 }
+
+#[test]
+fn matrix_functions_cover_powers_exponentials_and_equations() {
+    assert_eq!(
+        matrix_power_f64(&[2.0, 0.0, 0.0, 3.0], 2, 3).unwrap(),
+        vec![8.0, 0.0, 0.0, 27.0]
+    );
+    let diag = matrix_exponential_f64(&[1.0, 0.0, 0.0, -1.0], 2).unwrap();
+    assert!((diag.value[0] - 1.0f64.exp()).abs() < 1e-12);
+    assert!((diag.value[3] - (-1.0f64).exp()).abs() < 1e-12);
+    assert_eq!(diag.evidence.approximant_order, 13);
+    let nilpotent = matrix_exponential_f64(&[0.0, 1.0, 0.0, 0.0], 2).unwrap();
+    assert!(
+        nilpotent
+            .value
+            .iter()
+            .zip([1.0, 1.0, 0.0, 1.0])
+            .all(|(x, y)| (x - y).abs() < 1e-12)
+    );
+    let jordan = matrix_exponential_f64(&[2.0, 1.0, 0.0, 2.0], 2).unwrap();
+    assert!((jordan.value[1] - 2.0f64.exp()).abs() < 1e-11);
+    let syl = solve_sylvester_f64(
+        &[1.0, 0.0, 0.0, 2.0],
+        &[3.0, 0.0, 0.0, 4.0],
+        &[4.0, 5.0, 6.0, 7.0],
+        2,
+        1e-12,
+    )
+    .unwrap();
+    assert!(syl.evidence.residual < 1e-12);
+    assert!(syl.evidence.separation >= 4.0);
+    let lya = solve_lyapunov_f64(&[-1.0, 0.0, 0.0, -2.0], &[2.0, 0.0, 0.0, 4.0], 2, 1e-12).unwrap();
+    assert!(lya.evidence.residual < 1e-12);
+    assert!((lya.value[0] - 1.0).abs() < 1e-12 && (lya.value[3] - 1.0).abs() < 1e-12);
+}
 #[test]
 fn qr_diagonal_pivoted_hilbert_scaled_and_immutable() {
     for a in [
