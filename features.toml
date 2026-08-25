@@ -433,6 +433,32 @@ claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
 ]
 
+[[feature]]
+id = "feature/sim-numbers/implicit-radau-dae"
+title = "Radau IIA stiff ODE and index-1 DAE integration"
+summary = "Advance stiff ODEs and declared index-1 mass-matrix or residual DAEs with fifth-order Radau IIA, collocation dense output, common event semantics, and Newton/Jacobian/linear-solve evidence."
+owner = "crate/sim-lib-numbers-implicit"
+audiences = ["code", "framework", "user"]
+guidance = "Use radau-iia for stiff systems and only use the DAE forms when the problem supplies M(t,y)y'=f(t,y) with an explicit differential mask or F(t,y,ydot)=0 with a differential/algebraic partition and stage Jacobian. Select analytic or AD Jacobians when available; finite differences require an explicit step declaration. Inspect failed Newton attempts, recomputation reasons, rank, reciprocal conditioning, and factor reuse before trusting difficult solves."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-implicit",
+  "anchor/runtime-lib/sim-lib-numbers-implicit/implicit-numbers-lib",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-implicit/src/tests",
+  "recipe/sim-numbers/crates/sim-lib-numbers-implicit/01-basics/stiff-decay",
+]
+
+[[route]]
+id = "route/solve-stiff-ode-or-index-one-dae"
+task = "Solve a stiff ODE or declared index-1 DAE"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/numeric-pipelines", why = "The common numeric problem, plan, trajectory, event, and registry contracts define the composition boundary." },
+  { feature = "feature/sim-numbers/implicit-radau-dae", why = "The implicit owner supplies Radau collocation, bounded Newton, Jacobian policies, dense output, and DAE admission." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-implicit/src/tests", why = "The checked specimen proves order, stiff decay, scale separation, constraint retention, singular refusal, events, and work separation." },
+]
+
 [[route]]
 id = "route/process-sampled-signal"
 task = "Transform, smooth, solve, or interpolate sampled data"
