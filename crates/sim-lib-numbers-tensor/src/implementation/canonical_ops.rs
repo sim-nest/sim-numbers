@@ -463,14 +463,8 @@ pub(crate) fn execute_canonical_request(
         return diff(cx, request);
     }
     if *op == cumsum_op_symbol() {
-        let mut sum = 0.0;
-        let values = cells(cx, unary(request)?)?
-            .into_iter()
-            .map(|v| {
-                sum += v;
-                sum
-            })
-            .collect();
+        let input = cells(cx, unary(request)?)?;
+        let values = super::reduction::cumsum_f64(&input, super::reduction::SumMode::Naive);
         return output(cx, request, values);
     }
     if [

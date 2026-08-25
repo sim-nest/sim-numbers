@@ -229,3 +229,133 @@ fn numeric_diff_named_method_accepts_plain_callable() {
 
     assert!((value_to_f64(&mut cx, &out) - 7.0).abs() < 1.0e-3);
 }
+
+#[test]
+fn sampled_rules_preserve_orientation_tail_and_vector_evidence() {
+    use crate::{
+        FinalInterval, SampledPlan, SampledRule, SumMode, cumulative_sampled, integrate_sampled,
+    };
+    let p = SampledPlan {
+        rule: SampledRule::Simpson,
+        final_interval: FinalInterval::Trapezoid,
+        sum: SumMode::Neumaier,
+    };
+    let x = [0., 0.5, 2., 3.];
+    let y = x.iter().map(|x| vec![x * x, 2. * x]).collect::<Vec<_>>();
+    let r = integrate_sampled(&x, &y, p).unwrap();
+    assert!((r.value[0] - 55. / 6.).abs() < 1e-12);
+    assert!(r.evidence.fallback_used);
+    let sx = [0., 0.5, 2.];
+    let sy = sx.iter().map(|x| vec![x * x, 2. * x]).collect::<Vec<_>>();
+    let sr = integrate_sampled(&sx, &sy, p).unwrap();
+    let mut xr = sx;
+    xr.reverse();
+    let mut yr = sy;
+    yr.reverse();
+    let rr = integrate_sampled(&xr, &yr, p).unwrap();
+    assert!((rr.value[0] + sr.value[0]).abs() < 1e-12);
+    assert_eq!(rr.evidence.orientation, -1);
+    let c = cumulative_sampled(&x, &y, p).unwrap();
+    assert_eq!(c.len(), x.len());
+    assert_eq!(c.last().unwrap(), &r.value);
+}
+
+#[test]
+fn sampled_input_and_tail_policies_fail_closed() {
+    use crate::{
+        FinalInterval, SampledError, SampledPlan, SampledRule, SumMode, integrate_sampled,
+    };
+    let simpson = SampledPlan {
+        rule: SampledRule::Simpson,
+        final_interval: FinalInterval::Error,
+        sum: SumMode::Pairwise,
+    };
+    assert_eq!(
+        integrate_sampled(
+            &[0., 1., 2., 3.],
+            &[vec![0.], vec![1.], vec![4.], vec![9.]],
+            simpson
+        ),
+        Err(SampledError::UnmatchedFinalInterval)
+    );
+    assert_eq!(
+        integrate_sampled(&[0.], &[vec![0.]], SampledPlan::default()),
+        Err(SampledError::TooShort)
+    );
+    assert_eq!(
+        integrate_sampled(&[0., 0.], &[vec![0.], vec![0.]], SampledPlan::default()),
+        Err(SampledError::NotStrictlyMonotone)
+    );
+    assert_eq!(
+        integrate_sampled(
+            &[0., f64::NAN],
+            &[vec![0.], vec![1.]],
+            SampledPlan::default()
+        ),
+        Err(SampledError::NonFinite)
+    );
+}
+
+#[test]
+fn nonuniform_simpson_is_quadratic_exact_and_translation_stable() {
+    use crate::{FinalInterval, SampledPlan, SampledRule, SumMode, integrate_sampled};
+    let plan = SampledPlan {
+        rule: SampledRule::Simpson,
+        final_interval: FinalInterval::Error,
+        sum: SumMode::Neumaier,
+    };
+    for shift in [0., 1.0e6] {
+        let x = [shift, shift + 0.25, shift + 2.0];
+        let y = x
+            .iter()
+            .map(|&x| {
+                let u = x - shift;
+                vec![1., u, u * u]
+            })
+            .collect::<Vec<_>>();
+        let value = integrate_sampled(&x, &y, plan).unwrap().value;
+        assert!((value[0] - 2.).abs() < 1e-12);
+        assert!((value[1] - 2.).abs() < 1e-12);
+        assert!((value[2] - 8. / 3.).abs() < 1e-12);
+    }
+}
+
+#[test]
+fn event_split_keeps_named_one_sided_samples_separate() {
+    use crate::{EventSegment, SampledPlan, integrate_event_segments};
+    let segments = [
+        EventSegment {
+            id: "before-jump".into(),
+            x: vec![0., 1.],
+            y: vec![vec![0.], vec![1.]],
+        },
+        EventSegment {
+            id: "after-jump".into(),
+            x: vec![1., 2.],
+            y: vec![vec![10.], vec![10.]],
+        },
+    ];
+    let result = integrate_event_segments(&segments, SampledPlan::default()).unwrap();
+    assert_eq!(result[0].0, "before-jump");
+    assert_eq!(result[0].1.value, [0.5]);
+    assert_eq!(result[1].0, "after-jump");
+    assert_eq!(result[1].1.value, [10.]);
+}
+
+#[test]
+fn vector_kronrod_shares_mesh_and_compensation_keeps_small_terms() {
+    use crate::{SumMode, adaptive_vector_gauss_kronrod};
+    let r = adaptive_vector_gauss_kronrod(
+        |x| vec![x * x, x.sin()],
+        0.,
+        1.,
+        1e-10,
+        8,
+        SumMode::Neumaier,
+    )
+    .unwrap();
+    assert!((r.value[0] - 1. / 3.).abs() < 1e-10);
+    assert!((r.value[1] - (1. - 1f64.cos())).abs() < 1e-10);
+    assert!(!r.mesh.is_empty());
+    assert_eq!(r.sum, SumMode::Neumaier);
+}

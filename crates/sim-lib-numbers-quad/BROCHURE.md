@@ -11,6 +11,8 @@ When you need the total accumulated by a quantity, the area beneath its curve, t
 - You get dependable area-under-the-curve totals from just the values themselves.
 - Adaptive rules concentrate effort where it counts, saving time on the easy stretches.
 - Slope estimates come from the same handy toolkit, ready when you need them.
+- Sampled solver meshes retain orientation, Simpson-tail fallback, shared vector
+  refinement meshes, and compensated-reduction evidence instead of hiding it.
 
 ## Where it fits
 

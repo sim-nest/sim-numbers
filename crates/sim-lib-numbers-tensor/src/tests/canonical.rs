@@ -136,3 +136,16 @@ fn cpu_provider_card_advertises_the_complete_vocabulary() {
     assert!(card.operations.contains(&arange_op_symbol()));
     assert!(card.operations.contains(&allclose_op_symbol()));
 }
+
+#[test]
+fn explicit_sum_modes_expose_catastrophic_cancellation() {
+    use crate::{SumMode, cumsum_f64, sum_f64};
+    let v = [1.0e16, 1.0, -1.0e16];
+    assert_eq!(sum_f64(&v, SumMode::Naive), 0.0);
+    assert_eq!(sum_f64(&v, SumMode::Neumaier), 1.0);
+    assert_eq!(cumsum_f64(&v, SumMode::Neumaier).last(), Some(&1.0));
+    assert_eq!(sum_f64(&[1., 2., 3., 4.], SumMode::Pairwise), 10.0);
+    // The exact rational sum is one; the compensated mode preserves it despite
+    // the two terms sixteen orders of magnitude larger.
+    assert_eq!(sum_f64(&[1.0e16, 1.0, -1.0e16], SumMode::Neumaier), 1.0);
+}

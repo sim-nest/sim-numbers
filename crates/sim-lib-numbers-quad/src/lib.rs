@@ -6,8 +6,10 @@
 //! as a registered numeric plugin library.
 
 mod implementation;
+mod sampled;
 
 pub use implementation::QuadNumbersLib;
+pub use sampled::*;
 
 /// Cookbook recipes for this lib, embedded at build time.
 pub static RECIPES: sim_cookbook::EmbeddedDir =

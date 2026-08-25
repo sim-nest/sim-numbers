@@ -404,7 +404,7 @@ title = "Numeric pipelines"
 summary = "Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when composing or running numeric jobs through the numeric registry. ODE work uses the single OdeProblem/OdePlan/OdeSolution contract: mathematical callables and span stay in the problem, numerical tolerances, stepping, output, and limits stay in the plan, and every backend returns a dense trajectory with bounded method evidence. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry; quadrature remains scalar."
+guidance = "Use this row when composing or running numeric jobs through the numeric registry. ODE work uses the single OdeProblem/OdePlan/OdeSolution contract: mathematical callables and span stay in the problem, numerical tolerances, stepping, output, and limits stay in the plan, and every backend returns a dense trajectory with bounded method evidence. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry. sim-lib-numbers-quad additionally owns strictly monotone sampled scalar/vector quadrature, cumulative output, explicit event-side segments, non-uniform Simpson fallback evidence, and shared-mesh vector Gauss-Kronrod. Tensor reductions expose naive, pairwise, and Neumaier policies; audited quadrature plans default to Neumaier."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-numeric",
   "anchor/runtime-lib/sim-lib-numbers-numeric/numeric-numbers-lib",
