@@ -17,6 +17,8 @@ mod decision;
 #[cfg(test)]
 #[path = "decision_tests.rs"]
 mod decision_tests;
+#[path = "distribution.rs"]
+mod distribution;
 #[path = "function.rs"]
 mod function;
 #[path = "gmm.rs"]
@@ -55,6 +57,11 @@ mod runtime;
 mod runtime_clustering;
 #[path = "runtime_decision.rs"]
 mod runtime_decision;
+#[path = "sampling.rs"]
+mod sampling;
+#[cfg(test)]
+#[path = "sampling_tests.rs"]
+mod sampling_tests;
 #[path = "transition.rs"]
 mod transition;
 
@@ -70,6 +77,10 @@ pub use decision::{
     BinaryInterval, ClusterSample, IsotonicFit, IsotonicPoint, RegisteredLook,
     RegisteredLookSequence, SequentialInterval, ThresholdReadout, clustered_bootstrap_interval,
     exact_binary_interval, fit_isotonic, paired_bootstrap_interval,
+};
+pub use distribution::{
+    KsMethod, KsResult, MomentConvention, StandardizedMoments, kolmogorov_smirnov_one_sample,
+    kolmogorov_smirnov_two_sample, standardized_moments,
 };
 pub use function::{
     StatsNumbersLib, stats_claims_symbol, stats_clustered_bootstrap_symbol,
@@ -101,6 +112,10 @@ pub use quantile::{
 pub use robust::{
     BootstrapControl, BootstrapEffectInterval, bootstrap_mean_difference_interval,
     median_absolute_deviation,
+};
+pub use sampling::{
+    CoverageEvidence, DesignError, LatinHypercubePlan, SampleDesign, SamplerAlgorithm,
+    SamplerReceipt, SamplerState, Scramble, SeededSampler, SobolPlan, SweepPlan, UntestedRegion,
 };
 pub use transition::{FiniteTransitionMatrix, TransitionError};
 

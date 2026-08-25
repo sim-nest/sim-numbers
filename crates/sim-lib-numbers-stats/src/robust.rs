@@ -1,6 +1,7 @@
 //! Robust dispersion and deterministic uncertainty intervals for comparisons.
 
 use super::{StatsError, StatsResult, mean, validate_values};
+use crate::SeededSampler;
 use crate::exact_quantile;
 
 /// Controls a deterministic bootstrap of the candidate-minus-baseline mean.
@@ -137,7 +138,7 @@ pub fn bootstrap_mean_difference_interval(
         });
     }
 
-    let mut rng = SplitMix64(control.seed);
+    let mut rng = SeededSampler::new(control.seed);
     let mut effects = Vec::with_capacity(control.resamples);
     for _ in 0..control.resamples {
         let baseline_mean = resampled_mean(baseline, &mut rng);
@@ -164,26 +165,9 @@ pub fn bootstrap_mean_difference_interval(
     })
 }
 
-fn resampled_mean(values: &[f64], rng: &mut SplitMix64) -> f64 {
+fn resampled_mean(values: &[f64], rng: &mut SeededSampler) -> f64 {
     let sum = (0..values.len())
-        .map(|_| values[rng.index(values.len())])
+        .map(|_| values[rng.index_multiply_high(values.len())])
         .sum::<f64>();
     sum / values.len() as f64
-}
-
-#[derive(Clone, Copy, Debug)]
-struct SplitMix64(u64);
-
-impl SplitMix64 {
-    fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.0;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^ (value >> 31)
-    }
-
-    fn index(&mut self, len: usize) -> usize {
-        ((u128::from(self.next()) * len as u128) >> 64) as usize
-    }
 }

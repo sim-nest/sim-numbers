@@ -1,6 +1,7 @@
 //! Bounded, deterministic inference primitives for sequential study decisions.
 
 use super::{BootstrapControl, BootstrapEffectInterval, StatsError, StatsResult, exact_quantile};
+use crate::SeededSampler;
 
 /// A two-sided Clopper--Pearson interval for a finite binary count.
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -416,12 +417,12 @@ fn bootstrap_effects(
             limit: control.max_work,
         });
     }
-    let mut rng = SplitMix64(control.seed);
+    let mut rng = SeededSampler::new(control.seed);
     let mut estimates = Vec::with_capacity(control.resamples);
     for _ in 0..control.resamples {
         estimates.push(
             (0..effects.len())
-                .map(|_| effects[rng.index(effects.len())])
+                .map(|_| effects[rng.index_multiply_high(effects.len())])
                 .sum::<f64>()
                 / effects.len() as f64,
         );
@@ -498,19 +499,4 @@ fn bisect_probability(mut tail: impl FnMut(f64) -> f64, target: f64) -> f64 {
         }
     }
     (low + high) / 2.0
-}
-
-#[derive(Clone, Copy)]
-struct SplitMix64(u64);
-impl SplitMix64 {
-    fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut x = self.0;
-        x = (x ^ (x >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        x = (x ^ (x >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        x ^ (x >> 31)
-    }
-    fn index(&mut self, n: usize) -> usize {
-        ((u128::from(self.next()) * n as u128) >> 64) as usize
-    }
 }

@@ -1,5 +1,6 @@
 //! Deterministic, bounded k-means clustering and shared clustering substrate.
 
+use crate::SeededSampler;
 use std::{error::Error, fmt};
 
 /// Errors returned by clustering and mixture-model fitting.
@@ -501,7 +502,7 @@ pub(crate) fn kmeans_plus_plus(
     random: &mut SplitMix64,
     meter: &mut WorkMeter,
 ) -> Result<Vec<Vec<f64>>, ClusteringError> {
-    let first = random.index(points.len());
+    let first = random.index_modulo(points.len());
     let mut selected = vec![first];
     let mut centroids = vec![points[first].clone()];
     while centroids.len() < clusters {
@@ -640,33 +641,9 @@ impl WorkMeter {
     }
 }
 
-pub(crate) struct SplitMix64 {
-    state: u64,
-}
-
-impl SplitMix64 {
-    pub(crate) fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
-
-    pub(crate) fn next(&mut self) -> u64 {
-        self.state = self.state.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.state;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^ (value >> 31)
-    }
-
-    pub(crate) fn unit_interval(&mut self) -> f64 {
-        (self.next() >> 11) as f64 * (1.0 / ((1_u64 << 53) as f64))
-    }
-
-    pub(crate) fn index(&mut self, length: usize) -> usize {
-        (self.next() % length as u64) as usize
-    }
-}
+pub(crate) type SplitMix64 = SeededSampler;
 
 fn derived_seed(seed: u64, restart: usize) -> u64 {
     let mut random = SplitMix64::new(seed ^ restart as u64);
-    random.next()
+    random.next_u64()
 }

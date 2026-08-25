@@ -6,6 +6,13 @@ In one line: It summarizes streams and infers finite sequences without hiding me
 
 Point it at a set of numbers and it tells you the story they hold: the typical value, how spread out they are, and the shape of their likelihood. Seeded k-means and regularized Gaussian mixtures expose their centroids, assignments, covariance, convergence, repair, restart, work, AIC, and BIC evidence. Mergeable streaming quantiles state their rank-error and memory policy and stay exact for small inputs. Finite Markov and hidden Markov models expose their transition and emission rows, while normalized forward/backward, Viterbi, posterior decoding, and bounded Baum-Welch retain likelihood, convergence, repairs, work, seed, and termination evidence. It also computes fairness measures that flag when outcomes fall unevenly across groups.
 
+One public, versioned deterministic sampler now drives clustering, HMM fitting,
+and every bootstrap policy without hiding replay state or consumed work. Bounded
+Latin hypercubes and reviewed four-dimensional Sobol nets return sequence,
+stratum, boundary, duplicate, sampler, and caller-owned untested-region evidence.
+Standardized moment conventions and one-/two-sample Kolmogorov-Smirnov reports
+make finite-sample and asymptotic interpretation explicit.
+
 ## Why you will be glad
 
 - You get clear summaries of your data without assembling the math yourself.

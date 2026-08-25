@@ -3,6 +3,7 @@
 use super::hmm_baum_welch::baum_welch_step;
 use super::hmm_inference::forward_backward;
 use super::hmm_model::{HiddenMarkovModel, HmmError};
+use crate::SeededSampler;
 
 /// Stable numeric hidden-state identifier produced by [`fit_hmm`].
 pub type StateId = usize;
@@ -333,7 +334,7 @@ fn initialize_model(
 ) -> Result<HiddenMarkovModel<StateId>, HmmError> {
     let states = spec.states();
     let state_ids = (0..states).collect::<Vec<_>>();
-    let mut random = SplitMix64::new(seed);
+    let mut random = SeededSampler::new(seed);
     let initial = random_distribution(states, &mut random);
     let transitions = (0..states)
         .map(|_| random_distribution(states, &mut random))
@@ -362,7 +363,7 @@ fn initialize_model(
                 / values.len() as f64;
             let variance = global_variance.max(*variance_floor);
             let means = (0..states)
-                .map(|_| values[random.index(values.len())])
+                .map(|_| values[random.index_modulo(values.len())])
                 .collect();
             HiddenMarkovModel::gaussian(
                 state_ids,
@@ -376,7 +377,7 @@ fn initialize_model(
     }
 }
 
-fn random_distribution(length: usize, random: &mut SplitMix64) -> Vec<f64> {
+fn random_distribution(length: usize, random: &mut SeededSampler) -> Vec<f64> {
     let mut values = (0..length)
         .map(|_| 0.5 + random.unit_interval())
         .collect::<Vec<_>>();
@@ -385,30 +386,4 @@ fn random_distribution(length: usize, random: &mut SplitMix64) -> Vec<f64> {
         *value /= sum;
     }
     values
-}
-
-struct SplitMix64 {
-    state: u64,
-}
-
-impl SplitMix64 {
-    fn new(seed: u64) -> Self {
-        Self { state: seed }
-    }
-
-    fn next(&mut self) -> u64 {
-        self.state = self.state.wrapping_add(0x9e3779b97f4a7c15);
-        let mut value = self.state;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58476d1ce4e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d049bb133111eb);
-        value ^ (value >> 31)
-    }
-
-    fn unit_interval(&mut self) -> f64 {
-        (self.next() >> 11) as f64 * (1.0 / ((1_u64 << 53) as f64))
-    }
-
-    fn index(&mut self, length: usize) -> usize {
-        (self.next() % length as u64) as usize
-    }
 }
