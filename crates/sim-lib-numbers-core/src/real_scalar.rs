@@ -1,18 +1,11 @@
-//! Sealed scalar bridge for dependency-light numerical algorithms.
-
-mod sealed {
-    pub trait Sealed {}
-    impl Sealed for f64 {}
-}
+//! Scalar bridge for dependency-light numerical algorithms.
 
 /// A finite-real algorithm scalar, deliberately separate from SIM's runtime
 /// number domains and promotion lattice.
 ///
 /// Algorithms must reject non-finite inputs before calling arithmetic methods;
 /// [`Self::from_f64`] is the canonical admission boundary.
-pub trait RealScalar:
-    sealed::Sealed + Copy + PartialOrd + core::fmt::Debug + Send + Sync + 'static
-{
+pub trait RealScalar: Copy + PartialOrd + core::fmt::Debug + Send + Sync + 'static {
     /// Additive identity.
     const ZERO: Self;
     /// Multiplicative identity.

@@ -14,6 +14,33 @@ major_entrypoints = "advisory"
 frameworks = "advisory"
 
 [[feature]]
+id = "feature/sim-numbers/extended-precision-convergence"
+title = "Extended-precision convergence domain"
+owner = "crate/sim-lib-numbers-extended"
+audiences = ["code", "framework", "user"]
+summary = "Inject normalized double-double arithmetic into shared numerical kernels while preserving exact component identity and the canonical number-domain promotion lattice."
+guidance = "Use DoubleDouble through RealScalar when binary64 cancellation or convergence stalls before the requested tolerance. Load ExtendedNumbersLib for runtime literals and promotion from f64 or rational. This is fixed finite precision; use sim-lib-numbers-exotic continued fractions for lazy exact approximation and sim-lib-numbers-rational for exact oracles."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-extended",
+  "anchor/runtime-lib/sim-lib-numbers-extended/extended-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-extended/double-double",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/extended-precision-convergence"
+title = "Rerun a numerical kernel at extended precision"
+summary = "Keep the algorithm fixed, select DoubleDouble at the RealScalar boundary, and compare against exact rational oracles and binary64 evidence."
+audiences = ["framework", "user"]
+steps = [
+  "feature/sim-numbers/extended-precision-convergence",
+  "feature/sim-numbers/method-evidence",
+  "anchor/crate/sim-lib-numbers-extended",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests",
+  "recipe/sim-numbers/crates/sim-lib-numbers-extended/01-basics/convergence",
+]
+
+[[feature]]
 id = "feature/sim-numbers/sealed-interval-certification"
 title = "Sealed interval certification"
 owner = "crate/sim-lib-numbers-interval"

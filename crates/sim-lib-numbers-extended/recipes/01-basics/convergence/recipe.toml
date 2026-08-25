@@ -1,0 +1,8 @@
+id = "convergence"
+title = "Rerun a kernel at extended precision"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "extended", "convergence", "double-double"]
+requires = ["numbers/extended", "codec/lisp"]

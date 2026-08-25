@@ -1,0 +1,3 @@
+book = "numbers/extended"
+title = "Extended precision"
+summary = "Finite double-double arithmetic through shared numerical contracts."

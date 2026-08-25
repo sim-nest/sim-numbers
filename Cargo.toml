@@ -14,6 +14,7 @@ members = [
   "crates/sim-lib-numbers-continuation",
   "crates/sim-lib-numbers-core",
   "crates/sim-lib-numbers-exotic",
+  "crates/sim-lib-numbers-extended",
   "crates/sim-lib-numbers-f64",
   "crates/sim-lib-numbers-fixed",
   "crates/sim-lib-numbers-float",
