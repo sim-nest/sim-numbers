@@ -1,0 +1,8 @@
+id = "limiting-boundary"
+title = "Trace a limiting boundary"
+codec = "lisp"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "continuation", "boundary", "fold"]
+requires = ["numbers/continuation", "numbers/root", "numbers/tensor-decomp", "codec/lisp"]
+setup = "setup.siml"

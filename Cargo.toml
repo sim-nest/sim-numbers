@@ -11,6 +11,7 @@ members = [
   "crates/sim-lib-numbers-cas-eval",
   "crates/sim-lib-numbers-codec",
   "crates/sim-lib-numbers-complex",
+  "crates/sim-lib-numbers-continuation",
   "crates/sim-lib-numbers-core",
   "crates/sim-lib-numbers-exotic",
   "crates/sim-lib-numbers-f64",

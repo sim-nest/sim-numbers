@@ -19,7 +19,7 @@ title = "Evidence-carrying bounded optimization"
 owner = "crate/sim-lib-numbers-optimize"
 summary = "Bounded scalar, smooth multivariate, nonlinear, and linear least-squares methods with explicit plans and convergence evidence."
 guidance = "Use the bounded paths for box constraints; they use projected or active-set steps rather than clipping LM. Covariance is an availability result. Enable assignment only to convert numeric matrices into sim-discrete's certified solver; that crate remains the sole matching owner."
-anchors = [
+claims_anchors = [
   "anchor/crate/sim-lib-numbers-optimize",
   "anchor/rustdoc/sim-lib-numbers-optimize/objective-plan",
   "anchor/rustdoc/sim-lib-numbers-optimize/least-squares-plan",
@@ -611,6 +611,36 @@ steps = [
   { feature = "feature/sim-numbers/tensor-ode", why = "The tensor ODE row owns tensor-state admission, CPU fallback, and hardware RHS restrictions." },
   { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns Env-bound executor routing and CPU fallback for tensor operations." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests", why = "The RK tests prove tensor state across fixed/adaptive methods, hardware refusals, and CPU agreement." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/pseudo-arclength-continuation"
+title = "Evidence-carrying pseudo-arclength continuation"
+summary = "Trace one-dimensional residual manifolds through folds with bounded secant/tangent prediction, bordered Newton correction, adaptive steps, and restart evidence."
+owner = "crate/sim-lib-numbers-continuation"
+audiences = ["code", "framework"]
+guidance = "Use this owner to trace parameter boundaries and folds. Supply two admitted points and an analytic, AD, or explicitly policy-backed finite-difference Jacobian; inspect the retained root/decomposition evidence and terminal event. Domain exits are never clamped."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-continuation",
+  "anchor/runtime-lib/sim-lib-numbers-continuation/continuation-lib",
+  "anchor/rustdoc/sim-lib-numbers-continuation/trace",
+  "anchor/rustdoc/sim-lib-numbers-continuation/continuation-problem",
+  "anchor/rustdoc/sim-lib-numbers-continuation/continuation-trace",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-continuation/src/tests",
+]
+depends_on = ["feature/sim-numbers/root-finding", "feature/sim-numbers/tensor-decomposition"]
+
+[[route]]
+id = "route/trace-parameter-boundary"
+task = "Trace a parameter boundary through folds with bounded restartable evidence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/pseudo-arclength-continuation", why = "The continuation owner validates seeds, predicts and corrects pseudo-arclength points, adapts bounded steps, and records distinct fold, rank, loop, and domain events." },
+  { feature = "feature/sim-numbers/root-finding", why = "The bordered Newton solve exposes shared residual, rank, damping, work, and replay evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-continuation/src/tests", why = "Checked fixtures prove circle, fold/cusp, singular correction, reversed seeds, domain exit, resumption, and bounded work." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-continuation/01-basics/limiting-boundary", why = "The runtime recipe discovers the limiting-boundary continuation schema." },
 ]
 
 [[feature]]

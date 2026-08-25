@@ -10,6 +10,7 @@ Whole numbers of any size, fractions kept exact, complex and fixed and floating 
 
 - Exact and approximate numbers can meet in one calculation without you hand-sorting every case.
 - Symbolic formulas, numeric solvers, and tensors share the same arithmetic surface.
+- Pseudo-arclength continuation traces limiting boundaries through folds with bounded, restartable predictor/corrector evidence.
 - New number domains can join the stack without changing the kernel.
 
 ## Where it fits

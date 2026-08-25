@@ -1,0 +1,4 @@
+title = "Boundaries"
+order = 10
+summary = "Trace limiting boundaries through folds."
+recipes = ["limiting-boundary"]

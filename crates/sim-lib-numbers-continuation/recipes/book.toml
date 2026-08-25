@@ -1,0 +1,5 @@
+book = "numbers/continuation"
+title = "Continuation recipes"
+summary = "Bounded pseudo-arclength traces with predictor/corrector evidence."
+order = 48
+chapters = ["01-basics"]
