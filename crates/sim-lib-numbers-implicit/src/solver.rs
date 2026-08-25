@@ -428,6 +428,11 @@ fn attempt_step(
     } else {
         ev.recomputations.push(if cached.is_none() {
             RecomputeReason::Initial
+        } else if cached
+            .as_ref()
+            .is_some_and(|(_, _, uses)| *uses >= plan.max_factor_reuse)
+        {
+            RecomputeReason::ReuseLimit
         } else {
             RecomputeReason::StepChanged
         });
