@@ -122,6 +122,7 @@ summary = "Bounded scalar, smooth multivariate, nonlinear, and linear least-squa
 guidance = "Use the bounded paths for box constraints; they use projected or active-set steps rather than clipping LM. Covariance is an availability result. Enable assignment only to convert numeric matrices into sim-discrete's certified solver; that crate remains the sole matching owner."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-optimize",
+  "anchor/runtime-lib/sim-lib-numbers-optimize/optimize-lib",
   "anchor/rustdoc/sim-lib-numbers-optimize/objective-plan",
   "anchor/rustdoc/sim-lib-numbers-optimize/least-squares-plan",
   "anchor/rustdoc/sim-lib-numbers-optimize/minimize_scalar",
@@ -149,6 +150,7 @@ audiences = ["code", "framework", "user"]
 guidance = "Use MethodPlan and MethodEvidence for shared boundedness, termination, achieved-error, precision, and execution queries. Compose DenseSolveAdapter, StatsKMeansAdapter, or SignalEstimatorAdapter beside the original domain report. Use sim-lib-numbers-core RealScalar only inside algorithms; it is deliberately not a runtime NumberDomain or promotion lattice."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-method",
+  "anchor/runtime-lib/sim-lib-numbers-method/method-numbers-lib",
   "anchor/rustdoc/sim-lib-numbers-method/method-evidence",
   "anchor/rustdoc/sim-lib-numbers-method/method-plan",
   "anchor/rustdoc/sim-lib-numbers-core/real-scalar",
