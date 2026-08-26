@@ -140,7 +140,9 @@ fn shared_contracts_cover_five_kernel_families() {
 }
 #[test]
 fn extended_corrects_known_f64_sign_loss() {
-    let x = 1.0 + 1e-5;
+    // Keep the residual above the double-double precision floor while still
+    // exercising a binary64 cancellation that loses the result's sign.
+    let x: f64 = 1.0 + 7.2e-4;
     let f = (x - 1.0).powi(7);
     let expanded = x.powi(7) - 7.0 * x.powi(6) + 21.0 * x.powi(5) - 35.0 * x.powi(4)
         + 35.0 * x.powi(3)
@@ -150,10 +152,12 @@ fn extended_corrects_known_f64_sign_loss() {
     assert!(f > 0.0);
     assert!(expanded <= 0.0);
     let x = DoubleDouble::from_f64_exact(x);
-    let e = x.powi(7) - s(7.0) * x.powi(6) + s(21.0) * x.powi(5) - s(35.0) * x.powi(4)
-        + s(35.0) * x.powi(3)
-        - s(21.0) * x * x
-        + s(7.0) * x
+    let e = x.powi(7) - s::<DoubleDouble>(7.0) * x.powi(6) + s::<DoubleDouble>(21.0) * x.powi(5)
+        - s::<DoubleDouble>(35.0) * x.powi(4)
+        + s::<DoubleDouble>(35.0) * x.powi(3)
+        - s::<DoubleDouble>(21.0) * x * x
+        + s::<DoubleDouble>(7.0) * x
         - DoubleDouble::ONE;
     assert!(e > DoubleDouble::ZERO);
 }
+// conformance: extended-number tests prove normalized arithmetic and convergence behavior.

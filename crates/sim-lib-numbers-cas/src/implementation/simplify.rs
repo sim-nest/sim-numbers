@@ -51,7 +51,7 @@ pub fn value_to_cas_expr(cx: &mut Cx, value: Value) -> Result<CasExpr> {
 /// use sim_kernel::{Cx, DefaultFactory, Expr, NoopEvalPolicy, Symbol};
 /// use sim_lib_numbers_cas::{expr_to_cas_expr, CasExpr};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x36ec_48df_57d7_c4bd));
 /// let parsed = expr_to_cas_expr(&mut cx, &Expr::Symbol(Symbol::new("y"))).unwrap();
 /// assert!(matches!(parsed, Some(CasExpr::Var(_))));
 ///

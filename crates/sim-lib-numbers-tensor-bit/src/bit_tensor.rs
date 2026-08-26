@@ -252,6 +252,7 @@ fn parse_bool_cell(value: &Value) -> Option<bool> {
     let mut cx = sim_kernel::Cx::new(
         std::sync::Arc::new(sim_kernel::NoopEvalPolicy),
         std::sync::Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x5442_4954),
     );
     let literal = value
         .object()

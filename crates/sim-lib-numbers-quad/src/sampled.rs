@@ -291,15 +291,18 @@ where
         0.3818300505051189,
         0.4179591836734694,
     ];
+    struct AdaptiveState {
+        sum: SumMode,
+        parts: Vec<Vec<f64>>,
+        mesh: Vec<(f64, f64)>,
+    }
     fn go<F: FnMut(f64) -> Vec<f64>>(
         f: &mut F,
         a: f64,
         b: f64,
         tol: f64,
         d: usize,
-        m: SumMode,
-        parts: &mut Vec<Vec<f64>>,
-        mesh: &mut Vec<(f64, f64)>,
+        state: &mut AdaptiveState,
     ) -> Result<(), SampledError> {
         let mid = (a + b) * 0.5;
         let h = (b - a) * 0.5;
@@ -335,33 +338,37 @@ where
                 }
             }
         }
-        let kv: Vec<_> = kt.iter().map(|v| h * sum(v, m)).collect();
-        let gv: Vec<_> = gt.iter().map(|v| h * sum(v, m)).collect();
+        let kv: Vec<_> = kt.iter().map(|v| h * sum(v, state.sum)).collect();
+        let gv: Vec<_> = gt.iter().map(|v| h * sum(v, state.sum)).collect();
         let e = kv
             .iter()
             .zip(gv)
             .map(|(a, b)| (a - b).abs())
             .fold(0., f64::max);
         if d == 0 || e <= tol {
-            parts.push(kv);
-            mesh.push((a, b));
+            state.parts.push(kv);
+            state.mesh.push((a, b));
             Ok(())
         } else {
-            go(f, a, mid, tol * 0.5, d - 1, m, parts, mesh)?;
-            go(f, mid, b, tol * 0.5, d - 1, m, parts, mesh)
+            go(f, a, mid, tol * 0.5, d - 1, state)?;
+            go(f, mid, b, tol * 0.5, d - 1, state)
         }
     }
     if !a.is_finite() || !b.is_finite() || a == b || !tol.is_finite() || tol <= 0. {
         return Err(SampledError::NonFinite);
     }
-    let (mut p, mut mesh) = (vec![], vec![]);
-    go(&mut f, a, b, tol, depth, m, &mut p, &mut mesh)?;
-    let n = p[0].len();
+    let mut state = AdaptiveState {
+        sum: m,
+        parts: Vec::new(),
+        mesh: Vec::new(),
+    };
+    go(&mut f, a, b, tol, depth, &mut state)?;
+    let n = state.parts[0].len();
     Ok(VectorIntegral {
         value: (0..n)
-            .map(|c| sum(&p.iter().map(|v| v[c]).collect::<Vec<_>>(), m))
+            .map(|c| sum(&state.parts.iter().map(|v| v[c]).collect::<Vec<_>>(), m))
             .collect(),
-        mesh,
+        mesh: state.mesh,
         sum: m,
     })
 }

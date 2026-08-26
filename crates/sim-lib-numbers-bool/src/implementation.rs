@@ -185,7 +185,7 @@ impl sim_kernel::ObjectCompat for BoolNumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy};
 /// use sim_lib_numbers_bool::{BoolNumbersLib, number_domain};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0xd051_c01d_b64f_ce01));
 /// cx.load_lib(&BoolNumbersLib::new()).unwrap();
 ///
 /// let value = cx.factory().bool(true).unwrap();

@@ -124,7 +124,7 @@ impl sim_kernel::ObjectCompat for ExoticNumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy, Symbol};
 /// use sim_lib_numbers_exotic::{ExoticNumbersLib, number_domain};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x45cf_360d_8b49_6b62));
 /// cx.load_lib(&ExoticNumbersLib::new()).unwrap();
 ///
 /// // The builtin continued-fraction constants are registered as values in

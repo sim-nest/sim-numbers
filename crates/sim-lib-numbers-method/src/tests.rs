@@ -150,3 +150,4 @@ fn loadable_surface_advertises_the_inspection_schema() {
     );
     assert_eq!(manifest.exports.len(), 1);
 }
+// conformance: method tests prove bounded plans and criterion-specific retained evidence.

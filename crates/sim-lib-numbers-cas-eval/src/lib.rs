@@ -18,7 +18,7 @@
 //! use sim_lib_numbers_cas::CasNumbersLib;
 //! use sim_lib_numbers_cas_eval::{eval_cas_symbolic, expr_to_cas};
 //!
-//! let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+//! let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x8541_a8ad_9046_6a7f));
 //! cx.load_lib(&CasNumbersLib::new()).unwrap();
 //!
 //! let tree = expr_to_cas(&mut cx, &Expr::Symbol(Symbol::new("x"))).unwrap();

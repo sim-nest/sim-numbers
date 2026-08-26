@@ -172,3 +172,4 @@ fn malformed_inputs_and_work_are_rejected_without_changing_independent_bootstrap
     assert_eq!(fixture.resamples, 1_000);
     assert_eq!(fixture.point_effect, -2.0);
 }
+// conformance: decision tests prove registered looks and bounded statistical evidence.

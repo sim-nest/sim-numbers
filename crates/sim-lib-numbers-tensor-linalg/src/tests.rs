@@ -22,7 +22,11 @@ use crate::TensorLinalgLib;
 // conformance: tensor linalg executor routing covers reductions and matrix math.
 
 fn cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xefde_c76a_b5a6_2929),
+    );
     cx.load_lib(&TensorNumbersLib::new()).unwrap();
     cx.load_lib(&TensorBroadcastLib::new()).unwrap();
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();

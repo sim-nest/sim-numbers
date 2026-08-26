@@ -20,7 +20,7 @@
 //!     cas_expr_to_surface_expr, simplify_expr, CasExpr, CasNumbersLib,
 //! };
 //!
-//! let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+//! let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x4e44_3fd3_bb38_1491));
 //! cx.load_lib(&CasNumbersLib::new()).unwrap();
 //!
 //! let zero = cx

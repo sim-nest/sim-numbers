@@ -132,7 +132,7 @@ impl sim_kernel::ObjectCompat for F64NumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy};
 /// use sim_lib_numbers_f64::{F64NumbersLib, number_domain};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x3d15_9107_d3c4_b266));
 /// cx.load_lib(&F64NumbersLib::new()).unwrap();
 ///
 /// let value = cx.factory().number_literal(number_domain(), "1.5".to_owned()).unwrap();

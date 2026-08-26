@@ -49,3 +49,4 @@ fn elliptic_values_and_singular_region() {
         2e-13,
     );
 }
+// conformance: special-function tests prove numerical regions, tails, and bounded evidence.

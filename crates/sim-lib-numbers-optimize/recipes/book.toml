@@ -1,2 +1,5 @@
+book = "numbers/optimize"
 title = "Optimization recipes"
+summary = "Run bounded numerical optimization problems."
+order = 10
 chapters = ["01-basics"]

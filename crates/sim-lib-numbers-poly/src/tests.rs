@@ -98,3 +98,4 @@ fn pade_matches_exponential_series_and_rejects_singular_system() {
         Err(PolynomialError::RankDeficient { .. })
     ))
 }
+// conformance: polynomial tests prove canonical algebra and certified numerical evidence.

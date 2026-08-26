@@ -48,14 +48,17 @@ audiences = ["code", "framework", "user"]
 summary = "Compute reusable error, gamma, beta, elliptic, normal, Student-t, and ranked regular-grid results with explicit numerical regions, stable probability complements, tensor geometry, and resource evidence."
 guidance = "Use sim-lib-numbers-special for general real special functions, stats for normal and Student-t distributions, and signal's RegularGridInterpolator for dense row-major grids. Direct survival functions preserve tails. Ranked monotone interpolation composes one-dimensional shape preservation but deliberately makes no multidimensional monotonicity claim."
 claims_anchors = ["anchor/crate/sim-lib-numbers-special", "anchor/runtime-lib/sim-lib-numbers-special/special-numbers-lib", "anchor/rustdoc/sim-lib-numbers-special/accuracy-evidence", "anchor/rustdoc/sim-lib-numbers-signal/regular-grid-interpolator"]
-claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/regular-grid-tests"]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/regular_grid_tests"]
 
 [[route]]
 id = "route/sim-numbers/special-functions-and-ranked-grid"
 title = "Compute special functions, distribution tails, or a ranked grid"
-summary = "Select the single numerical owner, declare tail or tensor policy, then inspect algorithm and bounded-work evidence."
 audiences = ["framework", "user"]
-steps = ["feature/sim-numbers/special-functions-and-ranked-grid", "anchor/crate/sim-lib-numbers-special", "anchor/crate/sim-lib-numbers-stats", "anchor/crate/sim-lib-numbers-signal", "spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", "recipe/sim-numbers/crates/sim-lib-numbers-special/01-basics/gamma-tail"]
+steps = [
+  { feature = "feature/sim-numbers/special-functions-and-ranked-grid", why = "Select the single numerical owner and declare the tail or tensor policy before inspecting algorithm and bounded-work evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", why = "The checked special-function tests prove numerical-region selection and stable probability complements." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-special/01-basics/gamma-tail", why = "The runnable gamma-tail recipe exposes the selected algorithm and retained evidence." },
+]
 
 [[feature]]
 id = "feature/sim-numbers/extended-precision-convergence"
@@ -74,14 +77,12 @@ claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/t
 [[route]]
 id = "route/sim-numbers/extended-precision-convergence"
 title = "Rerun a numerical kernel at extended precision"
-summary = "Keep the algorithm fixed, select DoubleDouble at the RealScalar boundary, and compare against exact rational oracles and binary64 evidence."
 audiences = ["framework", "user"]
 steps = [
-  "feature/sim-numbers/extended-precision-convergence",
-  "feature/sim-numbers/method-evidence",
-  "anchor/crate/sim-lib-numbers-extended",
-  "spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-extended/01-basics/convergence",
+  { feature = "feature/sim-numbers/extended-precision-convergence", why = "Keep the algorithm fixed and select DoubleDouble at the RealScalar boundary." },
+  { feature = "feature/sim-numbers/method-evidence", why = "Retain common convergence and bounded-work evidence beside the domain result." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests", why = "The checked tests compare extended precision against exact rational oracles and binary64 behavior." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-extended/01-basics/convergence", why = "The runnable convergence recipe demonstrates the precision-domain substitution." },
 ]
 
 [[feature]]
@@ -97,7 +98,7 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-interval/certified-interval",
   "anchor/rustdoc/sim-lib-numbers-interval/estimate-interval",
   "anchor/rustdoc/sim-lib-numbers-interval/rational-interval",
-  "anchor/rustdoc/sim-lib-numbers-interval/interval-newton",
+  "anchor/rustdoc/sim-lib-numbers-interval/interval_newton",
   "anchor/rustdoc/sim-lib-numbers-interval/krawczyk",
 ]
 claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests"]
@@ -105,14 +106,12 @@ claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/t
 [[route]]
 id = "route/sim-numbers/sealed-interval-certification"
 title = "Certify an enclosure and make a definite decision"
-summary = "Start with exact inputs or an existing certificate, use a reviewed kernel, inspect its evidence, and pass only certified intervals to definite classification."
 audiences = ["framework", "user"]
 steps = [
-  "feature/sim-numbers/sealed-interval-certification",
-  "feature/sim-numbers/method-evidence",
-  "anchor/crate/sim-lib-numbers-interval",
-  "spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-interval/01-basics/sealed-threshold",
+  { feature = "feature/sim-numbers/sealed-interval-certification", why = "Start with exact inputs or an existing certificate and pass only reviewed certified intervals to definite classification." },
+  { feature = "feature/sim-numbers/method-evidence", why = "Inspect the reviewed kernel and bounded method evidence without promoting an estimate into a certificate." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests", why = "The checked tests prove sealed construction paths and refusal of forged or insufficient evidence." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-interval/01-basics/sealed-threshold", why = "The runnable threshold recipe demonstrates a definite decision from certified bounds." },
 ]
 
 [[feature]]
@@ -125,22 +124,20 @@ claims_anchors = [
   "anchor/crate/sim-lib-numbers-optimize",
   "anchor/rustdoc/sim-lib-numbers-optimize/objective-plan",
   "anchor/rustdoc/sim-lib-numbers-optimize/least-squares-plan",
-  "anchor/rustdoc/sim-lib-numbers-optimize/minimize-scalar",
-  "anchor/rustdoc/sim-lib-numbers-optimize/linear-least-squares",
+  "anchor/rustdoc/sim-lib-numbers-optimize/minimize_scalar",
+  "anchor/rustdoc/sim-lib-numbers-optimize/linear_least_squares",
 ]
 claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests"]
 
 [[route]]
 id = "route/sim-numbers/bounded-optimization"
 title = "Choose and run a bounded optimizer"
-summary = "Start from explicit bounds and evidence requirements, then select scalar Brent, projected BFGS, reflective least squares, or active-set linear least squares."
 steps = [
-  "feature/sim-numbers/bounded-optimization",
-  "feature/sim-numbers/method-evidence",
-  "feature/sim-numbers/tensor-decomposition",
-  "anchor/crate/sim-lib-numbers-optimize",
-  "spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-optimize/01-basics/bounded-optimization",
+  { feature = "feature/sim-numbers/bounded-optimization", why = "Start from explicit bounds and select scalar Brent, projected BFGS, reflective least squares, or active-set linear least squares." },
+  { feature = "feature/sim-numbers/method-evidence", why = "Declare termination and evidence requirements before running the selected optimizer." },
+  { feature = "feature/sim-numbers/tensor-decomposition", why = "Reuse the canonical decomposition owner for rank and covariance evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests", why = "The checked tests prove bounded steps, convergence evidence, covariance availability, and failure policy." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-optimize/01-basics/bounded-optimization", why = "The runnable recipe demonstrates bounded optimization with visible evidence." },
 ]
 
 [[feature]]
@@ -163,13 +160,11 @@ claims_specimens = [
 [[route]]
 id = "route/sim-numbers/bounded-numerical-method"
 title = "Plan and inspect a bounded numerical method"
-summary = "Reuse criterion-specific plans and common evidence while retaining domain certificates."
 audiences = ["framework", "user"]
 steps = [
-  "feature/sim-numbers/method-evidence",
-  "anchor/crate/sim-lib-numbers-method",
-  "spec-test/sim-numbers/crates/sim-lib-numbers-method/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-method/01-basics/method-evidence",
+  { feature = "feature/sim-numbers/method-evidence", why = "Reuse criterion-specific plans and common evidence while retaining domain certificates." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-method/src/tests", why = "The checked tests prove bounded plans, termination evidence, and domain-adapter separation." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-method/01-basics/method-evidence", why = "The runnable recipe exposes common method evidence beside its domain result." },
 ]
 
 [[feature]]
@@ -193,13 +188,11 @@ claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests
 [[route]]
 id = "route/sim-numbers/coefficient-polynomial"
 title = "Compute with coefficient polynomials and evidence"
-summary = "Choose the honest exponent domain, normalize coefficients, then inspect exact or numerical evidence."
 audiences = ["framework", "user"]
 steps = [
-  "feature/sim-numbers/coefficient-polynomial",
-  "anchor/crate/sim-lib-numbers-poly",
-  "spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-poly/01-basics/certified-evaluation",
+  { feature = "feature/sim-numbers/coefficient-polynomial", why = "Choose the honest exponent domain, normalize coefficients, and retain exact or numerical evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests", why = "The checked tests prove canonical forms, exact identities, guarded approximation, and root evidence." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-poly/01-basics/certified-evaluation", why = "The runnable recipe demonstrates certified coefficient-polynomial evaluation." },
 ]
 
 [[feature]]
@@ -224,13 +217,11 @@ claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/
 [[route]]
 id = "route/sim-numbers/tensor-decomposition"
 title = "Factor a dense tensor with reviewable evidence"
-summary = "Choose QR or symmetric eigen, set explicit admission and accuracy policy, then inspect the independent certificate."
 audiences = ["framework", "user"]
 steps = [
-  "feature/sim-numbers/tensor-decomposition",
-  "anchor/crate/sim-lib-numbers-tensor-decomp",
-  "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-tensor-decomp/01-basics/qr-eigen",
+  { feature = "feature/sim-numbers/tensor-decomposition", why = "Choose QR or symmetric eigen and set explicit admission and accuracy policy before inspecting the independent certificate." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests", why = "The checked tests prove decomposition identities, residual evidence, rank policy, and fail-closed admission." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-tensor-decomp/01-basics/qr-eigen", why = "The runnable recipe demonstrates QR and eigen evidence on a dense tensor." },
 ]
 
 [[feature]]
@@ -369,11 +360,10 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
   "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-report",
-  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic_signal",
   "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-report",
   "anchor/rustdoc/sim-lib-numbers-signal/analytic_envelope",
-  "anchor/rustdoc/sim-lib-numbers-signal/analytic_signal",
   "anchor/rustdoc/sim-lib-numbers-signal/ar-model",
   "anchor/rustdoc/sim-lib-numbers-signal/ar-order-criterion",
   "anchor/rustdoc/sim-lib-numbers-signal/burg",
@@ -608,7 +598,6 @@ claims_anchors = [
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-implicit/src/tests",
-  "recipe/sim-numbers/crates/sim-lib-numbers-implicit/01-basics/stiff-decay",
 ]
 
 [[route]]
@@ -789,8 +778,8 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-root/root-lib",
   "anchor/rustdoc/sim-lib-numbers-root/root-bracket",
   "anchor/rustdoc/sim-lib-numbers-root/root-evidence",
-  "anchor/rustdoc/sim-lib-numbers-root/brent-dekker",
-  "anchor/rustdoc/sim-lib-numbers-root/damped-newton",
+  "anchor/rustdoc/sim-lib-numbers-root/brent_dekker",
+  "anchor/rustdoc/sim-lib-numbers-root/damped_newton",
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-root/src/tests",

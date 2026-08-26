@@ -5,7 +5,11 @@ use sim_kernel::{Args, DefaultFactory, EagerPolicy, Symbol, read_construct_capab
 use crate::{ComplexNumbersLib, add_symbol, complex_value, complex_value_class_symbol};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x5954_b93e_96cd_7776),
+    );
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&ComplexNumbersLib::new()).unwrap();

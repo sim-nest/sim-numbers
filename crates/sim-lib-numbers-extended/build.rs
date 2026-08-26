@@ -1,3 +1,3 @@
 fn main() {
-    sim_cookbook_build::generate().expect("generate embedded recipes");
+    sim_cookbook_build::write_embed("recipes").expect("generate embedded recipes");
 }

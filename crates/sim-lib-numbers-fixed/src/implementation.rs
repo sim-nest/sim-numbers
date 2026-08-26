@@ -86,7 +86,7 @@ const FIXED_DOMAINS: [DomainSpec; 11] = [
 /// use sim_lib_numbers_core::domains;
 /// use sim_lib_numbers_fixed::FixedNumbersLib;
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x4a61_0d1e_bcce_4dd7));
 /// cx.load_lib(&FixedNumbersLib::new()).unwrap();
 ///
 /// let edges = cx.registry().value_promotion_rules();

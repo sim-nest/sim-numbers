@@ -210,3 +210,4 @@ fn assignment_adapter_preserves_certificate_and_receipt() {
     assert!(!format!("{:?}", out.certificate).is_empty());
     assert!(out.receipt.work_used > 0);
 }
+// conformance: optimization tests prove bounded steps, convergence, and failure policy.

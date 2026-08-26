@@ -305,3 +305,4 @@ fn malicious_read_construct_dimensions_are_bounded() {
     let manifest = QuantityLib::new().manifest();
     assert_eq!(manifest.id, Symbol::qualified("numbers", "quantity"));
 }
+// conformance: quantity tests prove semantic kinds, exact units, and affine laws.

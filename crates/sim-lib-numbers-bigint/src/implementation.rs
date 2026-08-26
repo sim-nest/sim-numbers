@@ -193,7 +193,7 @@ impl sim_kernel::ObjectCompat for BigIntNumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy};
 /// use sim_lib_numbers_bigint::{BigIntNumbersLib, number_domain};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x3d5a_37c4_e6f7_d2f1));
 /// cx.load_lib(&BigIntNumbersLib::new()).unwrap();
 ///
 /// let value = cx

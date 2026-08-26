@@ -15,23 +15,34 @@
 | `cookbook/numbers/cf` | `cookbook-recipe` | `sim-lib-numbers-exotic` | Continued-fraction and exotic number-domain descriptors. |
 | `cookbook/numbers/codec` | `cookbook-recipe` | `sim-lib-numbers-codec` | Codec-neutral numeric plugin descriptors. |
 | `cookbook/numbers/complex` | `cookbook-recipe` | `sim-lib-numbers-complex` | Complex scalar values and arithmetic. |
+| `cookbook/numbers/continuation` | `cookbook-recipe` | `sim-lib-numbers-continuation` | Bounded pseudo-arclength traces with predictor/corrector evidence. |
 | `cookbook/numbers/core` | `cookbook-recipe` | `sim-lib-numbers-core` | Shared number-domain shapes and helper descriptors. |
+| `cookbook/numbers/extended` | `cookbook-recipe` | `sim-lib-numbers-extended` | Finite double-double arithmetic through shared numerical contracts. |
 | `cookbook/numbers/f64` | `cookbook-recipe` | `sim-lib-numbers-f64` | Floating-point scalar values and arithmetic. |
 | `cookbook/numbers/fixed` | `cookbook-recipe` | `sim-lib-numbers-fixed` | Fixed-point numeric domain descriptors. |
 | `cookbook/numbers/float` | `cookbook-recipe` | `sim-lib-numbers-float` | Generic floating scalar domain descriptors. |
 | `cookbook/numbers/func` | `cookbook-recipe` | `sim-lib-numbers-func` | Symbolic and native numeric functions. |
 | `cookbook/numbers/i64` | `cookbook-recipe` | `sim-lib-numbers-i64` | I64 scalar values and checked arithmetic. |
+| `cookbook/numbers/implicit` | `cookbook-recipe` | `sim-lib-numbers-implicit` | Stiff ODE and index-1 DAE integration with inspectable evidence. |
+| `cookbook/numbers/interval` | `cookbook-recipe` | `sim-lib-numbers-interval` |  |
+| `cookbook/numbers/method` | `cookbook-recipe` | `sim-lib-numbers-method` | Plan bounded algorithms and inspect non-forgeable common evidence. |
 | `cookbook/numbers/numeric` | `cookbook-recipe` | `sim-lib-numbers-numeric` | Numeric methods such as differentiation, integration, and ODE solving. |
+| `cookbook/numbers/optimize` | `cookbook-recipe` | `sim-lib-numbers-optimize` | Run bounded numerical optimization problems. |
+| `cookbook/numbers/poly` | `cookbook-recipe` | `sim-lib-numbers-poly` |  |
 | `cookbook/numbers/prelude` | `cookbook-recipe` | `sim-lib-numbers-prelude` | Stable installer for the full number stack. |
 | `cookbook/numbers/quad` | `cookbook-recipe` | `sim-lib-numbers-quad` | Quadrature algorithms for numeric integration. |
+| `cookbook/numbers/quantity` | `cookbook-recipe` | `sim-lib-numbers-quantity` | Exact dimensions, semantic kinds, and honest units. |
 | `cookbook/numbers/rational` | `cookbook-recipe` | `sim-lib-numbers-rational` | Exact rational values and constructor forms. |
 | `cookbook/numbers/rk` | `cookbook-recipe` | `sim-lib-numbers-rk` | Runge-Kutta ODE solver methods. |
+| `cookbook/numbers/root` | `cookbook-recipe` | `sim-lib-numbers-root` | Bracketed scalar and residual-carrying vector root searches. |
 | `cookbook/numbers/signal` | `cookbook-recipe` | `sim-lib-numbers-signal` | Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples. |
+| `cookbook/numbers/special` | `cookbook-recipe` | `sim-lib-numbers-special` | Evidence-carrying real special functions. |
 | `cookbook/numbers/stats` | `cookbook-recipe` | `sim-lib-numbers-stats` | Probability, clustering, bounded inference, and inspectable evidence. |
 | `cookbook/numbers/tensor` | `cookbook-recipe` | `sim-lib-numbers-tensor` | Generic tensor values and indexing. |
 | `cookbook/numbers/tensor-bcast` | `cookbook-recipe` | `sim-lib-numbers-tensor-bcast` | Broadcasting helpers for tensor values. |
 | `cookbook/numbers/tensor-bit` | `cookbook-recipe` | `sim-lib-numbers-tensor-bit` | Packed boolean tensor helpers. |
 | `cookbook/numbers/tensor-cmplxf` | `cookbook-recipe` | `sim-lib-numbers-tensor-cmplxf` | Complex-cell tensor helpers. |
+| `cookbook/numbers/tensor-decomp` | `cookbook-recipe` | `sim-lib-numbers-tensor-decomp` |  |
 | `cookbook/numbers/tensor-f32` | `cookbook-recipe` | `sim-lib-numbers-tensor-f32` | F32-specialized tensor helpers. |
 | `cookbook/numbers/tensor-f64` | `cookbook-recipe` | `sim-lib-numbers-tensor-f64` | F64-specialized tensor helpers. |
 | `cookbook/numbers/tensor-half` | `cookbook-recipe` | `sim-lib-numbers-tensor-half` | F16 and bf16 tensor descriptors with f32-widened host helpers. |

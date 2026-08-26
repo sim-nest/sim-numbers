@@ -14,7 +14,7 @@
 //! use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy, Symbol};
 //! use sim_lib_numbers_arith::NumbersArithmeticLib;
 //!
-//! let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+//! let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x04a2_6bf8_c5d5_cfe3));
 //! cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
 //! assert!(cx.registry().function_by_symbol(&Symbol::new("+")).is_some());
 //! assert!(cx.registry().function_by_symbol(&Symbol::new("*")).is_some());

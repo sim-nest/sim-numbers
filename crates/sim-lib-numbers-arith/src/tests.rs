@@ -6,7 +6,11 @@ use crate::NumbersArithmeticLib;
 
 #[test]
 fn arithmetic_lib_registers_aliases() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x7854_fe72_a2f8_fd9f),
+    );
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
     for symbol in [Symbol::new("+"), Symbol::new("-"), Symbol::new("*")] {
         assert!(cx.registry().function_by_symbol(&symbol).is_some());
@@ -15,7 +19,11 @@ fn arithmetic_lib_registers_aliases() {
 
 #[test]
 fn arithmetic_function_dispatches_to_registered_number_ops() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xdf4e_30df_efb4_4416),
+    );
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
     cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())
         .unwrap();
@@ -43,7 +51,11 @@ fn arithmetic_function_dispatches_to_registered_number_ops() {
 
 #[test]
 fn cmp_function_dispatches_through_number_promotion() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x6958_1399_02db_319f),
+    );
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
     cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())
         .unwrap();
@@ -73,7 +85,11 @@ fn cmp_function_dispatches_through_number_promotion() {
 
 #[test]
 fn cmp_function_orders_bigint_values() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xaa0f_ea05_f9f8_ad28),
+    );
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
     cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())
         .unwrap();

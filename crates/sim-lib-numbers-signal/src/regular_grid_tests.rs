@@ -77,3 +77,4 @@ fn degenerate_duplicate_and_false_monotonicity_claim_are_explicit() {
             .multidimensional_monotonicity_claimed
     );
 }
+// conformance: regular-grid tests prove ranked interpolation geometry and bounded work.

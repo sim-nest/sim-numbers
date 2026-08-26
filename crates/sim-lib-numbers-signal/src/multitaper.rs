@@ -126,6 +126,16 @@ fn taper_work(len: usize, taper_count: usize) -> Result<u64, SignalError> {
         .ok_or_else(work_overflow)
 }
 
+fn jacobi_rotation_limit(len: usize) -> Result<usize, SignalError> {
+    let pairs = len
+        .checked_mul(len.saturating_sub(1))
+        .and_then(|value| value.checked_div(2))
+        .ok_or_else(work_overflow)?;
+    (JACOBI_SWEEPS as usize)
+        .checked_mul(pairs)
+        .ok_or_else(work_overflow)
+}
+
 pub(crate) fn dpss_tapers(
     len: usize,
     time_bandwidth: f64,
@@ -148,7 +158,9 @@ pub(crate) fn dpss_tapers(
         len,
         EigenPlan {
             max_dimension: len,
-            max_iterations: JACOBI_SWEEPS as usize * len.max(1),
+            // `symmetric_eigen_f64` counts Jacobi rotations, while the
+            // multitaper work policy is expressed in complete sweeps.
+            max_iterations: jacobi_rotation_limit(len)?,
             tolerance: f64::EPSILON * 16.0,
             symmetry_tolerance: Some(f64::EPSILON * 16.0),
             vectors: VectorPolicy::Compute,

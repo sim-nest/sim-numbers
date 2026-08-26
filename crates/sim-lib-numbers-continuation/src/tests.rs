@@ -148,3 +148,4 @@ fn recorded_points_resume_the_same_branch_and_cusp_is_traced() {
     let resumed = trace(make([[a[0], a[1]], [b[0], b[1]]]));
     assert!(dot(first.points()[3].tangent(), resumed.points()[1].tangent()) > 0.99);
 }
+// conformance: continuation tests prove folds, bounded correction, restart, and refusal evidence.

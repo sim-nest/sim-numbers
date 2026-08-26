@@ -103,7 +103,11 @@ fn strict_shape_tolerance_nan_and_padding_rules_hold() {
             equal_nan: false,
         },
     );
-    assert!(bad.unwrap_err().to_string().contains("non-negative"));
+    let error = match bad {
+        Err(error) => error,
+        Ok(_) => panic!("negative dimension unexpectedly produced a tensor"),
+    };
+    assert!(error.to_string().contains("non-negative"));
     let finite = tensor(&mut cx, vec![2], "i64", &["1", "2"]);
     let padded = execute_canonical_tensor_op(
         &mut cx,

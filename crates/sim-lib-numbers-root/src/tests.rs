@@ -139,3 +139,4 @@ fn finite_difference_and_broyden_provenance_survive() {
     );
     assert!(b.jacobian_resets.len() > 1);
 }
+// conformance: root tests prove brackets, residual evidence, rank diagnostics, and bounds.

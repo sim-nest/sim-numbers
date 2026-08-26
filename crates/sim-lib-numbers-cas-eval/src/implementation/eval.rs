@@ -28,7 +28,7 @@ pub fn cas_to_expr(cx: &mut Cx, expr: &CasExpr) -> Result<Expr> {
 /// use sim_kernel::{Cx, DefaultFactory, Expr, NoopEvalPolicy, Symbol};
 /// use sim_lib_numbers_cas_eval::{cas_to_expr, expr_to_cas};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x4c87_6693_62b5_98b5));
 /// let surface = Expr::Symbol(Symbol::new("y"));
 /// let tree = expr_to_cas(&mut cx, &surface).unwrap();
 /// assert_eq!(cas_to_expr(&mut cx, &tree).unwrap(), surface);

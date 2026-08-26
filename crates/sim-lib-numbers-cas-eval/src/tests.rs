@@ -15,7 +15,11 @@ use sim_lib_numbers_cas::CasExpr;
 use crate::{CasEvalLib, cas_to_expr, eval_cas, eval_cas_symbol, eval_cas_symbolic, expr_to_cas};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x0d8d_57ea_a6fe_c377),
+    );
     cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())

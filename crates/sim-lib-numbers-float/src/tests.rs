@@ -6,7 +6,11 @@ use sim_lib_numbers_core::domains;
 use crate::{F32NumbersLib, number_domain};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x8043_d39e_569c_97f2),
+    );
     cx.load_lib(&F32NumbersLib::new()).unwrap();
     cx
 }

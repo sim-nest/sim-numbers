@@ -329,3 +329,4 @@ fn provider_descriptors_and_admission_check_identity_shape_order_and_residual() 
     invalid.singular_values.swap(0, 1);
     assert!(admit_provider_svd(&a, 2, 2, &invalid, execution, 1.0e-10).is_err());
 }
+// conformance: decomposition tests prove identities, residuals, rank policy, and refusal.

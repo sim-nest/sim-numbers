@@ -176,3 +176,4 @@ fn ad_provenance_and_robertson_scale_separation() {
         JacobianSource::AutomaticDifferentiation
     );
 }
+// conformance: implicit-solver tests prove stiff ODE and admitted index-one DAE behavior.

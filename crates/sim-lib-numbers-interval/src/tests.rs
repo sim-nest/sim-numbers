@@ -135,3 +135,4 @@ fn inspection_datum_is_not_an_authority_decoder() {
     assert!(matches!(x.to_datum(), Datum::Node { .. }));
     assert!(x.evidence().method().contains("exact rational"));
 }
+// conformance: interval tests prove sealed certification and reject forged evidence.
