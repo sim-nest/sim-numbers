@@ -14,9 +14,9 @@ default = []
 assignment = ["dep:sim-lib-discrete-graph"]
 
 [dependencies]
-sim-lib-discrete-graph = { version = "0.2.0", optional = true }
-sim-cookbook = { version = "0.2.0" }
-sim-kernel = { version = "0.2.0" }
+sim-lib-discrete-graph = { version = "0.3.0", optional = true }
+sim-cookbook = { version = "0.3.0" }
+sim-kernel = { version = "0.3.0" }
 sim-lib-numbers-tensor-decomp = { version = "0.1.0", path = "../sim-lib-numbers-tensor-decomp" }
 
 [build-dependencies]

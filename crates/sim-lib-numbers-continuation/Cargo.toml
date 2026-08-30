@@ -10,8 +10,8 @@ repository = "https://github.com/sim-nest/sim-numbers"
 homepage = "https://github.com/sim-nest/sim-numbers"
 
 [dependencies]
-sim-cookbook = { version = "0.2.0" }
-sim-kernel = { version = "0.2.0" }
+sim-cookbook = { version = "0.3.0" }
+sim-kernel = { version = "0.3.0" }
 sim-lib-numbers-method = { version = "0.1.0", path = "../sim-lib-numbers-method", default-features = false }
 sim-lib-numbers-root = { version = "0.1.0", path = "../sim-lib-numbers-root" }
 sim-lib-numbers-tensor-decomp = { version = "0.1.0", path = "../sim-lib-numbers-tensor-decomp" }
