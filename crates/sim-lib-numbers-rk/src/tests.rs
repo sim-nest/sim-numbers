@@ -15,7 +15,11 @@ use sim_lib_numbers_tensor::{
 use crate::RkNumbersLib;
 
 fn test_cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x524b_0001),
+    );
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
@@ -144,7 +148,7 @@ fn ode_accepts_plain_binary_callable() {
         .factory()
         .table(vec![
             (Symbol::new(":method"), method),
-            (Symbol::new(":h"), h),
+            (Symbol::new(":fixed-step"), h),
         ])
         .unwrap();
     let x0 = f64_value(&mut cx, 0.0);
@@ -193,16 +197,24 @@ fn ode_methods_reach_e_within_tolerance() {
         ("midpoint", 0.01, 3.0e-4),
         ("rk4", 0.01, 1.0e-8),
         ("rkf45", 0.1, 1.0e-6),
+        ("dop853", 0.1, 2.0e-9),
     ] {
         let mut entries = vec![
             (
                 Symbol::new(":method"),
                 cx.factory().symbol(Symbol::new(method)).unwrap(),
             ),
-            (Symbol::new(":h"), f64_value(&mut cx, h)),
+            (
+                Symbol::new(if matches!(method, "rkf45" | "dop853") {
+                    ":first-step"
+                } else {
+                    ":fixed-step"
+                }),
+                f64_value(&mut cx, h),
+            ),
         ];
-        if method == "rkf45" {
-            entries.push((Symbol::new(":tol"), f64_value(&mut cx, 1.0e-8)));
+        if matches!(method, "rkf45" | "dop853") {
+            entries.push((Symbol::new(":rtol"), f64_value(&mut cx, 1.0e-8)));
         }
         let options = cx.factory().table(entries).unwrap();
         let x0 = f64_value(&mut cx, 0.0);
@@ -259,6 +271,7 @@ fn tensor_ode_pipeline_runs_all_rk_methods_and_matches_scalar_cpu() {
         ("midpoint", 0.01, 3.0e-4),
         ("rk4", 0.01, 1.0e-8),
         ("rkf45", 0.1, 1.0e-6),
+        ("dop853", 0.1, 2.0e-9),
     ] {
         let pipeline = cx
             .call_function(

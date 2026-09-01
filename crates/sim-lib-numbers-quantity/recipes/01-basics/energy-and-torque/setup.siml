@@ -1,0 +1,7 @@
+; Load the quantity runtime surface, then inspect the canonical value.
+#(numbers:Quantity v1 #(numbers:Quantity
+  :scalar 12.5
+  :dimension #([0 1] [2 1] [1 1] [0 1] [0 1] [0 1] [0 1])
+  :kind kind:energy
+  :unit unit:J
+  :role measure:interval))

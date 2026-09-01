@@ -1,0 +1,3 @@
+title = "Convergence"
+order = 10
+summary = "Compare binary64 and extended precision without changing algorithms."

@@ -1,0 +1,8 @@
+id = "gamma-tail"
+title = "Inspect a gamma tail"
+codec = "lisp"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "special", "gamma", "tail"]
+requires = ["numbers/special", "codec/lisp"]
+setup = "setup.siml"

@@ -1,0 +1,12 @@
+id = "space-filling-evidence"
+title = "Reconstructable space-filling evidence"
+codec = "rust"
+setup = "main.rs"
+purpose = "purpose.md"
+expected = "expected.txt"
+order = 50
+tags = ["numbers", "stats", "sampling", "sobol", "latin-hypercube", "bounded", "replay"]
+requires = []
+harness = "cargo-example"
+package = "sim-lib-numbers-stats"
+example = "space-filling-evidence"

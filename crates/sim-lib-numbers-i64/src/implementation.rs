@@ -192,7 +192,7 @@ impl sim_kernel::ObjectCompat for I64NumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy};
 /// use sim_lib_numbers_i64::{I64NumbersLib, number_domain};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0xb741_e8e0_d5f9_654f));
 /// cx.load_lib(&I64NumbersLib::new()).unwrap();
 ///
 /// let value = cx.factory().number_literal(number_domain(), "42".to_owned()).unwrap();
@@ -380,7 +380,11 @@ mod tests {
 
         use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy, NumberLiteral};
 
-        let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+        let mut cx = Cx::new(
+            Arc::new(NoopEvalPolicy),
+            Arc::new(DefaultFactory),
+            sim_kernel::HandleSeed::new(0x6e8a_e179_98ef_895c),
+        );
         let left = NumberLiteral {
             domain: super::number_domain(),
             canonical: i64::MIN.to_string(),

@@ -6,7 +6,11 @@ use sim_lib_numbers_core::domains;
 use crate::{BoolNumbersLib, number_domain};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x4104_743c_c61b_668b),
+    );
     cx.load_lib(&BoolNumbersLib::new()).unwrap();
     cx
 }

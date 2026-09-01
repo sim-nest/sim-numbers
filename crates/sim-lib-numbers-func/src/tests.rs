@@ -10,7 +10,11 @@ use sim_lib_numbers_cas_diff::{diff_symbol, integrate_sym_symbol};
 use crate::{Func, FuncMetadata, FuncNumbersLib, SymbolicStatus, fn_symbol, grad_symbol};
 
 fn test_cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xe5e5_5124_b2a2_94ce),
+    );
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_i64::I64NumbersLib::new())

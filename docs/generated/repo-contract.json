@@ -1,5 +1,5 @@
 {
-  "card_count": 35,
+  "card_count": 46,
   "cards": [
     {
       "id": "browse/catalog",
@@ -68,10 +68,22 @@
       "summary": "Complex scalar values and arithmetic."
     },
     {
+      "id": "cookbook/numbers/continuation",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-continuation",
+      "summary": "Bounded pseudo-arclength traces with predictor/corrector evidence."
+    },
+    {
       "id": "cookbook/numbers/core",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-core",
       "summary": "Shared number-domain shapes and helper descriptors."
+    },
+    {
+      "id": "cookbook/numbers/extended",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-extended",
+      "summary": "Finite double-double arithmetic through shared numerical contracts."
     },
     {
       "id": "cookbook/numbers/f64",
@@ -104,10 +116,40 @@
       "summary": "I64 scalar values and checked arithmetic."
     },
     {
+      "id": "cookbook/numbers/implicit",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-implicit",
+      "summary": "Stiff ODE and index-1 DAE integration with inspectable evidence."
+    },
+    {
+      "id": "cookbook/numbers/interval",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-interval",
+      "summary": ""
+    },
+    {
+      "id": "cookbook/numbers/method",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-method",
+      "summary": "Plan bounded algorithms and inspect non-forgeable common evidence."
+    },
+    {
       "id": "cookbook/numbers/numeric",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-numeric",
       "summary": "Numeric methods such as differentiation, integration, and ODE solving."
+    },
+    {
+      "id": "cookbook/numbers/optimize",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-optimize",
+      "summary": "Run bounded numerical optimization problems."
+    },
+    {
+      "id": "cookbook/numbers/poly",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-poly",
+      "summary": ""
     },
     {
       "id": "cookbook/numbers/prelude",
@@ -122,6 +164,12 @@
       "summary": "Quadrature algorithms for numeric integration."
     },
     {
+      "id": "cookbook/numbers/quantity",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-quantity",
+      "summary": "Exact dimensions, semantic kinds, and honest units."
+    },
+    {
       "id": "cookbook/numbers/rational",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-rational",
@@ -134,10 +182,22 @@
       "summary": "Runge-Kutta ODE solver methods."
     },
     {
+      "id": "cookbook/numbers/root",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-root",
+      "summary": "Bracketed scalar and residual-carrying vector root searches."
+    },
+    {
       "id": "cookbook/numbers/signal",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-signal",
       "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples."
+    },
+    {
+      "id": "cookbook/numbers/special",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-special",
+      "summary": "Evidence-carrying real special functions."
     },
     {
       "id": "cookbook/numbers/stats",
@@ -168,6 +228,12 @@
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-tensor-cmplxf",
       "summary": "Complex-cell tensor helpers."
+    },
+    {
+      "id": "cookbook/numbers/tensor-decomp",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-tensor-decomp",
+      "summary": ""
     },
     {
       "id": "cookbook/numbers/tensor-f32",
@@ -230,24 +296,35 @@
       "sim-lib-numbers-cas-eval",
       "sim-lib-numbers-codec",
       "sim-lib-numbers-complex",
+      "sim-lib-numbers-continuation",
       "sim-lib-numbers-core",
       "sim-lib-numbers-exotic",
+      "sim-lib-numbers-extended",
       "sim-lib-numbers-f64",
       "sim-lib-numbers-fixed",
       "sim-lib-numbers-float",
       "sim-lib-numbers-func",
       "sim-lib-numbers-i64",
+      "sim-lib-numbers-implicit",
+      "sim-lib-numbers-interval",
+      "sim-lib-numbers-method",
       "sim-lib-numbers-numeric",
+      "sim-lib-numbers-optimize",
+      "sim-lib-numbers-poly",
       "sim-lib-numbers-prelude",
       "sim-lib-numbers-quad",
+      "sim-lib-numbers-quantity",
       "sim-lib-numbers-rational",
       "sim-lib-numbers-rk",
+      "sim-lib-numbers-root",
       "sim-lib-numbers-signal",
+      "sim-lib-numbers-special",
       "sim-lib-numbers-stats",
       "sim-lib-numbers-tensor",
       "sim-lib-numbers-tensor-bcast",
       "sim-lib-numbers-tensor-bit",
       "sim-lib-numbers-tensor-cmplxf",
+      "sim-lib-numbers-tensor-decomp",
       "sim-lib-numbers-tensor-f32",
       "sim-lib-numbers-tensor-f64",
       "sim-lib-numbers-tensor-half",
@@ -257,7 +334,7 @@
       "xtask"
     ]
   },
-  "non_citizen_exemption_count": 15,
+  "non_citizen_exemption_count": 16,
   "non_citizen_exemptions": [
     {
       "crate": "sim-lib-numbers-bigint",
@@ -314,6 +391,14 @@
       "kind": "handle",
       "line": 328,
       "reason": "continued-fraction coefficient list view; descriptor is the source continued-fraction value"
+    },
+    {
+      "crate": "sim-lib-numbers-extended",
+      "descriptor": "numbers/extended",
+      "file": "crates/sim-lib-numbers-extended/src/extended.rs",
+      "kind": "marker",
+      "line": 387,
+      "reason": "number-domain marker; reconstruct by loading its library"
     },
     {
       "crate": "sim-lib-numbers-f64",
@@ -380,7 +465,7 @@
       "reason": "numbers/tensor literal class marker; tensor values use the numbers/Tensor citizen descriptor"
     }
   ],
-  "package_count": 34,
+  "package_count": 45,
   "packages": [
     {
       "crate_name": "sim_lib_numbers_ad",
@@ -880,6 +965,66 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_continuation",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-method",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-root",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-decomp",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Bounded pseudo-arclength continuation with reviewable predictor/corrector evidence.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-continuation/Cargo.toml",
+      "name": "sim-lib-numbers-continuation",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-continuation",
+      "rustdoc_summary": "Bounded pseudo-arclength continuation with explicit numerical evidence.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_continuation",
+          "src": "crates/sim-lib-numbers-continuation/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-continuation/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_core",
       "dependencies": [],
       "description": "Shared scalar-domain substrate: number-value shapes, literal classes, op installers, and promotion metadata.",
@@ -988,6 +1133,59 @@
           ],
           "name": "build-script-build",
           "src": "crates/sim-lib-numbers-exotic/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_extended",
+      "dependencies": [
+        {
+          "kind": "dev",
+          "optional": false,
+          "package": "sim-lib-numbers-rational",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-core",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Normalized double-double scalar and runtime number domain for SIM.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-extended/Cargo.toml",
+      "name": "sim-lib-numbers-extended",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-extended",
+      "rustdoc_summary": "Normalized double-double arithmetic and the numbers/extended runtime domain. A value is an unevaluated sum of two binary64 components with |lo| <= 0.5 ulp(hi) for finite nonzero results.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_extended",
+          "src": "crates/sim-lib-numbers-extended/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-extended/build.rs"
         }
       ]
     },
@@ -1269,6 +1467,194 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_implicit",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-codec",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-core",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-numeric",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-linalg",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Evidence-carrying Radau IIA integration for stiff ODEs and index-1 DAEs.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-implicit/Cargo.toml",
+      "name": "sim-lib-numbers-implicit",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-implicit",
+      "rustdoc_summary": "Fifth-order Radau IIA integration for stiff ODEs and index-1 DAEs.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_implicit",
+          "src": "crates/sim-lib-numbers-implicit/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-implicit/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_interval",
+      "dependencies": [],
+      "description": "Sealed, evidence-carrying interval certification for SIM.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-interval/Cargo.toml",
+      "name": "sim-lib-numbers-interval",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-interval",
+      "rustdoc_summary": "Sealed interval certification: evidence may be inspected, never imported as authority.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_interval",
+          "src": "crates/sim-lib-numbers-interval/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-interval/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_method",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-core",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": true,
+          "package": "sim-lib-numbers-stats",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": true,
+          "package": "sim-lib-numbers-tensor-linalg",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Validated bounded numerical method plans and canonical cross-domain evidence.",
+      "features": [
+        {
+          "edges": [
+            "dep:sim-lib-numbers-stats",
+            "dep:sim-lib-numbers-tensor-linalg"
+          ],
+          "name": "adapters",
+          "workspace_edges": [
+            {
+              "feature": null,
+              "package": "sim-lib-numbers-stats"
+            },
+            {
+              "feature": null,
+              "package": "sim-lib-numbers-tensor-linalg"
+            }
+          ]
+        },
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-method/Cargo.toml",
+      "name": "sim-lib-numbers-method",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-method",
+      "rustdoc_summary": "Validated, bounded numerical method plans and common evidence.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_method",
+          "src": "crates/sim-lib-numbers-method/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-method/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_numeric",
       "dependencies": [
         {
@@ -1367,6 +1753,118 @@
           ],
           "name": "build-script-build",
           "src": "crates/sim-lib-numbers-numeric/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_optimize",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-decomp",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Bounded optimization and evidence-carrying least squares for SIM.",
+      "features": [
+        {
+          "edges": [
+            "dep:sim-lib-discrete-graph"
+          ],
+          "name": "assignment",
+          "workspace_edges": []
+        },
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-optimize/Cargo.toml",
+      "name": "sim-lib-numbers-optimize",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-optimize",
+      "rustdoc_summary": "Bounded optimization with explicit plans and honest convergence evidence.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_optimize",
+          "src": "crates/sim-lib-numbers-optimize/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-optimize/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_poly",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-complex",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-decomp",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Evidence-carrying dense coefficient polynomials for SIM.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-poly/Cargo.toml",
+      "name": "sim-lib-numbers-poly",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-poly",
+      "rustdoc_summary": "Dense coefficient algebra, deliberately separate from symbolic CAS trees.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_poly",
+          "src": "crates/sim-lib-numbers-poly/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-poly/build.rs"
         }
       ]
     },
@@ -1544,6 +2042,13 @@
         {
           "kind": "normal",
           "optional": false,
+          "package": "sim-lib-numbers-tensor-decomp",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
           "package": "sim-lib-numbers-tensor-f32",
           "rename": null,
           "target": null
@@ -1697,6 +2202,44 @@
           ],
           "name": "build-script-build",
           "src": "crates/sim-lib-numbers-quad/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_quantity",
+      "dependencies": [],
+      "description": "Exact semantic dimensions, units, and generic physical quantities for SIM.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-quantity/Cargo.toml",
+      "name": "sim-lib-numbers-quantity",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-quantity",
+      "rustdoc_summary": "Semantic physical quantities for SIM.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_quantity",
+          "src": "crates/sim-lib-numbers-quantity/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-quantity/build.rs"
         }
       ]
     },
@@ -1877,6 +2420,59 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_root",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-method",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-decomp",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Bracketed and residual-carrying scalar and vector root finding for SIM.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-root/Cargo.toml",
+      "name": "sim-lib-numbers-root",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-root",
+      "rustdoc_summary": "Bounded scalar and vector root finding with reviewable evidence.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_root",
+          "src": "crates/sim-lib-numbers-root/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-root/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_signal",
       "dependencies": [
         {
@@ -1897,6 +2493,13 @@
           "kind": "normal",
           "optional": false,
           "package": "sim-lib-numbers-tensor-cmplxf",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-decomp",
           "rename": null,
           "target": null
         },
@@ -1992,12 +2595,57 @@
       ]
     },
     {
+      "crate_name": "sim_lib_numbers_special",
+      "dependencies": [],
+      "description": "Evidence-carrying real special functions for the SIM number stack.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-special/Cargo.toml",
+      "name": "sim-lib-numbers-special",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-special",
+      "rustdoc_summary": "Evidence-carrying real error, gamma, beta, and complete elliptic functions.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_special",
+          "src": "crates/sim-lib-numbers-special/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-special/build.rs"
+        }
+      ]
+    },
+    {
       "crate_name": "sim_lib_numbers_stats",
       "dependencies": [
         {
           "kind": "normal",
           "optional": false,
           "package": "sim-lib-numbers-core",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-special",
           "rename": null,
           "target": null
         }
@@ -2055,6 +2703,16 @@
           ],
           "name": "robust_benchmark_statistics",
           "src": "crates/sim-lib-numbers-stats/examples/robust_benchmark_statistics.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "example"
+          ],
+          "name": "space_filling_evidence",
+          "src": "crates/sim-lib-numbers-stats/examples/space_filling_evidence.rs"
         },
         {
           "crate_types": [
@@ -2319,6 +2977,80 @@
           ],
           "name": "build-script-build",
           "src": "crates/sim-lib-numbers-tensor-cmplxf/build.rs"
+        }
+      ]
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_decomp",
+      "dependencies": [
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-complex",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-core",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-method",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor",
+          "rename": null,
+          "target": null
+        },
+        {
+          "kind": "normal",
+          "optional": false,
+          "package": "sim-lib-numbers-tensor-linalg",
+          "rename": null,
+          "target": null
+        }
+      ],
+      "description": "Bounded, evidence-carrying dense matrix decompositions for SIM tensors.",
+      "features": [],
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-decomp/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-decomp",
+      "publish": "true",
+      "root": "crates/sim-lib-numbers-tensor-decomp",
+      "rustdoc_summary": "Bounded, evidence-carrying dense matrix factorizations.",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ],
+      "targets": [
+        {
+          "crate_types": [
+            "lib"
+          ],
+          "kind": [
+            "lib"
+          ],
+          "name": "sim_lib_numbers_tensor_decomp",
+          "src": "crates/sim-lib-numbers-tensor-decomp/src/lib.rs"
+        },
+        {
+          "crate_types": [
+            "bin"
+          ],
+          "kind": [
+            "custom-build"
+          ],
+          "name": "build-script-build",
+          "src": "crates/sim-lib-numbers-tensor-decomp/build.rs"
         }
       ]
     },
@@ -2684,10 +3416,10 @@
     "generated_by": "cargo run -p xtask -- simdoc",
     "generation_timestamp": "2026-07-14T23:29:08+02:00",
     "generator": "xtask repo-contract v1",
-    "git_commit": "a29b1fa292fe136540df8d8bbe15e967d0bd2a66",
+    "git_commit": "cd2cf6b71c39b48ef6479222cd1ea8cad9048655",
     "repo": "sim-numbers",
     "schema": "sim.provenance.v1",
-    "source_commit": "a29b1fa292fe136540df8d8bbe15e967d0bd2a66",
+    "source_commit": "cd2cf6b71c39b48ef6479222cd1ea8cad9048655",
     "source_remote": "https://github.com/sim-nest/sim-numbers",
     "validation_commands": [
       "cargo fmt --all --check",
@@ -2700,9 +3432,9 @@
       "cargo run -p xtask -- validation-matrix --check --repo .",
       "cargo run -p xtask -- crate-catalog --check --repo ."
     ],
-    "workspace_hash": "e39036dd1d97edb2",
+    "workspace_hash": "cb87dccade2bc357",
     "workspace_hash_algorithm": "fnv1a64",
-    "workspace_hash_input_count": 420,
+    "workspace_hash_input_count": 544,
     "workspace_hash_inputs": [
       "Cargo.toml",
       "crates/sim-lib-numbers-ad/Cargo.toml",
@@ -2795,14 +3527,23 @@
       "crates/sim-lib-numbers-complex/src/implementation.rs",
       "crates/sim-lib-numbers-complex/src/lib.rs",
       "crates/sim-lib-numbers-complex/src/tests.rs",
+      "crates/sim-lib-numbers-continuation/Cargo.toml",
+      "crates/sim-lib-numbers-continuation/build.rs",
+      "crates/sim-lib-numbers-continuation/recipes/01-basics/limiting-boundary/recipe.toml",
+      "crates/sim-lib-numbers-continuation/recipes/book.toml",
+      "crates/sim-lib-numbers-continuation/src/continuation.rs",
+      "crates/sim-lib-numbers-continuation/src/lib.rs",
+      "crates/sim-lib-numbers-continuation/src/tests.rs",
       "crates/sim-lib-numbers-core/Cargo.toml",
       "crates/sim-lib-numbers-core/build.rs",
       "crates/sim-lib-numbers-core/recipes/01-basics/value-shape-table/recipe.toml",
       "crates/sim-lib-numbers-core/recipes/book.toml",
       "crates/sim-lib-numbers-core/src/domains.rs",
       "crates/sim-lib-numbers-core/src/lib.rs",
+      "crates/sim-lib-numbers-core/src/limits.rs",
       "crates/sim-lib-numbers-core/src/literal.rs",
       "crates/sim-lib-numbers-core/src/magnitude.rs",
+      "crates/sim-lib-numbers-core/src/real_scalar.rs",
       "crates/sim-lib-numbers-core/src/scalar.rs",
       "crates/sim-lib-numbers-core/src/tests.rs",
       "crates/sim-lib-numbers-core/src/value_shape.rs",
@@ -2817,6 +3558,13 @@
       "crates/sim-lib-numbers-exotic/src/implementation.rs",
       "crates/sim-lib-numbers-exotic/src/lib.rs",
       "crates/sim-lib-numbers-exotic/src/tests.rs",
+      "crates/sim-lib-numbers-extended/Cargo.toml",
+      "crates/sim-lib-numbers-extended/build.rs",
+      "crates/sim-lib-numbers-extended/recipes/01-basics/convergence/recipe.toml",
+      "crates/sim-lib-numbers-extended/recipes/book.toml",
+      "crates/sim-lib-numbers-extended/src/extended.rs",
+      "crates/sim-lib-numbers-extended/src/lib.rs",
+      "crates/sim-lib-numbers-extended/src/tests.rs",
       "crates/sim-lib-numbers-f64/Cargo.toml",
       "crates/sim-lib-numbers-f64/build.rs",
       "crates/sim-lib-numbers-f64/recipes/01-basics/add-floats/recipe.toml",
@@ -2863,6 +3611,33 @@
       "crates/sim-lib-numbers-i64/src/implementation/ops.rs",
       "crates/sim-lib-numbers-i64/src/implementation.rs",
       "crates/sim-lib-numbers-i64/src/lib.rs",
+      "crates/sim-lib-numbers-implicit/Cargo.toml",
+      "crates/sim-lib-numbers-implicit/build.rs",
+      "crates/sim-lib-numbers-implicit/recipes/01-basics/stiff-decay/recipe.toml",
+      "crates/sim-lib-numbers-implicit/recipes/book.toml",
+      "crates/sim-lib-numbers-implicit/src/lib.rs",
+      "crates/sim-lib-numbers-implicit/src/solver/events.rs",
+      "crates/sim-lib-numbers-implicit/src/solver/registration.rs",
+      "crates/sim-lib-numbers-implicit/src/solver.rs",
+      "crates/sim-lib-numbers-implicit/src/tests.rs",
+      "crates/sim-lib-numbers-interval/Cargo.toml",
+      "crates/sim-lib-numbers-interval/build.rs",
+      "crates/sim-lib-numbers-interval/recipes/01-basics/sealed-threshold/recipe.toml",
+      "crates/sim-lib-numbers-interval/recipes/book.toml",
+      "crates/sim-lib-numbers-interval/src/analysis.rs",
+      "crates/sim-lib-numbers-interval/src/interval.rs",
+      "crates/sim-lib-numbers-interval/src/lib.rs",
+      "crates/sim-lib-numbers-interval/src/tests.rs",
+      "crates/sim-lib-numbers-method/Cargo.toml",
+      "crates/sim-lib-numbers-method/build.rs",
+      "crates/sim-lib-numbers-method/recipes/01-basics/method-evidence/recipe.toml",
+      "crates/sim-lib-numbers-method/recipes/book.toml",
+      "crates/sim-lib-numbers-method/src/adapters.rs",
+      "crates/sim-lib-numbers-method/src/datum.rs",
+      "crates/sim-lib-numbers-method/src/lib.rs",
+      "crates/sim-lib-numbers-method/src/model.rs",
+      "crates/sim-lib-numbers-method/src/runtime.rs",
+      "crates/sim-lib-numbers-method/src/tests.rs",
       "crates/sim-lib-numbers-numeric/Cargo.toml",
       "crates/sim-lib-numbers-numeric/build.rs",
       "crates/sim-lib-numbers-numeric/recipes/01-basics/composed-pipeline/recipe.toml",
@@ -2879,6 +3654,23 @@
       "crates/sim-lib-numbers-numeric/src/state.rs",
       "crates/sim-lib-numbers-numeric/src/tests.rs",
       "crates/sim-lib-numbers-numeric/src/traits.rs",
+      "crates/sim-lib-numbers-optimize/Cargo.toml",
+      "crates/sim-lib-numbers-optimize/build.rs",
+      "crates/sim-lib-numbers-optimize/recipes/01-basics/bounded-optimization/recipe.toml",
+      "crates/sim-lib-numbers-optimize/recipes/book.toml",
+      "crates/sim-lib-numbers-optimize/src/least_squares.rs",
+      "crates/sim-lib-numbers-optimize/src/lib.rs",
+      "crates/sim-lib-numbers-optimize/src/minimize.rs",
+      "crates/sim-lib-numbers-optimize/src/model.rs",
+      "crates/sim-lib-numbers-optimize/src/scalar.rs",
+      "crates/sim-lib-numbers-optimize/src/tests.rs",
+      "crates/sim-lib-numbers-poly/Cargo.toml",
+      "crates/sim-lib-numbers-poly/build.rs",
+      "crates/sim-lib-numbers-poly/recipes/01-basics/certified-evaluation/recipe.toml",
+      "crates/sim-lib-numbers-poly/recipes/book.toml",
+      "crates/sim-lib-numbers-poly/src/lib.rs",
+      "crates/sim-lib-numbers-poly/src/polynomial.rs",
+      "crates/sim-lib-numbers-poly/src/tests.rs",
       "crates/sim-lib-numbers-prelude/Cargo.toml",
       "crates/sim-lib-numbers-prelude/build.rs",
       "crates/sim-lib-numbers-prelude/recipes/01-basics/prelude-stack/recipe.toml",
@@ -2894,8 +3686,21 @@
       "crates/sim-lib-numbers-quad/src/implementation.rs",
       "crates/sim-lib-numbers-quad/src/lib.rs",
       "crates/sim-lib-numbers-quad/src/quad.rs",
+      "crates/sim-lib-numbers-quad/src/sampled.rs",
       "crates/sim-lib-numbers-quad/src/support.rs",
       "crates/sim-lib-numbers-quad/src/tests.rs",
+      "crates/sim-lib-numbers-quantity/Cargo.toml",
+      "crates/sim-lib-numbers-quantity/build.rs",
+      "crates/sim-lib-numbers-quantity/recipes/01-basics/energy-and-torque/recipe.toml",
+      "crates/sim-lib-numbers-quantity/recipes/book.toml",
+      "crates/sim-lib-numbers-quantity/src/dimension.rs",
+      "crates/sim-lib-numbers-quantity/src/lib.rs",
+      "crates/sim-lib-numbers-quantity/src/quantity.rs",
+      "crates/sim-lib-numbers-quantity/src/runtime.rs",
+      "crates/sim-lib-numbers-quantity/src/scalar.rs",
+      "crates/sim-lib-numbers-quantity/src/si.rs",
+      "crates/sim-lib-numbers-quantity/src/tests.rs",
+      "crates/sim-lib-numbers-quantity/src/unit.rs",
       "crates/sim-lib-numbers-rational/Cargo.toml",
       "crates/sim-lib-numbers-rational/build.rs",
       "crates/sim-lib-numbers-rational/recipes/01-basics/rational-constructor/recipe.toml",
@@ -2913,11 +3718,26 @@
       "crates/sim-lib-numbers-rk/build.rs",
       "crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/recipe.toml",
       "crates/sim-lib-numbers-rk/recipes/book.toml",
+      "crates/sim-lib-numbers-rk/src/dop853.rs",
       "crates/sim-lib-numbers-rk/src/implementation.rs",
       "crates/sim-lib-numbers-rk/src/lib.rs",
+      "crates/sim-lib-numbers-rk/src/solver/registration.rs",
       "crates/sim-lib-numbers-rk/src/solver.rs",
       "crates/sim-lib-numbers-rk/src/support.rs",
       "crates/sim-lib-numbers-rk/src/tests.rs",
+      "crates/sim-lib-numbers-root/Cargo.toml",
+      "crates/sim-lib-numbers-root/build.rs",
+      "crates/sim-lib-numbers-root/recipes/01-basics/scalar-root/recipe.toml",
+      "crates/sim-lib-numbers-root/recipes/02-vector/vector-root/recipe.toml",
+      "crates/sim-lib-numbers-root/recipes/book.toml",
+      "crates/sim-lib-numbers-root/src/bisection.rs",
+      "crates/sim-lib-numbers-root/src/brent.rs",
+      "crates/sim-lib-numbers-root/src/lib.rs",
+      "crates/sim-lib-numbers-root/src/model.rs",
+      "crates/sim-lib-numbers-root/src/newton.rs",
+      "crates/sim-lib-numbers-root/src/secant.rs",
+      "crates/sim-lib-numbers-root/src/tests.rs",
+      "crates/sim-lib-numbers-root/src/vector.rs",
       "crates/sim-lib-numbers-signal/Cargo.toml",
       "crates/sim-lib-numbers-signal/build.rs",
       "crates/sim-lib-numbers-signal/examples/autoregressive_spectral.rs",
@@ -2967,6 +3787,8 @@
       "crates/sim-lib-numbers-signal/src/plan_tests.rs",
       "crates/sim-lib-numbers-signal/src/prediction.rs",
       "crates/sim-lib-numbers-signal/src/reference.rs",
+      "crates/sim-lib-numbers-signal/src/regular_grid.rs",
+      "crates/sim-lib-numbers-signal/src/regular_grid_tests.rs",
       "crates/sim-lib-numbers-signal/src/runtime.rs",
       "crates/sim-lib-numbers-signal/src/runtime_convolution.rs",
       "crates/sim-lib-numbers-signal/src/runtime_convolution_callable.rs",
@@ -2989,11 +3811,19 @@
       "crates/sim-lib-numbers-signal/src/wavelet.rs",
       "crates/sim-lib-numbers-signal/src/wavelet_tests.rs",
       "crates/sim-lib-numbers-signal/src/window.rs",
+      "crates/sim-lib-numbers-special/Cargo.toml",
+      "crates/sim-lib-numbers-special/build.rs",
+      "crates/sim-lib-numbers-special/recipes/01-basics/gamma-tail/recipe.toml",
+      "crates/sim-lib-numbers-special/recipes/book.toml",
+      "crates/sim-lib-numbers-special/src/functions.rs",
+      "crates/sim-lib-numbers-special/src/lib.rs",
+      "crates/sim-lib-numbers-special/src/tests.rs",
       "crates/sim-lib-numbers-stats/Cargo.toml",
       "crates/sim-lib-numbers-stats/build.rs",
       "crates/sim-lib-numbers-stats/examples/bounded_sequence_inference.rs",
       "crates/sim-lib-numbers-stats/examples/clustering_evidence.rs",
       "crates/sim-lib-numbers-stats/examples/robust_benchmark_statistics.rs",
+      "crates/sim-lib-numbers-stats/examples/space_filling_evidence.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/clustering-evidence/main.rs",
@@ -3002,6 +3832,8 @@
       "crates/sim-lib-numbers-stats/recipes/01-basics/finite-markov-report/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/main.rs",
       "crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/main.rs",
+      "crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/30-agents/a30-010-data-analysis/recipe.toml",
       "crates/sim-lib-numbers-stats/recipes/30-agents/a30-024-healthcare-intelligence/recipe.toml",
@@ -3012,6 +3844,9 @@
       "crates/sim-lib-numbers-stats/src/claim.rs",
       "crates/sim-lib-numbers-stats/src/clustering.rs",
       "crates/sim-lib-numbers-stats/src/clustering_tests.rs",
+      "crates/sim-lib-numbers-stats/src/decision.rs",
+      "crates/sim-lib-numbers-stats/src/decision_tests.rs",
+      "crates/sim-lib-numbers-stats/src/distribution.rs",
       "crates/sim-lib-numbers-stats/src/function.rs",
       "crates/sim-lib-numbers-stats/src/gmm.rs",
       "crates/sim-lib-numbers-stats/src/gmm_math.rs",
@@ -3024,21 +3859,28 @@
       "crates/sim-lib-numbers-stats/src/lib.rs",
       "crates/sim-lib-numbers-stats/src/markov.rs",
       "crates/sim-lib-numbers-stats/src/markov_tests.rs",
+      "crates/sim-lib-numbers-stats/src/parametric_distribution.rs",
       "crates/sim-lib-numbers-stats/src/quantile.rs",
       "crates/sim-lib-numbers-stats/src/quantile_tests.rs",
       "crates/sim-lib-numbers-stats/src/robust.rs",
       "crates/sim-lib-numbers-stats/src/robust_tests.rs",
       "crates/sim-lib-numbers-stats/src/runtime.rs",
       "crates/sim-lib-numbers-stats/src/runtime_clustering.rs",
+      "crates/sim-lib-numbers-stats/src/runtime_decision.rs",
+      "crates/sim-lib-numbers-stats/src/sampling.rs",
+      "crates/sim-lib-numbers-stats/src/sampling_tests.rs",
       "crates/sim-lib-numbers-stats/src/tests.rs",
       "crates/sim-lib-numbers-stats/src/transition.rs",
       "crates/sim-lib-numbers-tensor/Cargo.toml",
       "crates/sim-lib-numbers-tensor/build.rs",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml",
+      "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-construction-selection/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-execution/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-scale/recipe.toml",
       "crates/sim-lib-numbers-tensor/recipes/book.toml",
+      "crates/sim-lib-numbers-tensor/src/implementation/canonical_ops/array.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/canonical_ops.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/cast.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/citizen.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/dimension.rs",
@@ -3048,6 +3890,7 @@
       "crates/sim-lib-numbers-tensor/src/implementation/execution_math_support.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/execution_ops.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/function.rs",
+      "crates/sim-lib-numbers-tensor/src/implementation/reduction.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/storage.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/tensor_site.rs",
       "crates/sim-lib-numbers-tensor/src/implementation/validation.rs",
@@ -3055,6 +3898,7 @@
       "crates/sim-lib-numbers-tensor/src/implementation.rs",
       "crates/sim-lib-numbers-tensor/src/lib.rs",
       "crates/sim-lib-numbers-tensor/src/spec.rs",
+      "crates/sim-lib-numbers-tensor/src/tests/canonical.rs",
       "crates/sim-lib-numbers-tensor/src/tests/cast.rs",
       "crates/sim-lib-numbers-tensor/src/tests/execution.rs",
       "crates/sim-lib-numbers-tensor/src/tests/storage.rs",
@@ -3077,6 +3921,17 @@
       "crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/recipe.toml",
       "crates/sim-lib-numbers-tensor-cmplxf/recipes/book.toml",
       "crates/sim-lib-numbers-tensor-cmplxf/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-decomp/Cargo.toml",
+      "crates/sim-lib-numbers-tensor-decomp/build.rs",
+      "crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/matrix-functions/recipe.toml",
+      "crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/qr-eigen/recipe.toml",
+      "crates/sim-lib-numbers-tensor-decomp/recipes/book.toml",
+      "crates/sim-lib-numbers-tensor-decomp/src/advanced.rs",
+      "crates/sim-lib-numbers-tensor-decomp/src/advanced_helpers.rs",
+      "crates/sim-lib-numbers-tensor-decomp/src/basic.rs",
+      "crates/sim-lib-numbers-tensor-decomp/src/lib.rs",
+      "crates/sim-lib-numbers-tensor-decomp/src/matrix_functions.rs",
+      "crates/sim-lib-numbers-tensor-decomp/src/tests.rs",
       "crates/sim-lib-numbers-tensor-f32/Cargo.toml",
       "crates/sim-lib-numbers-tensor-f32/build.rs",
       "crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/recipe.toml",
@@ -3123,10 +3978,11 @@
       "crates/sim-lib-numbers-tensor-rat64/src/lib.rs",
       "crates/sim-lib-numbers-tensor-rat64/src/tests.rs",
       "features.toml",
+      "optimize-check/Cargo.toml",
       "xtask/Cargo.toml"
     ]
   },
-  "recipe_book_count": 33,
+  "recipe_book_count": 44,
   "recipes": [
     {
       "book": "numbers/ad",
@@ -3317,6 +4173,26 @@
       "title": "Numbers Complex"
     },
     {
+      "book": "numbers/continuation",
+      "book_toml": "crates/sim-lib-numbers-continuation/recipes/book.toml",
+      "card_id": "cookbook/numbers/continuation",
+      "group": "workspace",
+      "package": "sim-lib-numbers-continuation",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/continuation/01-basics/limiting-boundary",
+          "codec": "lisp",
+          "id": "limiting-boundary",
+          "package": "sim-lib-numbers-continuation",
+          "recipe_toml": "crates/sim-lib-numbers-continuation/recipes/01-basics/limiting-boundary/recipe.toml",
+          "title": "Trace a limiting boundary"
+        }
+      ],
+      "summary": "Bounded pseudo-arclength traces with predictor/corrector evidence.",
+      "title": "Continuation recipes"
+    },
+    {
       "book": "numbers/core",
       "book_toml": "crates/sim-lib-numbers-core/recipes/book.toml",
       "card_id": "cookbook/numbers/core",
@@ -3355,6 +4231,26 @@
       ],
       "summary": "Continued-fraction and exotic number-domain descriptors.",
       "title": "Numbers Exotic"
+    },
+    {
+      "book": "numbers/extended",
+      "book_toml": "crates/sim-lib-numbers-extended/recipes/book.toml",
+      "card_id": "cookbook/numbers/extended",
+      "group": "workspace",
+      "package": "sim-lib-numbers-extended",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/extended/01-basics/convergence",
+          "codec": "lisp",
+          "id": "convergence",
+          "package": "sim-lib-numbers-extended",
+          "recipe_toml": "crates/sim-lib-numbers-extended/recipes/01-basics/convergence/recipe.toml",
+          "title": "Rerun a kernel at extended precision"
+        }
+      ],
+      "summary": "Finite double-double arithmetic through shared numerical contracts.",
+      "title": "Extended precision"
     },
     {
       "book": "numbers/f64",
@@ -3457,6 +4353,66 @@
       "title": "Numbers I64"
     },
     {
+      "book": "numbers/implicit",
+      "book_toml": "crates/sim-lib-numbers-implicit/recipes/book.toml",
+      "card_id": "cookbook/numbers/implicit",
+      "group": "workspace",
+      "package": "sim-lib-numbers-implicit",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/implicit/01-basics/stiff-decay",
+          "codec": "lisp",
+          "id": "stiff-decay",
+          "package": "sim-lib-numbers-implicit",
+          "recipe_toml": "crates/sim-lib-numbers-implicit/recipes/01-basics/stiff-decay/recipe.toml",
+          "title": "Stiff decay"
+        }
+      ],
+      "summary": "Stiff ODE and index-1 DAE integration with inspectable evidence.",
+      "title": "Implicit numbers"
+    },
+    {
+      "book": "numbers/interval",
+      "book_toml": "crates/sim-lib-numbers-interval/recipes/book.toml",
+      "card_id": "cookbook/numbers/interval",
+      "group": "workspace",
+      "package": "sim-lib-numbers-interval",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/interval/01-basics/sealed-threshold",
+          "codec": "lisp",
+          "id": "sealed-threshold",
+          "package": "sim-lib-numbers-interval",
+          "recipe_toml": "crates/sim-lib-numbers-interval/recipes/01-basics/sealed-threshold/recipe.toml",
+          "title": "Classify with sealed intervals"
+        }
+      ],
+      "summary": "",
+      "title": "Certified interval recipes"
+    },
+    {
+      "book": "numbers/method",
+      "book_toml": "crates/sim-lib-numbers-method/recipes/book.toml",
+      "card_id": "cookbook/numbers/method",
+      "group": "workspace",
+      "package": "sim-lib-numbers-method",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/method/01-basics/method-evidence",
+          "codec": "lisp",
+          "id": "method-evidence",
+          "package": "sim-lib-numbers-method",
+          "recipe_toml": "crates/sim-lib-numbers-method/recipes/01-basics/method-evidence/recipe.toml",
+          "title": "Inspect common method evidence"
+        }
+      ],
+      "summary": "Plan bounded algorithms and inspect non-forgeable common evidence.",
+      "title": "Bounded numerical methods"
+    },
+    {
       "book": "numbers/numeric",
       "book_toml": "crates/sim-lib-numbers-numeric/recipes/book.toml",
       "card_id": "cookbook/numbers/numeric",
@@ -3483,6 +4439,46 @@
       ],
       "summary": "Numeric methods such as differentiation, integration, and ODE solving.",
       "title": "Numbers Numeric"
+    },
+    {
+      "book": "numbers/optimize",
+      "book_toml": "crates/sim-lib-numbers-optimize/recipes/book.toml",
+      "card_id": "cookbook/numbers/optimize",
+      "group": "workspace",
+      "package": "sim-lib-numbers-optimize",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/optimize/01-basics/bounded-optimization",
+          "codec": "",
+          "id": "bounded-optimization",
+          "package": "sim-lib-numbers-optimize",
+          "recipe_toml": "crates/sim-lib-numbers-optimize/recipes/01-basics/bounded-optimization/recipe.toml",
+          "title": "Bounded optimization with convergence evidence"
+        }
+      ],
+      "summary": "Run bounded numerical optimization problems.",
+      "title": "Optimization recipes"
+    },
+    {
+      "book": "numbers/poly",
+      "book_toml": "crates/sim-lib-numbers-poly/recipes/book.toml",
+      "card_id": "cookbook/numbers/poly",
+      "group": "workspace",
+      "package": "sim-lib-numbers-poly",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/poly/01-basics/certified-evaluation",
+          "codec": "lisp",
+          "id": "certified-evaluation",
+          "package": "sim-lib-numbers-poly",
+          "recipe_toml": "crates/sim-lib-numbers-poly/recipes/01-basics/certified-evaluation/recipe.toml",
+          "title": "Certified coefficient evaluation"
+        }
+      ],
+      "summary": "",
+      "title": "Coefficient polynomial recipes"
     },
     {
       "book": "numbers/prelude",
@@ -3525,6 +4521,26 @@
       "title": "Numbers Quad"
     },
     {
+      "book": "numbers/quantity",
+      "book_toml": "crates/sim-lib-numbers-quantity/recipes/book.toml",
+      "card_id": "cookbook/numbers/quantity",
+      "group": "workspace",
+      "package": "sim-lib-numbers-quantity",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/quantity/01-basics/energy-and-torque",
+          "codec": "lisp",
+          "id": "energy-and-torque",
+          "package": "sim-lib-numbers-quantity",
+          "recipe_toml": "crates/sim-lib-numbers-quantity/recipes/01-basics/energy-and-torque/recipe.toml",
+          "title": "Energy is not torque"
+        }
+      ],
+      "summary": "Exact dimensions, semantic kinds, and honest units.",
+      "title": "Semantic quantities"
+    },
+    {
       "book": "numbers/rational",
       "book_toml": "crates/sim-lib-numbers-rational/recipes/book.toml",
       "card_id": "cookbook/numbers/rational",
@@ -3563,6 +4579,34 @@
       ],
       "summary": "Runge-Kutta ODE solver methods.",
       "title": "Numbers RK"
+    },
+    {
+      "book": "numbers/root",
+      "book_toml": "crates/sim-lib-numbers-root/recipes/book.toml",
+      "card_id": "cookbook/numbers/root",
+      "group": "workspace",
+      "package": "sim-lib-numbers-root",
+      "recipe_count": 2,
+      "recipes": [
+        {
+          "card_id": "numbers/root/01-basics/scalar-root",
+          "codec": "lisp",
+          "id": "scalar-root",
+          "package": "sim-lib-numbers-root",
+          "recipe_toml": "crates/sim-lib-numbers-root/recipes/01-basics/scalar-root/recipe.toml",
+          "title": "Bracketed scalar root"
+        },
+        {
+          "card_id": "numbers/root/02-vector/vector-root",
+          "codec": "lisp",
+          "id": "vector-root",
+          "package": "sim-lib-numbers-root",
+          "recipe_toml": "crates/sim-lib-numbers-root/recipes/02-vector/vector-root/recipe.toml",
+          "title": "Rank-diagnosed vector root"
+        }
+      ],
+      "summary": "Bracketed scalar and residual-carrying vector root searches.",
+      "title": "Numbers Root Finding"
     },
     {
       "book": "numbers/signal",
@@ -3633,12 +4677,32 @@
       "title": "Numbers Signal Transforms"
     },
     {
+      "book": "numbers/special",
+      "book_toml": "crates/sim-lib-numbers-special/recipes/book.toml",
+      "card_id": "cookbook/numbers/special",
+      "group": "workspace",
+      "package": "sim-lib-numbers-special",
+      "recipe_count": 1,
+      "recipes": [
+        {
+          "card_id": "numbers/special/01-basics/gamma-tail",
+          "codec": "lisp",
+          "id": "gamma-tail",
+          "package": "sim-lib-numbers-special",
+          "recipe_toml": "crates/sim-lib-numbers-special/recipes/01-basics/gamma-tail/recipe.toml",
+          "title": "Inspect a gamma tail"
+        }
+      ],
+      "summary": "Evidence-carrying real special functions.",
+      "title": "Special functions"
+    },
+    {
       "book": "numbers/stats",
       "book_toml": "crates/sim-lib-numbers-stats/recipes/book.toml",
       "card_id": "cookbook/numbers/stats",
       "group": "workspace",
       "package": "sim-lib-numbers-stats",
-      "recipe_count": 10,
+      "recipe_count": 11,
       "recipes": [
         {
           "card_id": "numbers/stats/01-basics/bounded-sequence-inference",
@@ -3679,6 +4743,14 @@
           "package": "sim-lib-numbers-stats",
           "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml",
           "title": "Robust benchmark statistics"
+        },
+        {
+          "card_id": "numbers/stats/01-basics/space-filling-evidence",
+          "codec": "rust",
+          "id": "space-filling-evidence",
+          "package": "sim-lib-numbers-stats",
+          "recipe_toml": "crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/recipe.toml",
+          "title": "Reconstructable space-filling evidence"
         },
         {
           "card_id": "numbers/stats/01-basics/stats-helpers",
@@ -3730,7 +4802,7 @@
       "card_id": "cookbook/numbers/tensor",
       "group": "workspace",
       "package": "sim-lib-numbers-tensor",
-      "recipe_count": 4,
+      "recipe_count": 5,
       "recipes": [
         {
           "card_id": "numbers/tensor/01-basics/tensor-cast",
@@ -3739,6 +4811,14 @@
           "package": "sim-lib-numbers-tensor",
           "recipe_toml": "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml",
           "title": "Cast a tensor explicitly"
+        },
+        {
+          "card_id": "numbers/tensor/01-basics/tensor-construction-selection",
+          "codec": "",
+          "id": "tensor-construction-selection",
+          "package": "sim-lib-numbers-tensor",
+          "recipe_toml": "crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-construction-selection/recipe.toml",
+          "title": "Construct and select a tensor"
         },
         {
           "card_id": "numbers/tensor/01-basics/tensor-constructor",
@@ -3827,6 +4907,34 @@
       ],
       "summary": "Complex-cell tensor helpers.",
       "title": "Numbers Tensor Cmplxf"
+    },
+    {
+      "book": "numbers/tensor-decomp",
+      "book_toml": "crates/sim-lib-numbers-tensor-decomp/recipes/book.toml",
+      "card_id": "cookbook/numbers/tensor-decomp",
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-decomp",
+      "recipe_count": 2,
+      "recipes": [
+        {
+          "card_id": "numbers/tensor-decomp/01-basics/matrix-functions",
+          "codec": "lisp",
+          "id": "matrix-functions",
+          "package": "sim-lib-numbers-tensor-decomp",
+          "recipe_toml": "crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/matrix-functions/recipe.toml",
+          "title": "Certified matrix functions"
+        },
+        {
+          "card_id": "numbers/tensor-decomp/01-basics/qr-eigen",
+          "codec": "lisp",
+          "id": "qr-eigen",
+          "package": "sim-lib-numbers-tensor-decomp",
+          "recipe_toml": "crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/qr-eigen/recipe.toml",
+          "title": "Certified dense decompositions"
+        }
+      ],
+      "summary": "",
+      "title": "Tensor decomposition"
     },
     {
       "book": "numbers/tensor-f32",

@@ -1,7 +1,9 @@
 //! Shared helpers for the linear-algebra ops: tensor shape/rank validation,
 //! argument extraction, and element-wise value arithmetic.
 
-use sim_kernel::{DefaultFactory, Error, Expr, Factory, Result, Symbol, Value, force_list_to_vec};
+use sim_kernel::{
+    DefaultFactory, Error, Expr, Factory, HandleSeed, Result, Symbol, Value, force_list_to_vec,
+};
 use sim_lib_numbers_core::domains;
 use sim_lib_numbers_tensor::{Tensor, tensor_value_ref};
 
@@ -90,6 +92,7 @@ pub fn extract_usize(value: &Value, context: &str) -> Result<usize> {
     let mut cx = sim_kernel::Cx::new(
         std::sync::Arc::new(sim_kernel::NoopEvalPolicy),
         std::sync::Arc::new(DefaultFactory),
+        HandleSeed::new(1),
     );
     match value.object().as_expr(&mut cx)? {
         Expr::Number(number) => number

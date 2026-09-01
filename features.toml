@@ -1,5 +1,32 @@
 schema = "sim.features"
 
+[[feature]]
+id = "feature/sim-numbers/semantic-quantities"
+title = "Semantic physical quantities"
+owner = "crate/sim-lib-numbers-quantity"
+audiences = ["code", "framework", "user"]
+summary = "Compose generic installed scalars with bounded exact SI dimensions, open semantic kinds, exact affine units, point/interval laws, Shape admission, and canonical read construction."
+guidance = "Use Quantity when physical meaning is part of the value contract. Dimension equality is necessary but semantic-kind equality is independently required: energy and torque deliberately refuse substitution. Implement Scalar for an installed number domain so conversions use exact rational constants inside that domain; do not convert through f64. DomainQuantity source strings remain construction evidence and are not numerical quantities."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-quantity",
+  "anchor/runtime-lib/sim-lib-numbers-quantity/quantity-lib",
+  "anchor/rustdoc/sim-lib-numbers-quantity/quantity",
+  "anchor/rustdoc/sim-lib-numbers-quantity/dimension",
+  "anchor/rustdoc/sim-lib-numbers-quantity/measure-kind",
+  "anchor/rustdoc/sim-lib-numbers-quantity/unit",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-quantity/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/semantic-quantity"
+task = "Represent and combine a physical quantity"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/semantic-quantities", why = "The quantity owner composes generic scalars, exact dimensions, open semantic kinds, affine units, roles, Shape, and read construction." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-quantity/src/tests", why = "Checked laws prove kind mismatch refusal, affine behavior, exact conversion, rational powers, bounded construction, and semantic data closure." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-quantity/01-basics/energy-and-torque", why = "The runtime recipe demonstrates the required equal-dimension, different-kind distinction." },
+]
+
 [enforcement.audience]
 code = "strict"
 framework = "strict"
@@ -12,6 +39,192 @@ code = "advisory"
 [enforcement.route]
 major_entrypoints = "advisory"
 frameworks = "advisory"
+
+[[feature]]
+id = "feature/sim-numbers/special-functions-and-ranked-grid"
+title = "Evidence-carrying special functions and ranked-grid interpolation"
+owner = "crate/sim-lib-numbers-special"
+audiences = ["code", "framework", "user"]
+summary = "Compute reusable error, gamma, beta, elliptic, normal, Student-t, and ranked regular-grid results with explicit numerical regions, stable probability complements, tensor geometry, and resource evidence."
+guidance = "Use sim-lib-numbers-special for general real special functions, stats for normal and Student-t distributions, and signal's RegularGridInterpolator for dense row-major grids. Direct survival functions preserve tails. Ranked monotone interpolation composes one-dimensional shape preservation but deliberately makes no multidimensional monotonicity claim."
+claims_anchors = ["anchor/crate/sim-lib-numbers-special", "anchor/runtime-lib/sim-lib-numbers-special/special-numbers-lib", "anchor/rustdoc/sim-lib-numbers-special/accuracy-evidence", "anchor/rustdoc/sim-lib-numbers-signal/regular-grid-interpolator"]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", "spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/regular_grid_tests"]
+
+[[route]]
+id = "route/sim-numbers/special-functions-and-ranked-grid"
+title = "Compute special functions, distribution tails, or a ranked grid"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/special-functions-and-ranked-grid", why = "Select the single numerical owner and declare the tail or tensor policy before inspecting algorithm and bounded-work evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests", why = "The checked special-function tests prove numerical-region selection and stable probability complements." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-special/01-basics/gamma-tail", why = "The runnable gamma-tail recipe exposes the selected algorithm and retained evidence." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/extended-precision-convergence"
+title = "Extended-precision convergence domain"
+owner = "crate/sim-lib-numbers-extended"
+audiences = ["code", "framework", "user"]
+summary = "Inject normalized double-double arithmetic into shared numerical kernels while preserving exact component identity and the canonical number-domain promotion lattice."
+guidance = "Use DoubleDouble through RealScalar when binary64 cancellation or convergence stalls before the requested tolerance. Load ExtendedNumbersLib for runtime literals and promotion from f64 or rational. This is fixed finite precision; use sim-lib-numbers-exotic continued fractions for lazy exact approximation and sim-lib-numbers-rational for exact oracles."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-extended",
+  "anchor/runtime-lib/sim-lib-numbers-extended/extended-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-extended/double-double",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/extended-precision-convergence"
+title = "Rerun a numerical kernel at extended precision"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/extended-precision-convergence", why = "Keep the algorithm fixed and select DoubleDouble at the RealScalar boundary." },
+  { feature = "feature/sim-numbers/method-evidence", why = "Retain common convergence and bounded-work evidence beside the domain result." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests", why = "The checked tests compare extended precision against exact rational oracles and binary64 behavior." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-extended/01-basics/convergence", why = "The runnable convergence recipe demonstrates the precision-domain substitution." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/sealed-interval-certification"
+title = "Sealed interval certification"
+owner = "crate/sim-lib-numbers-interval"
+audiences = ["code", "framework", "user"]
+summary = "Keep estimates distinct from unforgeable mathematical enclosures carrying exact inputs, reviewed issuer identity, trace digest, and method evidence."
+guidance = "Use EstimateInterval for numerical spreads and CertifiedInterval only when a definite decision needs a mathematical enclosure. Certificates are issued solely by exact-rational, directed-binary64, reviewed-sqrt, and scalar-root kernels; runtime data and provider reports are inspection inputs, never certificate constructors. Compose sim-lib-numbers-rational, sim-lib-numbers-root, and sim-lib-numbers-method for domain values and broader solver evidence without promoting their estimates or brackets."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-interval",
+  "anchor/runtime-lib/sim-lib-numbers-interval/interval-lib",
+  "anchor/rustdoc/sim-lib-numbers-interval/certified-interval",
+  "anchor/rustdoc/sim-lib-numbers-interval/estimate-interval",
+  "anchor/rustdoc/sim-lib-numbers-interval/rational-interval",
+  "anchor/rustdoc/sim-lib-numbers-interval/interval_newton",
+  "anchor/rustdoc/sim-lib-numbers-interval/krawczyk",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/sealed-interval-certification"
+title = "Certify an enclosure and make a definite decision"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/sealed-interval-certification", why = "Start with exact inputs or an existing certificate and pass only reviewed certified intervals to definite classification." },
+  { feature = "feature/sim-numbers/method-evidence", why = "Inspect the reviewed kernel and bounded method evidence without promoting an estimate into a certificate." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests", why = "The checked tests prove sealed construction paths and refusal of forged or insufficient evidence." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-interval/01-basics/sealed-threshold", why = "The runnable threshold recipe demonstrates a definite decision from certified bounds." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/bounded-optimization"
+title = "Evidence-carrying bounded optimization"
+owner = "crate/sim-lib-numbers-optimize"
+summary = "Bounded scalar, smooth multivariate, nonlinear, and linear least-squares methods with explicit plans and convergence evidence."
+guidance = "Use the bounded paths for box constraints; they use projected or active-set steps rather than clipping LM. Covariance is an availability result. Enable assignment only to convert numeric matrices into sim-discrete's certified solver; that crate remains the sole matching owner."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-optimize",
+  "anchor/runtime-lib/sim-lib-numbers-optimize/optimize-lib",
+  "anchor/rustdoc/sim-lib-numbers-optimize/objective-plan",
+  "anchor/rustdoc/sim-lib-numbers-optimize/least-squares-plan",
+  "anchor/rustdoc/sim-lib-numbers-optimize/minimize_scalar",
+  "anchor/rustdoc/sim-lib-numbers-optimize/linear_least_squares",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/bounded-optimization"
+title = "Choose and run a bounded optimizer"
+steps = [
+  { feature = "feature/sim-numbers/bounded-optimization", why = "Start from explicit bounds and select scalar Brent, projected BFGS, reflective least squares, or active-set linear least squares." },
+  { feature = "feature/sim-numbers/method-evidence", why = "Declare termination and evidence requirements before running the selected optimizer." },
+  { feature = "feature/sim-numbers/tensor-decomposition", why = "Reuse the canonical decomposition owner for rank and covariance evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests", why = "The checked tests prove bounded steps, convergence evidence, covariance availability, and failure policy." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-optimize/01-basics/bounded-optimization", why = "The runnable recipe demonstrates bounded optimization with visible evidence." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/method-evidence"
+title = "Bounded numerical method evidence"
+summary = "Plan numerical work with validated limits and criterion-specific tolerances, then inspect exact common evidence without replacing domain reports."
+owner = "crate/sim-lib-numbers-method"
+audiences = ["code", "framework", "user"]
+guidance = "Use MethodPlan and MethodEvidence for shared boundedness, termination, achieved-error, precision, and execution queries. Compose DenseSolveAdapter, StatsKMeansAdapter, or SignalEstimatorAdapter beside the original domain report. Use sim-lib-numbers-core RealScalar only inside algorithms; it is deliberately not a runtime NumberDomain or promotion lattice."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-method",
+  "anchor/runtime-lib/sim-lib-numbers-method/method-numbers-lib",
+  "anchor/rustdoc/sim-lib-numbers-method/method-evidence",
+  "anchor/rustdoc/sim-lib-numbers-method/method-plan",
+  "anchor/rustdoc/sim-lib-numbers-core/real-scalar",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-method/src/tests",
+]
+
+[[route]]
+id = "route/sim-numbers/bounded-numerical-method"
+title = "Plan and inspect a bounded numerical method"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/method-evidence", why = "Reuse criterion-specific plans and common evidence while retaining domain certificates." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-method/src/tests", why = "The checked tests prove bounded plans, termination evidence, and domain-adapter separation." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-method/01-basics/method-evidence", why = "The runnable recipe exposes common method evidence beside its domain result." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/coefficient-polynomial"
+title = "Certified coefficient polynomial algebra"
+summary = "Represent ordinary, integer-exponent Laurent, and rational-exponent Puiseux coefficient rows with canonical zeros, exact identities, certified floating evaluation, companion-Schur roots, and guarded Pade approximants."
+owner = "crate/sim-lib-numbers-poly"
+audiences = ["code", "framework", "user"]
+guidance = "Use sim-lib-numbers-poly when coefficients and their exponent lattice are the data: dense Polynomial, integer-exponent LaurentPolynomial, rational-exponent PuiseuxPolynomial, Horner error evidence, exact rational GCD/division, root certificates, or Pade construction. Use sim-lib-numbers-cas instead when expressions, symbols, rewriting, or formula differentiation are the data. Root extraction composes the canonical tensor-decomp Schur path; it does not introduce another eigen owner."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-poly",
+  "anchor/runtime-lib/sim-lib-numbers-poly/poly-lib",
+  "anchor/rustdoc/sim-lib-numbers-poly/polynomial",
+  "anchor/rustdoc/sim-lib-numbers-poly/laurent-polynomial",
+  "anchor/rustdoc/sim-lib-numbers-poly/puiseux-polynomial",
+  "anchor/rustdoc/sim-lib-numbers-poly/root-evidence",
+  "anchor/rustdoc/sim-lib-numbers-poly/pade-approximant",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/coefficient-polynomial"
+title = "Compute with coefficient polynomials and evidence"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/coefficient-polynomial", why = "Choose the honest exponent domain, normalize coefficients, and retain exact or numerical evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests", why = "The checked tests prove canonical forms, exact identities, guarded approximation, and root evidence." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-poly/01-basics/certified-evaluation", why = "The runnable recipe demonstrates certified coefficient-polynomial evaluation." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/tensor-decomposition"
+title = "Evidence-carrying tensor decomposition"
+summary = "Factor immutable dense matrices and compute matrix functions with bounded QR, eigen, Schur, SVD, scaling-and-squaring exponential, and Schur-backed matrix equations, retaining method and residual evidence."
+owner = "crate/sim-lib-numbers-tensor-decomp"
+audiences = ["code", "framework", "user"]
+guidance = "Use qr_f64 for optional column-pivoted QR, symmetric_eigen_f64 for admitted symmetry, real_schur_f64 for general real spectra, and svd_f64 for stable rectangular decomposition without normal equations. Use matrix_power_f64, matrix_exponential_f64, solve_sylvester_f64, and solve_lyapunov_f64 for reviewed matrix functions and equations with scale, Pade order, squaring, separation, and residual evidence. Derive rank, condition, pseudoinverse, least squares, and null spaces from one caller cutoff. Provider factors require local admission. Reuse tensor-linalg for direct solves; decomposition remains the single matrix-function owner."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-tensor-decomp",
+  "anchor/runtime-lib/sim-lib-numbers-tensor-decomp/tensor-decomp-lib",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/qr-factorization",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/symmetric-eigen",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/real-schur",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/svd",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/matrix-exponential",
+  "anchor/rustdoc/sim-lib-numbers-tensor-decomp/matrix-equation-solution",
+]
+claims_specimens = ["spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests"]
+
+[[route]]
+id = "route/sim-numbers/tensor-decomposition"
+title = "Factor a dense tensor with reviewable evidence"
+audiences = ["framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/tensor-decomposition", why = "Choose QR or symmetric eigen and set explicit admission and accuracy policy before inspecting the independent certificate." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests", why = "The checked tests prove decomposition identities, residual evidence, rank policy, and fail-closed admission." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-tensor-decomp/01-basics/qr-eigen", why = "The runnable recipe demonstrates QR and eigen evidence on a dense tensor." },
+]
 
 [[feature]]
 id = "feature/sim-numbers/generated-docs"
@@ -105,11 +318,11 @@ claims_specimens = [
 
 [[feature]]
 id = "feature/sim-numbers/statistical-inference"
-title = "Bounded clustering and sequence inference"
-summary = "Compute robust benchmark dispersion and seeded uncertainty, cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence."
+title = "Bounded statistical and sequence inference"
+summary = "Compute exact binary uncertainty, deterministic bootstrap intervals, versioned replayable sampling, bounded Latin hypercube and Sobol designs, standardized moments and Kolmogorov-Smirnov statistics, alpha-spent registered looks, robust dispersion, clustering, mixtures, streaming quantiles, and finite hidden-state inference with explicit work and termination evidence."
 owner = "crate/sim-lib-numbers-stats"
 audiences = ["code", "framework", "user"]
-guidance = "Use median_absolute_deviation for benchmark dispersion in source units and bootstrap_mean_difference_interval for the benchmark comparison policy's seeded, work-bounded candidate-minus-baseline mean uncertainty. Use fit_kmeans with KMeansControl for deterministic k-means++ initialization, explicit empty-cluster repair, bounded restarts, and lowest-inertia selection. Use fit_gmm with GmmSpec and GmmControl for log-domain diagonal or full-covariance EM, positive regularization, explicit singular-component policy, and AIC/BIC evidence. Use QuantileSketch when exact small inputs must graduate to a mergeable rank summary under a hard entry limit. Use MarkovModel for observable transition counts and HiddenMarkovModel for finite discrete or scalar-Gaussian emissions. Use forward_backward, viterbi, or posterior_decode for underflow-safe inference, and fit_hmm only with an explicit seeded HmmFitControl work/iteration bound. Point clustering does not own temporal alignment: compose sim-lib-discrete-graph dynamic_time_warp or layered_shortest_path when observation order matters."
+guidance = "Use SeededSampler when deterministic numeric work needs version identity, exact word accounting, replay state, or labeled substreams; existing clustering, HMM, and bootstrap paths preserve their published SplitMix64-v1 mappings. Use LatinHypercubePlan or the reviewed bounded SobolPlan for reconstructable space-filling sweeps, then SweepPlan for boundary, duplicate, occupancy, sampler, and caller-owned untested-region evidence. Use standardized_moments with an explicit population or adjusted-sample convention and Kolmogorov-Smirnov reports with exact-statistic or asymptotic identity. Reuse BootstrapControl across independent, paired, and cluster-preserving resampling. Seal optional-stopping policy with RegisteredLookSequence. Use fit_kmeans or fit_gmm for bounded clustering, QuantileSketch for mergeable ranks, and HiddenMarkovModel for finite sequence inference. Point clustering does not own temporal alignment: compose sim-lib-discrete-graph dynamic_time_warp or layered_shortest_path when observation order matters."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-stats",
   "anchor/runtime-lib/sim-lib-numbers-stats/stats-numbers-lib",
@@ -117,16 +330,21 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-stats/fit_hmm",
   "anchor/rustdoc/sim-lib-numbers-stats/fit_kmeans",
   "anchor/rustdoc/sim-lib-numbers-stats/bootstrap_mean_difference_interval",
+  "anchor/rustdoc/sim-lib-numbers-stats/clustered_bootstrap_interval",
+  "anchor/rustdoc/sim-lib-numbers-stats/exact_binary_interval",
+  "anchor/rustdoc/sim-lib-numbers-stats/fit_isotonic",
   "anchor/rustdoc/sim-lib-numbers-stats/forward_backward",
   "anchor/rustdoc/sim-lib-numbers-stats/gmm-model",
   "anchor/rustdoc/sim-lib-numbers-stats/hidden-markov-model",
   "anchor/rustdoc/sim-lib-numbers-stats/kmeans-control",
   "anchor/rustdoc/sim-lib-numbers-stats/median_absolute_deviation",
+  "anchor/rustdoc/sim-lib-numbers-stats/paired_bootstrap_interval",
   "anchor/rustdoc/sim-lib-numbers-stats/quantile-sketch",
   "anchor/rustdoc/sim-lib-numbers-stats/viterbi",
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/clustering_tests",
+  "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/decision_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/markov_tests",
   "spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/quantile_tests",
@@ -144,11 +362,10 @@ claims_anchors = [
   "anchor/runtime-lib/sim-lib-numbers-signal/signal-numbers-lib",
   "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/block-convolution-report",
-  "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal",
+  "anchor/rustdoc/sim-lib-numbers-signal/analytic_signal",
   "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-plan",
   "anchor/rustdoc/sim-lib-numbers-signal/analytic-signal-report",
   "anchor/rustdoc/sim-lib-numbers-signal/analytic_envelope",
-  "anchor/rustdoc/sim-lib-numbers-signal/analytic_signal",
   "anchor/rustdoc/sim-lib-numbers-signal/ar-model",
   "anchor/rustdoc/sim-lib-numbers-signal/ar-order-criterion",
   "anchor/rustdoc/sim-lib-numbers-signal/burg",
@@ -270,12 +487,10 @@ claims_anchors = [
   "anchor/rustdoc/sim-lib-numbers-tensor/tensor-location",
   "anchor/rustdoc/sim-lib-numbers-tensor/boxed-tensor-storage",
   "anchor/rustdoc/sim-lib-numbers-tensor/spec-tensor",
-  "anchor/rustdoc/sim-lib-numbers-tensor/tensor-function",
   "anchor/rustdoc/sim-lib-numbers-tensor/build_tensor_value",
   "anchor/rustdoc/sim-lib-numbers-tensor/cast_tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/checked_element_count",
   "anchor/rustdoc/sim-lib-numbers-tensor-linalg/tensor-linalg-lib",
-  "anchor/rustdoc/sim-lib-numbers-tensor-linalg/dispatch",
 ]
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-tensor/src/implementation/citizen",
@@ -284,10 +499,10 @@ claims_specimens = [
 [[feature]]
 id = "feature/sim-numbers/tensor-execution"
 title = "Tensor execution"
-summary = "Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
+summary = "Run the canonical construction, composition, selection, comparison, element-wise, reduction, linear-algebra, and transcendental Tensor vocabulary through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path."
 owner = "crate/sim-lib-numbers-tensor"
 audiences = ["code", "framework"]
-guidance = "Use this row when a tensor expression needs explicit executor placement. TensorBroadcastLib and TensorLinalgLib submit element-wise add, sub, mul, div, rem, pow, neg, whole-tensor sum/min/max/norm, transpose, dot, matmul, sqrt, exp, sin, and cos through checked TensorRequest values, defaulting to CPU when no executor is bound. Keep providers behind TensorExecutor and realize through TensorSite so the caller environment is restored after evaluation."
+guidance = "Use this row for canonical Tensor work: explicit range/space/grid construction; strict concat, stack, padding, selection, cumulative, closeness, and element-wise operations; reductions and linear algebra. Every edge policy travels in the TensorOp descriptor, providers advertise the exact symbols they accept, and a decline uses the existing CPU fallback. Use machine_limits from sim-lib-numbers-core instead of copying dtype constants. Keep providers behind TensorExecutor and realize through TensorSite so binding remains child-Env scoped."
 claims_anchors = [
   "anchor/export/sim-lib-numbers-tensor/site/tensor",
   "anchor/rustdoc/sim-lib-numbers-tensor/active_tensor_executor",
@@ -343,7 +558,7 @@ title = "Numeric pipelines"
 summary = "Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when composing or running numeric jobs through the numeric registry. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry; quadrature remains scalar."
+guidance = "Use this row when composing or running numeric jobs through the numeric registry. ODE work uses the single OdeProblem/OdePlan/OdeSolution contract: mathematical callables and span stay in the problem, numerical tolerances, stepping, output, and limits stay in the plan, and every backend returns a dense trajectory with bounded method evidence. Executable composed ODE pipelines support scalar f64 and tensor state through the same OdeSolver registry. sim-lib-numbers-quad additionally owns strictly monotone sampled scalar/vector quadrature, cumulative output, explicit event-side segments, non-uniform Simpson fallback evidence, and shared-mesh vector Gauss-Kronrod. Tensor reductions expose naive, pairwise, and Neumaier policies; audited quadrature plans default to Neumaier."
 claims_anchors = [
   "anchor/crate/sim-lib-numbers-numeric",
   "anchor/runtime-lib/sim-lib-numbers-numeric/numeric-numbers-lib",
@@ -367,9 +582,34 @@ title = "Tensor ODE pipelines"
 summary = "Run tensor-valued ODE state through the existing numeric ODE pipeline and Runge-Kutta solver registry."
 owner = "crate/sim-lib-numbers-numeric"
 audiences = ["code", "framework"]
-guidance = "Use this row when an ODE state is a Tensor. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state."
+guidance = "Use this row when an ODE state is a Tensor. Tensor state uses the same OdeProblem/OdePlan/OdeSolution surface and capability admission as scalar state. CPU runs accept ordinary callables; hardware tensor executors require a pure symbolic Func RHS whose sampled output has the same bounded shape and dtype as the state. The DOP853 reference backend provides eighth-order adaptive scalar/tensor parity with hard step and work refusal."
 claims_specimens = [
   "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests",
+]
+
+[[feature]]
+id = "feature/sim-numbers/implicit-radau-dae"
+title = "Radau IIA stiff ODE and index-1 DAE integration"
+summary = "Advance stiff ODEs and declared index-1 mass-matrix or residual DAEs with fifth-order Radau IIA, collocation dense output, common event semantics, and Newton/Jacobian/linear-solve evidence."
+owner = "crate/sim-lib-numbers-implicit"
+audiences = ["code", "framework", "user"]
+guidance = "Use radau-iia for stiff systems and only use the DAE forms when the problem supplies M(t,y)y'=f(t,y) with an explicit differential mask or F(t,y,ydot)=0 with a differential/algebraic partition and stage Jacobian. Select analytic or AD Jacobians when available; finite differences require an explicit step declaration. Inspect failed Newton attempts, recomputation reasons, rank, reciprocal conditioning, and factor reuse before trusting difficult solves."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-implicit",
+  "anchor/runtime-lib/sim-lib-numbers-implicit/implicit-numbers-lib",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-implicit/src/tests",
+]
+
+[[route]]
+id = "route/solve-stiff-ode-or-index-one-dae"
+task = "Solve a stiff ODE or declared index-1 DAE"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/numeric-pipelines", why = "The common numeric problem, plan, trajectory, event, and registry contracts define the composition boundary." },
+  { feature = "feature/sim-numbers/implicit-radau-dae", why = "The implicit owner supplies Radau collocation, bounded Newton, Jacobian policies, dense output, and DAE admission." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-implicit/src/tests", why = "The checked specimen proves order, stiff decay, scale separation, constraint retention, singular refusal, events, and work separation." },
 ]
 
 [[route]]
@@ -496,4 +736,64 @@ steps = [
   { feature = "feature/sim-numbers/tensor-ode", why = "The tensor ODE row owns tensor-state admission, CPU fallback, and hardware RHS restrictions." },
   { feature = "feature/sim-numbers/tensor-execution", why = "The tensor execution row owns Env-bound executor routing and CPU fallback for tensor operations." },
   { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-rk/src/tests", why = "The RK tests prove tensor state across fixed/adaptive methods, hardware refusals, and CPU agreement." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/pseudo-arclength-continuation"
+title = "Evidence-carrying pseudo-arclength continuation"
+summary = "Trace one-dimensional residual manifolds through folds with bounded secant/tangent prediction, bordered Newton correction, adaptive steps, and restart evidence."
+owner = "crate/sim-lib-numbers-continuation"
+audiences = ["code", "framework"]
+guidance = "Use this owner to trace parameter boundaries and folds. Supply two admitted points and an analytic, AD, or explicitly policy-backed finite-difference Jacobian; inspect the retained root/decomposition evidence and terminal event. Domain exits are never clamped."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-continuation",
+  "anchor/runtime-lib/sim-lib-numbers-continuation/continuation-lib",
+  "anchor/rustdoc/sim-lib-numbers-continuation/trace",
+  "anchor/rustdoc/sim-lib-numbers-continuation/continuation-problem",
+  "anchor/rustdoc/sim-lib-numbers-continuation/continuation-trace",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-continuation/src/tests",
+]
+depends_on = ["feature/sim-numbers/root-finding", "feature/sim-numbers/tensor-decomposition"]
+
+[[route]]
+id = "route/trace-parameter-boundary"
+task = "Trace a parameter boundary through folds with bounded restartable evidence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/pseudo-arclength-continuation", why = "The continuation owner validates seeds, predicts and corrects pseudo-arclength points, adapts bounded steps, and records distinct fold, rank, loop, and domain events." },
+  { feature = "feature/sim-numbers/root-finding", why = "The bordered Newton solve exposes shared residual, rank, damping, work, and replay evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-continuation/src/tests", why = "Checked fixtures prove circle, fold/cusp, singular correction, reversed seeds, domain exit, resumption, and bounded work." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-continuation/01-basics/limiting-boundary", why = "The runtime recipe discovers the limiting-boundary continuation schema." },
+]
+
+[[feature]]
+id = "feature/sim-numbers/root-finding"
+title = "Evidence-carrying root finding"
+summary = "Find scalar and vector roots while preserving brackets, residuals, derivative provenance, rank diagnostics, work bounds, and replay identity."
+owner = "crate/sim-lib-numbers-root"
+audiences = ["code", "framework"]
+guidance = "Use this owner below ODE, optimization, continuation, and interval Newton. Choose bisection or Brent-Dekker when a sign-changing bracket is required; choose safeguarded Newton, secant, damped vector Newton, or bounded Broyden when residual evidence is sufficient."
+claims_anchors = [
+  "anchor/crate/sim-lib-numbers-root",
+  "anchor/runtime-lib/sim-lib-numbers-root/root-lib",
+  "anchor/rustdoc/sim-lib-numbers-root/root-bracket",
+  "anchor/rustdoc/sim-lib-numbers-root/root-evidence",
+  "anchor/rustdoc/sim-lib-numbers-root/brent_dekker",
+  "anchor/rustdoc/sim-lib-numbers-root/damped_newton",
+]
+claims_specimens = [
+  "spec-test/sim-numbers/crates/sim-lib-numbers-root/src/tests",
+]
+
+[[route]]
+id = "route/find-numeric-root"
+task = "Find a scalar or vector root with reviewable evidence"
+audiences = ["code", "framework", "user"]
+steps = [
+  { feature = "feature/sim-numbers/root-finding", why = "The root owner distinguishes proved sign-changing brackets from residual-only estimates and records derivative, rank, work, termination, and replay evidence." },
+  { specimen = "spec-test/sim-numbers/crates/sim-lib-numbers-root/src/tests", why = "The checked tests cover endpoint and multiple roots, invalid and discontinuous brackets, flat derivatives, scaling, singular Jacobians, bounded Broyden resets, and deterministic replay." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-root/01-basics/scalar-root", why = "The scalar recipe demonstrates bracket-preserving Brent-Dekker search." },
+  { specimen = "recipe/sim-numbers/crates/sim-lib-numbers-root/02-vector/vector-root", why = "The vector recipe demonstrates rank-diagnosed damped Newton search." },
 ]

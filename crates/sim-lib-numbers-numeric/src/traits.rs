@@ -109,40 +109,206 @@ impl QuadOpts {
     }
 }
 
-/// Options controlling an ODE-solve call.
-#[derive(Clone, Debug)]
-pub struct OdeOpts {
-    /// The ODE solver method to use, or `auto` to let the registry choose.
-    pub method: Symbol,
-    /// The fixed step size, for fixed-step solvers.
-    pub h: Option<f64>,
-    /// The error tolerance, for adaptive solvers.
-    pub tol: Option<f64>,
-    /// An optional cap on the number of integration steps.
-    pub max_steps: Option<usize>,
+/// Absolute error scale, either shared by all components or component-wise.
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub enum AbsoluteTolerance {
+    Scalar(f64),
+    Components(Vec<f64>),
 }
 
-impl OdeOpts {
-    /// Returns default options for an adaptive ODE solve (`auto` with a tolerance).
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use sim_lib_numbers_numeric::OdeOpts;
-    ///
-    /// let opts = OdeOpts::default_adaptive();
-    /// assert_eq!(opts.method.to_string(), "auto");
-    /// assert!(opts.tol.is_some());
-    /// assert!(opts.h.is_none());
-    /// ```
-    pub fn default_adaptive() -> Self {
+/// Relative and absolute local-error policy.
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub struct ComponentTolerance {
+    pub relative: f64,
+    pub absolute: AbsoluteTolerance,
+}
+
+/// Step-size policy. Fixed methods use `fixed`; adaptive methods use `first` and `max`.
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub struct StepPolicy {
+    pub fixed: Option<f64>,
+    pub first: Option<f64>,
+    pub max: Option<f64>,
+}
+
+/// Which projections of the continuous path must be returned.
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub struct OutputPolicy {
+    pub samples: Vec<f64>,
+    pub retain_dense: bool,
+}
+
+/// Hard solver bounds.
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[allow(missing_docs)]
+pub struct MethodLimits {
+    pub steps: usize,
+    pub work: usize,
+    pub trace: usize,
+}
+
+/// Numerical policy for an ODE solve, separate from the mathematical problem.
+#[derive(Clone, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub struct OdePlan {
+    pub method: Symbol,
+    pub tolerance: ComponentTolerance,
+    pub step: StepPolicy,
+    pub output: OutputPolicy,
+    pub limits: MethodLimits,
+}
+
+impl OdePlan {
+    /// Conservative adaptive defaults; every tolerance component is explicit.
+    pub fn adaptive_default() -> Self {
         Self {
             method: Symbol::new("auto"),
-            h: None,
-            tol: Some(1.0e-8),
-            max_steps: None,
+            tolerance: ComponentTolerance {
+                relative: 1.0e-8,
+                absolute: AbsoluteTolerance::Scalar(1.0e-10),
+            },
+            step: StepPolicy {
+                fixed: None,
+                first: None,
+                max: None,
+            },
+            output: OutputPolicy {
+                samples: Vec::new(),
+                retain_dense: false,
+            },
+            limits: MethodLimits {
+                steps: 100_000,
+                work: 1_000_000,
+                trace: 256,
+            },
         }
     }
+}
+
+/// Integration interval, including reversed and zero-length spans.
+#[derive(Clone, Copy, Debug, PartialEq)]
+#[allow(missing_docs)]
+pub struct TimeSpan {
+    pub start: f64,
+    pub end: f64,
+}
+
+/// Event crossing direction.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[allow(missing_docs)]
+pub enum EventDirection {
+    Rising,
+    Falling,
+    Either,
+}
+
+/// A scalar event function and its stopping policy.
+#[derive(Clone)]
+#[allow(missing_docs)]
+pub struct EventFunction {
+    pub function: NumericCallable,
+    pub direction: EventDirection,
+    pub terminal: bool,
+    pub priority: i32,
+}
+
+/// Optional Jacobian callable.
+pub type JacobianFunction = NumericCallable;
+
+/// An implicit ODE form supplied as either a mass matrix or residual callable.
+#[derive(Clone)]
+#[allow(missing_docs)]
+pub enum ImplicitForm {
+    MassMatrix(Value),
+    Residual(NumericCallable),
+}
+
+/// One accepted endpoint of a trajectory.
+#[derive(Clone)]
+#[allow(missing_docs)]
+pub struct AcceptedStep {
+    pub time: f64,
+    pub state: Value,
+}
+
+/// Backend-owned interpolation data for one accepted interval.
+#[derive(Clone)]
+#[allow(missing_docs)]
+pub struct DenseSegment {
+    pub start: AcceptedStep,
+    pub end: AcceptedStep,
+}
+
+/// Continuous solver path: accepted endpoints plus interpolation segments.
+#[derive(Clone, Default)]
+#[allow(missing_docs)]
+pub struct Trajectory {
+    pub accepted: Vec<AcceptedStep>,
+    pub dense: Vec<DenseSegment>,
+}
+
+/// An event located on a dense segment.
+#[derive(Clone)]
+#[allow(missing_docs)]
+pub struct LocatedEvent {
+    pub event: usize,
+    pub time: f64,
+    pub state_before: Value,
+    pub state_after: Value,
+    pub terminal: bool,
+    pub priority: i32,
+}
+
+/// Why integration stopped.
+#[derive(Clone, Debug, PartialEq, Eq)]
+#[allow(missing_docs)]
+pub enum OdeTermination {
+    ReachedEnd,
+    TerminalEvent(usize),
+    StepLimit,
+    WorkLimit,
+}
+
+/// Inspectable numerical evidence retained by every backend.
+#[derive(Clone, Debug)]
+#[allow(missing_docs)]
+pub struct MethodEvidence {
+    pub accepted_steps: usize,
+    pub rejected_steps: usize,
+    pub rhs_evaluations: usize,
+    pub jacobian_evaluations: usize,
+    pub step_sizes: Vec<f64>,
+    pub step_size_range: Option<(f64, f64)>,
+    pub achieved_local_error: f64,
+    pub event_brackets: Vec<(usize, f64, f64)>,
+    pub termination: OdeTermination,
+}
+
+/// Complete ODE result.
+#[allow(missing_docs)]
+pub struct OdeSolution {
+    pub path: Trajectory,
+    pub events: Vec<LocatedEvent>,
+    pub evidence: MethodEvidence,
+}
+
+/// Capabilities used to reject unsupported problems before any RHS evaluation.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+#[allow(missing_docs)]
+pub struct OdeCapabilities {
+    pub scalar_state: bool,
+    pub tensor_state: bool,
+    pub adaptive: bool,
+    pub fixed: bool,
+    pub dense_path: bool,
+    pub events: bool,
+    pub jacobian: bool,
+    pub mass_matrix: bool,
+    pub dae_residual: bool,
 }
 
 /// A numeric-method callable, either a `Func` value or any ordinary callable
@@ -291,17 +457,21 @@ impl NumericCallable {
 /// [`OdeSolver`].
 pub struct OdeProblem<'a> {
     /// The right-hand-side function giving the derivative.
-    pub dy: &'a NumericCallable,
+    pub rhs: &'a NumericCallable,
     /// The independent-variable symbol (typically `x`).
     pub var: &'a Symbol,
     /// The dependent-variable symbol (typically `y`).
     pub y_var: &'a Symbol,
     /// The initial value of the independent variable.
-    pub x0: &'a Value,
-    /// The initial value of the dependent variable.
-    pub y0: &'a Value,
-    /// The end value of the independent variable to integrate toward.
-    pub x_end: &'a Value,
+    pub span: TimeSpan,
+    /// The initial state.
+    pub initial: &'a Value,
+    /// Root-located event functions.
+    pub events: &'a [EventFunction],
+    /// Optional Jacobian.
+    pub jacobian: Option<&'a JacobianFunction>,
+    /// Optional mass matrix or DAE residual.
+    pub implicit: Option<&'a ImplicitForm>,
 }
 
 /// A numeric differentiation backend: computes `df/dvar` at a point.
@@ -352,11 +522,8 @@ pub trait Quadrature: NumericPlugin {
 
 /// A numeric ODE-solving backend: integrates an initial-value problem.
 pub trait OdeSolver: NumericPlugin {
-    /// Solves `problem`, returning the sampled `(x, y)` points of the trajectory.
-    fn solve(
-        &self,
-        cx: &mut Cx,
-        problem: OdeProblem<'_>,
-        opt: OdeOpts,
-    ) -> Result<Vec<(Value, Value)>>;
+    /// Declares demands this backend can satisfy.
+    fn capabilities(&self) -> OdeCapabilities;
+    /// Solves a validated problem and plan.
+    fn solve(&self, cx: &mut Cx, problem: OdeProblem<'_>, plan: OdePlan) -> Result<OdeSolution>;
 }

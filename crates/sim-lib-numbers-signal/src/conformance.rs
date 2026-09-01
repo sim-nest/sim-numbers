@@ -119,3 +119,4 @@ fn empty_and_non_finite_inputs_fail_closed() {
         })
     );
 }
+// conformance: signal tests prove transform conventions against direct reference definitions.

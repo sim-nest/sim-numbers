@@ -39,6 +39,7 @@ mod periodogram;
 mod plan;
 mod prediction;
 mod reference;
+mod regular_grid;
 mod runtime;
 mod runtime_convolution;
 mod runtime_convolution_callable;
@@ -106,6 +107,10 @@ pub use prediction::{
     PredictionDirection, PredictionPlan, PredictionResult, predict_backward, predict_forward,
 };
 pub use reference::{reference_dct, reference_dft, reference_dst};
+pub use regular_grid::{
+    GridInterpolationPlan, GridInterpolationReport, GridInterpolationResult,
+    RegularGridInterpolator,
+};
 pub use runtime::{SignalNumbersLib, call_signal_transform, signal_transform_symbol};
 pub use runtime_convolution_callable::{
     call_signal_convolve, call_signal_correlate, call_signal_deconvolve, signal_convolve_symbol,
@@ -158,6 +163,8 @@ mod interpolation_tests;
 mod multidimensional_tests;
 #[cfg(test)]
 mod plan_tests;
+#[cfg(test)]
+mod regular_grid_tests;
 #[cfg(test)]
 mod runtime_tests;
 #[cfg(test)]

@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use half::{bf16, f16};
 use sim_kernel::{
-    Cx, DefaultFactory, Factory, NoopEvalPolicy, NumberLiteral, Result, Symbol, Value,
+    Cx, DefaultFactory, Factory, HandleSeed, NoopEvalPolicy, NumberLiteral, Result, Symbol, Value,
 };
 
 use crate::Tensor;
@@ -173,7 +173,11 @@ pub fn bounded_element_count(shape: &[usize]) -> Result<usize> {
 /// `None` if the value is not a number. Shared backing for the typed
 /// literal-cell parsers below.
 pub fn number_literal_for_tensor_cell(value: &Value) -> Option<NumberLiteral> {
-    let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(1),
+    );
     value
         .object()
         .as_number_value()?

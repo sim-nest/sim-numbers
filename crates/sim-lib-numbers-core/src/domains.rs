@@ -23,6 +23,8 @@
 //! - `bigint` is the arbitrary-precision integer domain and reaches
 //!   `rational`.
 //! - `f32 -> f64`; `f64 <-> rational` when decimal rationalization succeeds.
+//! - `f64 -> extended` and `rational -> extended`; conversion back to `f64` is
+//!   explicit because it can discard the low component.
 //! - `i64`, `f64`, and `rational` reach `complex`; `complex` is the scalar
 //!   numeric sink before symbolic, function, or tensor lifting.
 //! - `cas` absorbs scalar domains through value promotion so symbolic
@@ -127,6 +129,11 @@ pub fn f64() -> Symbol {
     domain("f64")
 }
 
+/// The `numbers/extended` normalized double-double domain symbol.
+pub fn extended() -> Symbol {
+    domain("extended")
+}
+
 /// The `numbers/fixed` fixed-point domain symbol.
 pub fn fixed() -> Symbol {
     domain("fixed")
@@ -185,6 +192,11 @@ pub fn tensor_bcast() -> Symbol {
 /// The `numbers/tensor-linalg` linear-algebra tensor domain symbol.
 pub fn tensor_linalg() -> Symbol {
     domain("tensor-linalg")
+}
+
+/// The `numbers/tensor-decomp` factorization domain symbol.
+pub fn tensor_decomp() -> Symbol {
+    domain("tensor-decomp")
 }
 
 /// The `numbers/numeric` namespace symbol for numeric utilities.

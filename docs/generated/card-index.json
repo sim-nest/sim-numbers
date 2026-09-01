@@ -1,5 +1,5 @@
 {
-  "card_count": 35,
+  "card_count": 46,
   "cards": [
     {
       "id": "browse/catalog",
@@ -68,10 +68,22 @@
       "summary": "Complex scalar values and arithmetic."
     },
     {
+      "id": "cookbook/numbers/continuation",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-continuation",
+      "summary": "Bounded pseudo-arclength traces with predictor/corrector evidence."
+    },
+    {
       "id": "cookbook/numbers/core",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-core",
       "summary": "Shared number-domain shapes and helper descriptors."
+    },
+    {
+      "id": "cookbook/numbers/extended",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-extended",
+      "summary": "Finite double-double arithmetic through shared numerical contracts."
     },
     {
       "id": "cookbook/numbers/f64",
@@ -104,10 +116,40 @@
       "summary": "I64 scalar values and checked arithmetic."
     },
     {
+      "id": "cookbook/numbers/implicit",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-implicit",
+      "summary": "Stiff ODE and index-1 DAE integration with inspectable evidence."
+    },
+    {
+      "id": "cookbook/numbers/interval",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-interval",
+      "summary": ""
+    },
+    {
+      "id": "cookbook/numbers/method",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-method",
+      "summary": "Plan bounded algorithms and inspect non-forgeable common evidence."
+    },
+    {
       "id": "cookbook/numbers/numeric",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-numeric",
       "summary": "Numeric methods such as differentiation, integration, and ODE solving."
+    },
+    {
+      "id": "cookbook/numbers/optimize",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-optimize",
+      "summary": "Run bounded numerical optimization problems."
+    },
+    {
+      "id": "cookbook/numbers/poly",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-poly",
+      "summary": ""
     },
     {
       "id": "cookbook/numbers/prelude",
@@ -122,6 +164,12 @@
       "summary": "Quadrature algorithms for numeric integration."
     },
     {
+      "id": "cookbook/numbers/quantity",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-quantity",
+      "summary": "Exact dimensions, semantic kinds, and honest units."
+    },
+    {
       "id": "cookbook/numbers/rational",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-rational",
@@ -134,10 +182,22 @@
       "summary": "Runge-Kutta ODE solver methods."
     },
     {
+      "id": "cookbook/numbers/root",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-root",
+      "summary": "Bracketed scalar and residual-carrying vector root searches."
+    },
+    {
       "id": "cookbook/numbers/signal",
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-signal",
       "summary": "Deterministic transforms, wavelets, smoothing, interpolation, spectral estimation, and guarded inverse examples."
+    },
+    {
+      "id": "cookbook/numbers/special",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-special",
+      "summary": "Evidence-carrying real special functions."
     },
     {
       "id": "cookbook/numbers/stats",
@@ -168,6 +228,12 @@
       "kind": "cookbook-recipe",
       "owner": "sim-lib-numbers-tensor-cmplxf",
       "summary": "Complex-cell tensor helpers."
+    },
+    {
+      "id": "cookbook/numbers/tensor-decomp",
+      "kind": "cookbook-recipe",
+      "owner": "sim-lib-numbers-tensor-decomp",
+      "summary": ""
     },
     {
       "id": "cookbook/numbers/tensor-f32",

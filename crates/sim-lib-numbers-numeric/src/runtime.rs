@@ -13,7 +13,9 @@ use super::{
     },
     registry::global_numeric_registry,
     traits::{
-        DiffOpts, Differentiator, NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts,
+        AbsoluteTolerance, ComponentTolerance, DiffOpts, Differentiator, MethodLimits,
+        NumericCallable, NumericKind, OdePlan, OdeProblem, OutputPolicy, QuadOpts, StepPolicy,
+        TimeSpan,
     },
 };
 
@@ -74,7 +76,7 @@ pub fn call_ode_solve(cx: &mut Cx, args: Args) -> Result<Value> {
             x0.clone(),
             y0.clone(),
             x_end.clone(),
-            OdeOpts::default_adaptive(),
+            OdePlan::adaptive_default(),
         ),
         [dy, var, y_var, x0, y0, x_end, options] => (
             dy.clone(),
@@ -293,7 +295,7 @@ struct OdeDispatch {
     x0: Value,
     y0: Value,
     x_end: Value,
-    opts: OdeOpts,
+    opts: OdePlan,
 }
 
 fn ode_dispatch(cx: &mut Cx, dispatch: OdeDispatch) -> Result<Value> {
@@ -314,33 +316,42 @@ fn ode_dispatch(cx: &mut Cx, dispatch: OdeDispatch) -> Result<Value> {
     };
     let mut resolved = dispatch.opts.clone();
     resolved.method = method;
+    let span = TimeSpan {
+        start: value_as_f64(cx, &dispatch.x0, "ode start")?,
+        end: value_as_f64(cx, &dispatch.x_end, "ode end")?,
+    };
     let points = plugin.solve(
         cx,
         OdeProblem {
-            dy: &dy,
+            rhs: &dy,
             var: &dispatch.var,
             y_var: &dispatch.y_var,
-            x0: &dispatch.x0,
-            y0: &dispatch.y0,
-            x_end: &dispatch.x_end,
+            span,
+            initial: &dispatch.y0,
+            events: &[],
+            jacobian: None,
+            implicit: None,
         },
         resolved.clone(),
     )?;
     let values = points
+        .path
+        .accepted
+        .into_iter()
+        .map(|point| {
+            Ok((
+                cx.factory()
+                    .number_literal(domains::f64(), point.time.to_string())?,
+                point.state,
+            ))
+        })
+        .collect::<Result<Vec<_>>>()?
         .into_iter()
         .map(|(x, y)| cx.factory().list(vec![x, y]))
         .collect::<Result<Vec<_>>>()?;
     cx.push_info(format!(
         "ode-solve method={} steps={} tol={}",
-        resolved.method,
-        resolved
-            .max_steps
-            .map(|value| value.to_string())
-            .unwrap_or_else(|| "n/a".to_owned()),
-        resolved
-            .tol
-            .map(|value| value.to_string())
-            .unwrap_or_else(|| "n/a".to_owned())
+        resolved.method, resolved.limits.steps, resolved.tolerance.relative
     ));
     cx.factory().list(values)
 }
@@ -372,19 +383,55 @@ fn quad_opts_from_table(
     Ok(QuadOpts { method, n, tol })
 }
 
-fn ode_opts_from_table(cx: &mut Cx, options: &Value) -> Result<OdeOpts> {
+fn ode_opts_from_table(cx: &mut Cx, options: &Value) -> Result<OdePlan> {
     let table = parse_table_options(cx, "ode-solve", options)?;
     let method = option_symbol(&table, "method")?.unwrap_or(Symbol::new("auto"));
-    let h = option_f64(&table, "h")?;
-    let tol = option_f64(&table, "tol")?;
-    let max_steps = option_usize(&table, "max-steps")?;
-    reject_unknown("ode-solve", &table, &["method", "h", "tol", "max-steps"])?;
-    Ok(OdeOpts {
+    let first = option_f64(&table, "first-step")?;
+    let fixed = option_f64(&table, "fixed-step")?;
+    let max = option_f64(&table, "max-step")?;
+    let relative = option_f64(&table, "rtol")?.unwrap_or(1.0e-8);
+    let absolute = option_f64(&table, "atol")?.unwrap_or(1.0e-10);
+    let steps = option_usize(&table, "step-limit")?.unwrap_or(100_000);
+    let work = option_usize(&table, "work-limit")?.unwrap_or(1_000_000);
+    reject_unknown(
+        "ode-solve",
+        &table,
+        &[
+            "method",
+            "first-step",
+            "fixed-step",
+            "max-step",
+            "rtol",
+            "atol",
+            "step-limit",
+            "work-limit",
+        ],
+    )?;
+    Ok(OdePlan {
         method,
-        h,
-        tol,
-        max_steps,
+        tolerance: ComponentTolerance {
+            relative,
+            absolute: AbsoluteTolerance::Scalar(absolute),
+        },
+        step: StepPolicy { fixed, first, max },
+        output: OutputPolicy {
+            samples: Vec::new(),
+            retain_dense: false,
+        },
+        limits: MethodLimits {
+            steps,
+            work,
+            trace: 256,
+        },
     })
+}
+
+fn value_as_f64(cx: &mut Cx, value: &Value, label: &str) -> Result<f64> {
+    value
+        .object()
+        .display(cx)?
+        .parse()
+        .map_err(|_| Error::Eval(format!("{label} must be f64")))
 }
 
 fn extract_var(cx: &mut Cx, value: &Value) -> Result<Symbol> {

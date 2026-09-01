@@ -183,7 +183,7 @@ impl sim_kernel::ObjectCompat for RationalNumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy};
 /// use sim_lib_numbers_rational::{RationalNumbersLib, number_domain};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0x8668_7924_f11c_0884));
 /// cx.load_lib(&RationalNumbersLib::new()).unwrap();
 ///
 /// // Rational literals parse into the domain even before any base scalar lib

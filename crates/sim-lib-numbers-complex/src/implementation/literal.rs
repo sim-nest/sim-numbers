@@ -199,7 +199,7 @@ impl sim_kernel::ObjectCompat for ComplexNumberDomain {
 /// use sim_kernel::{Cx, DefaultFactory, NoopEvalPolicy};
 /// use sim_lib_numbers_complex::{ComplexNumbersLib, number_domain, complex_value};
 ///
-/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+/// let mut cx = Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory), sim_kernel::HandleSeed::new(0xe223_2df5_2526_3325));
 /// cx.load_lib(&ComplexNumbersLib::new()).unwrap();
 ///
 /// let value = complex_value(&mut cx, 3.0, -4.0).unwrap();

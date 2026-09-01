@@ -6,7 +6,11 @@ use sim_lib_numbers_core::domains;
 use crate::FixedNumbersLib;
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x2db0_b095_9cb4_c70f),
+    );
     cx.load_lib(&FixedNumbersLib::new()).unwrap();
     cx
 }

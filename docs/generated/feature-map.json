@@ -49,12 +49,22 @@
     {
       "features": [],
       "group": "workspace",
+      "package": "sim-lib-numbers-continuation"
+    },
+    {
+      "features": [],
+      "group": "workspace",
       "package": "sim-lib-numbers-core"
     },
     {
       "features": [],
       "group": "workspace",
       "package": "sim-lib-numbers-exotic"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-extended"
     },
     {
       "features": [
@@ -93,7 +103,68 @@
     {
       "features": [],
       "group": "workspace",
+      "package": "sim-lib-numbers-implicit"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-interval"
+    },
+    {
+      "features": [
+        {
+          "edges": [
+            "dep:sim-lib-numbers-stats",
+            "dep:sim-lib-numbers-tensor-linalg"
+          ],
+          "name": "adapters",
+          "workspace_edges": [
+            {
+              "feature": null,
+              "package": "sim-lib-numbers-stats"
+            },
+            {
+              "feature": null,
+              "package": "sim-lib-numbers-tensor-linalg"
+            }
+          ]
+        },
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "package": "sim-lib-numbers-method"
+    },
+    {
+      "features": [],
+      "group": "workspace",
       "package": "sim-lib-numbers-numeric"
+    },
+    {
+      "features": [
+        {
+          "edges": [
+            "dep:sim-lib-discrete-graph"
+          ],
+          "name": "assignment",
+          "workspace_edges": []
+        },
+        {
+          "edges": [],
+          "name": "default",
+          "workspace_edges": []
+        }
+      ],
+      "group": "workspace",
+      "package": "sim-lib-numbers-optimize"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-poly"
     },
     {
       "features": [],
@@ -108,6 +179,11 @@
     {
       "features": [],
       "group": "workspace",
+      "package": "sim-lib-numbers-quantity"
+    },
+    {
+      "features": [],
+      "group": "workspace",
       "package": "sim-lib-numbers-rational"
     },
     {
@@ -118,7 +194,17 @@
     {
       "features": [],
       "group": "workspace",
+      "package": "sim-lib-numbers-root"
+    },
+    {
+      "features": [],
+      "group": "workspace",
       "package": "sim-lib-numbers-signal"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-special"
     },
     {
       "features": [],
@@ -144,6 +230,11 @@
       "features": [],
       "group": "workspace",
       "package": "sim-lib-numbers-tensor-cmplxf"
+    },
+    {
+      "features": [],
+      "group": "workspace",
+      "package": "sim-lib-numbers-tensor-decomp"
     },
     {
       "features": [

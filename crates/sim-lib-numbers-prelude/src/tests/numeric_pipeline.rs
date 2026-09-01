@@ -2,7 +2,11 @@ use super::*;
 
 #[test]
 fn numeric6_full_smoke() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x47cf_bcda_f94c_1db4),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
 
     let decay = decay_func(&mut cx);
@@ -106,7 +110,11 @@ fn numeric6_full_smoke() {
 
 #[test]
 fn numeric6_rk_over_func_composed_pipeline() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x3e3c_fb36_4445_56b2),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     let decay = decay_func(&mut cx);
     let t0 = f64_value(&mut cx, 0.0);
@@ -169,7 +177,7 @@ fn numeric6_rk_over_func_composed_pipeline() {
                             Symbol::new(":method"),
                             cx.factory().symbol(Symbol::new("rk4")).unwrap(),
                         ),
-                        (Symbol::new(":h"), dt),
+                        (Symbol::new(":fixed-step"), dt),
                     ])
                     .unwrap(),
             ]),
@@ -181,7 +189,11 @@ fn numeric6_rk_over_func_composed_pipeline() {
 
 #[test]
 fn numeric6_quad_over_func_composed_pipeline() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x34ba_8a63_2484_f11e),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     let square = square_func(&mut cx);
     let a = f64_value(&mut cx, 0.0);
@@ -230,7 +242,11 @@ fn numeric6_quad_over_func_composed_pipeline() {
 
 #[test]
 fn numeric6_tensor_state_runs_through_composed_ode_pipeline() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xbdd0_6358_be15_6f78),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     let decay = decay_func(&mut cx);
     let y0_first = f64_value(&mut cx, 1.0);

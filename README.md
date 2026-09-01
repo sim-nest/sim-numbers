@@ -58,6 +58,7 @@ prelude installs the standard set in one call.
 | `sim-lib-numbers-core` | Shared substrate for scalar domains: the number-value shape and browse table, the shared number-literal shape and class, the scalar-domain spec, literal matcher, and op-loop installer, and the canonical number-domain symbol registry and promotion-lattice documentation. |
 | `sim-lib-numbers-prelude` | Umbrella library: `NumbersPreludeLib` installs the standard number domains and tensor backends into a runtime in one call. |
 | `sim-lib-numbers-codec` | The number-literal codec surface: helpers that build the `numeric-plugin-v1` descriptor symbols and table values advertising a numeric codec or method provider to the runtime. |
+| `sim-lib-numbers-quantity` | Semantic quantities over generic installed scalars: exact rational SI dimensions, open content-identified kinds, affine units, point/interval laws, Shape constraints, and canonical read construction. |
 
 ### Scalar number domains
 
@@ -96,6 +97,8 @@ prelude installs the standard set in one call.
 | `sim-lib-numbers-quad` | Quadrature and finite-difference backends for the numeric domain: fixed and adaptive integration rules plus finite-difference differentiators, packaged as a numeric plugin library. |
 | `sim-lib-numbers-rk` | Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric `ode-solve` plugins. |
 | `sim-lib-numbers-ad` | Automatic differentiation primitives: forward-mode dual numbers, a reverse-mode evaluation tape, and the `Scalarish` numeric trait they share. |
+| `sim-lib-numbers-continuation` | Bounded pseudo-arclength continuation with secant/tangent prediction, bordered Newton correction, adaptive steps, fold and domain events, and restartable evidence. |
+| `sim-lib-numbers-interval` | Sealed exact-rational and directed-binary64 enclosures, reviewed elementary kernels, verified scalar roots, and definite threshold decisions that cannot accept estimates or decoded provider claims. |
 | `sim-lib-numbers-stats` | Probability, descriptive statistics, and fairness metric helpers for `f64` number-domain data. |
 
 ### Tensor domain and specializations
@@ -112,6 +115,7 @@ prelude installs the standard set in one call.
 | `sim-lib-numbers-tensor-bit` | Bit-tensor specialization: a packed-word boolean element type and its `SpecTensor` backend, with bitwise operations over the tensor domain. |
 | `sim-lib-numbers-tensor-bcast` | Tensor broadcasting specialization: element-wise binary and unary tensor operations with NumPy-style shape broadcasting and promotion rules. |
 | `sim-lib-numbers-tensor-linalg` | Linear-algebra operations over the tensor domain: `dot`, `matmul`, `cross`, `transpose`, `det`, `inv`, `trace`, `norm`, and the `eye`/`zeros`/`ones` constructors. |
+| `sim-lib-numbers-tensor-decomp` | Bounded Householder QR and symmetric real eigendecomposition with numerical rank, optional vectors, and reconstruction/orthogonality evidence. |
 
 ## Number domains and the promotion lattice
 

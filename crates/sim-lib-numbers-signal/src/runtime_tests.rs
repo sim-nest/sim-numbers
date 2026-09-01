@@ -5,13 +5,18 @@ use std::sync::Arc;
 use sim_codec::{Input, decode_eval_expr_with_codec, encode_value_with_codec};
 use sim_codec_lisp::LispCodecLib;
 use sim_kernel::{
-    CapabilitySet, DefaultFactory, EagerPolicy, EncodeOptions, ReadPolicy, Symbol, TrustLevel,
+    CapabilitySet, DefaultFactory, EagerPolicy, EncodeOptions, HandleSeed, ReadPolicy, Symbol,
+    TrustLevel,
 };
 
 use crate::{RECIPES, SignalNumbersLib};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4704),
+    );
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
         .unwrap();
     cx.load_lib(&SignalNumbersLib::new()).unwrap();

@@ -11,6 +11,8 @@ Many things are described not by where they are but by how they change: how fast
 - You turn a rule about change into a concrete path you can watch unfold.
 - Adaptive stepping keeps accuracy high through the tricky parts automatically.
 - You choose between simple fixed steps and smarter adaptive ones to fit the job.
+- DOP853 supplies a high-accuracy eighth-order reference path with bounded work,
+  explicit rejection evidence, tensor parity, and reproducible coefficient provenance.
 
 ## Where it fits
 

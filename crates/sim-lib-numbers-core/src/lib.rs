@@ -8,17 +8,21 @@
 //! promotion-lattice documentation live in [`domains`].
 
 pub mod domains;
+pub mod limits;
 pub mod literal;
 pub mod magnitude;
+pub mod real_scalar;
 pub mod scalar;
 pub mod value_shape;
 
+pub use limits::{MachineLimits, machine_limits};
 pub use literal::{
     NumberLiteralClass, NumberLiteralShape, class_surface_or_symbol, shape_surface_or_symbol,
 };
 pub use magnitude::{
     DEFAULT_MAX_ARBITRARY_MAGNITUDE_BITS, MagnitudeLimit, decimal_digits_to_bits_ceil,
 };
+pub use real_scalar::RealScalar;
 pub use scalar::{
     DomainLiteralMatcher, ScalarBinaryOp, ScalarDomainSpec, ScalarLiteralMatcher, ScalarOps,
     ScalarReductionOp, ScalarUnaryOp, install_scalar_ops, number_domain_class_stub,

@@ -1,0 +1,5 @@
+book = "numbers/implicit"
+title = "Implicit numbers"
+summary = "Stiff ODE and index-1 DAE integration with inspectable evidence."
+order = 45
+chapters = ["01-basics"]

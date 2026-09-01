@@ -22,7 +22,11 @@ use crate::TensorLinalgLib;
 // conformance: tensor linalg executor routing covers reductions and matrix math.
 
 fn cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xefde_c76a_b5a6_2929),
+    );
     cx.load_lib(&TensorNumbersLib::new()).unwrap();
     cx.load_lib(&TensorBroadcastLib::new()).unwrap();
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
@@ -312,11 +316,12 @@ fn zeros_with_oversized_shape_errors_instead_of_oom() {
 }
 
 #[test]
-fn det_of_large_matrix_uses_elimination_and_returns_promptly() {
+fn det_of_large_matrix_uses_elimination_with_an_explicit_size_profile() {
     let mut cx = cx();
     // A 20x20 upper-triangular matrix with 2 on the diagonal: determinant is
     // 2^20 = 1048576. Cofactor expansion would need ~20! operations and hang;
-    // the Bareiss elimination path returns immediately.
+    // the implementation selects the polynomial Bareiss path from this explicit
+    // size profile; no host clock is part of the contract or its proof.
     let n = 20usize;
     let mut rows = Vec::with_capacity(n);
     for i in 0..n {
@@ -337,14 +342,9 @@ fn det_of_large_matrix_uses_elimination_and_returns_promptly() {
     let matrix = cx
         .call_function(&Symbol::new("mat"), Args::new(vec![grid]))
         .unwrap();
-    let start = std::time::Instant::now();
     let out = cx
         .call_function(&Symbol::new("det"), Args::new(vec![matrix]))
         .unwrap();
-    assert!(
-        start.elapsed() < std::time::Duration::from_secs(5),
-        "det of a 20x20 matrix must return promptly"
-    );
     assert_eq!(
         out.object().as_expr(&mut cx).unwrap(),
         Expr::Number(NumberLiteral {

@@ -13,24 +13,35 @@
 | `sim-lib-numbers-cas-eval` | `workspace` | Evaluation of numbers/cas symbolic expressions: the eval-cas function that walks a CasExpr against an environment, in either numeric or symbolic mode, and the surface Expr/CasExpr bridge it uses. |
 | `sim-lib-numbers-codec` | `workspace` | The number-literal codec surface: helpers that build the numeric-plugin-v1 descriptor symbols and table values advertising a numeric codec or method provider to the runtime. |
 | `sim-lib-numbers-complex` | `workspace` | The numbers/complex domain: complex literals and values, their arithmetic, and the promotion edges from i64, f64, and rational into the complex sink of the scalar lattice. |
+| `sim-lib-numbers-continuation` | `workspace` | Bounded pseudo-arclength continuation with explicit numerical evidence. |
 | `sim-lib-numbers-core` | `workspace` | Shared substrate for scalar number domains: the number-value shape and browse table (value_shape), the shared number-literal shape and class (literal), and the scalar-domain spec, literal matcher, and op-loop installer (scalar). The canonical number-domain symbol registry and promotion-lattice documentation live in domains. |
 | `sim-lib-numbers-exotic` | `workspace` | Exotic number domains, currently the lazy continued-fraction domain (numbers/cf): infinite-precision reals carried as continued-fraction coefficient streams, their builtin constants, and the as-f64 truncation function. |
+| `sim-lib-numbers-extended` | `workspace` | Normalized double-double arithmetic and the numbers/extended runtime domain. A value is an unevaluated sum of two binary64 components with \|lo\| <= 0.5 ulp(hi) for finite nonzero results. |
 | `sim-lib-numbers-f64` | `workspace` | Double-precision float number domain with arithmetic and complex promotion. |
 | `sim-lib-numbers-fixed` | `workspace` | The fixed-width integer domains (numbers/i8 .. numbers/i128, numbers/u8 .. numbers/u128): their literals, values, and the widening promotion edges through the signed and unsigned integer lattice. |
 | `sim-lib-numbers-float` | `workspace` | The numbers/f32 domain: single-precision floating-point literals and values, their scalar arithmetic, and promotion into f64. |
 | `sim-lib-numbers-func` | `workspace` | Function number domain: callable function values built over CAS or native bodies, with fn, call, and grad operations for the Func domain. |
 | `sim-lib-numbers-i64` | `workspace` | The numbers/i64 domain: 64-bit signed-integer literals and values, their scalar arithmetic, and promotion edges into f64 and rational. |
+| `sim-lib-numbers-implicit` | `workspace` | Fifth-order Radau IIA integration for stiff ODEs and index-1 DAEs. |
+| `sim-lib-numbers-interval` | `workspace` | Sealed interval certification: evidence may be inspected, never imported as authority. |
+| `sim-lib-numbers-method` | `workspace` | Validated, bounded numerical method plans and common evidence. |
 | `sim-lib-numbers-numeric` | `workspace` | Numeric evaluation surface: the numeric domain exposes numeric-diff, integrate, ode-solve, and composed pipelines over a registry of pluggable differentiator, quadrature, and ODE-solver backends. |
+| `sim-lib-numbers-optimize` | `workspace` | Bounded optimization with explicit plans and honest convergence evidence. |
+| `sim-lib-numbers-poly` | `workspace` | Dense coefficient algebra, deliberately separate from symbolic CAS trees. |
 | `sim-lib-numbers-prelude` | `workspace` | Umbrella library for the sim-numbers family: NumbersPreludeLib installs the standard number domains and tensor backends (arithmetic, f64/i64/bigint, rational, complex, CAS, func, tensor and its specializations, numeric, quad, and rk) into a runtime in one call. |
 | `sim-lib-numbers-quad` | `workspace` | Quadrature and finite-difference backends for the numeric domain: fixed and adaptive integration rules plus finite-difference differentiators, packaged as a registered numeric plugin library. |
+| `sim-lib-numbers-quantity` | `workspace` | Semantic physical quantities for SIM. |
 | `sim-lib-numbers-rational` | `workspace` | The numbers/rational domain: exact rational literals and values built over bigint numerator/denominator pairs, their reduced arithmetic, and promotion edges to and from the integer and f64 domains. |
 | `sim-lib-numbers-rk` | `workspace` | Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric ode-solve plugins. |
+| `sim-lib-numbers-root` | `workspace` | Bounded scalar and vector root finding with reviewable evidence. |
 | `sim-lib-numbers-signal` | `workspace` | Deterministic transforms, convolution, autoregression, spectral estimation, interpolation, and guarded deconvolution over canonical SIM tensors. |
+| `sim-lib-numbers-special` | `workspace` | Evidence-carrying real error, gamma, beta, and complete elliptic functions. |
 | `sim-lib-numbers-stats` | `workspace` | Probability, descriptive and robust benchmark statistics, deterministic clustering, streaming quantiles, finite Markov and hidden-state sequence inference, and fairness helpers for number-domain data. |
 | `sim-lib-numbers-tensor` | `workspace` | The n-dimensional tensor number domain: the uniform Tensor value, its domain registration and constructors (tensor, vec, mat, ...), and the SpecTensor interface that specialized element-type backends plug into. Tensor shape and dtype stay canonical while the open TensorStorage contract supplies boxed host or loadable resident storage. Observation through Tensor::cell, Tensor::cells, and Tensor::materialize is checked so encoding and projection report resident readback failures. |
 | `sim-lib-numbers-tensor-bcast` | `workspace` | Tensor broadcasting specialization: element-wise binary and unary tensor operations with NumPy-style shape broadcasting and promotion rules. |
 | `sim-lib-numbers-tensor-bit` | `workspace` | Bit-tensor specialization: a packed-word boolean tensor element type and its SpecTensor backend, with bitwise operations over the tensor domain. |
 | `sim-lib-numbers-tensor-cmplxf` | `workspace` | Complex-float tensor specialization: a (real, imag) f64-pair tensor element type and its SpecTensor backend for the complex tensor domain. |
+| `sim-lib-numbers-tensor-decomp` | `workspace` | Bounded, evidence-carrying dense matrix factorizations. |
 | `sim-lib-numbers-tensor-f32` | `workspace` | f32 tensor specialization: a contiguous f32 tensor element type and its SpecTensor backend for the f32 tensor domain. |
 | `sim-lib-numbers-tensor-f64` | `workspace` | f64 tensor specialization: a contiguous f64 tensor element type and its SpecTensor backend for the f64 tensor domain. |
 | `sim-lib-numbers-tensor-half` | `workspace` | Half-precision tensor specialization: contiguous f16 and bf16 element types with CPU arithmetic widened to f32. |

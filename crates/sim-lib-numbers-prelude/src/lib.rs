@@ -30,6 +30,7 @@ use sim_lib_numbers_tensor::TensorNumbersLib;
 use sim_lib_numbers_tensor_bcast::TensorBroadcastLib;
 use sim_lib_numbers_tensor_bit::BitTensorLib;
 use sim_lib_numbers_tensor_cmplxf::ComplexFTensorLib;
+use sim_lib_numbers_tensor_decomp::TensorDecompLib;
 use sim_lib_numbers_tensor_f32::F32TensorLib;
 use sim_lib_numbers_tensor_f64::F64TensorLib;
 use sim_lib_numbers_tensor_half::HalfTensorLib;
@@ -67,6 +68,7 @@ impl NumbersPreludeLib {
         install_if_missing(cx, domains::tensor(), &TensorNumbersLib::new())?;
         install_if_missing(cx, domains::tensor_bcast(), &TensorBroadcastLib::new())?;
         install_if_missing(cx, domains::tensor_linalg(), &TensorLinalgLib::new())?;
+        install_if_missing(cx, domains::tensor_decomp(), &TensorDecompLib::new())?;
         install_if_missing(
             cx,
             sim_lib_numbers_tensor_f32::tensor_lib_symbol(),

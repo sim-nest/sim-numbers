@@ -1,0 +1,22 @@
+[package]
+name = "sim-lib-numbers-root"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Bracketed and residual-carrying scalar and vector root finding for SIM."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-cookbook = { version = "0.3.0" }
+sim-kernel = { version = "0.3.0" }
+sim-lib-numbers-method = { version = "0.1.0", path = "../sim-lib-numbers-method", default-features = false }
+sim-lib-numbers-tensor-decomp = { version = "0.1.0", path = "../sim-lib-numbers-tensor-decomp" }
+
+[build-dependencies]
+sim-cookbook-build = { version = "0.1.0" }
+
+[lints]
+workspace = true

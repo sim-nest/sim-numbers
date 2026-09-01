@@ -17,14 +17,25 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 
 | Feature | Subject | Specimens | Summary |
 | --- | --- | ---: | --- |
+| `feature/sim-numbers/semantic-quantities` | `crate/sim-lib-numbers-quantity` | 1 | Compose generic installed scalars with bounded exact SI dimensions, open semantic kinds, exact affine units, point/interval laws, Shape admission, and canonical read construction. |
+| `feature/sim-numbers/special-functions-and-ranked-grid` | `crate/sim-lib-numbers-special` | 2 | Compute reusable error, gamma, beta, elliptic, normal, Student-t, and ranked regular-grid results with explicit numerical regions, stable probability complements, tensor geometry, and resource evidence. |
+| `feature/sim-numbers/extended-precision-convergence` | `crate/sim-lib-numbers-extended` | 1 | Inject normalized double-double arithmetic into shared numerical kernels while preserving exact component identity and the canonical number-domain promotion lattice. |
+| `feature/sim-numbers/sealed-interval-certification` | `crate/sim-lib-numbers-interval` | 1 | Keep estimates distinct from unforgeable mathematical enclosures carrying exact inputs, reviewed issuer identity, trace digest, and method evidence. |
+| `feature/sim-numbers/bounded-optimization` | `crate/sim-lib-numbers-optimize` | 1 | Bounded scalar, smooth multivariate, nonlinear, and linear least-squares methods with explicit plans and convergence evidence. |
+| `feature/sim-numbers/method-evidence` | `crate/sim-lib-numbers-method` | 1 | Plan numerical work with validated limits and criterion-specific tolerances, then inspect exact common evidence without replacing domain reports. |
+| `feature/sim-numbers/coefficient-polynomial` | `crate/sim-lib-numbers-poly` | 1 | Represent ordinary, integer-exponent Laurent, and rational-exponent Puiseux coefficient rows with canonical zeros, exact identities, certified floating evaluation, companion-Schur roots, and guarded Pade approximants. |
+| `feature/sim-numbers/tensor-decomposition` | `crate/sim-lib-numbers-tensor-decomp` | 1 | Factor immutable dense matrices and compute matrix functions with bounded QR, eigen, Schur, SVD, scaling-and-squaring exponential, and Schur-backed matrix equations, retaining method and residual evidence. |
 | `feature/sim-numbers/generated-docs` | `crate/xtask` | 0 | Publish generated package, card, rustdoc, and index facts for the number-domain crates. |
 | `feature/sim-numbers/numbers` | `crate/sim-lib-numbers-core` | 1 | Provide arithmetic, exact, floating, symbolic, tensor, signal-algorithm, and inspectable statistical domains as loadable libraries. |
-| `feature/sim-numbers/statistical-inference` | `crate/sim-lib-numbers-stats` | 4 | Compute robust benchmark dispersion and seeded uncertainty, cluster finite points, fit regularized mixtures, estimate mergeable streaming quantiles, and infer finite hidden-state sequences with explicit numerical, model-selection, convergence, memory, and termination evidence. |
+| `feature/sim-numbers/statistical-inference` | `crate/sim-lib-numbers-stats` | 5 | Compute exact binary uncertainty, deterministic bootstrap intervals, versioned replayable sampling, bounded Latin hypercube and Sobol designs, standardized moments and Kolmogorov-Smirnov statistics, alpha-spent registered looks, robust dispersion, clustering, mixtures, streaming quantiles, and finite hidden-state inference with explicit work and termination evidence. |
 | `feature/sim-numbers/signal-transforms` | `crate/sim-lib-numbers-signal` | 11 | Transform with Fourier or wavelet plans, smooth and differentiate polynomials, solve Toeplitz systems, interpolate periodic or sampled data, estimate spectra, and guardedly deconvolve with explicit policy and diagnostics. |
 | `feature/sim-numbers/tensors` | `crate/sim-lib-numbers-tensor` | 1 | Provide the canonical storage-polymorphic runtime Tensor value, checked host or resident observation, typed tensor descriptors, explicit casts, broadcasting, and matrix operations. |
-| `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run canonical Tensor expressions, element-wise broadcast operations, reductions, linear algebra, and f32/f64 transcendentals through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
+| `feature/sim-numbers/tensor-execution` | `crate/sim-lib-numbers-tensor` | 3 | Run the canonical construction, composition, selection, comparison, element-wise, reduction, linear-algebra, and transcendental Tensor vocabulary through an open TensorExecutor contract and a loadable TensorSite over the standard EvalFabric path. |
 | `feature/sim-numbers/numeric-pipelines` | `crate/sim-lib-numbers-numeric` | 1 | Compose differentiator, quadrature, and ODE methods into inspectable numeric pipeline values and execute them through registered numeric plugins. |
 | `feature/sim-numbers/tensor-ode` | `crate/sim-lib-numbers-numeric` | 1 | Run tensor-valued ODE state through the existing numeric ODE pipeline and Runge-Kutta solver registry. |
+| `feature/sim-numbers/implicit-radau-dae` | `crate/sim-lib-numbers-implicit` | 1 | Advance stiff ODEs and declared index-1 mass-matrix or residual DAEs with fifth-order Radau IIA, collocation dense output, common event semantics, and Newton/Jacobian/linear-solve evidence. |
+| `feature/sim-numbers/pseudo-arclength-continuation` | `crate/sim-lib-numbers-continuation` | 1 | Trace one-dimensional residual manifolds through folds with bounded secant/tangent prediction, bordered Newton correction, adaptive steps, and restart evidence. |
+| `feature/sim-numbers/root-finding` | `crate/sim-lib-numbers-root` | 1 | Find scalar and vector roots while preserving brackets, residuals, derivative provenance, rank diagnostics, work bounds, and replay identity. |
 
 ## Surfaces
 
@@ -85,6 +96,11 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-complex/recipes/01-basics/complex-constructor/recipe.toml`
 - `crates/sim-lib-numbers-complex/recipes/01-basics/complex-constructor/setup.siml`
 - `crates/sim-lib-numbers-complex/recipes/book.toml`
+- `crates/sim-lib-numbers-continuation/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-continuation/recipes/01-basics/limiting-boundary/purpose.md`
+- `crates/sim-lib-numbers-continuation/recipes/01-basics/limiting-boundary/recipe.toml`
+- `crates/sim-lib-numbers-continuation/recipes/01-basics/limiting-boundary/setup.siml`
+- `crates/sim-lib-numbers-continuation/recipes/book.toml`
 - `crates/sim-lib-numbers-core/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-core/recipes/01-basics/value-shape-table/purpose.md`
 - `crates/sim-lib-numbers-core/recipes/01-basics/value-shape-table/recipe.toml`
@@ -95,6 +111,11 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-exotic/recipes/01-basics/continued-fraction/recipe.toml`
 - `crates/sim-lib-numbers-exotic/recipes/01-basics/continued-fraction/setup.siml`
 - `crates/sim-lib-numbers-exotic/recipes/book.toml`
+- `crates/sim-lib-numbers-extended/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-extended/recipes/01-basics/convergence/purpose.md`
+- `crates/sim-lib-numbers-extended/recipes/01-basics/convergence/recipe.toml`
+- `crates/sim-lib-numbers-extended/recipes/01-basics/convergence/setup.siml`
+- `crates/sim-lib-numbers-extended/recipes/book.toml`
 - `crates/sim-lib-numbers-f64/recipes/01-basics/add-floats/purpose.md`
 - `crates/sim-lib-numbers-f64/recipes/01-basics/add-floats/recipe.toml`
 - `crates/sim-lib-numbers-f64/recipes/01-basics/add-floats/setup.siml`
@@ -120,6 +141,21 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-i64/recipes/01-basics/i64-domain/recipe.toml`
 - `crates/sim-lib-numbers-i64/recipes/01-basics/i64-domain/setup.siml`
 - `crates/sim-lib-numbers-i64/recipes/book.toml`
+- `crates/sim-lib-numbers-implicit/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-implicit/recipes/01-basics/stiff-decay/purpose.md`
+- `crates/sim-lib-numbers-implicit/recipes/01-basics/stiff-decay/recipe.toml`
+- `crates/sim-lib-numbers-implicit/recipes/01-basics/stiff-decay/setup.siml`
+- `crates/sim-lib-numbers-implicit/recipes/book.toml`
+- `crates/sim-lib-numbers-interval/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-interval/recipes/01-basics/sealed-threshold/purpose.md`
+- `crates/sim-lib-numbers-interval/recipes/01-basics/sealed-threshold/recipe.toml`
+- `crates/sim-lib-numbers-interval/recipes/01-basics/sealed-threshold/setup.siml`
+- `crates/sim-lib-numbers-interval/recipes/book.toml`
+- `crates/sim-lib-numbers-method/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-method/recipes/01-basics/method-evidence/purpose.md`
+- `crates/sim-lib-numbers-method/recipes/01-basics/method-evidence/recipe.toml`
+- `crates/sim-lib-numbers-method/recipes/01-basics/method-evidence/setup.siml`
+- `crates/sim-lib-numbers-method/recipes/book.toml`
 - `crates/sim-lib-numbers-numeric/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-numeric/recipes/01-basics/composed-pipeline/purpose.md`
 - `crates/sim-lib-numbers-numeric/recipes/01-basics/composed-pipeline/recipe.toml`
@@ -128,6 +164,16 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-numeric/recipes/01-basics/numeric-methods/recipe.toml`
 - `crates/sim-lib-numbers-numeric/recipes/01-basics/numeric-methods/setup.siml`
 - `crates/sim-lib-numbers-numeric/recipes/book.toml`
+- `crates/sim-lib-numbers-optimize/recipes/01-basics/bounded-optimization/purpose.md`
+- `crates/sim-lib-numbers-optimize/recipes/01-basics/bounded-optimization/recipe.toml`
+- `crates/sim-lib-numbers-optimize/recipes/01-basics/bounded-optimization/setup.siml`
+- `crates/sim-lib-numbers-optimize/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-optimize/recipes/book.toml`
+- `crates/sim-lib-numbers-poly/recipes/01-basics/certified-evaluation/purpose.md`
+- `crates/sim-lib-numbers-poly/recipes/01-basics/certified-evaluation/recipe.toml`
+- `crates/sim-lib-numbers-poly/recipes/01-basics/certified-evaluation/setup.siml`
+- `crates/sim-lib-numbers-poly/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-poly/recipes/book.toml`
 - `crates/sim-lib-numbers-prelude/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-prelude/recipes/01-basics/prelude-stack/purpose.md`
 - `crates/sim-lib-numbers-prelude/recipes/01-basics/prelude-stack/recipe.toml`
@@ -138,6 +184,11 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-quad/recipes/01-basics/quadrature-method/recipe.toml`
 - `crates/sim-lib-numbers-quad/recipes/01-basics/quadrature-method/setup.siml`
 - `crates/sim-lib-numbers-quad/recipes/book.toml`
+- `crates/sim-lib-numbers-quantity/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-quantity/recipes/01-basics/energy-and-torque/purpose.md`
+- `crates/sim-lib-numbers-quantity/recipes/01-basics/energy-and-torque/recipe.toml`
+- `crates/sim-lib-numbers-quantity/recipes/01-basics/energy-and-torque/setup.siml`
+- `crates/sim-lib-numbers-quantity/recipes/book.toml`
 - `crates/sim-lib-numbers-rational/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-rational/recipes/01-basics/rational-constructor/purpose.md`
 - `crates/sim-lib-numbers-rational/recipes/01-basics/rational-constructor/recipe.toml`
@@ -148,6 +199,15 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/recipe.toml`
 - `crates/sim-lib-numbers-rk/recipes/01-basics/rk-method/setup.siml`
 - `crates/sim-lib-numbers-rk/recipes/book.toml`
+- `crates/sim-lib-numbers-root/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-root/recipes/01-basics/scalar-root/purpose.md`
+- `crates/sim-lib-numbers-root/recipes/01-basics/scalar-root/recipe.toml`
+- `crates/sim-lib-numbers-root/recipes/01-basics/scalar-root/setup.siml`
+- `crates/sim-lib-numbers-root/recipes/02-vector/chapter.toml`
+- `crates/sim-lib-numbers-root/recipes/02-vector/vector-root/purpose.md`
+- `crates/sim-lib-numbers-root/recipes/02-vector/vector-root/recipe.toml`
+- `crates/sim-lib-numbers-root/recipes/02-vector/vector-root/setup.siml`
+- `crates/sim-lib-numbers-root/recipes/book.toml`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/expected.txt`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/main.rs`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/blocked-transform/purpose.md`
@@ -175,6 +235,11 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/purpose.md`
 - `crates/sim-lib-numbers-signal/recipes/01-basics/wavelet-smoothing/recipe.toml`
 - `crates/sim-lib-numbers-signal/recipes/book.toml`
+- `crates/sim-lib-numbers-special/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-special/recipes/01-basics/gamma-tail/purpose.md`
+- `crates/sim-lib-numbers-special/recipes/01-basics/gamma-tail/recipe.toml`
+- `crates/sim-lib-numbers-special/recipes/01-basics/gamma-tail/setup.siml`
+- `crates/sim-lib-numbers-special/recipes/book.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/expected.txt`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/main.rs`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/bounded-sequence-inference/purpose.md`
@@ -194,6 +259,10 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/main.rs`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/robust-benchmark-statistics/recipe.toml`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/expected.txt`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/main.rs`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/purpose.md`
+- `crates/sim-lib-numbers-stats/recipes/01-basics/space-filling-evidence/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/purpose.md`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/recipe.toml`
 - `crates/sim-lib-numbers-stats/recipes/01-basics/stats-helpers/setup.siml`
@@ -230,6 +299,14 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/recipe.toml`
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/01-basics/cmplxf-tensor/setup.siml`
 - `crates/sim-lib-numbers-tensor-cmplxf/recipes/book.toml`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/chapter.toml`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/matrix-functions/purpose.md`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/matrix-functions/recipe.toml`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/matrix-functions/setup.siml`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/qr-eigen/purpose.md`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/qr-eigen/recipe.toml`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/01-basics/qr-eigen/setup.siml`
+- `crates/sim-lib-numbers-tensor-decomp/recipes/book.toml`
 - `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/chapter.toml`
 - `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/purpose.md`
 - `crates/sim-lib-numbers-tensor-f32/recipes/01-basics/f32-tensor/recipe.toml`
@@ -264,6 +341,9 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/purpose.md`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/recipe.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-cast/setup.siml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-construction-selection/purpose.md`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-construction-selection/recipe.toml`
+- `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-construction-selection/setup.siml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/purpose.md`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/recipe.toml`
 - `crates/sim-lib-numbers-tensor/recipes/01-basics/tensor-constructor/setup.siml`
@@ -276,6 +356,1625 @@ This generated lane consumes `docs/generated/sim-index-fragment.sx`. Global inde
 - `crates/sim-lib-numbers-tensor/recipes/book.toml`
 
 ## Worked Examples
+
+### `feature/sim-numbers/semantic-quantities`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-quantity/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-quantity/src/tests.rs`:
+
+```rust
+use std::sync::Arc;
+
+use sim_codec::{Input, decode_datum_with_codec, encode_datum_with_codec};
+use sim_kernel::{Datum, DefaultFactory, Lib, NoopEvalPolicy, NumberLiteral, Symbol};
+
+use crate::*;
+
+fn interval<S: Scalar>(
+    scalar: S,
+    dimension: Dimension,
+    kind: Option<MeasureKind>,
+    unit: Option<Unit>,
+) -> Quantity<S> {
+    Quantity::new(scalar, dimension, kind, unit, MeasureRole::Interval).unwrap()
+}
+
+#[test]
+fn rational_exponents_are_normalized_bounded_and_canonical() {
+    assert_eq!(Exponent::new(2, 4).unwrap(), Exponent::new(1, 2).unwrap());
+    assert_eq!(Exponent::new(0, -99).unwrap(), Exponent::ZERO);
+    assert_eq!(
+        Exponent::new(1025, 1),
+        Err(DimensionError::ExponentOutOfBounds)
+    );
+    let speed = Dimension::base(BaseDimension::Length)
+        .quotient(&Dimension::base(BaseDimension::Time))
+        .unwrap();
+    assert_eq!(speed.canonical(), "time^-1*length^1");
+    assert_eq!(
+        speed
+            .product(&Dimension::base(BaseDimension::Time))
+            .unwrap(),
+        Dimension::base(BaseDimension::Length)
+    );
+}
+
+#[test]
+fn energy_and_torque_have_equal_dimensions_but_distinct_content_ids() {
+    assert_eq!(energy_kind().dimension(), torque_kind().dimension());
+    assert_ne!(energy_kind().id(), torque_kind().id());
+    let energy = interval(
+        ExactScalar::from(1),
+        energy_kind().dimension().clone(),
+        Some(energy_kind()),
+        Some(JOULE()),
+    );
+    let torque = interval(
+        ExactScalar::from(1),
+        torque_kind().dimension().clone(),
+        Some(torque_kind()),
+        Some(NEWTON_METRE()),
+    );
+    assert!(matches!(
+        energy.add(&torque),
+        Err(QuantityError::Incompatible {
+            reason: "semantic kinds differ"
+        })
+    ));
+}
+
+#[test]
+fn affine_points_convert_exactly_and_obey_point_difference_laws() {
+    let freezing = Quantity::new(
+        ExactScalar::from(0),
+        CELSIUS().dimension().clone(),
+        None,
+        Some(CELSIUS()),
+        MeasureRole::Point,
+    )
+    .unwrap();
+    let kelvin = freezing.convert(&KELVIN()).unwrap();
+    assert_eq!(*kelvin.scalar(), ExactScalar::new(27315, 100).unwrap());
+    assert!(matches!(
+        freezing.add(&freezing),
+        Err(QuantityError::Incompatible { .. })
+    ));
+    assert!(matches!(
+        freezing.mul(&freezing),
+        Err(QuantityError::AffinePointInLinearOperation)
+    ));
+    let boiling = Quantity::new(
+        ExactScalar::from(100),
+        CELSIUS().dimension().clone(),
+        None,
+        Some(CELSIUS()),
+        MeasureRole::Point,
+    )
+    .unwrap();
+    let difference = boiling.sub(&freezing).unwrap();
+    assert_eq!(*difference.scalar(), ExactScalar::from(100));
+    assert_eq!(difference.role(), MeasureRole::Interval);
+}
+
+#[test]
+fn algebra_derives_dimensions_without_inventing_kinds() {
+    let length = interval(
+        9.0,
+        Dimension::base(BaseDimension::Length),
+        None,
+        Some(METRE()),
+    );
+    let area = length.mul(&length).unwrap();
+    assert_eq!(
+        area.dimension(),
+        &Dimension::base(BaseDimension::Length)
+            .power(Exponent::new(2, 1).unwrap())
+            .unwrap()
+    );
+    assert!(area.kind().is_none());
+    let root = area.pow(Exponent::new(1, 2).unwrap()).unwrap();
+    assert_eq!(*root.scalar(), 9.0);
+    assert_eq!(root.dimension(), &Dimension::base(BaseDimension::Length));
+}
+
+#[test]
+fn exact_conversion_preserves_scalar_type_and_dimensionless_kind_rules() {
+    let centimetre = Unit::new(
+        "cm",
+        "si:length",
+        (1, 100),
+        (0, 1),
+        Dimension::base(BaseDimension::Length),
+        None,
+        MeasureRole::Interval,
+    )
+    .unwrap();
+    let value = interval(
+        ExactScalar::from(125),
+        Dimension::base(BaseDimension::Length),
+        None,
+        Some(centimetre),
+    );
+    let metres: Quantity<ExactScalar> = value.convert(&METRE()).unwrap();
+    assert_eq!(*metres.scalar(), ExactScalar::new(5, 4).unwrap());
+    let factor = interval(ExactScalar::from(2), Dimension::DIMENSIONLESS, None, None);
+    let energy = interval(
+        ExactScalar::from(3),
+        energy_kind().dimension().clone(),
+        Some(energy_kind()),
+        None,
+    );
+    assert_eq!(factor.mul(&energy).unwrap().kind(), Some(&energy_kind()));
+}
+
+#[test]
+fn shape_constraints_cover_dimension_kind_family_and_role() {
+    let quantity = interval(
+        ExactScalar::from(3),
+        energy_kind().dimension().clone(),
+        Some(energy_kind()),
+        Some(JOULE()),
+    );
+    assert!(
+        QuantityShape {
+            dimension: Some(energy_kind().dimension().clone()),
+            kind_id: Some(energy_kind().id().to_owned()),
+            unit_family: Some("si:energy".to_owned()),
+            role: Some(MeasureRole::Interval)
+        }
+        .matches(&quantity)
+    );
+    assert!(
+        !QuantityShape {
+            kind_id: Some(torque_kind().id().to_owned()),
+            ..QuantityShape::default()
+        }
+        .matches(&quantity)
+    );
+}
+
+fn i64_datum(value: i64) -> Datum {
+    Datum::Number(NumberLiteral {
+        domain: Symbol::qualified("numbers", "i64"),
+        canonical: value.to_string(),
+    })
+}
+fn runtime_datum(exponents: Vec<(i64, i64)>) -> Datum {
+    Datum::Node {
+        tag: quantity_class_symbol(),
+        fields: vec![
+            (
+                Symbol::new("scalar"),
+                Datum::Number(NumberLiteral {
+                    domain: Symbol::qualified("numbers", "rational"),
+                    canonical: "25/2".to_owned(),
+                }),
+            ),
+            (
+                Symbol::new("dimension"),
+                Datum::Vector(
+                    exponents
+                        .into_iter()
+                        .map(|(n, d)| Datum::Vector(vec![i64_datum(n), i64_datum(d)]))
+                        .collect(),
+                ),
+            ),
+            (
+                Symbol::new("kind"),
+                Datum::Symbol(Symbol::qualified("kind", "energy")),
+            ),
+            (
+                Symbol::new("unit"),
+                Datum::Symbol(Symbol::qualified("unit", "J")),
+            ),
+            (
+                Symbol::new("role"),
+                Datum::Symbol(Symbol::qualified("measure", "interval")),
+            ),
+        ],
+    }
+}
+
+#[test]
+fn runtime_value_has_canonical_read_construct_and_semantic_data_round_trip() {
+    let datum = runtime_datum(vec![(0, 1), (2, 1), (1, 1), (0, 1), (0, 1), (0, 1), (0, 1)]);
+    let value = QuantityValue::from_datum(datum.clone()).unwrap();
+    assert_eq!(
+        Datum::try_from(sim_kernel::Expr::from(value.datum().clone())).unwrap(),
+        datum
+    );
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(7),
+    );
+    cx.load_lib(&QuantityLib::new()).unwrap();
+    assert_eq!(
+        value
+            .into_value()
+            .unwrap()
+            .object()
+            .snapshot(&mut cx)
+            .unwrap(),
+        Some(datum)
+    );
+}
+
+#[test]
+fn quantity_data_round_trips_through_installed_general_codecs() {
+    let datum = runtime_datum(vec![(0, 1), (2, 1), (1, 1), (0, 1), (0, 1), (0, 1), (0, 1)]);
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(8),
+    );
+    let json = sim_codec_json::JsonCodecLib::new(cx.registry_mut().fresh_codec_id());
+    cx.load_lib(&json).unwrap();
+    let lisp = sim_codec_lisp::LispCodecLib::new(cx.registry_mut().fresh_codec_id()).unwrap();
+    cx.load_lib(&lisp).unwrap();
+    for symbol in [
+        Symbol::qualified("codec", "json"),
+        Symbol::qualified("codec", "lisp"),
+    ] {
+        let encoded = encode_datum_with_codec(
+            &mut cx,
+            &symbol,
+            &datum,
+            sim_kernel::EncodeOptions::default(),
+        )
+        .unwrap()
+        .into_text()
+        .unwrap();
+        let decoded = decode_datum_with_codec(
+            &mut cx,
+            &symbol,
+            Input::Text(encoded),
+            sim_kernel::ReadPolicy::default(),
+        )
+        .unwrap();
+        assert_eq!(
+            decoded.content_id().unwrap(),
+            datum.content_id().unwrap(),
+            "semantic drift through {symbol}"
+        );
+    }
+}
+
+#[test]
+fn malicious_read_construct_dimensions_are_bounded() {
+    assert!(QuantityValue::from_datum(runtime_datum(vec![(0, 1); 6])).is_err());
+    assert!(
+        QuantityValue::from_datum(runtime_datum(vec![
+            (0, 1),
+            (0, 1),
+            (1025, 1),
+            (0, 1),
+            (0, 1),
+            (0, 1),
+            (0, 1)
+        ]))
+        .is_err()
+    );
+    assert!(
+        QuantityValue::from_datum(runtime_datum(vec![
+            (0, 1),
+            (0, 1),
+            (1, 0),
+            (0, 1),
+            (0, 1),
+            (0, 1),
+            (0, 1)
+        ]))
+        .is_err()
+    );
+    let manifest = QuantityLib::new().manifest();
+    assert_eq!(manifest.id, Symbol::qualified("numbers", "quantity"));
+}
+// conformance: quantity tests prove semantic kinds, exact units, and affine laws.
+```
+
+### `feature/sim-numbers/special-functions-and-ranked-grid`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-special/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-special/src/tests.rs`:
+
+```rust
+use super::*;
+fn close(a: f64, b: f64, t: f64) {
+    assert!((a - b).abs() <= t * b.abs().max(1.0), "{a} != {b}");
+}
+#[test]
+fn error_symmetry_and_inverse() {
+    for x in [-0.99, -0.5, 0.0, 0.5, 0.99] {
+        let y = erf(x).value;
+        close(erf(-x).value, -y, 2e-15);
+        close(inverse_erf(y).unwrap().value, x, 2e-7);
+        close(y + erfc(x).value, 1.0, 2e-15);
+    }
+}
+#[test]
+fn gamma_identities_and_tails() {
+    close(log_gamma(5.0).unwrap().value, 24.0f64.ln(), 2e-14);
+    for (a, x) in [(0.5, 0.25), (4.0, 20.0), (10.0, 9.0)] {
+        let p = regularized_gamma_p(a, x).unwrap().value;
+        let q = regularized_gamma_q(a, x).unwrap().value;
+        close(p + q, 1.0, 3e-14);
+    }
+    close(
+        regularized_gamma_q(4.0, 20.0).unwrap().value,
+        3.203_719_780_476_998e-6,
+        2e-14,
+    );
+}
+#[test]
+fn beta_symmetry() {
+    for x in [0.01, 0.4, 0.99] {
+        let p = regularized_beta(2.5, 4.0, x).unwrap().value;
+        let q = regularized_beta(4.0, 2.5, 1.0 - x).unwrap().value;
+        close(p + q, 1.0, 2e-14);
+    }
+}
+#[test]
+fn elliptic_values_and_singular_region() {
+    close(elliptic_k(0.0).unwrap().value, PI / 2.0, 2e-15);
+    close(elliptic_e(0.0).unwrap().value, PI / 2.0, 2e-14);
+    close(elliptic_e(1.0).unwrap().value, 1.0, 0.0);
+    close(
+        elliptic_k(0.9999).unwrap().value,
+        5.991_589_340_507_051,
+        2e-13,
+    );
+    close(
+        elliptic_e(0.5).unwrap().value,
+        1.350_643_881_047_675_5,
+        2e-13,
+    );
+}
+// conformance: special-function tests prove numerical regions, tails, and bounded evidence.
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/regular_grid_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-signal/src/regular_grid_tests.rs`:
+
+```rust
+use super::*;
+fn plan(method: InterpolationMethod) -> GridInterpolationPlan {
+    GridInterpolationPlan {
+        axis_order: vec![1, 0],
+        interpolation: InterpolationPlan {
+            method,
+            ..InterpolationPlan::default()
+        },
+        max_work: 100,
+        max_memory_values: 100,
+    }
+}
+#[test]
+fn exact_nodes_and_bilinear_plane() {
+    let grid = RegularGridInterpolator::new(
+        vec![vec![0.0, 1.0], vec![0.0, 2.0]],
+        vec![2, 2],
+        vec![0.0, 4.0, 1.0, 5.0],
+        plan(InterpolationMethod::Linear),
+    )
+    .unwrap();
+    assert_eq!(grid.evaluate(&[1.0, 2.0]).unwrap().value, 5.0);
+    assert_eq!(grid.evaluate(&[0.25, 0.5]).unwrap().value, 1.25);
+}
+#[test]
+fn axis_reversal_is_storage_stable() {
+    let grid = RegularGridInterpolator::new(
+        vec![vec![1.0, 0.0], vec![0.0, 2.0]],
+        vec![2, 2],
+        vec![1.0, 5.0, 0.0, 4.0],
+        plan(InterpolationMethod::Linear),
+    )
+    .unwrap();
+    assert_eq!(grid.evaluate(&[0.25, 0.5]).unwrap().value, 1.25);
+}
+#[test]
+fn extrapolation_and_limits_fail_closed() {
+    let axes = vec![vec![0.0, 1.0], vec![0.0, 1.0]];
+    let shape = vec![2, 2];
+    let mut low = plan(InterpolationMethod::Linear);
+    low.max_work = 7;
+    assert!(matches!(
+        RegularGridInterpolator::new(axes.clone(), shape.clone(), vec![0.0; 4], low),
+        Err(SignalError::WorkLimit { .. })
+    ));
+    let grid =
+        RegularGridInterpolator::new(axes, shape, vec![0.0; 4], plan(InterpolationMethod::Linear))
+            .unwrap();
+    assert!(matches!(
+        grid.evaluate(&[2.0, 0.0]),
+        Err(SignalError::OutOfDomain { .. })
+    ));
+}
+#[test]
+fn degenerate_duplicate_and_false_monotonicity_claim_are_explicit() {
+    assert!(
+        RegularGridInterpolator::new(
+            vec![vec![0.0], vec![0.0, 1.0]],
+            vec![1, 2],
+            vec![0.0; 2],
+            plan(InterpolationMethod::Linear)
+        )
+        .is_err()
+    );
+    let grid = RegularGridInterpolator::new(
+        vec![vec![0.0, 1.0], vec![0.0, 1.0]],
+        vec![2, 2],
+        vec![0.0, 0.0, 0.0, 1.0],
+        plan(InterpolationMethod::Monotone),
+    )
+    .unwrap();
+    assert!(
+        !grid
+            .evaluate(&[0.5, 0.5])
+            .unwrap()
+            .report
+            .multidimensional_monotonicity_claimed
+    );
+}
+// conformance: regular-grid tests prove ranked interpolation geometry and bounded work.
+```
+
+### `feature/sim-numbers/extended-precision-convergence`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-extended/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-extended/src/tests.rs`:
+
+```rust
+use super::*;
+
+fn s<T: RealScalar>(x: f64) -> T {
+    T::from_f64(x).unwrap()
+}
+fn root<T: RealScalar>(mut lo: T, mut hi: T, f: impl Fn(T) -> T) -> T {
+    for _ in 0..160 {
+        let m = lo.add(hi).mul(s(0.5));
+        if f(lo).to_f64().is_sign_negative() == f(m).to_f64().is_sign_negative() {
+            lo = m
+        } else {
+            hi = m
+        }
+    }
+    lo.add(hi).mul(s(0.5))
+}
+fn quad<T: RealScalar>(f: impl Fn(T) -> T, n: usize) -> T {
+    let h = s::<T>(1.0 / n as f64);
+    let mut z = T::ZERO;
+    for i in 0..n {
+        let x = s::<T>((i as f64 + 0.5) / n as f64);
+        z = z.add(f(x).mul(h));
+    }
+    z
+}
+fn ode<T: RealScalar>(n: usize) -> T {
+    let h = s::<T>(1.0 / n as f64);
+    let mut y = T::ONE;
+    for _ in 0..n {
+        let k1 = y;
+        let k2 = y.add(k1.mul(h).mul(s(0.5)));
+        let k3 = y.add(k2.mul(h).mul(s(0.5)));
+        let k4 = y.add(k3.mul(h));
+        y = y.add(
+            k1.add(k2.mul(s(2.0)))
+                .add(k3.mul(s(2.0)))
+                .add(k4)
+                .mul(h.div(s(6.0))),
+        );
+    }
+    y
+}
+fn horner<T: RealScalar>(x: T, c: &[T]) -> T {
+    c.iter().rev().fold(T::ZERO, |y, &a| y.mul(x).add(a))
+}
+fn dominant_eigen<T: RealScalar>(a: [[T; 2]; 2]) -> T {
+    let (mut x, mut y) = (T::ONE, T::ONE);
+    for _ in 0..32 {
+        let u = a[0][0].mul(x).add(a[0][1].mul(y));
+        let v = a[1][0].mul(x).add(a[1][1].mul(y));
+        let norm = u.mul(u).add(v.mul(v)).sqrt();
+        x = u.div(norm);
+        y = v.div(norm);
+    }
+    x.mul(a[0][0].mul(x).add(a[0][1].mul(y)))
+        .add(y.mul(a[1][0].mul(x).add(a[1][1].mul(y))))
+}
+
+#[test]
+fn transforms_normalize_and_preserve_cancellation() {
+    let a = DoubleDouble::from_f64_exact(1e16) + DoubleDouble::ONE;
+    let r = a - DoubleDouble::from_f64_exact(1e16);
+    assert_eq!(r, DoubleDouble::ONE);
+    for v in [a, r, DoubleDouble::PI] {
+        let ulp = (v.hi.next_up() - v.hi).abs();
+        assert!(v.lo.abs() <= 0.5 * ulp || v.lo == 0.0);
+    }
+}
+#[test]
+fn exact_bits_and_canonical_text_round_trip() {
+    for v in [
+        DoubleDouble::ZERO,
+        DoubleDouble::PI,
+        DoubleDouble::new(-0.0, 0.0),
+        DoubleDouble::from_f64_exact(f64::INFINITY),
+    ] {
+        let text = v.canonical();
+        assert_eq!(
+            DoubleDouble::parse_canonical(&text).unwrap().to_bits(),
+            v.to_bits()
+        );
+    }
+}
+#[test]
+fn division_sqrt_and_elementary_accuracy() {
+    let two = s::<DoubleDouble>(2.0);
+    let root = two.sqrt();
+    assert!((root * root - two).abs().to_f64().abs() < 1e-30);
+    let x = DoubleDouble::new(0.7, 1e-18);
+    assert!((x.exp().ln() - x).abs().to_f64() < 2e-30);
+    let (sc, cc) = (x.sin(), x.cos());
+    assert!((sc * sc + cc * cc - DoubleDouble::ONE).abs().to_f64() < 2e-30);
+}
+#[test]
+fn finite_limits_and_non_finite_policy() {
+    assert!(DoubleDouble::from_f64(f64::NAN).is_none());
+    assert!(DoubleDouble::from_f64(f64::INFINITY).is_none());
+    assert!(
+        DoubleDouble::from_f64_exact(f64::INFINITY)
+            .sqrt()
+            .hi()
+            .is_infinite()
+    );
+    assert!((DoubleDouble::from_f64_exact(-1.0).sqrt()).is_nan());
+    assert_eq!(DoubleDouble::MAX.hi(), f64::MAX);
+    assert_eq!(DoubleDouble::MIN_POSITIVE.hi(), f64::MIN_POSITIVE);
+}
+#[test]
+fn exact_rational_order_and_wide_exponents() {
+    let third = DoubleDouble::from_ratio_i128(1, 3).unwrap();
+    assert!(third < DoubleDouble::from_f64_exact(0.334));
+    assert!(third > DoubleDouble::from_f64_exact(0.333));
+    assert_eq!(DoubleDouble::from_i128((1_i128 << 100) + 1).lo(), 1.0);
+    let wide = DoubleDouble::from_f64_exact(1e200) + DoubleDouble::from_f64_exact(1e184);
+    assert!(wide > DoubleDouble::from_f64_exact(1e200));
+}
+#[test]
+fn promotion_edges_are_single_lattice_edges() {
+    let rules = promotion_rules();
+    assert_eq!(rules.len(), 2);
+    assert!(rules.iter().any(|r| r.from_domain == domains::f64()));
+    assert!(rules.iter().any(|r| r.from_domain == domains::rational()));
+}
+#[test]
+fn shared_contracts_cover_five_kernel_families() {
+    let rf = root::<f64>(1.0, 2.0, |x| x * x - 2.0);
+    let rd = root::<DoubleDouble>(s(1.0), s(2.0), |x| x * x - s(2.0));
+    assert!((rf - rd.to_f64()).abs() < 1e-15);
+    let qf = quad::<f64>(|x| x * x, 4096);
+    let qd = quad::<DoubleDouble>(|x| x * x, 4096);
+    assert!((qf - qd.to_f64()).abs() < 1e-14);
+    assert!((ode::<f64>(1024) - ode::<DoubleDouble>(1024).to_f64()).abs() < 1e-13);
+    let cf = [s::<f64>(-1.0), s(3.0), s(-3.0), s(1.0)];
+    let cd = [s::<DoubleDouble>(-1.0), s(3.0), s(-3.0), s(1.0)];
+    assert!(horner(s::<DoubleDouble>(1.0 + 1e-12), &cd).abs() < s(1e-30));
+    assert_eq!(horner(1.0 + 1e-12, &cf), 0.0);
+    let af = [[s::<f64>(2.0), s(1.0)], [s(1.0), s(2.0)]];
+    let ad = [[s::<DoubleDouble>(2.0), s(1.0)], [s(1.0), s(2.0)]];
+    assert!((dominant_eigen(af) - dominant_eigen(ad).to_f64()).abs() < 1e-14);
+}
+#[test]
+fn extended_corrects_known_f64_sign_loss() {
+    // Keep the residual above the double-double precision floor while still
+    // exercising a binary64 cancellation that loses the result's sign.
+    let x: f64 = 1.0 + 7.2e-4;
+    let f = (x - 1.0).powi(7);
+    let expanded = x.powi(7) - 7.0 * x.powi(6) + 21.0 * x.powi(5) - 35.0 * x.powi(4)
+        + 35.0 * x.powi(3)
+        - 21.0 * x * x
+        + 7.0 * x
+        - 1.0;
+    assert!(f > 0.0);
+    assert!(expanded <= 0.0);
+    let x = DoubleDouble::from_f64_exact(x);
+    let e = x.powi(7) - s::<DoubleDouble>(7.0) * x.powi(6) + s::<DoubleDouble>(21.0) * x.powi(5)
+        - s::<DoubleDouble>(35.0) * x.powi(4)
+        + s::<DoubleDouble>(35.0) * x.powi(3)
+        - s::<DoubleDouble>(21.0) * x * x
+        + s::<DoubleDouble>(7.0) * x
+        - DoubleDouble::ONE;
+    assert!(e > DoubleDouble::ZERO);
+}
+// conformance: extended-number tests prove normalized arithmetic and convergence behavior.
+```
+
+### `feature/sim-numbers/sealed-interval-certification`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-interval/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-interval/src/tests.rs`:
+
+```rust
+use super::*;
+fn q(n: i128, d: i128) -> ExactRational {
+    ExactRational::new(n, d).unwrap()
+}
+fn ri(a: (i128, i128), b: (i128, i128)) -> RationalInterval {
+    RationalInterval::new(q(a.0, a.1), q(b.0, b.1)).unwrap()
+}
+fn c(a: (i128, i128), b: (i128, i128)) -> CertifiedInterval {
+    ri(a, b).certify().unwrap()
+}
+
+#[test]
+fn exact_oracle_and_directed_operations_contain_results() {
+    let a = ri((1, 10), (1, 3));
+    let b = ri((-7, 5), (2, 7));
+    for (exact, float) in [
+        (
+            a.add(b).unwrap(),
+            a.certify().unwrap().add(&b.certify().unwrap()).unwrap(),
+        ),
+        (
+            a.sub(b).unwrap(),
+            a.certify().unwrap().sub(&b.certify().unwrap()).unwrap(),
+        ),
+        (
+            a.mul(b).unwrap(),
+            a.certify().unwrap().mul(&b.certify().unwrap()).unwrap(),
+        ),
+    ] {
+        assert!(float.lower() <= exact.lower().value());
+        assert!(float.upper() >= exact.upper().value())
+    }
+}
+#[test]
+fn hostile_cancellation_subnormal_overflow_and_dependency_are_contained() {
+    let huge = c((i128::MAX / 4, 1), (i128::MAX / 4, 1));
+    assert!(huge.add(&huge).unwrap().upper().is_finite());
+    let tiny = CertifiedInterval::issue(
+        f64::MIN_POSITIVE,
+        f64::MIN_POSITIVE,
+        evidence(
+            CertificationKernelId::DirectedBinary64V1,
+            vec![],
+            "fixture",
+            "fixture",
+        ),
+    )
+    .unwrap();
+    assert!(tiny.sub(&tiny).unwrap().lower() < 0.0);
+    let x = c((1, 1), (2, 1));
+    let dependency = x.sub(&x).unwrap();
+    assert!(dependency.lower() <= 0.0 && dependency.upper() >= 0.0);
+    let max = CertifiedInterval::issue(
+        f64::MAX,
+        f64::MAX,
+        evidence(
+            CertificationKernelId::DirectedBinary64V1,
+            vec![],
+            "fixture",
+            "fixture",
+        ),
+    )
+    .unwrap();
+    assert_eq!(max.add(&max).unwrap().upper(), f64::INFINITY);
+}
+#[test]
+fn discontinuities_and_unsupported_functions_refuse() {
+    let z = c((-1, 1), (1, 1));
+    assert_eq!(z.div(&z), Err(IntervalError::ZeroContainingDivisor));
+    assert_eq!(
+        certify_elementary("sin", &z),
+        Err(IntervalError::UnsupportedElementary("sin".into()))
+    );
+}
+#[test]
+fn signed_zero_nan_and_infinity_are_explicit() {
+    assert_eq!(
+        EstimateInterval::new(f64::NAN, 1.0),
+        Err(IntervalError::NaN)
+    );
+    let z = c((0, 1), (0, 1));
+    assert!(z.lower().is_sign_negative() && z.upper().is_sign_positive());
+    let inf = CertifiedInterval::issue(
+        f64::NEG_INFINITY,
+        f64::INFINITY,
+        evidence(
+            CertificationKernelId::DirectedBinary64V1,
+            vec![],
+            "fixture",
+            "fixture",
+        ),
+    )
+    .unwrap();
+    assert_eq!(inf.midpoint(), Err(IntervalError::Unbounded));
+    let exact_zero = CertifiedInterval::issue(
+        -0.0,
+        0.0,
+        evidence(
+            CertificationKernelId::DirectedBinary64V1,
+            vec![],
+            "fixture",
+            "fixture",
+        ),
+    )
+    .unwrap();
+    assert_eq!(exact_zero.mul(&inf), Err(IntervalError::Indeterminate));
+}
+#[test]
+fn only_certificates_make_definite_thresholds() {
+    let low = c((1, 1), (2, 1));
+    let high = c((3, 1), (4, 1));
+    assert_eq!(classify_threshold(&low, &high), ThresholdVerdict::Below);
+    assert!(matches!(
+        classify_estimate(
+            EstimateInterval::new(1., 2.).unwrap(),
+            EstimateInterval::new(3., 4.).unwrap()
+        ),
+        ThresholdVerdict::Unresolved(_)
+    ));
+}
+#[test]
+fn interval_newton_and_krawczyk_prove_simple_unique_root() {
+    let x = c((1, 1), (2, 1));
+    let fm = c((-1, 4), (-1, 4));
+    let d = c((2, 1), (4, 1));
+    let n = interval_newton(&x, &fm, &d).unwrap();
+    assert!(n.existence() && n.uniqueness());
+    let inv = c((1, 3), (1, 3));
+    let k = krawczyk(&x, &fm, &d, &inv).unwrap();
+    assert!(k.existence() && k.uniqueness());
+}
+#[test]
+fn inspection_datum_is_not_an_authority_decoder() {
+    let x = c((1, 1), (2, 1));
+    assert!(matches!(x.to_datum(), Datum::Node { .. }));
+    assert!(x.evidence().method().contains("exact rational"));
+}
+// conformance: interval tests prove sealed certification and reject forged evidence.
+```
+
+### `feature/sim-numbers/bounded-optimization`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-optimize/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-optimize/src/tests.rs`:
+
+```rust
+use super::*;
+
+fn limits() -> Limits {
+    Limits {
+        evaluations: 2_000,
+        iterations: 200,
+        memory_bytes: 1_000_000,
+    }
+}
+
+#[test]
+fn brent_finds_known_minimum_and_returns_bracket() {
+    let out = minimize_scalar(|x| (x - 2.0).powi(2), -4.0, 7.0, 1e-10, limits()).unwrap();
+    assert!((out.minimizer - 2.0).abs() < 1e-6);
+    assert!(out.final_bracket.0 <= out.minimizer && out.minimizer <= out.final_bracket.1);
+    assert_eq!(out.termination, Termination::Converged);
+}
+
+#[test]
+fn scalar_reports_non_finite_and_work_limit_honestly() {
+    assert_eq!(
+        minimize_scalar(|_| f64::NAN, 0.0, 1.0, 1e-8, limits())
+            .unwrap()
+            .termination,
+        Termination::NonFinite
+    );
+    let tiny = Limits {
+        evaluations: 1,
+        iterations: 1,
+        memory_bytes: 0,
+    };
+    assert_eq!(
+        minimize_scalar(|x| (x - 0.3).abs(), 0.0, 1.0, 1e-15, tiny)
+            .unwrap()
+            .termination,
+        Termination::WorkLimit
+    );
+}
+
+fn objective_plan(bounds: Bounds) -> ObjectivePlan {
+    ObjectivePlan {
+        bounds,
+        scale: vec![1.0, 1.0],
+        derivative: DerivativeSource::Analytic,
+        policy: StepPolicy::ProjectedBfgs,
+        tolerances: Tolerances::default(),
+        limits: limits(),
+        initial_radius: 1.0,
+    }
+}
+
+#[test]
+fn projected_objective_finds_active_bound_not_false_stationary_point() {
+    let bounds = Bounds::new(vec![0.0, -4.0], vec![1.0, 4.0]).unwrap();
+    let out = minimize(
+        |x| (x[0] - 3.0).powi(2) + (x[1] + 1.0).powi(2),
+        Some(|x: &[f64], g: &mut [f64]| {
+            g[0] = 2.0 * (x[0] - 3.0);
+            g[1] = 2.0 * (x[1] + 1.0)
+        }),
+        vec![0.2, 3.0],
+        &objective_plan(bounds),
+    )
+    .unwrap();
+    assert!(
+        (out.point[0] - 1.0).abs() < 1e-7 && (out.point[1] + 1.0).abs() < 1e-5,
+        "{out:?}"
+    );
+    assert!(matches!(
+        out.termination,
+        Termination::Converged | Termination::BoundaryConverged
+    ));
+}
+
+#[test]
+fn finite_difference_fallback_and_bad_scaling_are_explicit() {
+    let mut p = objective_plan(Bounds::new(vec![-5.0, -5.0], vec![5.0, 5.0]).unwrap());
+    p.derivative = DerivativeSource::FiniteDifference;
+    let out = minimize::<_, fn(&[f64], &mut [f64])>(
+        |x| x[0] * x[0] + x[1] * x[1],
+        None,
+        vec![2.0, -3.0],
+        &p,
+    )
+    .unwrap();
+    assert!(out.value < 1e-8, "{out:?}");
+    p.scale[0] = 0.0;
+    assert!(matches!(
+        minimize::<_, fn(&[f64], &mut [f64])>(|_| 0.0, None, vec![0.0, 0.0], &p),
+        Err(Error::InvalidPlan(_))
+    ));
+}
+
+fn ls_plan(bounds: Option<Bounds>, policy: StepPolicy) -> LeastSquaresPlan {
+    LeastSquaresPlan {
+        bounds,
+        variable_scale: vec![1.0, 1.0],
+        residual_scale: vec![1.0, 1.0],
+        derivative: DerivativeSource::Analytic,
+        policy,
+        tolerances: Tolerances::default(),
+        limits: limits(),
+        initial_damping: 1e-3,
+    }
+}
+
+#[test]
+fn lm_fits_nonlinear_residuals() {
+    let out = least_squares(
+        |x| vec![x[0] * x[0] - 4.0, x[1] - 3.0],
+        |x| vec![vec![2.0 * x[0], 0.0], vec![0.0, 1.0]],
+        vec![1.0, 0.0],
+        &ls_plan(None, StepPolicy::LevenbergMarquardt),
+    )
+    .unwrap();
+    assert!(
+        (out.point[0] - 2.0).abs() < 1e-5 && (out.point[1] - 3.0).abs() < 1e-5,
+        "{out:?}"
+    );
+}
+
+#[test]
+fn bounded_least_squares_uses_reflective_path() {
+    let bounds = Bounds::new(vec![0.0, 0.0], vec![1.0, 2.0]).unwrap();
+    let out = least_squares(
+        |x| vec![x[0] - 5.0, x[1] - 1.0],
+        |_| vec![vec![1.0, 0.0], vec![0.0, 1.0]],
+        vec![0.2, 0.2],
+        &ls_plan(Some(bounds), StepPolicy::TrustRegionReflective),
+    )
+    .unwrap();
+    assert!(
+        (out.point[0] - 1.0).abs() < 1e-7 && (out.point[1] - 1.0).abs() < 1e-5,
+        "{out:?}"
+    );
+    assert_eq!(out.active, vec![0]);
+}
+
+#[test]
+fn linear_rank_and_covariance_unavailability_are_evidence() {
+    let a = vec![vec![1.0, 2.0], vec![2.0, 4.0]];
+    let b = vec![1.0, 2.0];
+    let out = linear_least_squares(
+        &a,
+        &b,
+        Bounds::new(vec![-10.0, -10.0], vec![10.0, 10.0]).unwrap(),
+        1e-10,
+        limits(),
+        true,
+    )
+    .unwrap();
+    assert_eq!(out.rank, 1);
+    assert_eq!(
+        out.covariance,
+        Covariance::Unavailable(CovarianceUnavailable::RankDeficient)
+    );
+}
+
+#[test]
+fn bounded_linear_solver_uses_active_set_and_certified_svd_rank() {
+    let a = vec![vec![1.0, 0.0], vec![0.0, 1.0], vec![1.0, 1.0]];
+    let b = vec![4.0, 1.0, 5.0];
+    let out = linear_least_squares(
+        &a,
+        &b,
+        Bounds::new(vec![0.0, 0.0], vec![2.0, 10.0]).unwrap(),
+        1e-10,
+        limits(),
+        true,
+    )
+    .unwrap();
+    assert!((out.point[0] - 2.0).abs() < 1e-9, "{out:?}");
+    assert_eq!(out.active, vec![0]);
+    assert_eq!(out.rank, 2);
+    assert!(matches!(out.covariance, Covariance::Available(_)));
+}
+
+#[test]
+fn flat_nonsmooth_and_memory_limits_terminate() {
+    let flat = minimize_scalar(|_| 1.0, -1.0, 1.0, 1e-8, limits()).unwrap();
+    assert!(matches!(
+        flat.termination,
+        Termination::Converged | Termination::WorkLimit
+    ));
+    let nonsmooth = minimize_scalar(|x| x.abs(), -1.0, 2.0, 1e-9, limits()).unwrap();
+    assert!(nonsmooth.minimizer.abs() < 1e-5);
+    let mut p = objective_plan(Bounds::new(vec![-1.0, -1.0], vec![1.0, 1.0]).unwrap());
+    p.limits.memory_bytes = 1;
+    assert_eq!(
+        minimize(
+            |x| x[0],
+            Some(|_: &[f64], g: &mut [f64]| g.fill(1.0)),
+            vec![0.0, 0.0],
+            &p
+        )
+        .unwrap()
+        .termination,
+        Termination::WorkLimit
+    );
+}
+
+#[cfg(feature = "assignment")]
+#[test]
+fn assignment_adapter_preserves_certificate_and_receipt() {
+    use sim_lib_discrete_graph::{AssignmentPolicy, CostMatrix, verify_assignment};
+    let costs = vec![vec![1.0, 9.0], vec![8.0, 2.0]];
+    let policy = AssignmentPolicy::new(vec![20.0, 20.0], vec![20.0, 20.0]);
+    let out = crate::assignment::assign(costs.clone(), policy.clone()).unwrap();
+    verify_assignment(&CostMatrix::try_from(costs).unwrap(), &policy, &out).unwrap();
+    assert!(!format!("{:?}", out.certificate).is_empty());
+    assert!(out.receipt.work_used > 0);
+}
+// conformance: optimization tests prove bounded steps, convergence, and failure policy.
+```
+
+### `feature/sim-numbers/method-evidence`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-method/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-method/src/tests.rs`:
+
+```rust
+use sim_kernel::Datum;
+use sim_kernel::Lib;
+#[cfg(feature = "adapters")]
+use sim_lib_numbers_signal::{EstimatorEvidence, EstimatorKind, FrequencyGridPolicy, SpectrumSide};
+#[cfg(feature = "adapters")]
+use sim_lib_numbers_stats::{KMeansRestartEvidence, KMeansTermination};
+#[cfg(feature = "adapters")]
+use sim_lib_numbers_tensor_linalg::{DenseSolveOptions, solve_dense_f64};
+
+use crate::*;
+
+fn execution() -> ExecutionIdentity {
+    ExecutionIdentity::new("test-engine", "method-tests-v1", "case-0001").unwrap()
+}
+
+#[test]
+fn work_charging_saturates_without_overflow() {
+    let limit = WorkLimit::new(17).unwrap();
+    let receipt = WorkReceipt::empty(limit).charge(u64::MAX).charge(1);
+    assert_eq!(receipt.charged(), 17);
+    assert!(receipt.saturated());
+    assert!(WorkReceipt::new(18, limit, false).is_err());
+}
+
+#[test]
+fn criteria_are_not_substitutable_and_success_cannot_be_forged() {
+    let requested = ToleranceSet::new([
+        ErrorMeasure::new(CriterionId::ResidualNorm, 1e-8).unwrap(),
+        ErrorMeasure::new(CriterionId::StepNorm, 1e-6).unwrap(),
+    ])
+    .unwrap();
+    let error = MethodEvidence::new(
+        MethodId::new(MethodId::DENSE_SCALED_PIVOT).unwrap(),
+        Termination::Converged {
+            criterion: CriterionId::ResidualNorm,
+        },
+        WorkReceipt::empty(WorkLimit::new(10).unwrap()),
+        requested,
+        vec![ErrorMeasure::new(CriterionId::StepNorm, 0.0).unwrap()],
+        PrecisionId::Binary64,
+        execution(),
+    )
+    .unwrap_err();
+    assert_eq!(error, MethodError::ContradictoryEvidence);
+}
+
+#[test]
+fn every_record_has_deterministic_exact_datum_identity() {
+    let requested =
+        ToleranceSet::new([ErrorMeasure::new(CriterionId::ResidualNorm, -0.0).unwrap()]).unwrap();
+    let plan = MethodPlan::new(
+        MethodId::new(MethodId::DENSE_SCALED_PIVOT).unwrap(),
+        WorkLimit::new(8).unwrap(),
+        requested.clone(),
+    );
+    let plan_datum = plan.to_datum();
+    assert_eq!(MethodPlan::from_datum(&plan_datum).unwrap(), plan);
+    assert_eq!(
+        plan_datum.content_id().unwrap(),
+        plan.to_datum().content_id().unwrap()
+    );
+    assert_eq!(
+        plan.tolerances().measures()[0].value().to_bits(),
+        (-0.0f64).to_bits()
+    );
+
+    let work = WorkReceipt::empty(WorkLimit::new(8).unwrap()).charge(8);
+    assert_eq!(WorkReceipt::from_datum(&work.to_datum()).unwrap(), work);
+    let termination = Termination::Refused {
+        reason: RefusalId::Unsupported,
+    };
+    assert_eq!(
+        Termination::from_datum(&termination.to_datum()).unwrap(),
+        termination
+    );
+    assert_eq!(
+        ExecutionIdentity::from_datum(&execution().to_datum()).unwrap(),
+        execution()
+    );
+
+    let mut forged = ErrorMeasure::new(CriterionId::ResidualNorm, 0.0)
+        .unwrap()
+        .to_datum();
+    if let Datum::Node { fields, .. } = &mut forged {
+        fields[1].1 = Datum::String("binary64:7ff8000000000001".into());
+    }
+    assert!(ErrorMeasure::from_datum(&forged).is_err());
+}
+
+#[test]
+#[cfg(feature = "adapters")]
+fn dense_adapter_preserves_domain_report_and_common_queries() {
+    let solution = solve_dense_f64(
+        &[2.0, 0.0, 0.0, 4.0],
+        &[2.0, 8.0],
+        DenseSolveOptions::default(),
+    )
+    .unwrap();
+    let retained = solution.report;
+    let common = DenseSolveAdapter::evidence(&solution.report, 1e-12, execution()).unwrap();
+    assert_eq!(solution.report, retained);
+    assert_eq!(common.method().as_str(), MethodId::DENSE_SCALED_PIVOT);
+    assert!(matches!(
+        common.termination(),
+        Termination::Converged {
+            criterion: CriterionId::ResidualNorm
+        }
+    ));
+    assert_eq!(common.achieved()[0].value(), retained.residual_l2);
+    assert_eq!(
+        MethodEvidence::from_datum(&common.to_datum()).unwrap(),
+        common
+    );
+}
+
+#[test]
+#[cfg(feature = "adapters")]
+fn stats_adapter_preserves_domain_evidence() {
+    let stats = KMeansRestartEvidence {
+        restart: 2,
+        seed: 41,
+        inertia: 0.25,
+        iterations: 7,
+        converged: true,
+        empty_cluster_repairs: 1,
+        work: 90,
+        termination: KMeansTermination::Converged,
+    };
+    let retained_stats = stats.clone();
+    let common = StatsKMeansAdapter::evidence(&stats, 0.5, 100, execution()).unwrap();
+    assert_eq!(stats, retained_stats);
+    assert_eq!(common.work().charged(), 90);
+    assert_eq!(common.achieved()[0].value(), 0.25);
+}
+
+#[test]
+fn ids_limits_and_measures_reject_invalid_boundaries() {
+    assert!(MethodId::new("invented/method").is_err());
+    assert!(WorkLimit::new(0).is_err());
+    assert!(ErrorMeasure::new(CriterionId::BracketWidth, f64::NAN).is_err());
+    assert!(ErrorMeasure::new(CriterionId::EmbeddedLocalError, -1.0).is_err());
+}
+
+#[test]
+fn loadable_surface_advertises_the_inspection_schema() {
+    let manifest = MethodNumbersLib::new().manifest();
+    assert_eq!(
+        manifest.id,
+        sim_kernel::Symbol::qualified("numbers", "method")
+    );
+    assert_eq!(manifest.exports.len(), 1);
+}
+// conformance: method tests prove bounded plans and criterion-specific retained evidence.
+```
+
+### `feature/sim-numbers/coefficient-polynomial`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-poly/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-poly/src/tests.rs`:
+
+```rust
+use super::*;
+
+fn r(n: i128, d: i128) -> Rational {
+    Rational::new(n, d).unwrap()
+}
+#[test]
+fn canonical_exponent_domains_are_distinct() {
+    assert_eq!(Polynomial::new(vec![]).unwrap().coefficients(), &[0.]);
+    let l = LaurentPolynomial::new(-3, vec![0., 2., 0.]).unwrap();
+    assert_eq!(l.minimum_exponent, -2);
+    assert_eq!(l.coefficients(), &[2.]);
+    let p = PuiseuxPolynomial::new(
+        RationalExponent::new(-1, 2).unwrap(),
+        RationalExponent::new(1, 3).unwrap(),
+        vec![0., 4.],
+    )
+    .unwrap();
+    assert_eq!(p.minimum_exponent, RationalExponent::new(-1, 6).unwrap());
+    assert_eq!(p.coefficients(), &[4.])
+}
+#[test]
+fn exact_identities_division_and_gcd() {
+    let a = ExactPolynomial::new(vec![r(-1, 1), r(0, 1), r(1, 1)]);
+    let b = ExactPolynomial::new(vec![r(-1, 1), r(1, 1)]);
+    let (q, rem) = a.div_rem(&b).unwrap();
+    assert_eq!(q.coefficients(), &[r(1, 1), r(1, 1)]);
+    assert_eq!(rem.coefficients(), &[Rational::ZERO]);
+    let g = ExactPolynomial::gcd(a, b.clone()).unwrap();
+    assert_eq!(g, b)
+}
+#[test]
+fn horner_derivative_and_integral_carry_evidence() {
+    let p = Polynomial::new(vec![1., -3., 2.]).unwrap();
+    let e = p.evaluate(2.);
+    let c = p.evaluate_compensated(2.);
+    assert_eq!(e.value, 3.);
+    assert!(e.absolute_error_bound >= 0.);
+    assert!((c.value - 3.).abs() <= c.absolute_error_bound);
+    assert_eq!(p.derivative().coefficients(), &[-3., 4.]);
+    assert_eq!(p.antiderivative(7.).unwrap().derivative(), p);
+    assert_eq!(p.add(&p).coefficients(), &[2., -6., 4.]);
+    assert_eq!(
+        p.mul(&Polynomial::new(vec![1., 1.]).unwrap())
+            .coefficients(),
+        &[1., -2., -1., 2.]
+    )
+}
+#[test]
+fn roots_cover_repetition_clusters_sensitivity_and_imaginary_pairs() {
+    let repeated = Polynomial::from_roots(&[1., 1., 1.])
+        .unwrap()
+        .roots(RootPlan {
+            cluster_tolerance: 1e-3,
+            ..RootPlan::default()
+        })
+        .unwrap();
+    assert_eq!(repeated.roots.len(), 3);
+    assert!(repeated.roots.iter().all(|x| x.multiplicity >= 2));
+    let imag = Polynomial::new(vec![1., 0., 1.])
+        .unwrap()
+        .roots(RootPlan::default())
+        .unwrap();
+    assert!(imag.roots.iter().any(|x| x.root.im().abs() > 0.9));
+    assert!(imag.roots.iter().all(|x| x.backward_error < 1e-7));
+    let wilkinson = Polynomial::from_roots(&(1..=8).map(|x| x as f64).collect::<Vec<_>>()).unwrap();
+    let roots = wilkinson
+        .roots(RootPlan {
+            cluster_tolerance: 1e-5,
+            ..RootPlan::default()
+        })
+        .unwrap();
+    assert_eq!(roots.roots.len(), 8);
+    assert!(roots.roots.iter().all(|x| x.backward_error < 1e-4));
+    let clustered = Polynomial::from_roots(&[1., 1. + 1e-8, 2.])
+        .unwrap()
+        .roots(RootPlan {
+            cluster_tolerance: 1e-4,
+            ..RootPlan::default()
+        })
+        .unwrap();
+    assert!(clustered.roots.iter().any(|x| x.multiplicity >= 2))
+}
+#[test]
+fn pade_matches_exponential_series_and_rejects_singular_system() {
+    let mut series = vec![1.];
+    for k in 1..=6 {
+        series.push(series[k - 1] / k as f64)
+    }
+    let p = pade(&series, 3, 3, 1e-12).unwrap();
+    assert_eq!(p.rank, 3);
+    for &x in &[-0.5, 0., 0.5] {
+        let value = p.numerator.evaluate(x).value / p.denominator.evaluate(x).value;
+        assert!((value - x.exp()).abs() < 1e-6)
+    }
+    let singular = vec![1.; 5];
+    assert!(matches!(
+        pade(&singular, 2, 2, 1e-12),
+        Err(PolynomialError::RankDeficient { .. })
+    ))
+}
+// conformance: polynomial tests prove canonical algebra and certified numerical evidence.
+```
+
+### `feature/sim-numbers/tensor-decomposition`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-tensor-decomp/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-tensor-decomp/src/tests.rs`:
+
+```rust
+use super::*;
+fn close(x: f64, t: f64) {
+    assert!(x < t, "{x} >= {t}")
+}
+
+#[test]
+fn matrix_functions_cover_powers_exponentials_and_equations() {
+    assert_eq!(
+        matrix_power_f64(&[2.0, 0.0, 0.0, 3.0], 2, 3).unwrap(),
+        vec![8.0, 0.0, 0.0, 27.0]
+    );
+    let diag = matrix_exponential_f64(&[1.0, 0.0, 0.0, -1.0], 2).unwrap();
+    assert!((diag.value[0] - 1.0f64.exp()).abs() < 1e-12);
+    assert!((diag.value[3] - (-1.0f64).exp()).abs() < 1e-12);
+    assert_eq!(diag.evidence.approximant_order, 13);
+    let nilpotent = matrix_exponential_f64(&[0.0, 1.0, 0.0, 0.0], 2).unwrap();
+    assert!(
+        nilpotent
+            .value
+            .iter()
+            .zip([1.0, 1.0, 0.0, 1.0])
+            .all(|(x, y)| (x - y).abs() < 1e-12)
+    );
+    let jordan = matrix_exponential_f64(&[2.0, 1.0, 0.0, 2.0], 2).unwrap();
+    assert!((jordan.value[1] - 2.0f64.exp()).abs() < 1e-11);
+    let syl = solve_sylvester_f64(
+        &[1.0, 0.0, 0.0, 2.0],
+        &[3.0, 0.0, 0.0, 4.0],
+        &[4.0, 5.0, 6.0, 7.0],
+        2,
+        1e-12,
+    )
+    .unwrap();
+    assert!(syl.evidence.residual < 1e-12);
+    assert!(syl.evidence.separation >= 4.0);
+    let lya = solve_lyapunov_f64(&[-1.0, 0.0, 0.0, -2.0], &[2.0, 0.0, 0.0, 4.0], 2, 1e-12).unwrap();
+    assert!(lya.evidence.residual < 1e-12);
+    assert!((lya.value[0] - 1.0).abs() < 1e-12 && (lya.value[3] - 1.0).abs() < 1e-12);
+}
+#[test]
+fn qr_diagonal_pivoted_hilbert_scaled_and_immutable() {
+    for a in [
+        vec![3., 0., 0., 2.],
+        vec![1., 0.5, 1. / 3., 0.5, 1. / 3., 0.25, 1. / 3., 0.25, 0.2],
+        vec![1e8, 2., 3., 4e-8],
+    ] {
+        let n = (a.len() as f64).sqrt() as usize;
+        let before = a.clone();
+        let out = qr_f64(
+            &a,
+            n,
+            n,
+            QrPlan {
+                column_pivoting: true,
+                reconstruction_tolerance: 1e-6,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(a, before);
+        close(out.evidence.orthogonality_residual, 1e-8);
+        close(out.evidence.reconstruction_residual, 1e-5);
+        assert_eq!(out.permutation.len(), n)
+    }
+}
+#[test]
+fn qr_permutation_and_work_limit() {
+    let a = [0., 2., 1., 3.];
+    let q = qr_f64(
+        &a,
+        2,
+        2,
+        QrPlan {
+            column_pivoting: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(q.permutation, vec![1, 0]);
+    assert!(matches!(
+        qr_f64(
+            &a,
+            2,
+            2,
+            QrPlan {
+                max_work: 1,
+                ..Default::default()
+            }
+        ),
+        Err(DecompositionError::WorkLimit)
+    ));
+}
+#[test]
+fn eigen_diagonal_rotation_repeated_clustered_and_scaled() {
+    let c = 0.6;
+    let s = 0.8;
+    for a in [
+        vec![3., 0., 0., 1.],
+        vec![
+            3. * c * c + s * s,
+            (3. - 1.) * c * s,
+            (3. - 1.) * c * s,
+            3. * s * s + c * c,
+        ],
+        vec![2., 0., 0., 2.],
+        vec![1., 1e-10, 1e-10, 1. + 1e-12],
+        vec![1e8, 0., 0., -1e8],
+    ] {
+        let before = a.clone();
+        let e = symmetric_eigen_f64(
+            &a,
+            2,
+            EigenPlan {
+                symmetry_tolerance: Some(1e-14),
+                reconstruction_tolerance: 1e-6,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(a, before);
+        assert!(e.eigenvalues[0] >= e.eigenvalues[1]);
+        close(e.evidence.orthogonality_residual, 1e-8);
+        close(
+            e.evidence.reconstruction_residual,
+            1e-5 * matrix_norm(&a).max(1.),
+        );
+    }
+}
+#[test]
+fn eigen_refuses_asymmetry_and_honors_iteration_limit() {
+    let a = [1., 0.1, 0.2, 2.];
+    assert!(matches!(
+        symmetric_eigen_f64(&a, 2, EigenPlan::default()),
+        Err(DecompositionError::Asymmetric { .. })
+    ));
+    let a = [1., 1., 1., 2.];
+    assert!(matches!(
+        symmetric_eigen_f64(
+            &a,
+            2,
+            EigenPlan {
+                max_iterations: 0,
+                symmetry_tolerance: Some(0.),
+                ..Default::default()
+            }
+        ),
+        Err(DecompositionError::InvalidPlan(_))
+    ));
+}
+
+#[test]
+fn eigen_householder_stage_handles_hilbert_and_permuted_three_by_three() {
+    for a in [
+        vec![
+            1.0,
+            0.5,
+            1.0 / 3.0,
+            0.5,
+            1.0 / 3.0,
+            0.25,
+            1.0 / 3.0,
+            0.25,
+            0.2,
+        ],
+        vec![4.0, 1.0, 2.0, 1.0, 3.0, 0.5, 2.0, 0.5, 2.0],
+    ] {
+        let e = symmetric_eigen_f64(
+            &a,
+            3,
+            EigenPlan {
+                symmetry_tolerance: Some(0.0),
+                max_iterations: 256,
+                reconstruction_tolerance: 1e-9,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        close(e.evidence.reconstruction_residual, 1e-8);
+        close(e.evidence.orthogonality_residual, 1e-8);
+    }
+}
+
+#[test]
+fn schur_covers_normal_non_normal_defective_and_complex_pairs() {
+    for (a, n) in [
+        (vec![0.0, -1.0, 1.0, 0.0], 2),
+        (vec![1.0, 100.0, 0.0, 2.0], 2),
+        (vec![2.0, 1.0, 0.0, 2.0], 2),
+        (vec![1.0, 1.0, 0.0, 1.0e-10, 1.0, 1.0, 0.0, 1.0e-10, 1.0], 3),
+    ] {
+        let out = real_schur_f64(&a, n, SchurPlan::default()).unwrap();
+        assert_eq!(out.status, FactorStatus::Complete);
+        assert_eq!(out.eigenvalues.len(), n);
+        close(out.evidence.reconstruction_residual, 1.0e-7);
+        close(out.evidence.orthogonality_residual, 1.0e-7);
+    }
+}
+
+#[test]
+fn svd_covers_rectangular_rank_deficient_repeated_scaled_and_permuted() {
+    for (a, rows, cols) in [
+        (vec![1.0, 0.0, 0.0, 1.0, 0.0, 0.0], 3, 2),
+        (vec![1.0, 2.0, 2.0, 4.0, 3.0, 6.0], 3, 2),
+        (vec![0.0, 1.0e12, 1.0e-12, 0.0], 2, 2),
+        (vec![0.0, 1.0, 1.0, 0.0], 2, 2),
+        (vec![1.0, 0.0, 0.0, 0.0, 2.0, 0.0], 2, 3),
+    ] {
+        let out = svd_f64(
+            &a,
+            rows,
+            cols,
+            SvdPlan {
+                vectors: VectorForm::Full,
+                reconstruction_tolerance: 1.0e-8,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert_eq!(out.status, FactorStatus::Complete);
+        assert!(out.singular_values.windows(2).all(|x| x[0] >= x[1]));
+        close(out.evidence.reconstruction_residual, 1.0e-8);
+    }
+}
+
+#[test]
+fn svd_values_only_still_carries_a_reconstruction_certificate() {
+    for (a, rows, cols) in [
+        (vec![3.0, 0.0, 0.0, 1.0], 2, 2),
+        (vec![1.0, 2.0, 3.0, 4.0, 5.0, 6.0], 2, 3),
+    ] {
+        let out = svd_f64(
+            &a,
+            rows,
+            cols,
+            SvdPlan {
+                vectors: VectorForm::None,
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        assert!(out.u.is_none() && out.v.is_none());
+        close(out.evidence.reconstruction_residual, 1.0e-9);
+    }
+}
+
+#[test]
+fn svd_derived_solves_share_one_cutoff_and_retain_near_rank() {
+    // Squaring this matrix into normal equations loses the small direction much
+    // earlier; direct column rotations retain it under the declared cutoff.
+    let a = [1.0, 1.0, 1.0, 1.0 + 1.0e-10];
+    let s = svd_f64(
+        &a,
+        2,
+        2,
+        SvdPlan {
+            vectors: VectorForm::Full,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let cutoff = SingularCutoff::new(1.0e-12).unwrap();
+    assert_eq!(numerical_rank(&s, cutoff).unwrap(), 2);
+    assert!(condition_2(&s, cutoff).unwrap().is_finite());
+    let pinv = pseudoinverse(&s, cutoff).unwrap();
+    assert_eq!(pinv.len(), 4);
+    let x = least_squares(&s, &[2.0, 2.0 + 1.0e-10], cutoff).unwrap();
+    close((x[0] - 1.0).abs(), 1.0e-4);
+    close((x[1] - 1.0).abs(), 1.0e-4);
+    assert!(null_space(&s, cutoff).unwrap().is_empty());
+
+    let deficient = svd_f64(
+        &[1.0, 2.0, 2.0, 4.0],
+        2,
+        2,
+        SvdPlan {
+            vectors: VectorForm::Full,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(numerical_rank(&deficient, cutoff).unwrap(), 1);
+    assert!(condition_2(&deficient, cutoff).unwrap().is_infinite());
+    assert_eq!(null_space(&deficient, cutoff).unwrap().len(), 2);
+}
+
+#[test]
+fn exhaustion_is_labelled_partial_and_never_admitted_to_solves() {
+    let a = [1.0, 2.0, 3.0, 4.0, 7.0, 11.0, 5.0, 13.0, 17.0];
+    let partial = svd_f64(
+        &a,
+        3,
+        3,
+        SvdPlan {
+            max_iterations: 1,
+            return_partial: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(partial.status, FactorStatus::Partial);
+    assert!(matches!(
+        numerical_rank(&partial, SingularCutoff(1.0e-12)),
+        Err(DecompositionError::NoConvergence)
+    ));
+    assert!(matches!(
+        svd_f64(
+            &a,
+            3,
+            3,
+            SvdPlan {
+                max_iterations: 1,
+                ..Default::default()
+            }
+        ),
+        Err(DecompositionError::NoConvergence)
+    ));
+}
+
+#[test]
+fn provider_descriptors_and_admission_check_identity_shape_order_and_residual() {
+    let a = [3.0, 0.0, 0.0, 1.0];
+    let s = svd_f64(&a, 2, 2, SvdPlan::default()).unwrap();
+    let execution = ExecutionIdentity::new("test", "provider", "invocation-1").unwrap();
+    let admitted = admit_provider_svd(&a, 2, 2, &s, execution.clone(), 1.0e-10).unwrap();
+    assert_eq!(admitted.execution, execution);
+    assert_eq!(svd_operation(2, 2, VectorForm::Thin).output_shapes.len(), 3);
+    assert_eq!(schur_operation(2).output_shapes.len(), 3);
+    let mut invalid = s.clone();
+    invalid.singular_values.swap(0, 1);
+    assert!(admit_provider_svd(&a, 2, 2, &invalid, execution, 1.0e-10).is_err());
+}
+// conformance: decomposition tests prove identities, residuals, rank policy, and refusal.
+```
 
 ### `feature/sim-numbers/numbers`
 
@@ -632,6 +2331,188 @@ fn singular_policy_and_non_finite_or_unadmitted_inputs_fail_closed() {
         Err(ClusteringError::WorkLimit { .. })
     ));
 }
+```
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/decision_tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-stats/src/decision_tests.rs`:
+
+```rust
+use super::{
+    BootstrapControl, ClusterSample, IsotonicPoint, RegisteredLook, RegisteredLookSequence,
+    StatsError, ThresholdReadout, bootstrap_mean_difference_interval, clustered_bootstrap_interval,
+    exact_binary_interval, fit_isotonic, paired_bootstrap_interval,
+};
+
+#[test]
+fn exact_binary_reference_and_exhaustive_tiny_cases() {
+    let interval = exact_binary_interval(5, 10, 0.95).unwrap();
+    assert!((interval.lower - 0.187_086_028_447_398_52).abs() < 1.0e-12);
+    assert!((interval.upper - 0.812_913_971_552_601_5).abs() < 1.0e-12);
+    for trials in 1..=12 {
+        let mut previous_lower = 0.0;
+        let mut previous_upper = 0.0;
+        for successes in 0..=trials {
+            let value = exact_binary_interval(successes, trials, 0.9).unwrap();
+            assert!(0.0 <= value.lower && value.lower <= value.upper && value.upper <= 1.0);
+            assert!(value.lower >= previous_lower);
+            assert!(value.upper >= previous_upper);
+            previous_lower = value.lower;
+            previous_upper = value.upper;
+        }
+    }
+}
+
+#[test]
+fn paired_and_clustered_bootstraps_replay_and_preserve_identity() {
+    let control = BootstrapControl::new(91, 400, 0.9, 10_000).unwrap();
+    let pairs = [(1.0, 2.0), (4.0, 3.0), (2.0, 4.0)];
+    assert_eq!(
+        paired_bootstrap_interval(&pairs, control),
+        paired_bootstrap_interval(&pairs, control)
+    );
+
+    let clusters = vec![
+        ClusterSample {
+            id: 20,
+            pairs: vec![(4.0, 7.0), (2.0, 3.0)],
+        },
+        ClusterSample {
+            id: 10,
+            pairs: vec![(1.0, 1.5), (3.0, 4.0)],
+        },
+        ClusterSample {
+            id: 30,
+            pairs: vec![(8.0, 7.0)],
+        },
+    ];
+    let mut shuffled = clusters.clone();
+    shuffled.reverse();
+    for cluster in &mut shuffled {
+        cluster.pairs.reverse();
+    }
+    assert_eq!(
+        clustered_bootstrap_interval(&clusters, 3, control),
+        clustered_bootstrap_interval(&shuffled, 3, control)
+    );
+    assert!(matches!(
+        clustered_bootstrap_interval(&clusters[..2], 3, control),
+        Err(StatsError::InsufficientInput { .. })
+    ));
+}
+
+#[test]
+fn registered_looks_seal_the_optional_stopping_budget() {
+    let sequence = RegisteredLookSequence::new(
+        vec![
+            RegisteredLook {
+                samples: 4,
+                alpha: 0.01,
+            },
+            RegisteredLook {
+                samples: 8,
+                alpha: 0.02,
+            },
+        ],
+        0.03,
+    )
+    .unwrap();
+    assert_eq!(
+        sequence.interval(&[0.0; 3]).unwrap_err(),
+        StatsError::InvalidControl {
+            field: "observations",
+            reason: "sample count is not a registered look"
+        }
+    );
+    let first = sequence.interval(&[0.0, 1.0, 1.0, 1.0]).unwrap();
+    let second = sequence
+        .interval(&[0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0])
+        .unwrap();
+    assert_eq!(first.alpha_spent + second.alpha_spent, first.total_budget);
+    assert!(first.lower <= first.mean && first.mean <= first.upper);
+    assert!(second.lower <= second.mean && second.mean <= second.upper);
+}
+
+#[test]
+fn weighted_pav_is_monotone_permutation_invariant_and_censored() {
+    let points = [
+        IsotonicPoint {
+            level: 2.0,
+            value: 0.2,
+            weight: 1.0,
+        },
+        IsotonicPoint {
+            level: 1.0,
+            value: 0.8,
+            weight: 3.0,
+        },
+        IsotonicPoint {
+            level: 3.0,
+            value: 0.9,
+            weight: 1.0,
+        },
+    ];
+    let fit = fit_isotonic(&points).unwrap();
+    let mut reversed = points;
+    reversed.reverse();
+    assert_eq!(fit, fit_isotonic(&reversed).unwrap());
+    assert!(fit.fitted.windows(2).all(|pair| pair[0] <= pair[1]));
+    assert!(
+        fit.fitted[0..2]
+            .iter()
+            .all(|value| (*value - 0.65).abs() < 1.0e-15)
+    );
+    assert_eq!(fit.fitted[2], 0.9);
+    assert_eq!(
+        fit.threshold(0.1).unwrap(),
+        ThresholdReadout::BelowTestedRange
+    );
+    assert_eq!(
+        fit.threshold(0.8).unwrap(),
+        ThresholdReadout::Observed { level: 3.0 }
+    );
+    assert_eq!(
+        fit.threshold(1.0).unwrap(),
+        ThresholdReadout::AboveTestedRange
+    );
+    assert!(fit.normalized_area.is_some());
+    assert_eq!(fit_isotonic(&points[..1]).unwrap().normalized_area, None);
+}
+
+#[test]
+fn malformed_inputs_and_work_are_rejected_without_changing_independent_bootstrap() {
+    assert!(exact_binary_interval(2, 1, 0.95).is_err());
+    assert!(exact_binary_interval(1, 2, f64::NAN).is_err());
+    assert!(
+        paired_bootstrap_interval(
+            &[(0.0, f64::INFINITY)],
+            BootstrapControl::new(1, 2, 0.9, 10).unwrap()
+        )
+        .is_err()
+    );
+    assert!(
+        fit_isotonic(&[IsotonicPoint {
+            level: 0.0,
+            value: 1.0,
+            weight: 0.0
+        }])
+        .is_err()
+    );
+    let too_small = BootstrapControl::new(1, 10, 0.9, 9).unwrap();
+    assert!(matches!(
+        paired_bootstrap_interval(&[(0.0, 1.0)], too_small),
+        Err(StatsError::WorkLimitExceeded { .. })
+    ));
+
+    let independent = BootstrapControl::new(0x5eed, 1_000, 0.95, 10_000).unwrap();
+    let fixture =
+        bootstrap_mean_difference_interval(&[10.0, 11.0, 12.0], &[8.0, 9.0, 10.0], independent)
+            .unwrap();
+    assert_eq!(fixture.seed, 0x5eed);
+    assert_eq!(fixture.resamples, 1_000);
+    assert_eq!(fixture.point_effect, -2.0);
+}
+// conformance: decision tests prove registered looks and bounded statistical evidence.
 ```
 
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-stats/src/hmm_tests` is checked by `cargo test`.
@@ -1186,6 +3067,7 @@ fn empty_and_non_finite_inputs_fail_closed() {
         })
     );
 }
+// conformance: signal tests prove transform conventions against direct reference definitions.
 ```
 
 Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-signal/src/analytic_tests` is checked by `cargo test`.
@@ -1618,7 +3500,7 @@ Source `crates/sim-lib-numbers-signal/src/multidimensional_tests.rs`:
 
 use std::sync::Arc;
 
-use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, Symbol};
+use sim_kernel::{AssocTable, Cx, DefaultFactory, EagerPolicy, HandleSeed, Symbol};
 
 use crate::{
     PlacementPolicy, SignalBuffer, TensorView, TransformKind, TransformPlan, TransformPrecision,
@@ -1698,7 +3580,11 @@ fn blocked_table_transform_matches_in_memory_with_bounded_scratch() {
         max_scratch_bytes: 4096,
         block_len: 3,
     };
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4701),
+    );
     let store = AssocTable::new();
     let blocked = write_blocked_tensor(
         &mut cx,
@@ -1761,7 +3647,11 @@ fn blocked_plan_rejects_insufficient_scratch_before_execution() {
         max_scratch_bytes: 1024,
         block_len: 2,
     };
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4702),
+    );
     let store = AssocTable::new();
     let blocked = write_blocked_tensor(
         &mut cx,
@@ -1782,7 +3672,11 @@ fn blocked_plan_rejects_insufficient_scratch_before_execution() {
 
 #[test]
 fn caller_can_seed_external_descriptor_one_block_at_a_time() {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4703),
+    );
     let store = AssocTable::new();
     let tensor = crate::BlockedTensor::new(
         Symbol::qualified("test", "incremental-blocks"),
@@ -1930,13 +3824,18 @@ use std::sync::Arc;
 use sim_codec::{Input, decode_eval_expr_with_codec, encode_value_with_codec};
 use sim_codec_lisp::LispCodecLib;
 use sim_kernel::{
-    CapabilitySet, DefaultFactory, EagerPolicy, EncodeOptions, ReadPolicy, Symbol, TrustLevel,
+    CapabilitySet, DefaultFactory, EagerPolicy, EncodeOptions, HandleSeed, ReadPolicy, Symbol,
+    TrustLevel,
 };
 
 use crate::{RECIPES, SignalNumbersLib};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        HandleSeed::new(0x5349_4704),
+    );
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
         .unwrap();
     cx.load_lib(&SignalNumbersLib::new()).unwrap();
@@ -3261,7 +5160,11 @@ use sim_lib_numbers_tensor::{
 use crate::TensorBroadcastLib;
 
 fn test_cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x469e_82b3_c3b2_0ba6),
+    );
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
@@ -3750,7 +5653,11 @@ use crate::TensorLinalgLib;
 // conformance: tensor linalg executor routing covers reductions and matrix math.
 
 fn cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xefde_c76a_b5a6_2929),
+    );
     cx.load_lib(&TensorNumbersLib::new()).unwrap();
     cx.load_lib(&TensorBroadcastLib::new()).unwrap();
     cx.load_lib(&NumbersArithmeticLib::new()).unwrap();
@@ -4040,11 +5947,12 @@ fn zeros_with_oversized_shape_errors_instead_of_oom() {
 }
 
 #[test]
-fn det_of_large_matrix_uses_elimination_and_returns_promptly() {
+fn det_of_large_matrix_uses_elimination_with_an_explicit_size_profile() {
     let mut cx = cx();
     // A 20x20 upper-triangular matrix with 2 on the diagonal: determinant is
     // 2^20 = 1048576. Cofactor expansion would need ~20! operations and hang;
-    // the Bareiss elimination path returns immediately.
+    // the implementation selects the polynomial Bareiss path from this explicit
+    // size profile; no host clock is part of the contract or its proof.
     let n = 20usize;
     let mut rows = Vec::with_capacity(n);
     for i in 0..n {
@@ -4065,14 +5973,9 @@ fn det_of_large_matrix_uses_elimination_and_returns_promptly() {
     let matrix = cx
         .call_function(&Symbol::new("mat"), Args::new(vec![grid]))
         .unwrap();
-    let start = std::time::Instant::now();
     let out = cx
         .call_function(&Symbol::new("det"), Args::new(vec![matrix]))
         .unwrap();
-    assert!(
-        start.elapsed() < std::time::Duration::from_secs(5),
-        "det of a 20x20 matrix must return promptly"
-    );
     assert_eq!(
         out.object().as_expr(&mut cx).unwrap(),
         Expr::Number(NumberLiteral {
@@ -4180,7 +6083,10 @@ use super::{
     pipeline::{ComposedPipeline, PipelineKind},
     registry::global_numeric_registry,
     state::{ensure_quadrature_state, validate_ode_state},
-    traits::{NumericCallable, NumericKind, OdeOpts, OdeProblem, QuadOpts, Quadrature},
+    traits::{
+        AbsoluteTolerance, ComponentTolerance, MethodLimits, NumericCallable, NumericKind, OdePlan,
+        OdeProblem, OutputPolicy, QuadOpts, Quadrature, StepPolicy, TimeSpan,
+    },
 };
 
 pub fn call_numeric_run_composed(cx: &mut Cx, args: Args) -> Result<Value> {
@@ -4357,24 +6263,53 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
     } else {
         None
     };
+    let span = TimeSpan {
+        start: value_to_f64(cx, &t0, "numeric/run-composed :t0")?,
+        end: value_to_f64(cx, &t1, "numeric/run-composed :t1")?,
+    };
     let points = plugin.solve(
         cx,
         OdeProblem {
-            dy: &dy,
+            rhs: &dy,
             var: &dy.vars()[0],
             y_var: &dy.vars()[1],
-            x0: &t0,
-            y0: &y0,
-            x_end: &t1,
+            span,
+            initial: &y0,
+            events: &[],
+            jacobian: None,
+            implicit: None,
         },
-        OdeOpts {
+        OdePlan {
             method: method.clone(),
-            h: Some(dt),
-            tol,
-            max_steps: None,
+            tolerance: ComponentTolerance {
+                relative: tol.unwrap_or(1.0e-8),
+                absolute: AbsoluteTolerance::Scalar(1.0e-10),
+            },
+            step: StepPolicy {
+                fixed: if plugin_kind == NumericKind::OdeFixed {
+                    Some(dt)
+                } else {
+                    None
+                },
+                first: if plugin_kind == NumericKind::OdeAdaptive {
+                    Some(dt)
+                } else {
+                    None
+                },
+                max: None,
+            },
+            output: OutputPolicy {
+                samples: Vec::new(),
+                retain_dense: false,
+            },
+            limits: MethodLimits {
+                steps: 100_000,
+                work: 1_000_000,
+                trace: 256,
+            },
         },
     )?;
-    let steps = points.len().saturating_sub(1);
+    let steps = points.path.accepted.len().saturating_sub(1);
     let steps_value = if plugin_kind == NumericKind::OdeAdaptive {
         cx.factory()
             .number_literal(domains::f64(), tol.unwrap_or(1.0e-8).to_string())?
@@ -4383,8 +6318,10 @@ fn run_ode_composed(cx: &mut Cx, input: RunComposedInput) -> Result<Value> {
             .number_literal(domains::i64(), steps.to_string())?
     };
     let value = points
+        .path
+        .accepted
         .last()
-        .map(|(_, y)| y.clone())
+        .map(|point| point.state.clone())
         .ok_or_else(|| Error::Eval("numeric/run-composed solver returned no points".to_owned()))?;
     cx.factory().table(vec![
         (Symbol::new("value"), value),
@@ -4597,7 +6534,11 @@ mod tests {
     use crate::StateKind;
 
     fn test_cx() -> Cx {
-        Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory))
+        Cx::new(
+            Arc::new(EagerPolicy),
+            Arc::new(DefaultFactory),
+            sim_kernel::HandleSeed::new(0x4f44_4502),
+        )
     }
 
     fn pipeline_value(cx: &mut Cx, kind: PipelineKind, state: StateKind) -> Value {
@@ -4673,7 +6614,11 @@ use sim_lib_numbers_tensor::{
 use crate::RkNumbersLib;
 
 fn test_cx() -> Cx {
-    let mut cx = Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x524b_0001),
+    );
     cx.load_lib(&sim_lib_numbers_arith::NumbersArithmeticLib::new())
         .unwrap();
     cx.load_lib(&sim_lib_numbers_f64::F64NumbersLib::new())
@@ -4802,7 +6747,7 @@ fn ode_accepts_plain_binary_callable() {
         .factory()
         .table(vec![
             (Symbol::new(":method"), method),
-            (Symbol::new(":h"), h),
+            (Symbol::new(":fixed-step"), h),
         ])
         .unwrap();
     let x0 = f64_value(&mut cx, 0.0);
@@ -4851,16 +6796,24 @@ fn ode_methods_reach_e_within_tolerance() {
         ("midpoint", 0.01, 3.0e-4),
         ("rk4", 0.01, 1.0e-8),
         ("rkf45", 0.1, 1.0e-6),
+        ("dop853", 0.1, 2.0e-9),
     ] {
         let mut entries = vec![
             (
                 Symbol::new(":method"),
                 cx.factory().symbol(Symbol::new(method)).unwrap(),
             ),
-            (Symbol::new(":h"), f64_value(&mut cx, h)),
+            (
+                Symbol::new(if matches!(method, "rkf45" | "dop853") {
+                    ":first-step"
+                } else {
+                    ":fixed-step"
+                }),
+                f64_value(&mut cx, h),
+            ),
         ];
-        if method == "rkf45" {
-            entries.push((Symbol::new(":tol"), f64_value(&mut cx, 1.0e-8)));
+        if matches!(method, "rkf45" | "dop853") {
+            entries.push((Symbol::new(":rtol"), f64_value(&mut cx, 1.0e-8)));
         }
         let options = cx.factory().table(entries).unwrap();
         let x0 = f64_value(&mut cx, 0.0);
@@ -4917,6 +6870,7 @@ fn tensor_ode_pipeline_runs_all_rk_methods_and_matches_scalar_cpu() {
         ("midpoint", 0.01, 3.0e-4),
         ("rk4", 0.01, 1.0e-8),
         ("rkf45", 0.1, 1.0e-6),
+        ("dop853", 0.1, 2.0e-9),
     ] {
         let pipeline = cx
             .call_function(
@@ -5091,4 +7045,503 @@ fn tensor_ode_hardware_refuses_non_tensor_rhs() {
         "{err}"
     );
 }
+```
+
+### `feature/sim-numbers/implicit-radau-dae`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-implicit/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-implicit/src/tests.rs`:
+
+```rust
+use super::*;
+use std::sync::Arc;
+
+fn analytic_decay(lambda: f64) -> ImplicitProblem {
+    ImplicitProblem::Ode {
+        rhs: Arc::new(move |_, y, out| {
+            out[0] = lambda * y[0];
+            Ok(())
+        }),
+        jacobian: JacobianStrategy::Analytic(Arc::new(move |_, _, out| {
+            out[0] = lambda;
+            Ok(())
+        })),
+    }
+}
+fn plan(step: f64) -> RadauPlan {
+    RadauPlan {
+        initial_step: step,
+        max_step: step,
+        relative_tolerance: 1e-8,
+        absolute_tolerance: 1e-10,
+        ..RadauPlan::default()
+    }
+}
+
+#[test]
+fn observed_fifth_order_and_stiff_decay() {
+    let exact = (-1.0_f64).exp();
+    let coarse = solve_radau(&analytic_decay(-1.0), (0.0, 1.0), &[1.0], &plan(0.2), &[]).unwrap();
+    let fine = solve_radau(&analytic_decay(-1.0), (0.0, 1.0), &[1.0], &plan(0.1), &[]).unwrap();
+    let ratio = (coarse.state[0] - exact).abs() / (fine.state[0] - exact).abs();
+    assert!(ratio > 20.0, "observed refinement ratio {ratio}");
+    let stiff = solve_radau(
+        &analytic_decay(-1000.0),
+        (0.0, 1.0),
+        &[1.0],
+        &plan(0.1),
+        &[],
+    )
+    .unwrap();
+    assert!(
+        stiff.state[0].abs() < 1e-8,
+        "L-stable decay {}",
+        stiff.state[0]
+    );
+}
+
+#[test]
+fn index_one_constraint_is_retained_and_ode_is_not_a_dae() {
+    // y0'=-y0, y1-y0^2=0. The stage Jacobian is dF/dy+alpha*dF/dydot.
+    let problem = ImplicitProblem::Residual {
+        residual: Arc::new(|_, y, yd, out| {
+            out[0] = yd[0] + y[0];
+            out[1] = y[1] - y[0] * y[0];
+            Ok(())
+        }),
+        jacobian: Arc::new(|_, y, _, alpha, out| {
+            out.copy_from_slice(&[1.0 + alpha, 0.0, -2.0 * y[0], 1.0]);
+            Ok(())
+        }),
+        differential: vec![true, false],
+    };
+    let solved = solve_radau(&problem, (0.0, 0.5), &[1.0, 1.0], &plan(0.02), &[]).unwrap();
+    assert!((solved.state[1] - solved.state[0] * solved.state[0]).abs() < 2e-6);
+    let invalid = ImplicitProblem::Residual {
+        residual: Arc::new(|_, _, _, _| Ok(())),
+        jacobian: Arc::new(|_, _, _, _, _| Ok(())),
+        differential: vec![true, true],
+    };
+    assert!(matches!(
+        solve_radau(&invalid, (0.0, 1.0), &[1.0, 1.0], &plan(0.1), &[]),
+        Err(RadauError::Invalid(_))
+    ));
+}
+
+#[test]
+fn finite_difference_provenance_event_accuracy_and_work_separation() {
+    let problem = ImplicitProblem::Ode {
+        rhs: Arc::new(|_, y, out| {
+            out[0] = -40.0 * y[0];
+            Ok(())
+        }),
+        jacobian: JacobianStrategy::FiniteDifference {
+            relative_step: 1e-7,
+        },
+    };
+    let event = EventSpec {
+        function: Arc::new(|_, y| y[0] - 0.5),
+        direction: EventDirection::Falling,
+        terminal: true,
+    };
+    let solved = solve_radau(&problem, (0.0, 1.0), &[1.0], &plan(0.01), &[event]).unwrap();
+    assert!((solved.events[0].time - 2.0_f64.ln() / 40.0).abs() < 2e-5);
+    assert_eq!(
+        solved.evidence.jacobian_source,
+        JacobianSource::FiniteDifference
+    );
+    // Forward Euler positivity requires h<1/40: materially more accepted work
+    // than the large stable Radau steps, independent of wall-clock timing.
+    let mut work_plan = plan(0.1);
+    work_plan.relative_tolerance = 1e-4;
+    work_plan.absolute_tolerance = 1e-7;
+    let implicit =
+        solve_radau(&analytic_decay(-40.0), (0.0, 1.0), &[1.0], &work_plan, &[]).unwrap();
+    assert!(40 > implicit.evidence.accepted_steps * 2);
+}
+
+#[test]
+fn singular_stage_jacobian_refuses_and_dense_requires_convergence() {
+    let singular = ImplicitProblem::MassMatrix {
+        rhs: Arc::new(|_, _, out| {
+            out.fill(1.0);
+            Ok(())
+        }),
+        mass: Arc::new(|_, _, out| {
+            out.fill(0.0);
+            Ok(())
+        }),
+        jacobian: JacobianStrategy::Analytic(Arc::new(|_, _, out| {
+            out.fill(0.0);
+            Ok(())
+        })),
+        differential: vec![true],
+    };
+    assert!(matches!(
+        solve_radau(&singular, (0.0, 1.0), &[1.0], &plan(0.1), &[]),
+        Err(RadauError::SingularJacobian { .. })
+    ));
+    let divergent = ImplicitProblem::Ode {
+        rhs: Arc::new(|_, y, out| {
+            out[0] = y[0].exp();
+            Ok(())
+        }),
+        jacobian: JacobianStrategy::Analytic(Arc::new(|_, y, out| {
+            out[0] = y[0].exp();
+            Ok(())
+        })),
+    };
+    let mut bounded = plan(1.0);
+    bounded.max_newton_iterations = 1;
+    bounded.max_steps = 1;
+    assert!(solve_radau(&divergent, (0.0, 1.0), &[10.0], &bounded, &[]).is_err());
+}
+
+#[test]
+fn ad_provenance_and_robertson_scale_separation() {
+    let p = ImplicitProblem::Ode {
+        rhs: Arc::new(|_, y, o| {
+            o[0] = -0.04 * y[0] + 1e4 * y[1] * y[2];
+            o[1] = 0.04 * y[0] - 1e4 * y[1] * y[2] - 3e7 * y[1] * y[1];
+            o[2] = 3e7 * y[1] * y[1];
+            Ok(())
+        }),
+        jacobian: JacobianStrategy::AutomaticDifferentiation(Arc::new(|_, y, j| {
+            j.copy_from_slice(&[
+                -0.04,
+                1e4 * y[2],
+                1e4 * y[1],
+                0.04,
+                -1e4 * y[2] - 6e7 * y[1],
+                -1e4 * y[1],
+                0.0,
+                6e7 * y[1],
+                0.0,
+            ]);
+            Ok(())
+        })),
+    };
+    let mut pplan = plan(1e-4);
+    pplan.max_step = 1e-2;
+    let s = solve_radau(&p, (0.0, 0.1), &[1.0, 0.0, 0.0], &pplan, &[]).unwrap();
+    assert!((s.state.iter().sum::<f64>() - 1.0).abs() < 1e-7);
+    assert!(s.state[1] < 1e-4 && s.state[2] > 1e-5);
+    assert_eq!(
+        s.evidence.jacobian_source,
+        JacobianSource::AutomaticDifferentiation
+    );
+}
+// conformance: implicit-solver tests prove stiff ODE and admitted index-one DAE behavior.
+```
+
+### `feature/sim-numbers/pseudo-arclength-continuation`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-continuation/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-continuation/src/tests.rs`:
+
+```rust
+use super::*;
+
+fn identity() -> ExecutionIdentity {
+    ExecutionIdentity::new("test", "sim-lib-numbers-continuation", "trace-1").unwrap()
+}
+fn scalar_problem<R, J>(residual: R, jacobian: J, seeds: [[f64; 2]; 2]) -> ContinuationProblem<R, J>
+where
+    R: FnMut(&[f64]) -> Vec<f64>,
+    J: FnMut(&[f64]) -> Vec<f64>,
+{
+    ContinuationProblem {
+        residual,
+        jacobian,
+        seeds: seeds.map(Vec::from),
+        domain: ParameterDomain {
+            lower: -2.0,
+            upper: 2.0,
+        },
+        derivative: DerivativeSource::Analytic,
+        orientation: OrientationPolicy::SeedDirection,
+        step: StepPlan {
+            initial: 0.08,
+            maximum: 0.12,
+            ..StepPlan::default()
+        },
+        corrector: VectorPlan::default(),
+        limits: MethodLimits {
+            steps: 12,
+            ..MethodLimits::default()
+        },
+        identity: identity(),
+    }
+}
+
+#[test]
+fn circle_points_are_ordered_immutable_and_carry_corrector_evidence() {
+    let p = scalar_problem(
+        |z| vec![z[0] * z[0] + z[1] * z[1] - 1.0],
+        |z| vec![2.0 * z[0], 2.0 * z[1]],
+        [[1.0, 0.0], [0.9950041653, 0.0998334166]],
+    );
+    let out = trace(p);
+    assert!(out.points().len() > 4);
+    for point in &out.points()[2..] {
+        assert!(norm(point.residual()) < 1e-9);
+        assert!((norm(point.tangent()) - 1.0).abs() < 1e-10);
+        assert!(point.corrector().is_some());
+    }
+    assert!(
+        out.events()
+            .iter()
+            .any(|e| matches!(e, ContinuationEvent::StepChanged { .. }))
+    );
+}
+
+#[test]
+fn fold_and_reversed_seeds_preserve_requested_orientation() {
+    let forward = trace(scalar_problem(
+        |z| vec![z[0] * z[0] - z[1]],
+        |z| vec![2.0 * z[0], -1.0],
+        [[-0.2, 0.04], [-0.1, 0.01]],
+    ));
+    assert!(
+        forward
+            .events()
+            .iter()
+            .any(|e| matches!(e, ContinuationEvent::Fold))
+            || forward
+                .points()
+                .iter()
+                .any(|p| p.fold() != FoldClassification::Regular)
+    );
+    let reverse = trace(scalar_problem(
+        |z| vec![z[0] * z[0] - z[1]],
+        |z| vec![2.0 * z[0], -1.0],
+        [[0.1, 0.01], [-0.1, 0.01]],
+    ));
+    assert!(reverse.points()[1].tangent()[0] < 0.0);
+}
+
+#[test]
+fn rank_loss_and_seed_inconsistency_are_distinct() {
+    let singular = trace(scalar_problem(
+        |_| vec![0.0],
+        |_| vec![0.0, 0.0],
+        [[0.0, 0.0], [0.1, 0.0]],
+    ));
+    assert_eq!(singular.termination(), TraceTermination::RankLoss);
+    assert!(singular.events().contains(&ContinuationEvent::RankLoss));
+    let bad = trace(scalar_problem(
+        |z| vec![z[0] * z[0] - z[1]],
+        |z| vec![2.0 * z[0], -1.0],
+        [[0.0, 0.2], [0.1, 0.01]],
+    ));
+    assert_eq!(bad.termination(), TraceTermination::SeedInconsistency);
+}
+
+#[test]
+fn domain_exit_is_unclamped_and_work_is_bounded() {
+    let mut p = scalar_problem(
+        |z| vec![z[0] - z[1]],
+        |_| vec![1.0, -1.0],
+        [[0.0, 0.0], [0.05, 0.05]],
+    );
+    p.domain = ParameterDomain {
+        lower: 0.0,
+        upper: 0.11,
+    };
+    p.step.initial = 0.1;
+    p.step.maximum = 0.1;
+    let out = trace(p);
+    assert_eq!(out.termination(), TraceTermination::DomainExit);
+    let parameter = out
+        .events()
+        .iter()
+        .find_map(|e| {
+            if let ContinuationEvent::DomainExit { parameter } = e {
+                Some(*parameter)
+            } else {
+                None
+            }
+        })
+        .unwrap();
+    assert!(parameter > 0.11);
+    let mut bounded = scalar_problem(
+        |z| vec![z[0] - z[1]],
+        |_| vec![1.0, -1.0],
+        [[0.0, 0.0], [0.05, 0.05]],
+    );
+    bounded.limits.steps = 2;
+    let bounded = trace(bounded);
+    assert_eq!(bounded.termination(), TraceTermination::StepLimit);
+    assert_eq!(bounded.points().len(), 4);
+}
+
+#[test]
+fn recorded_points_resume_the_same_branch_and_cusp_is_traced() {
+    let make = |seeds| {
+        scalar_problem(
+            |z| vec![z[0].powi(3) - z[1]],
+            |z| vec![3.0 * z[0] * z[0], -1.0],
+            seeds,
+        )
+    };
+    let first = trace(make([[-0.3, -0.027], [-0.2, -0.008]]));
+    let a = first.points()[2].coordinates();
+    let b = first.points()[3].coordinates();
+    let resumed = trace(make([[a[0], a[1]], [b[0], b[1]]]));
+    assert!(dot(first.points()[3].tangent(), resumed.points()[1].tangent()) > 0.99);
+}
+// conformance: continuation tests prove folds, bounded correction, restart, and refusal evidence.
+```
+
+### `feature/sim-numbers/root-finding`
+
+Specimen `spec-test/sim-numbers/crates/sim-lib-numbers-root/src/tests` is checked by `cargo test`.
+
+Source `crates/sim-lib-numbers-root/src/tests.rs`:
+
+```rust
+use super::*;
+fn id() -> ExecutionIdentity {
+    ExecutionIdentity::new("test", "sim-lib-numbers-root", "replay-1").unwrap()
+}
+#[test]
+fn bracket_type_rejects_unproved_intervals_and_orients() {
+    assert_eq!(RootBracket::new(2.0, 2.0, 0.0, -2.0).unwrap().lower, 0.0);
+    assert_eq!(
+        RootBracket::new(0.0, 1.0, 2.0, 2.0),
+        Err(RootTermination::InvalidBracket)
+    );
+}
+#[test]
+fn bisection_and_brent_cover_endpoint_multiple_and_replay() {
+    let br = establish_bracket(|x| x * x - 2.0, 0.0, 2.0).unwrap();
+    let a = brent_dekker(|x| x * x - 2.0, br, ScalarPlan::default(), id());
+    let b = brent_dekker(|x| x * x - 2.0, br, ScalarPlan::default(), id());
+    assert_eq!(a, b);
+    assert!(a.bracket.is_some());
+    assert!(a.estimate.residual.abs() < 1e-10);
+    let end = bisection(
+        |x| x,
+        RootBracket::new(0.0, 0.0, 2.0, 2.0).unwrap(),
+        ScalarPlan::default(),
+        id(),
+    );
+    assert_eq!(end.evidence.termination, RootTermination::EndpointRoot);
+    let multiple = safeguarded_newton(
+        |x| (x - 1.0).powi(2),
+        |x| 2.0 * (x - 1.0),
+        DerivativeSource::Analytic,
+        2.0,
+        None,
+        ScalarPlan::default(),
+        id(),
+    );
+    assert!(multiple.estimate.residual.abs() < 1e-10);
+}
+#[test]
+fn scalar_failures_are_distinct() {
+    let flat = safeguarded_newton(
+        |_| 1.0,
+        |_| 0.0,
+        DerivativeSource::Analytic,
+        0.0,
+        None,
+        ScalarPlan::default(),
+        id(),
+    );
+    assert_eq!(flat.evidence.termination, RootTermination::FlatDerivative);
+    let nf = secant(
+        |x| if x > 0.5 { f64::NAN } else { x - 1.0 },
+        0.0,
+        0.25,
+        ScalarPlan::default(),
+        id(),
+    );
+    assert_eq!(
+        nf.evidence.termination,
+        RootTermination::NonFiniteEvaluation
+    );
+    let exhausted = secant(
+        |x| x * x - 2.0,
+        0.0,
+        2.0,
+        ScalarPlan {
+            max_evaluations: 2,
+            ..ScalarPlan::default()
+        },
+        id(),
+    );
+    assert_eq!(exhausted.evidence.termination, RootTermination::WorkLimit);
+
+    let discontinuity = bisection(
+        |x| 1.0 / (x - 0.1),
+        establish_bracket(|x| 1.0 / (x - 0.1), 0.0, 1.0).unwrap(),
+        ScalarPlan {
+            step_tolerance: 1e-6,
+            discontinuity_ratio: 1.01,
+            ..ScalarPlan::default()
+        },
+        id(),
+    );
+    assert_eq!(
+        discontinuity.evidence.termination,
+        RootTermination::DiscontinuousSignChange
+    );
+}
+#[test]
+fn vector_newton_handles_scaling_and_reports_rank() {
+    let out = damped_newton(
+        |x| vec![1e6 * (x[0] - 1.0), 1e-6 * (x[1] - 2.0)],
+        |_| vec![1e6, 0.0, 0.0, 1e-6],
+        JacobianSource::Analytic,
+        vec![0.0, 0.0],
+        VectorPlan {
+            rank_cutoff: 1e-14,
+            ..VectorPlan::default()
+        },
+        id(),
+    );
+    assert_eq!(out.evidence.termination, RootTermination::ResidualConverged);
+    assert_eq!(out.ranks, [2]);
+    let singular = damped_newton(
+        |x| vec![x[0] + x[1] - 1.0, 2.0 * x[0] + 2.0 * x[1] - 2.0],
+        |_| vec![1.0, 1.0, 2.0, 2.0],
+        JacobianSource::Analytic,
+        vec![0.0, 0.0],
+        VectorPlan::default(),
+        id(),
+    );
+    assert_eq!(singular.evidence.termination, RootTermination::RankLoss);
+}
+#[test]
+fn finite_difference_and_broyden_provenance_survive() {
+    let fd = FiniteDifferencePlan {
+        absolute_step: 1e-8,
+        relative_step: 1e-7,
+    };
+    let out = finite_difference_vector_newton(
+        |x| vec![x[0] * x[0] - 2.0],
+        vec![1.0],
+        fd,
+        VectorPlan::default(),
+        id(),
+    );
+    assert_eq!(out.jacobian_source, JacobianSource::FiniteDifference(fd));
+    assert!(out.evidence.derivative_evaluations > 0);
+    let b = broyden(
+        |x| vec![x[0] * x[0] - 2.0],
+        |x| vec![2.0 * x[0]],
+        JacobianSource::Analytic,
+        vec![1.0],
+        VectorPlan {
+            broyden_reset_interval: 2,
+            ..VectorPlan::default()
+        },
+        id(),
+    );
+    assert!(b.jacobian_resets.len() > 1);
+}
+// conformance: root tests prove brackets, residual evidence, rank diagnostics, and bounds.
 ```

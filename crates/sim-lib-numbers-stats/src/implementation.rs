@@ -12,6 +12,13 @@ mod clustering;
 #[cfg(test)]
 #[path = "clustering_tests.rs"]
 mod clustering_tests;
+#[path = "decision.rs"]
+mod decision;
+#[cfg(test)]
+#[path = "decision_tests.rs"]
+mod decision_tests;
+#[path = "distribution.rs"]
+mod distribution;
 #[path = "function.rs"]
 mod function;
 #[path = "gmm.rs"]
@@ -34,6 +41,8 @@ mod markov;
 #[cfg(test)]
 #[path = "markov_tests.rs"]
 mod markov_tests;
+#[path = "parametric_distribution.rs"]
+mod parametric_distribution;
 #[path = "quantile.rs"]
 mod quantile;
 #[cfg(test)]
@@ -48,6 +57,13 @@ mod robust_tests;
 mod runtime;
 #[path = "runtime_clustering.rs"]
 mod runtime_clustering;
+#[path = "runtime_decision.rs"]
+mod runtime_decision;
+#[path = "sampling.rs"]
+mod sampling;
+#[cfg(test)]
+#[path = "sampling_tests.rs"]
+mod sampling_tests;
 #[path = "transition.rs"]
 mod transition;
 
@@ -59,10 +75,21 @@ pub use clustering::{
     ClusteringError, KMeansControl, KMeansModel, KMeansReport, KMeansRestartEvidence,
     KMeansSearchTermination, KMeansTermination, fit_kmeans,
 };
+pub use decision::{
+    BinaryInterval, ClusterSample, IsotonicFit, IsotonicPoint, RegisteredLook,
+    RegisteredLookSequence, SequentialInterval, ThresholdReadout, clustered_bootstrap_interval,
+    exact_binary_interval, fit_isotonic, paired_bootstrap_interval,
+};
+pub use distribution::{
+    KsMethod, KsResult, MomentConvention, StandardizedMoments, kolmogorov_smirnov_one_sample,
+    kolmogorov_smirnov_two_sample, standardized_moments,
+};
 pub use function::{
-    StatsNumbersLib, stats_claims_symbol, stats_disparate_impact_claim_symbol,
-    stats_entropy_claim_symbol, stats_gmm_symbol, stats_kmeans_symbol, stats_mean_claim_symbol,
-    stats_variance_claim_symbol,
+    StatsNumbersLib, stats_claims_symbol, stats_clustered_bootstrap_symbol,
+    stats_disparate_impact_claim_symbol, stats_entropy_claim_symbol,
+    stats_exact_binary_interval_symbol, stats_gmm_symbol, stats_isotonic_symbol,
+    stats_kmeans_symbol, stats_mean_claim_symbol, stats_paired_bootstrap_symbol,
+    stats_registered_look_symbol, stats_variance_claim_symbol,
 };
 pub use gmm::{
     CovarianceType, GaussianCovariance, GmmControl, GmmEvidence, GmmModel, GmmReport, GmmSpec,
@@ -81,12 +108,20 @@ pub use markov::{
     CorpusProvenance, MarkovError, MarkovModel, MarkovPolicy, ModelReport, TransitionScore,
     fit_markov, fnv1a64,
 };
+pub use parametric_distribution::{
+    normal_cdf, normal_density, normal_quantile, normal_survival, student_t_cdf, student_t_density,
+    student_t_quantile, student_t_survival,
+};
 pub use quantile::{
     QuantileError, QuantileEstimate, QuantilePolicy, QuantileSketch, exact_quantile,
 };
 pub use robust::{
     BootstrapControl, BootstrapEffectInterval, bootstrap_mean_difference_interval,
     median_absolute_deviation,
+};
+pub use sampling::{
+    CoverageEvidence, DesignError, LatinHypercubePlan, SampleDesign, SamplerAlgorithm,
+    SamplerReceipt, SamplerState, Scramble, SeededSampler, SobolPlan, SweepPlan, UntestedRegion,
 };
 pub use transition::{FiniteTransitionMatrix, TransitionError};
 

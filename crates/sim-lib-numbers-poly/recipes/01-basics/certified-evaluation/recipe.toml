@@ -1,0 +1,8 @@
+id = "certified-evaluation"
+title = "Certified coefficient evaluation"
+codec = "lisp"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "polynomial", "horner", "evidence"]
+requires = ["numbers/poly", "numbers/complex", "numbers/tensor-decomp", "codec/lisp"]
+setup = "setup.siml"

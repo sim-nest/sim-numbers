@@ -1,0 +1,5 @@
+book = "numbers/root"
+title = "Numbers Root Finding"
+summary = "Bracketed scalar and residual-carrying vector root searches."
+order = 45
+chapters = ["01-basics", "02-vector"]

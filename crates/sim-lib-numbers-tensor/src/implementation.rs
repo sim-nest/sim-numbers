@@ -1,6 +1,7 @@
 //! Implementation of the tensor domain: its value class citizen, domain
 //! registration, constructor operations, and the `Tensor` value type.
 
+pub(crate) mod canonical_ops;
 mod cast;
 mod citizen;
 mod dimension;
@@ -10,6 +11,7 @@ mod execution;
 mod execution_math_support;
 mod execution_ops;
 mod function;
+mod reduction;
 mod storage;
 mod tensor_site;
 mod validation;
@@ -36,6 +38,7 @@ pub use execution_ops::{
     sin_op_symbol, sqrt_op_symbol, sum_op_symbol, tensor_executor_math_op_symbols,
     transpose_exec_op_symbol,
 };
+pub use reduction::{SumMode, cumsum_f64, sum_f64};
 pub use storage::{
     BoxedTensorStorage, TensorCell, TensorLocation, TensorStorage, TypedTensorStorage,
 };

@@ -6,7 +6,11 @@ use sim_lib_numbers_core::{MagnitudeLimit, domains};
 use crate::{BigIntNumbersLib, number_domain};
 
 fn cx() -> sim_kernel::Cx {
-    let mut cx = sim_kernel::Cx::new(Arc::new(NoopEvalPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(NoopEvalPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xb16f_0fab_cc29_394d),
+    );
     cx.load_lib(&BigIntNumbersLib::new()).unwrap();
     cx
 }

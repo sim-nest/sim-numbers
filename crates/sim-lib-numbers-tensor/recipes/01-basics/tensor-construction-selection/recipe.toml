@@ -1,0 +1,5 @@
+id = "tensor-construction-selection"
+title = "Construct and select a tensor"
+order = 40
+setup = "setup.siml"
+purpose = "purpose.md"

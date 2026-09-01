@@ -1,0 +1,2 @@
+latin=8 occupancy=[[1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1, 1, 1]] sampler=Some(SamplerReceipt { state: SamplerState { algorithm: SplitMix64V1, state: 18054082321272550819, words_generated: 21, seed: 2026, stream: 0 }, max_words: Some(21) })
+sobol=10 boundaries=[0, 9] duplicates=[] exclusions=[UntestedRegion { label: "unstable-corner", reason: "excluded by study protocol" }]

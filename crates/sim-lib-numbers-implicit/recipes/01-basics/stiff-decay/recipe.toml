@@ -1,0 +1,8 @@
+id = "stiff-decay"
+title = "Stiff decay"
+codec = "lisp"
+setup = "setup.siml"
+purpose = "purpose.md"
+order = 10
+tags = ["numbers", "implicit", "radau", "dae"]
+requires = ["numbers/implicit", "codec/lisp"]

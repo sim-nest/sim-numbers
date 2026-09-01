@@ -1,0 +1,8 @@
+id = "matrix-functions"
+title = "Certified matrix functions"
+codec = "lisp"
+purpose = "purpose.md"
+order = 20
+tags = ["numbers", "matrix", "exponential", "lyapunov", "evidence"]
+requires = ["numbers/tensor-decomp", "numbers/tensor", "numbers/f64", "codec/lisp"]
+setup = "setup.siml"

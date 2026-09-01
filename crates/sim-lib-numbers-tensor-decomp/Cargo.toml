@@ -1,0 +1,25 @@
+[package]
+name = "sim-lib-numbers-tensor-decomp"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Bounded, evidence-carrying dense matrix decompositions for SIM tensors."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-cookbook = { version = "0.3.0" }
+sim-kernel = { version = "0.3.0" }
+sim-lib-numbers-core = { version = "0.4.0", path = "../sim-lib-numbers-core" }
+sim-lib-numbers-complex = { version = "0.4.0", path = "../sim-lib-numbers-complex" }
+sim-lib-numbers-method = { version = "0.1.0", path = "../sim-lib-numbers-method", default-features = false }
+sim-lib-numbers-tensor = { version = "0.3.0", path = "../sim-lib-numbers-tensor" }
+sim-lib-numbers-tensor-linalg = { version = "0.4.0", path = "../sim-lib-numbers-tensor-linalg" }
+
+[build-dependencies]
+sim-cookbook-build = { version = "0.1.0" }
+
+[lints]
+workspace = true

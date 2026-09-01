@@ -1,6 +1,7 @@
 //! Robust dispersion and deterministic uncertainty intervals for comparisons.
 
 use super::{StatsError, StatsResult, mean, validate_values};
+use crate::SeededSampler;
 use crate::exact_quantile;
 
 /// Controls a deterministic bootstrap of the candidate-minus-baseline mean.
@@ -73,6 +74,12 @@ pub struct BootstrapEffectInterval {
     pub baseline_samples: usize,
     /// Number of source candidate observations.
     pub candidate_samples: usize,
+    /// Rows excluded before resampling; current strict APIs reject rather than exclude.
+    pub exclusions: usize,
+    /// Independent clusters resampled, or zero for non-clustered intervals.
+    pub cluster_count: usize,
+    /// Sampled observations or clusters admitted under `max_work`.
+    pub admitted_work: u64,
 }
 
 /// Computes the raw median absolute deviation from the sample median.
@@ -131,7 +138,7 @@ pub fn bootstrap_mean_difference_interval(
         });
     }
 
-    let mut rng = SplitMix64(control.seed);
+    let mut rng = SeededSampler::new(control.seed);
     let mut effects = Vec::with_capacity(control.resamples);
     for _ in 0..control.resamples {
         let baseline_mean = resampled_mean(baseline, &mut rng);
@@ -152,29 +159,15 @@ pub fn bootstrap_mean_difference_interval(
         resamples: control.resamples,
         baseline_samples: baseline.len(),
         candidate_samples: candidate.len(),
+        exclusions: 0,
+        cluster_count: 0,
+        admitted_work: required,
     })
 }
 
-fn resampled_mean(values: &[f64], rng: &mut SplitMix64) -> f64 {
+fn resampled_mean(values: &[f64], rng: &mut SeededSampler) -> f64 {
     let sum = (0..values.len())
-        .map(|_| values[rng.index(values.len())])
+        .map(|_| values[rng.index_multiply_high(values.len())])
         .sum::<f64>();
     sum / values.len() as f64
-}
-
-#[derive(Clone, Copy, Debug)]
-struct SplitMix64(u64);
-
-impl SplitMix64 {
-    fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
-        let mut value = self.0;
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^ (value >> 31)
-    }
-
-    fn index(&mut self, len: usize) -> usize {
-        ((u128::from(self.next()) * len as u128) >> 64) as usize
-    }
 }

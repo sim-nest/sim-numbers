@@ -1,0 +1,20 @@
+[package]
+name = "sim-lib-numbers-interval"
+version = "0.1.0"
+edition = "2024"
+license = "MPL-2.0"
+description = "Sealed, evidence-carrying interval certification for SIM."
+readme = "README.md"
+publish = true
+repository = "https://github.com/sim-nest/sim-numbers"
+homepage = "https://github.com/sim-nest/sim-numbers"
+
+[dependencies]
+sim-cookbook = { version = "0.3.0" }
+sim-kernel = { version = "0.3.0" }
+
+[build-dependencies]
+sim-cookbook-build = { version = "0.1.0" }
+
+[lints]
+workspace = true

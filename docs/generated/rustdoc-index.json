@@ -65,6 +65,13 @@
       "summary": "The numbers/complex domain: complex literals and values, their arithmetic, and the promotion edges from i64, f64, and rational into the complex sink of the scalar lattice."
     },
     {
+      "crate_name": "sim_lib_numbers_continuation",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-continuation/Cargo.toml",
+      "package": "sim-lib-numbers-continuation",
+      "summary": "Bounded pseudo-arclength continuation with explicit numerical evidence."
+    },
+    {
       "crate_name": "sim_lib_numbers_core",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-core/Cargo.toml",
@@ -77,6 +84,13 @@
       "manifest": "crates/sim-lib-numbers-exotic/Cargo.toml",
       "package": "sim-lib-numbers-exotic",
       "summary": "Exotic number domains, currently the lazy continued-fraction domain (numbers/cf): infinite-precision reals carried as continued-fraction coefficient streams, their builtin constants, and the as-f64 truncation function."
+    },
+    {
+      "crate_name": "sim_lib_numbers_extended",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-extended/Cargo.toml",
+      "package": "sim-lib-numbers-extended",
+      "summary": "Normalized double-double arithmetic and the numbers/extended runtime domain. A value is an unevaluated sum of two binary64 components with |lo| <= 0.5 ulp(hi) for finite nonzero results."
     },
     {
       "crate_name": "sim_lib_numbers_f64",
@@ -114,11 +128,46 @@
       "summary": "The numbers/i64 domain: 64-bit signed-integer literals and values, their scalar arithmetic, and promotion edges into f64 and rational."
     },
     {
+      "crate_name": "sim_lib_numbers_implicit",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-implicit/Cargo.toml",
+      "package": "sim-lib-numbers-implicit",
+      "summary": "Fifth-order Radau IIA integration for stiff ODEs and index-1 DAEs."
+    },
+    {
+      "crate_name": "sim_lib_numbers_interval",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-interval/Cargo.toml",
+      "package": "sim-lib-numbers-interval",
+      "summary": "Sealed interval certification: evidence may be inspected, never imported as authority."
+    },
+    {
+      "crate_name": "sim_lib_numbers_method",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-method/Cargo.toml",
+      "package": "sim-lib-numbers-method",
+      "summary": "Validated, bounded numerical method plans and common evidence."
+    },
+    {
       "crate_name": "sim_lib_numbers_numeric",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-numeric/Cargo.toml",
       "package": "sim-lib-numbers-numeric",
       "summary": "Numeric evaluation surface: the numeric domain exposes numeric-diff, integrate, ode-solve, and composed pipelines over a registry of pluggable differentiator, quadrature, and ODE-solver backends."
+    },
+    {
+      "crate_name": "sim_lib_numbers_optimize",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-optimize/Cargo.toml",
+      "package": "sim-lib-numbers-optimize",
+      "summary": "Bounded optimization with explicit plans and honest convergence evidence."
+    },
+    {
+      "crate_name": "sim_lib_numbers_poly",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-poly/Cargo.toml",
+      "package": "sim-lib-numbers-poly",
+      "summary": "Dense coefficient algebra, deliberately separate from symbolic CAS trees."
     },
     {
       "crate_name": "sim_lib_numbers_prelude",
@@ -135,6 +184,13 @@
       "summary": "Quadrature and finite-difference backends for the numeric domain: fixed and adaptive integration rules plus finite-difference differentiators, packaged as a registered numeric plugin library."
     },
     {
+      "crate_name": "sim_lib_numbers_quantity",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-quantity/Cargo.toml",
+      "package": "sim-lib-numbers-quantity",
+      "summary": "Semantic physical quantities for SIM."
+    },
+    {
       "crate_name": "sim_lib_numbers_rational",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-rational/Cargo.toml",
@@ -149,11 +205,25 @@
       "summary": "Runge-Kutta ODE integrators for the numeric domain: fixed-step and adaptive solver backends registered as numeric ode-solve plugins."
     },
     {
+      "crate_name": "sim_lib_numbers_root",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-root/Cargo.toml",
+      "package": "sim-lib-numbers-root",
+      "summary": "Bounded scalar and vector root finding with reviewable evidence."
+    },
+    {
       "crate_name": "sim_lib_numbers_signal",
       "group": "workspace",
       "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
       "package": "sim-lib-numbers-signal",
       "summary": "Deterministic transforms, convolution, autoregression, spectral estimation, interpolation, and guarded deconvolution over canonical SIM tensors."
+    },
+    {
+      "crate_name": "sim_lib_numbers_special",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-special/Cargo.toml",
+      "package": "sim-lib-numbers-special",
+      "summary": "Evidence-carrying real error, gamma, beta, and complete elliptic functions."
     },
     {
       "crate_name": "sim_lib_numbers_stats",
@@ -189,6 +259,13 @@
       "manifest": "crates/sim-lib-numbers-tensor-cmplxf/Cargo.toml",
       "package": "sim-lib-numbers-tensor-cmplxf",
       "summary": "Complex-float tensor specialization: a (real, imag) f64-pair tensor element type and its SpecTensor backend for the complex tensor domain."
+    },
+    {
+      "crate_name": "sim_lib_numbers_tensor_decomp",
+      "group": "workspace",
+      "manifest": "crates/sim-lib-numbers-tensor-decomp/Cargo.toml",
+      "package": "sim-lib-numbers-tensor-decomp",
+      "summary": "Bounded, evidence-carrying dense matrix factorizations."
     },
     {
       "crate_name": "sim_lib_numbers_tensor_f32",

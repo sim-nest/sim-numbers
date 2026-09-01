@@ -16,7 +16,11 @@ mod numeric_pipeline;
 
 #[test]
 fn prelude_loads_everyday_numeric_names() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x6fb3_76b0_ec03_8888),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     for symbol in [
         Symbol::new("+"),
@@ -44,7 +48,11 @@ fn prelude_loads_everyday_numeric_names() {
 
 #[test]
 fn prelude_emits_stats_claims_in_batch() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xac46_3a8f_4cb5_5e95),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
 
     let mean_metric = symbol_value(&mut cx, Symbol::qualified("stats", "mean"));
@@ -107,7 +115,11 @@ fn prelude_emits_stats_claims_in_batch() {
 
 #[test]
 fn prelude_is_idempotent() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0x0c6f_c9ca_d364_ac3d),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     assert!(
@@ -119,7 +131,11 @@ fn prelude_is_idempotent() {
 
 #[test]
 fn prelude_registers_typed_tensor_descriptors() {
-    let mut cx = sim_kernel::Cx::new(Arc::new(EagerPolicy), Arc::new(DefaultFactory));
+    let mut cx = sim_kernel::Cx::new(
+        Arc::new(EagerPolicy),
+        Arc::new(DefaultFactory),
+        sim_kernel::HandleSeed::new(0xe448_10a9_b38c_89ff),
+    );
     NumbersPreludeLib::new().install_all(&mut cx).unwrap();
     for symbol in [
         sim_lib_numbers_tensor_f32::tensor_spec_symbol(),
