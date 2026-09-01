@@ -15,23 +15,34 @@ Generated from Cargo metadata by `xtask crate-catalog v1`.
 | `sim-lib-numbers-cas` | `true` | `custom-build, lib` | Computer-algebra expression domain, simplification, and value conversion for SIM numbers. |
 | `sim-lib-numbers-codec` | `true` | `custom-build, lib` | Numeric plugin descriptor helpers for advertising SIM number methods and codecs. |
 | `sim-lib-numbers-complex` | `true` | `custom-build, lib` | Complex number domain with arithmetic and scalar promotion edges. |
+| `sim-lib-numbers-continuation` | `true` | `custom-build, lib` | Bounded pseudo-arclength continuation with reviewable predictor/corrector evidence. |
 | `sim-lib-numbers-core` | `true` | `custom-build, lib` | Shared scalar-domain substrate: number-value shapes, literal classes, op installers, and promotion metadata. |
 | `sim-lib-numbers-exotic` | `true` | `custom-build, lib` | Continued-fraction and exact-real helpers for the SIM number stack. |
+| `sim-lib-numbers-extended` | `true` | `custom-build, lib` | Normalized double-double scalar and runtime number domain for SIM. |
 | `sim-lib-numbers-f64` | `true` | `cdylib, custom-build, rlib` | Double-precision float number domain with arithmetic and complex promotion. |
 | `sim-lib-numbers-fixed` | `true` | `custom-build, lib` | Fixed-width signed and unsigned integer number domains from 8 to 128 bits. |
 | `sim-lib-numbers-float` | `true` | `custom-build, lib` | Single-precision float number domain and promotion into f64. |
 | `sim-lib-numbers-func` | `true` | `custom-build, lib` | Callable numeric function values over symbolic or native bodies. |
 | `sim-lib-numbers-i64` | `true` | `custom-build, lib` | Signed 64-bit integer number domain with arithmetic and promotion edges. |
+| `sim-lib-numbers-implicit` | `true` | `custom-build, lib` | Evidence-carrying Radau IIA integration for stiff ODEs and index-1 DAEs. |
+| `sim-lib-numbers-interval` | `true` | `custom-build, lib` | Sealed, evidence-carrying interval certification for SIM. |
+| `sim-lib-numbers-method` | `true` | `custom-build, lib` | Validated bounded numerical method plans and canonical cross-domain evidence. |
 | `sim-lib-numbers-numeric` | `true` | `custom-build, lib` | Numeric differentiation, quadrature, and ODE dispatch over pluggable SIM number backends. |
+| `sim-lib-numbers-optimize` | `true` | `custom-build, lib` | Bounded optimization and evidence-carrying least squares for SIM. |
+| `sim-lib-numbers-poly` | `true` | `custom-build, lib` | Evidence-carrying dense coefficient polynomials for SIM. |
 | `sim-lib-numbers-prelude` | `true` | `custom-build, lib` | One-call installer for the standard SIM number domains and tensor backends. |
 | `sim-lib-numbers-quad` | `true` | `custom-build, lib` | Quadrature and finite-difference plugins for the SIM numeric surface. |
+| `sim-lib-numbers-quantity` | `true` | `custom-build, lib` | Exact semantic dimensions, units, and generic physical quantities for SIM. |
 | `sim-lib-numbers-rational` | `true` | `custom-build, lib` | Exact rational number domain over arbitrary-precision integer numerators and denominators. |
 | `sim-lib-numbers-rk` | `true` | `custom-build, lib` | Runge-Kutta ODE solver plugins for the SIM numeric surface. |
+| `sim-lib-numbers-root` | `true` | `custom-build, lib` | Bracketed and residual-carrying scalar and vector root finding for SIM. |
 | `sim-lib-numbers-signal` | `true` | `custom-build, example, lib` | Deterministic transforms, autoregression, spectral estimation, and guarded signal operations. |
+| `sim-lib-numbers-special` | `true` | `custom-build, lib` | Evidence-carrying real special functions for the SIM number stack. |
 | `sim-lib-numbers-stats` | `true` | `custom-build, example, lib` | Statistical and probability helpers for the SIM number stack. |
 | `sim-lib-numbers-tensor-bcast` | `true` | `custom-build, lib` | NumPy-style tensor broadcasting and promoted element-wise operations for SIM tensors. |
 | `sim-lib-numbers-tensor-bit` | `true` | `custom-build, lib` | Packed boolean tensor specialization with bitwise tensor operations. |
 | `sim-lib-numbers-tensor-cmplxf` | `true` | `custom-build, lib` | Complex f64-pair tensor specialization for SIM tensor values. |
+| `sim-lib-numbers-tensor-decomp` | `true` | `custom-build, lib` | Bounded, evidence-carrying dense matrix decompositions for SIM tensors. |
 | `sim-lib-numbers-tensor-f32` | `true` | `custom-build, lib` | Contiguous f32 tensor specialization with native element-wise math. |
 | `sim-lib-numbers-tensor-f64` | `true` | `custom-build, lib` | Contiguous f64 tensor specialization with native element-wise math. |
 | `sim-lib-numbers-tensor-half` | `true` | `custom-build, lib` | Contiguous f16 and bf16 tensor specializations with f32-widened CPU math. |

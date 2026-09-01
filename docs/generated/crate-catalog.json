@@ -1,6 +1,6 @@
 {
   "generator": "xtask crate-catalog v1",
-  "package_count": 34,
+  "package_count": 45,
   "packages": [
     {
       "description": "Forward and reverse automatic-differentiation primitives for SIM numeric code.",
@@ -120,6 +120,19 @@
       ]
     },
     {
+      "description": "Bounded pseudo-arclength continuation with reviewable predictor/corrector evidence.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-continuation/Cargo.toml",
+      "name": "sim-lib-numbers-continuation",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-continuation/README.md",
+      "root": "crates/sim-lib-numbers-continuation",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
       "description": "Shared scalar-domain substrate: number-value shapes, literal classes, op installers, and promotion metadata.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-core/Cargo.toml",
@@ -140,6 +153,19 @@
       "publish": "true",
       "readme": "crates/sim-lib-numbers-exotic/README.md",
       "root": "crates/sim-lib-numbers-exotic",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Normalized double-double scalar and runtime number domain for SIM.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-extended/Cargo.toml",
+      "name": "sim-lib-numbers-extended",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-extended/README.md",
+      "root": "crates/sim-lib-numbers-extended",
       "target_kinds": [
         "custom-build",
         "lib"
@@ -212,6 +238,45 @@
       ]
     },
     {
+      "description": "Evidence-carrying Radau IIA integration for stiff ODEs and index-1 DAEs.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-implicit/Cargo.toml",
+      "name": "sim-lib-numbers-implicit",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-implicit/README.md",
+      "root": "crates/sim-lib-numbers-implicit",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Sealed, evidence-carrying interval certification for SIM.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-interval/Cargo.toml",
+      "name": "sim-lib-numbers-interval",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-interval/README.md",
+      "root": "crates/sim-lib-numbers-interval",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Validated bounded numerical method plans and canonical cross-domain evidence.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-method/Cargo.toml",
+      "name": "sim-lib-numbers-method",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-method/README.md",
+      "root": "crates/sim-lib-numbers-method",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
       "description": "Numeric differentiation, quadrature, and ODE dispatch over pluggable SIM number backends.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-numeric/Cargo.toml",
@@ -219,6 +284,32 @@
       "publish": "true",
       "readme": "crates/sim-lib-numbers-numeric/README.md",
       "root": "crates/sim-lib-numbers-numeric",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Bounded optimization and evidence-carrying least squares for SIM.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-optimize/Cargo.toml",
+      "name": "sim-lib-numbers-optimize",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-optimize/README.md",
+      "root": "crates/sim-lib-numbers-optimize",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Evidence-carrying dense coefficient polynomials for SIM.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-poly/Cargo.toml",
+      "name": "sim-lib-numbers-poly",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-poly/README.md",
+      "root": "crates/sim-lib-numbers-poly",
       "target_kinds": [
         "custom-build",
         "lib"
@@ -251,6 +342,19 @@
       ]
     },
     {
+      "description": "Exact semantic dimensions, units, and generic physical quantities for SIM.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-quantity/Cargo.toml",
+      "name": "sim-lib-numbers-quantity",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-quantity/README.md",
+      "root": "crates/sim-lib-numbers-quantity",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
       "description": "Exact rational number domain over arbitrary-precision integer numerators and denominators.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-rational/Cargo.toml",
@@ -277,6 +381,19 @@
       ]
     },
     {
+      "description": "Bracketed and residual-carrying scalar and vector root finding for SIM.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-root/Cargo.toml",
+      "name": "sim-lib-numbers-root",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-root/README.md",
+      "root": "crates/sim-lib-numbers-root",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
       "description": "Deterministic transforms, autoregression, spectral estimation, and guarded signal operations.",
       "generated_readme": true,
       "manifest": "crates/sim-lib-numbers-signal/Cargo.toml",
@@ -287,6 +404,19 @@
       "target_kinds": [
         "custom-build",
         "example",
+        "lib"
+      ]
+    },
+    {
+      "description": "Evidence-carrying real special functions for the SIM number stack.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-special/Cargo.toml",
+      "name": "sim-lib-numbers-special",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-special/README.md",
+      "root": "crates/sim-lib-numbers-special",
+      "target_kinds": [
+        "custom-build",
         "lib"
       ]
     },
@@ -338,6 +468,19 @@
       "publish": "true",
       "readme": "crates/sim-lib-numbers-tensor-cmplxf/README.md",
       "root": "crates/sim-lib-numbers-tensor-cmplxf",
+      "target_kinds": [
+        "custom-build",
+        "lib"
+      ]
+    },
+    {
+      "description": "Bounded, evidence-carrying dense matrix decompositions for SIM tensors.",
+      "generated_readme": false,
+      "manifest": "crates/sim-lib-numbers-tensor-decomp/Cargo.toml",
+      "name": "sim-lib-numbers-tensor-decomp",
+      "publish": "true",
+      "readme": "crates/sim-lib-numbers-tensor-decomp/README.md",
+      "root": "crates/sim-lib-numbers-tensor-decomp",
       "target_kinds": [
         "custom-build",
         "lib"
