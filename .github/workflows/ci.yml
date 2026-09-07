@@ -78,7 +78,10 @@ jobs:
       - run: cargo doc --workspace --no-deps
         env:
           RUSTDOCFLAGS: -D warnings
-      - run: cargo run -p xtask -- simdoc --check
+      - name: Regenerate and require byte-current documentation
+        run: |
+          cargo run -p xtask -- simdoc
+          git diff --exit-code -- docs/generated/provenance.json docs/generated/repo-contract.json
 
   check:
     name: check
